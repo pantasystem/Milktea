@@ -28,6 +28,12 @@ data class Instance(
 
     @SerialName("fedibird_capabilities")
     val fedibirdCapabilities: List<String>? = null,
+
+    @SerialName("pleroma")
+    val pleroma: Pleroma? = null,
+
+    @SerialName("feature_quote")
+    val featureQuote: Boolean? = null,
 ) {
     @Serializable
     data class Configuration(
@@ -35,7 +41,10 @@ data class Instance(
         val statuses: Statuses? = null,
 
         @SerialName("polls")
-        val polls: Polls? = null
+        val polls: Polls? = null,
+
+        @SerialName("emoji_reactions")
+        val emojiReactions: EmojiReactions? = null,
     ) {
 
         @Serializable
@@ -52,6 +61,12 @@ data class Instance(
             @SerialName("max_expiration") val maxExpiration: Int? = null,
         )
 
+        @Serializable
+        data class EmojiReactions(
+            @SerialName("max_reactions") val maxReactions: Int? = null,
+            @SerialName("max_reactions_per_account") val maxReactionsPerAccount: Int? = null,
+        )
+
     }
 
 
@@ -59,4 +74,15 @@ data class Instance(
     data class Urls(
         @SerialName("streaming_api") val streamingApi: String
     )
+
+    @Serializable
+    data class Pleroma(
+        @SerialName("metadata") val metadata: Metadata,
+
+    ) {
+        @Serializable
+        data class Metadata(
+            @SerialName("features") val features: List<String>,
+        )
+    }
 }

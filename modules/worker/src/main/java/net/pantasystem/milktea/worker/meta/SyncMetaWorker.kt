@@ -45,14 +45,15 @@ class SyncMetaWorker @AssistedInject constructor(
                         instanceInfoService.sync(it.normalizedInstanceUri)
                     }
                 }.awaitAll()
-            }.forEach { result ->
+            }.count { result ->
                 result.onFailure {
                     logger.error("Fetch instance info failed", it)
-                }.getOrThrow()
-            }
+                }.isSuccess
+            } == accounts.size
         }.fold(
             onSuccess = {
-                Result.success()
+                if (it) Result.success() else Result.failure()
+
             },
             onFailure = {
                 Result.failure()

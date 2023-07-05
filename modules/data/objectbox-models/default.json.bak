@@ -1,0 +1,503 @@
+{
+  "_note1": "KEEP THIS FILE! Check it into a version control system (VCS) like git.",
+  "_note2": "ObjectBox manages crucial IDs for your object model. See docs for details.",
+  "_note3": "If you have VCS merge conflicts, you must resolve them according to ObjectBox docs.",
+  "entities": [
+    {
+      "id": "1:4355718382021751829",
+      "lastPropertyId": "54:1696546822899785376",
+      "name": "NoteRecord",
+      "properties": [
+        {
+          "id": "1:8272452730188899909",
+          "name": "id",
+          "type": 6,
+          "flags": 1
+        },
+        {
+          "id": "2:9063671629732813236",
+          "name": "accountId",
+          "indexId": "2:1359784589476878204",
+          "type": 6,
+          "flags": 8
+        },
+        {
+          "id": "3:7535868506911901175",
+          "name": "noteId",
+          "indexId": "3:9028601148259908010",
+          "type": 9,
+          "flags": 2048
+        },
+        {
+          "id": "4:6442096145905059295",
+          "name": "accountIdAndNoteId",
+          "indexId": "1:7288350540838608646",
+          "type": 9,
+          "flags": 2080
+        },
+        {
+          "id": "5:7710661194467523389",
+          "name": "createdAt",
+          "type": 9
+        },
+        {
+          "id": "6:7628905268626047068",
+          "name": "text",
+          "type": 9
+        },
+        {
+          "id": "7:642718946565483033",
+          "name": "cw",
+          "type": 9
+        },
+        {
+          "id": "8:7875342824717901704",
+          "name": "userId",
+          "indexId": "4:873220635513493863",
+          "type": 9,
+          "flags": 2048
+        },
+        {
+          "id": "9:2696126269908017727",
+          "name": "replyId",
+          "type": 9
+        },
+        {
+          "id": "10:7671147018644324486",
+          "name": "renoteId",
+          "type": 9
+        },
+        {
+          "id": "11:5925666535923240248",
+          "name": "viaMobile",
+          "type": 1
+        },
+        {
+          "id": "12:7278439925725375992",
+          "name": "visibility",
+          "type": 9
+        },
+        {
+          "id": "13:847812078561538164",
+          "name": "fedibirdCircleId",
+          "type": 9
+        },
+        {
+          "id": "14:8110512460338708921",
+          "name": "localOnly",
+          "type": 1
+        },
+        {
+          "id": "15:4694592880431104676",
+          "name": "visibleUserIds",
+          "type": 30
+        },
+        {
+          "id": "16:1186483322771015101",
+          "name": "url",
+          "type": 9
+        },
+        {
+          "id": "17:2024059859948210103",
+          "name": "uri",
+          "type": 9
+        },
+        {
+          "id": "18:7037620531362936612",
+          "name": "renoteCount",
+          "type": 5
+        },
+        {
+          "id": "19:2236394410735542656",
+          "name": "reactionCounts",
+          "type": 13
+        },
+        {
+          "id": "20:3729529343763408216",
+          "name": "emojis",
+          "type": 13
+        },
+        {
+          "id": "21:6036481626668798700",
+          "name": "repliesCount",
+          "type": 5
+        },
+        {
+          "id": "22:7174160995211405661",
+          "name": "fileIds",
+          "type": 30
+        },
+        {
+          "id": "23:6211678249736176180",
+          "name": "pollExpiresAt",
+          "type": 9
+        },
+        {
+          "id": "24:6669217353719482404",
+          "name": "pollMultiple",
+          "type": 1
+        },
+        {
+          "id": "25:3948737789517340243",
+          "name": "pollChoices",
+          "type": 30
+        },
+        {
+          "id": "26:793339216143089151",
+          "name": "pollChoicesVotes",
+          "type": 30
+        },
+        {
+          "id": "27:6452623503349626204",
+          "name": "pollChoicesIsVoted",
+          "type": 30
+        },
+        {
+          "id": "28:4083832487305389369",
+          "name": "myReaction",
+          "type": 9
+        },
+        {
+          "id": "29:9093239415547628997",
+          "name": "channelId",
+          "type": 9
+        },
+        {
+          "id": "30:3324579080801649916",
+          "name": "type",
+          "type": 9
+        },
+        {
+          "id": "31:3063499869455528735",
+          "name": "mastodonReblogged",
+          "type": 1
+        },
+        {
+          "id": "32:9105231982798534371",
+          "name": "mastodonFavourited",
+          "type": 1
+        },
+        {
+          "id": "33:4399131295653378622",
+          "name": "mastodonBookmarked",
+          "type": 1
+        },
+        {
+          "id": "34:7536084876962986464",
+          "name": "mastodonMuted",
+          "type": 1
+        },
+        {
+          "id": "35:4389185113146110546",
+          "name": "mastodonFavoriteCount",
+          "type": 5
+        },
+        {
+          "id": "36:8245146144562689363",
+          "name": "mastodonTagNames",
+          "type": 30
+        },
+        {
+          "id": "37:4295513395759066524",
+          "name": "mastodonTagUrls",
+          "type": 30
+        },
+        {
+          "id": "38:2078366836220201658",
+          "name": "mastodonMentionIds",
+          "type": 30
+        },
+        {
+          "id": "39:4906798512586853797",
+          "name": "mastodonMentionUserNames",
+          "type": 30
+        },
+        {
+          "id": "40:6815318346139013870",
+          "name": "mastodonMentionUrls",
+          "type": 30
+        },
+        {
+          "id": "41:5034900393433514094",
+          "name": "mastodonMentionAccts",
+          "type": 30
+        },
+        {
+          "id": "42:2432945643631783084",
+          "name": "mastodonIsFedibirdQuote",
+          "type": 1
+        },
+        {
+          "id": "43:8599957524389440622",
+          "name": "mastodonPollId",
+          "type": 9
+        },
+        {
+          "id": "44:918472720106521826",
+          "name": "mastodonIsSensitive",
+          "type": 1
+        },
+        {
+          "id": "45:4691087268272065354",
+          "name": "mastodonPureText",
+          "type": 9
+        },
+        {
+          "id": "46:6038607075476419692",
+          "name": "mastodonIsReactionAvailable",
+          "type": 1
+        },
+        {
+          "id": "47:8695980387794841290",
+          "name": "misskeyChannelId",
+          "type": 9
+        },
+        {
+          "id": "48:8716505910147340998",
+          "name": "misskeyChannelName",
+          "type": 9
+        },
+        {
+          "id": "49:603475478183588601",
+          "name": "misskeyIsAcceptingOnlyLikeReaction",
+          "type": 1
+        },
+        {
+          "id": "50:4252978610725343033",
+          "name": "myReactions",
+          "type": 30
+        },
+        {
+          "id": "51:1047146758580551890",
+          "name": "maxReactionsPerAccount",
+          "type": 5
+        },
+        {
+          "id": "52:3207491205296200689",
+          "name": "customEmojiAspectRatioMap",
+          "type": 13
+        },
+        {
+          "id": "53:5101199550893785799",
+          "name": "misskeyIsNotAcceptingSensitiveReaction",
+          "type": 1
+        },
+        {
+          "id": "54:1696546822899785376",
+          "name": "customEmojiUrlAndCachePathMap",
+          "type": 13
+        }
+      ],
+      "relations": []
+    },
+    {
+      "id": "2:2221534449032746185",
+      "lastPropertyId": "4:3861751215772392457",
+      "name": "ThreadRecord",
+      "properties": [
+        {
+          "id": "1:6898596592219565017",
+          "name": "id",
+          "type": 6,
+          "flags": 1
+        },
+        {
+          "id": "2:2473069054411856439",
+          "name": "targetNoteId",
+          "type": 9
+        },
+        {
+          "id": "3:2251620119095233921",
+          "name": "accountId",
+          "type": 6
+        },
+        {
+          "id": "4:3861751215772392457",
+          "name": "targetNoteIdAndAccountId",
+          "indexId": "5:7310482946990627063",
+          "type": 9,
+          "flags": 2080
+        }
+      ],
+      "relations": [
+        {
+          "id": "1:5368363319508289421",
+          "name": "ancestors",
+          "targetId": "1:4355718382021751829"
+        },
+        {
+          "id": "2:5971800600708341253",
+          "name": "descendants",
+          "targetId": "1:4355718382021751829"
+        }
+      ]
+    },
+    {
+      "id": "3:1672123969377209864",
+      "lastPropertyId": "6:7634221281760726222",
+      "name": "ReactionUsersRecord",
+      "properties": [
+        {
+          "id": "1:676934433640553584",
+          "name": "id",
+          "type": 6,
+          "flags": 1
+        },
+        {
+          "id": "2:8038701529227730420",
+          "name": "accountId",
+          "indexId": "6:6489830746707304657",
+          "type": 6,
+          "flags": 8
+        },
+        {
+          "id": "3:2163943456333549192",
+          "name": "noteId",
+          "indexId": "7:7445768282858324655",
+          "type": 9,
+          "flags": 2048
+        },
+        {
+          "id": "4:2143810341282238420",
+          "name": "accountIdAndNoteIdAndReaction",
+          "indexId": "8:2235427975397612884",
+          "type": 9,
+          "flags": 2080
+        },
+        {
+          "id": "5:1292188942965914799",
+          "name": "reaction",
+          "type": 9
+        },
+        {
+          "id": "6:7634221281760726222",
+          "name": "accountIds",
+          "type": 30
+        }
+      ],
+      "relations": []
+    },
+    {
+      "id": "4:5892387857597582401",
+      "lastPropertyId": "3:5250934048025398662",
+      "name": "CustomEmojiAspectRatioRecord",
+      "properties": [
+        {
+          "id": "1:27795029384995044",
+          "name": "id",
+          "type": 6,
+          "flags": 1
+        },
+        {
+          "id": "2:6142530143329153194",
+          "name": "uri",
+          "indexId": "9:4038966684149214552",
+          "type": 9,
+          "flags": 2080
+        },
+        {
+          "id": "3:5250934048025398662",
+          "name": "aspectRatio",
+          "type": 7
+        }
+      ],
+      "relations": []
+    },
+    {
+      "id": "5:192241672526547352",
+      "lastPropertyId": "4:2544401018528846153",
+      "name": "ImageCacheRecord",
+      "properties": [
+        {
+          "id": "1:6002315150189198372",
+          "name": "id",
+          "type": 6,
+          "flags": 1
+        },
+        {
+          "id": "2:7274049216628202631",
+          "name": "sourceUrl",
+          "indexId": "10:5291013203713667470",
+          "type": 9,
+          "flags": 2080
+        },
+        {
+          "id": "3:3858052356230995928",
+          "name": "cachePath",
+          "type": 9
+        },
+        {
+          "id": "4:2544401018528846153",
+          "name": "cachedAt",
+          "type": 6
+        }
+      ],
+      "relations": []
+    },
+    {
+      "id": "6:5418605338436881136",
+      "lastPropertyId": "9:4598656151033408118",
+      "name": "CustomEmojiRecord",
+      "properties": [
+        {
+          "id": "1:271785103207869909",
+          "name": "id",
+          "type": 6,
+          "flags": 1
+        },
+        {
+          "id": "2:6655539627519293459",
+          "name": "serverId",
+          "type": 9
+        },
+        {
+          "id": "3:211101382978291231",
+          "name": "name",
+          "type": 9
+        },
+        {
+          "id": "4:7927231724161011575",
+          "name": "emojiHost",
+          "type": 9
+        },
+        {
+          "id": "5:2060901050158269776",
+          "name": "url",
+          "type": 9
+        },
+        {
+          "id": "6:1468865394375722898",
+          "name": "uri",
+          "type": 9
+        },
+        {
+          "id": "7:3770123434781396120",
+          "name": "type",
+          "type": 9
+        },
+        {
+          "id": "8:8187355251103755613",
+          "name": "category",
+          "type": 9
+        },
+        {
+          "id": "9:4598656151033408118",
+          "name": "aliases",
+          "type": 30
+        }
+      ],
+      "relations": []
+    }
+  ],
+  "lastEntityId": "6:5418605338436881136",
+  "lastIndexId": "10:5291013203713667470",
+  "lastRelationId": "2:5971800600708341253",
+  "lastSequenceId": "0:0",
+  "modelVersion": 5,
+  "modelVersionParserMinimum": 5,
+  "retiredEntityUids": [],
+  "retiredIndexUids": [],
+  "retiredPropertyUids": [],
+  "retiredRelationUids": [],
+  "version": 1
+}

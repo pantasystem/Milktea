@@ -1,25 +1,25 @@
 package net.pantasystem.milktea.data.di.module
 
+import android.content.Context
 import dagger.Binds
 import dagger.Module
+import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import net.pantasystem.milktea.app_store.notes.NoteTranslationStore
 import net.pantasystem.milktea.app_store.notes.TimelineStore
-import net.pantasystem.milktea.data.infrastructure.notes.NoteStreamingImpl
-import net.pantasystem.milktea.data.infrastructure.notes.NoteTranslationStoreImpl
-import net.pantasystem.milktea.data.infrastructure.notes.TimelineStoreImpl
+import net.pantasystem.milktea.common.getPreferences
+import net.pantasystem.milktea.data.infrastructure.notes.*
 import net.pantasystem.milktea.data.infrastructure.notes.draft.DraftNoteRepositoryImpl
 import net.pantasystem.milktea.data.infrastructure.notes.impl.DraftNoteServiceImpl
-import net.pantasystem.milktea.data.infrastructure.notes.impl.InMemoryNoteDataSource
 import net.pantasystem.milktea.data.infrastructure.notes.impl.NoteRepositoryImpl
+import net.pantasystem.milktea.data.infrastructure.notes.impl.ObjectBoxNoteDataSource
 import net.pantasystem.milktea.data.infrastructure.notes.renote.RenotesPagingServiceImpl
-import net.pantasystem.milktea.model.notes.NoteDataSource
-import net.pantasystem.milktea.model.notes.NoteRepository
-import net.pantasystem.milktea.model.notes.NoteStreaming
+import net.pantasystem.milktea.model.notes.*
 import net.pantasystem.milktea.model.notes.draft.DraftNoteRepository
 import net.pantasystem.milktea.model.notes.draft.DraftNoteService
-import net.pantasystem.milktea.model.notes.renote.RenotesPagingService
+import net.pantasystem.milktea.model.notes.repost.RenotesPagingService
 import javax.inject.Singleton
 
 @Module
@@ -28,7 +28,7 @@ abstract class NoteBindModule{
 
     @Binds
     @Singleton
-    abstract fun noteDataSource(inMem: InMemoryNoteDataSource): NoteDataSource
+    abstract fun noteDataSource(inMem: ObjectBoxNoteDataSource): NoteDataSource
 
     @Binds
     @Singleton
@@ -54,6 +54,24 @@ abstract class NoteBindModule{
     @Singleton
     abstract fun provideDraftNoteRepository(impl: DraftNoteRepositoryImpl): DraftNoteRepository
 
+    @Binds
+    @Singleton
+    abstract fun bindReplyStreaming(impl: ReplyStreamingImpl): ReplyStreaming
+
+}
+
+@Module
+@InstallIn(SingletonComponent::class)
+object NoteProvideModule {
+    @Provides
+    @Singleton
+    fun provideTimelineScrollPositionRepository(
+        @ApplicationContext context: Context
+    ): TimelineScrollPositionRepository {
+        return TimelineScrollPositionRepositoryImpl(
+            context.getPreferences()
+        )
+    }
 }
 
 

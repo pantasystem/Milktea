@@ -20,13 +20,13 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.rememberAsyncImagePainter
-import net.pantasystem.milktea.api.misskey.infos.InstanceInfosResponse
+import net.pantasystem.milktea.api.misskey.infos.SimpleInstanceInfo
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun MisskeyInstanceInfoCard(
     modifier: Modifier = Modifier,
-    info: InstanceInfosResponse.InstanceInfo,
+    info: SimpleInstanceInfo,
     selected: Boolean,
     onClick: () -> Unit,
 ) {
@@ -44,7 +44,7 @@ fun MisskeyInstanceInfoCard(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Image(
-                rememberAsyncImagePainter(info.meta.iconUrl),
+                rememberAsyncImagePainter(info.iconUrl),
                 contentDescription = null,
                 modifier = Modifier
                     .size(32.dp)

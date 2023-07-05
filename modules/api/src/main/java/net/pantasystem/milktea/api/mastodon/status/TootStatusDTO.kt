@@ -178,6 +178,12 @@ data class TootStatusDTO(
 
         @SerialName("static_url")
         val staticUrl: String? = null,
+
+        @SerialName("width")
+        val width: Float? = null,
+
+        @SerialName("height")
+        val height: Float? = null,
     ) {
         val isCustomEmoji = url != null || staticUrl != null
 
@@ -191,7 +197,7 @@ data class TootStatusDTO(
             name
         }
         
-        fun getEmoji(): Emoji? {
+        fun getEmoji(cachePath: String? = null): Emoji? {
             if (!isCustomEmoji) {
                 return null
             }
@@ -203,6 +209,12 @@ data class TootStatusDTO(
                 },
                 url = url,
                 host = domain,
+                aspectRatio = if (width == null || height == null) {
+                    null
+                } else {
+                    width / height
+                },
+                cachePath = cachePath,
             )
         }
 

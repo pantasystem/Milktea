@@ -13,6 +13,7 @@ import com.github.penfeizhou.animation.decode.FrameSeqDecoder
 import net.pantasystem.milktea.common.glide.apng.ByteBufferApngDecoder
 import net.pantasystem.milktea.common.glide.apng.FrameSeqDecoderBitmapTranscoder
 import net.pantasystem.milktea.common.glide.apng.FrameSeqDecoderDrawableTranscoder
+import net.pantasystem.milktea.common.glide.apng.StreamApngDecoder
 import net.pantasystem.milktea.common.glide.blurhash.*
 import net.pantasystem.milktea.common.glide.svg.SvgBitmapTransCoder
 import net.pantasystem.milktea.common.glide.svg.SvgDecoder
@@ -24,8 +25,10 @@ import java.nio.ByteBuffer
 class MiGlideModule : AppGlideModule(){
 
     override fun registerComponents(context: Context, glide: Glide, registry: Registry) {
+        val decoder = ByteBufferApngDecoder()
         registry
-            .prepend(ByteBuffer::class.java, FrameSeqDecoder::class.java, ByteBufferApngDecoder())
+            .prepend(InputStream::class.java, FrameSeqDecoder::class.java, StreamApngDecoder(decoder))
+            .prepend(ByteBuffer::class.java, FrameSeqDecoder::class.java, decoder)
             .register(FrameSeqDecoder::class.java, Drawable::class.java, FrameSeqDecoderDrawableTranscoder())
             .register(FrameSeqDecoder::class.java, Bitmap::class.java, FrameSeqDecoderBitmapTranscoder(glide))
             .register(SVG::class.java, BitmapDrawable::class.java, SvgBitmapTransCoder(context))

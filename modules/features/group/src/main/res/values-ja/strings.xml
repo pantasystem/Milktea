@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <string name="cancel">取りやめ</string>
-    <string name="save">保存</string>
-    <string name="group_name">グループ名</string>
-    <string name="create_group">グループを作成</string>
-    <string name="edit_group">グループを編集</string>
-</resources>

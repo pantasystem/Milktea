@@ -27,6 +27,8 @@ import net.pantasystem.milktea.api.mastodon.search.SearchResponse
 import net.pantasystem.milktea.api.mastodon.status.CreateStatus
 import net.pantasystem.milktea.api.mastodon.status.ScheduledStatus
 import net.pantasystem.milktea.api.mastodon.status.TootStatusDTO
+import net.pantasystem.milktea.api.mastodon.suggestion.SuggestionDTO
+import net.pantasystem.milktea.api.mastodon.tag.MastodonTagDTO
 import retrofit2.Response
 import retrofit2.http.*
 
@@ -78,7 +80,7 @@ interface MastodonAPI {
     suspend fun getHomeTimeline(
         @Query("min_id") minId: String? = null,
         @Query("max_id") maxId: String? = null,
-        @Query("visibilities[]", encoded = true) visibilities: List<String>? = null
+        @Query("visibilities[]", encoded = true) visibilities: List<String>? = null,
     ): Response<List<TootStatusDTO>>
 
     @GET("api/v1/timelines/list/{listId}")
@@ -100,7 +102,7 @@ interface MastodonAPI {
         @Query("min_id") minId: String? = null,
         @Query("max_id") maxId: String? = null,
         @Query("since_id") sinceId: String? = null,
-        @Query("limit") limit: Int = 40
+        @Query("limit") limit: Int = 40,
     ): Response<List<MastodonAccountDTO>>
 
     @GET("api/v1/accounts/{accountId}/following")
@@ -109,7 +111,7 @@ interface MastodonAPI {
         @Query("min_id") minId: String? = null,
         @Query("max_id") maxId: String? = null,
         @Query("since_id") sinceId: String? = null,
-        @Query("limit") limit: Int = 40
+        @Query("limit") limit: Int = 40,
     ): Response<List<MastodonAccountDTO>>
 
     @GET("api/v1/accounts/{accountId}")
@@ -120,7 +122,7 @@ interface MastodonAPI {
         @Query(
             "id[]",
             encoded = true
-        ) ids: List<String>
+        ) ids: List<String>,
     ): Response<List<MastodonAccountRelationshipDTO>>
 
     @POST("api/v1/accounts/{accountId}/follow")
@@ -132,7 +134,13 @@ interface MastodonAPI {
     @PUT("api/v1/statuses/{statusId}/emoji_reactions/{emoji}")
     suspend fun reaction(
         @Path("statusId") statusId: String,
-        @Path("emoji") emoji: String
+        @Path("emoji") emoji: String,
+    ): Response<TootStatusDTO>
+
+    @DELETE("api/v1/statuses/{statusId}/emoji_reactions/{emoji}")
+    suspend fun deleteReaction(
+        @Path("statusId") statusId: String,
+        @Path("emoji") emoji: String,
     ): Response<TootStatusDTO>
 
     @POST("api/v1/statuses/{statusId}/emoji_unreaction")
@@ -153,13 +161,13 @@ interface MastodonAPI {
     @GET("api/v1/favourites")
     suspend fun getFavouriteStatuses(
         @Query("min_id") minId: String? = null,
-        @Query("max_id") maxId: String? = null
+        @Query("max_id") maxId: String? = null,
     ): Response<List<TootStatusDTO>>
 
     @POST("api/v1/accounts/{accountId}/mute")
     suspend fun muteAccount(
         @Path("accountId") accountId: String,
-        @Body body: MuteAccountRequest
+        @Body body: MuteAccountRequest,
     ): Response<MastodonAccountRelationshipDTO>
 
     @POST("api/v1/accounts/{accountId}/unmute")
@@ -185,7 +193,7 @@ interface MastodonAPI {
 
     @POST("api/v1/statuses")
     suspend fun createStatus(
-        @Body body: CreateStatus
+        @Body body: CreateStatus,
     ): Response<TootStatusDTO>
 
     @POST("api/v1/status")
@@ -203,7 +211,7 @@ interface MastodonAPI {
     @POST("api/v1/polls/{pollId}/votes")
     suspend fun voteOnPoll(
         @Path("pollId") pollId: String,
-        @Field("choices[]", encoded = true) choices: List<Int>
+        @Field("choices[]", encoded = true) choices: List<Int>,
     ): Response<TootPollDTO>
 
     @POST("api/v1/statuses/{statusId}/mute")
@@ -239,27 +247,37 @@ interface MastodonAPI {
     suspend fun getList(@Path("listId") listId: String): Response<ListDTO>
 
     @POST("api/v1/lists/{listId}/accounts")
-    suspend fun addAccountsToList(@Path("listId") listId: String, @Body body: AddAccountsToList): Response<Unit>
+    suspend fun addAccountsToList(
+        @Path("listId") listId: String,
+        @Body body: AddAccountsToList,
+    ): Response<Unit>
 
     @DELETE("api/v1/lists/{listId}/accounts")
-    suspend fun removeAccountsFromList(@Path("listId") listId: String, @Body body: RemoveAccountsFromList): Response<Unit>
+    suspend fun removeAccountsFromList(
+        @Path("listId") listId: String,
+        @Body body: RemoveAccountsFromList,
+    ): Response<Unit>
 
     @GET("api/v1/lists/{listId}")
     suspend fun getAccountsInList(
         @Path("listId") listId: String,
         @Query("max_id") maxId: String? = null,
-        @Query("min_id") minId: String? = null
+        @Query("min_id") minId: String? = null,
     ): Response<List<MastodonAccountDTO>>
 
     @GET("api/v1/statuses/{statusId}/context")
     suspend fun getStatusesContext(@Path("statusId") statusId: String): Response<ContextDTO>
 
     @PUT("api/v1/media/{mediaId}")
-    suspend fun updateMediaAttachment(@Path("mediaId") mediaId: String, @Body body: UpdateMediaAttachment): Response<TootMediaAttachment>
+    suspend fun updateMediaAttachment(
+        @Path("mediaId") mediaId: String,
+        @Body body: UpdateMediaAttachment,
+    ): Response<TootMediaAttachment>
 
     @GET("api/v2/search")
     suspend fun search(
         @Query("q") q: String,
+        @Query("type") type: String? = null,
         @Query("resolve") resolve: Boolean = true,
         @Query("following") following: Boolean = false,
         @Query("account_id") accountId: String? = null,
@@ -267,7 +285,7 @@ interface MastodonAPI {
         @Query("max_id") maxId: String? = null,
         @Query("min_id") minId: String? = null,
         @Query("limit") limit: Int? = null,
-        @Query("offset") offset: Int? = null
+        @Query("offset") offset: Int? = null,
     ): Response<SearchResponse>
 
     @POST("api/v1/follow_requests/{accountId}/authorize")
@@ -277,16 +295,19 @@ interface MastodonAPI {
     suspend fun rejectFollowRequest(@Path("accountId") accountId: String): Response<MastodonAccountRelationshipDTO>
 
     @GET("api/v1/follow_requests")
-    suspend fun getFollowRequests(@Query("max_id") maxId: String? = null, @Query("min_id") minId: String? = null): Response<List<MastodonAccountDTO>>
+    suspend fun getFollowRequests(
+        @Query("max_id") maxId: String? = null,
+        @Query("min_id") minId: String? = null,
+    ): Response<List<MastodonAccountDTO>>
 
     @GET("api/v1/markers")
     suspend fun getMarkers(
-        @Query("timeline[]", encoded = true) timeline: List<String>
+        @Query("timeline[]", encoded = true) timeline: List<String>,
     ): Response<MarkersDTO>
 
     @POST("api/v1/markers")
     suspend fun saveMarkers(
-        @Body markers: SaveMarkersRequest
+        @Body markers: SaveMarkersRequest,
     ): Response<MarkersDTO>
 
     @GET("api/v1/filters")
@@ -297,4 +318,29 @@ interface MastodonAPI {
 
     @GET("api/v1/instance/rules")
     suspend fun getRules(): Response<List<RuleDTO>>
+
+    @GET("api/v1/statuses/{id}/reblogged_by")
+    suspend fun getRebloggedBy(
+        @Path("id") id: String,
+        @Query("max_id") maxId: String? = null,
+        @Query("since_id") sinceId: String? = null,
+        @Query("min_id") minId: String? = null,
+    ): Response<List<MastodonAccountDTO>>
+
+    @GET("api/v1/trends/statuses")
+    suspend fun getTrendStatuses(
+        @Query("limit") limit: Int? = null,
+        @Query("offset") offset: Int? = null,
+    ): Response<List<TootStatusDTO>>
+
+    @GET("api/v1/trends/tags")
+    suspend fun getTagTrends(
+        @Query("limit") limit: Int? = null,
+        @Query("offset") offset: Int? = null,
+    ): Response<List<MastodonTagDTO>>
+
+    @GET("api/v2/suggestions")
+    suspend fun getSuggestionUsers(
+        @Query("limit") limit: Int? = null
+    ): Response<List<SuggestionDTO>>
 }

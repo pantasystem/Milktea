@@ -14,12 +14,10 @@ import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import net.pantasystem.milktea.common.PageableState
 import net.pantasystem.milktea.common.StateContent
 import net.pantasystem.milktea.data.infrastructure.channel.ChannelListType
-import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.channel.Channel
 
 @Composable
 fun ChannelListStateScreen(
-    account: Account,
     uiState: ChannelListUiState,
     listType: ChannelListType,
     viewModel: ChannelViewModel,
@@ -48,11 +46,9 @@ fun ChannelListStateScreen(
                 is StateContent.Exist -> {
                     items(content.rawContent.size) { index ->
                         val channel = content.rawContent[index]
-                        val isPaged =
-                            account.pages.any { it.pageParams.channelId == channel.id.channelId }
                         ChannelCard(
-                            channel = channel,
-                            isPaged = isPaged,
+                            channel = channel.channel,
+                            isPaged = channel.isAddedTab,
                             onAction = {
                                 when (it) {
                                     is ChannelCardAction.OnToggleTabButtonClicked -> {
@@ -65,7 +61,7 @@ fun ChannelListStateScreen(
                                         viewModel.follow(it.channel.id)
                                     }
                                     is ChannelCardAction.OnClick -> {
-                                        navigateToDetailView.invoke(channel.id)
+                                        navigateToDetailView.invoke(channel.channel.id)
                                     }
                                 }
                             }

@@ -202,5 +202,63 @@ class DatabaseMigrationTest {
         helper.runMigrationsAndValidate(testDb, 41, true)
     }
 
+    @Test
+    @Throws(IOException::class)
+    fun migrate41To42() {
+        helper.createDatabase(testDb, 41)
+        helper.runMigrationsAndValidate(testDb, 42, true)
+    }
 
+    @Test
+    @Throws(IOException::class)
+    fun migrate42To43() {
+        helper.createDatabase(testDb, 42)
+        helper.runMigrationsAndValidate(testDb, 43, true)
+    }
+
+    @Test
+    @Throws(IOException::class)
+    fun migrate43To44() {
+        helper.createDatabase(testDb, 43)
+        helper.runMigrationsAndValidate(testDb, 44, true)
+    }
+
+    @Test
+    @Throws(IOException::class)
+    fun migrate44To45() {
+        helper.createDatabase(testDb, 44)
+        helper.runMigrationsAndValidate(testDb, 45, true)
+    }
+
+    @Test
+    @Throws(IOException::class)
+    fun migrate45To46() {
+        helper.createDatabase(testDb, 45)
+        helper.runMigrationsAndValidate(testDb, 46, true)
+
+    }
+
+    @Test
+    @Throws(IOException::class)
+    fun migrate46To47() {
+        helper.createDatabase(testDb, 46)
+        helper.runMigrationsAndValidate(testDb, 47, true)
+
+    }
+
+    @Test
+    @Throws(IOException::class)
+    fun migrate47To48() {
+        helper.createDatabase(testDb, 47)
+        helper.runMigrationsAndValidate(testDb, 48, true)
+
+    }
+
+    @Test
+    @Throws(IOException::class)
+    fun migrate48To49() {
+        helper.createDatabase(testDb, 48)
+        helper.runMigrationsAndValidate(testDb, 49, true)
+
+    }
 }

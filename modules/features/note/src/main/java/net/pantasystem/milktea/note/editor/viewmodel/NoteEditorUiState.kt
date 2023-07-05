@@ -58,7 +58,7 @@ data class NoteEditorUiState(
             return false
         }
 
-        if (this.sendToState.renoteId != null) {
+        if (this.sendToState.renoteId != null && currentAccount?.instanceType == Account.InstanceType.MISSKEY) {
             return true
         }
         if (this.poll != null && this.poll.checkValidate()) {

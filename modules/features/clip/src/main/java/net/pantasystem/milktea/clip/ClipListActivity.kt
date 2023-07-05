@@ -73,6 +73,7 @@ class ClipListNavigationImpl @Inject constructor(
     companion object {
         const val EXTRA_ACCOUNT_ID = "ClipListActivity.EXTRA_ACCOUNT_ID"
         const val EXTRA_MODE = "ClipListActivity.EXTRA_MODE"
+        const val EXTRA_ADD_TAB_TO_ACCOUNT_ID = "ClipListActivity.EXTRA_ADD_TAB_TO_ACCOUNT_ID"
     }
 
     override fun newIntent(args: ClipListNavigationArgs): Intent {
@@ -80,6 +81,7 @@ class ClipListNavigationImpl @Inject constructor(
             args.accountId?.let {
                 putExtra(EXTRA_ACCOUNT_ID, it)
             }
+            putExtra(EXTRA_ADD_TAB_TO_ACCOUNT_ID, args.addTabToAccountId)
             putExtra(EXTRA_MODE, args.mode.name)
         }
     }

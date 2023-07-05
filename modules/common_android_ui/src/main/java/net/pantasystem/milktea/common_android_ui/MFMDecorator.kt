@@ -5,22 +5,37 @@ import android.app.SearchManager
 import android.content.Intent
 import android.graphics.Color
 import android.graphics.Typeface
-import android.graphics.drawable.Drawable
 import android.net.Uri
-import android.text.*
-import android.text.style.*
+import android.text.Layout
+import android.text.SpannableString
+import android.text.SpannableStringBuilder
+import android.text.Spanned
+import android.text.SpannedString
+import android.text.style.AlignmentSpan
+import android.text.style.BackgroundColorSpan
+import android.text.style.ClickableSpan
+import android.text.style.ForegroundColorSpan
+import android.text.style.QuoteSpan
+import android.text.style.RelativeSizeSpan
+import android.text.style.StrikethroughSpan
+import android.text.style.StyleSpan
 import android.util.Log
 import android.view.View
 import android.widget.TextView
-import com.bumptech.glide.load.DataSource
-import com.bumptech.glide.load.engine.GlideException
-import com.bumptech.glide.request.RequestListener
-import com.bumptech.glide.request.target.Target
 import dagger.hilt.android.EntryPointAccessors
 import dagger.hilt.android.internal.managers.FragmentComponentManager
-import jp.panta.misskeyandroidclient.mfm.*
+import jp.panta.misskeyandroidclient.mfm.EmojiElement
+import jp.panta.misskeyandroidclient.mfm.HashTag
+import jp.panta.misskeyandroidclient.mfm.Mention
+import jp.panta.misskeyandroidclient.mfm.Node
+import jp.panta.misskeyandroidclient.mfm.Search
+import jp.panta.misskeyandroidclient.mfm.Text
 import net.pantasystem.milktea.common.glide.GlideApp
-import net.pantasystem.milktea.common_android.mfm.*
+import net.pantasystem.milktea.common_android.mfm.Element
+import net.pantasystem.milktea.common_android.mfm.ElementType
+import net.pantasystem.milktea.common_android.mfm.Leaf
+import net.pantasystem.milktea.common_android.mfm.Link
+import net.pantasystem.milktea.common_android.mfm.Root
 import net.pantasystem.milktea.common_android.ui.Activities
 import net.pantasystem.milktea.common_android.ui.putActivity
 import net.pantasystem.milktea.common_android.ui.text.DrawableEmojiSpan
@@ -39,8 +54,8 @@ object MFMDecorator {
     fun decorate(
         textView: TextView,
         lazyDecorateResult: LazyDecorateResult?,
+        customEmojiScale: Float = 1f,
         skipEmojis: SkipEmojiHolder = SkipEmojiHolder(),
-        retryCounter: Int = 0,
     ): Spanned? {
         lazyDecorateResult ?: return null
         val emojiAdapter = EmojiAdapter(textView)
@@ -51,7 +66,7 @@ object MFMDecorator {
             lazyDecorateResult,
             skipEmojis,
             emojiAdapter,
-            retryCounter,
+            customEmojiScale,
         ).decorate()
     }
 
@@ -268,6 +283,15 @@ object MFMDecorator {
                     ElementType.SMALL -> {
                         setSpan(RelativeSizeSpan(0.6F))
                     }
+                    ElementType.FnX2 -> {
+                        setSpan(RelativeSizeSpan(2.0F))
+                    }
+                    ElementType.FnX3 -> {
+                        setSpan(RelativeSizeSpan(3.0F))
+                    }
+                    ElementType.FnX4 -> {
+                        setSpan(RelativeSizeSpan(4.0F))
+                    }
                     ElementType.ROOT -> {
 
                     }
@@ -283,11 +307,11 @@ object MFMDecorator {
     }
 
     class LazyEmojiDecorator(
-        val textView: WeakReference<TextView>,
-        val lazyDecorateResult: LazyDecorateResult,
-        val skipEmojis: SkipEmojiHolder,
-        val emojiAdapter: EmojiAdapter,
-        val retryCounter: Int,
+        private val textView: WeakReference<TextView>,
+        private val lazyDecorateResult: LazyDecorateResult,
+        private val skipEmojis: SkipEmojiHolder,
+        private val emojiAdapter: EmojiAdapter,
+        private val customEmojiScale: Float,
     ) {
 
         private val spannableString = SpannableString(lazyDecorateResult.spanned)
@@ -308,44 +332,22 @@ object MFMDecorator {
                 return
             }
             textView.get()?.let { textView ->
-                val emojiSpan = DrawableEmojiSpan(emojiAdapter, emojiElement.emoji.url)
+                val emojiSpan = DrawableEmojiSpan(emojiAdapter, emojiElement.emoji.url, emojiElement.emoji.aspectRatio)
                 spannableString.setSpan(emojiSpan, skippedEmoji.start, skippedEmoji.end, 0)
+                spannableString.setSpan(RelativeSizeSpan(customEmojiScale), skippedEmoji.start, skippedEmoji.end, 0)
+                val height = max(textView.textSize * 0.75f, 10f)
+                val width = when(val aspectRatio = emojiElement.emoji.aspectRatio) {
+                    null -> height
+                    else -> height * aspectRatio
+                }
                 GlideApp.with(textView)
-                    .load(emojiElement.emoji.url)
-                    .override(max(textView.textSize.toInt(), 10))
-                                        .addListener(object : RequestListener<Drawable> {
-                        override fun onLoadFailed(
-                            e: GlideException?,
-                            model: Any?,
-                            target: Target<Drawable>?,
-                            isFirstResource: Boolean
-                        ): Boolean {
-                            val t = this@LazyEmojiDecorator.textView.get()
-                            if (t != null && !skipEmojis.contains(emojiElement.emoji) && t.getTag(R.id.TEXT_VIEW_MFM_TAG_ID) == lazyDecorateResult.sourceText) {
-                                if (retryCounter < 100) {
-
-                                    t.text = decorate(
-                                        t,
-                                        lazyDecorateResult = lazyDecorateResult,
-                                        skipEmojis = skipEmojis.add(emojiElement.emoji),
-                                        retryCounter + 1
-                                    )
-                                }
-                            }
-
-                            return false
-                        }
-
-                        override fun onResourceReady(
-                            resource: Drawable?,
-                            model: Any?,
-                            target: Target<Drawable>?,
-                            dataSource: DataSource?,
-                            isFirstResource: Boolean
-                        ): Boolean {
-                            return false
-                        }
-                    })
+                    .load(emojiElement.emoji.cachePath)
+                    .error(
+                        GlideApp.with(textView)
+                            .load(emojiElement.emoji.url ?: emojiElement.emoji.uri)
+                            .override((width * customEmojiScale).toInt(), (height * customEmojiScale).toInt())
+                    )
+                    .override((width * customEmojiScale).toInt(), (height * customEmojiScale).toInt())
                     .into(emojiSpan.target)
             }
         }

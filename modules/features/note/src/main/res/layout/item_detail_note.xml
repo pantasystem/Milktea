@@ -81,7 +81,7 @@
                     android:layout_below="@id/statusView"
                     android:layout_marginEnd="8dp"
                     android:layout_toEndOf="@id/avatarIcon"
-                    android:textSize="15sp"
+                    android:textSize="@dimen/note_author_info_text_size"
                     android:textStyle="bold" />
 
             <TextView
@@ -91,7 +91,7 @@
                     android:layout_alignParentEnd="true"
                     android:layout_toEndOf="@id/mainName"
                     android:gravity="end"
-                    android:textSize="15sp"
+                    android:textSize="@dimen/note_author_info_text_size"
                     tools:text="36秒前" />
 
             <TextView
@@ -102,7 +102,7 @@
                     android:layout_toEndOf="@id/avatarIcon"
                     android:ellipsize="end"
                     android:singleLine="true"
-                    android:textSize="15sp"
+                    android:textSize="@dimen/note_author_info_text_size"
                     android:textStyle="italic"
 
                     />
@@ -110,7 +110,7 @@
             <TextView
                     android:id="@+id/instanceInfoLabel"
                     tools:text="Misskey.io"
-                    android:textSize="12sp"
+                    android:textSize="@dimen/note_instance_info_text_size"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     tools:background="#8BC34A"
@@ -128,7 +128,8 @@
                     android:layout_height="wrap_content"
                     android:layout_below="@id/instanceInfoLabel"
                     app:textNode="@{note.cwNode}"
-                    tools:text="cwcwcwwcwcw" />
+                    tools:text="cwcwcwwcwcw"
+                    android:textSize="@dimen/note_content_text_size" />
 
 
             <TextView
@@ -157,9 +158,10 @@
                         android:id="@id/text"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:textSize="15sp"
+                        android:textSize="@dimen/note_content_text_size"
                         android:visibility='@{note.text == null ? View.GONE : View.VISIBLE}'
                         textTypeSource="@{note.textNode}"
+                        customEmojiScale="@{note.config.noteCustomEmojiScaleSizeInText}"
                         tools:text="aoiwefjowiaejiowajefihawoefoiawehfioawheoifawoiefioawejfowaoeifjawoiejfoaw" />
 
                 <include
@@ -252,7 +254,7 @@
                             android:layout_height="wrap_content"
                             android:layout_marginEnd="8dp"
                             android:layout_toEndOf="@+id/subAvatarIcon"
-                            android:textSize="15sp"
+                            android:textSize="@dimen/note_author_info_text_size"
 
                             android:textStyle="bold" />
 
@@ -262,7 +264,7 @@
                             android:layout_height="wrap_content"
                             android:layout_toEndOf="@id/subNoteMainName"
                             android:singleLine="true"
-                            android:textSize="15sp"
+                            android:textSize="@dimen/note_author_info_text_size"
                             android:textStyle="italic"
 
                             />
@@ -274,7 +276,8 @@
                             android:layout_below="@+id/subNoteMainName"
                             android:visibility='@{note.cw == null ? View.GONE : View.VISIBLE}'
                             app:textNode="@{note.subCwNode}"
-                            tools:text="cwcwcwwcwcw" />
+                            tools:text="cwcwcwwcwcw"
+                            android:textSize="@dimen/note_content_text_size" />
 
 
                     <TextView
@@ -297,9 +300,10 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_below="@+id/subContentFoldingButton"
-                            android:textSize="15sp"
+                            android:textSize="@dimen/note_content_text_size"
                             android:visibility="@{SafeUnbox.unboxBool(note.subContentFolding) ? View.GONE : View.VISIBLE }"
                             textTypeSource="@{note.subNoteTextNode}"
+                            customEmojiScale="@{note.config.noteCustomEmojiScaleSizeInText}"
                             tools:text="aowjfoiwajehofijawioefjioawejfiowajeiofhawoifahwoiefwaioe" />
 
                     <include
@@ -403,7 +407,8 @@
                         android:layout_weight="1"
                         android:singleLine="true"
                         android:text='@{String.valueOf(SafeUnbox.unbox(note.replyCount))}'
-                        android:visibility='@{note.replyCount == 0 ? View.INVISIBLE : View.VISIBLE}' />
+                        android:visibility='@{note.replyCount == 0 ? View.INVISIBLE : View.VISIBLE}'
+                        android:textSize="@dimen/note_counter_text_size" />
 
                 <ImageButton
                         android:id="@+id/renoteButton"
@@ -429,7 +434,7 @@
                         android:singleLine="true"
                         android:text='@{String.valueOf(SafeUnbox.unbox(note.currentNote.renoteCount))}'
                         android:visibility='@{note.currentNote.renoteCount == 0 ? View.INVISIBLE : View.VISIBLE}'
-
+                        android:textSize="@dimen/note_counter_text_size"
                         />
                 <ImageButton
                         android:id="@+id/toggleMastodonFavouriteButton"
@@ -460,6 +465,7 @@
 
                         tools:text="10"
                         app:emojiCompatEnabled="false"
+                        android:textSize="@dimen/note_counter_text_size"
                         />
 
 
@@ -472,7 +478,7 @@
                         android:onClick="@{ ()-> noteCardActionListener.onReactionButtonClicked(note) }"
                         android:padding="@dimen/note_bottom_action_icon_padding_size"
                         android:scaleType="centerCrop"
-                        app:isReacted="@{note.currentNote.myReaction != null}"
+                        app:isReacted="@{!note.currentNote.canReaction}"
                         isAcceptingOnlyFavoriteReaction="@{note.currentNote.acceptingOnlyLikeReaction}"
                         tools:srcCompat="@drawable/ic_add_circle_outline_black_24dp"
                         android:visibility="@{note.currentNote.supportEmojiReaction ? View.VISIBLE : View.GONE }"
@@ -487,7 +493,7 @@
                         android:layout_weight="1"
                         android:text='@{String.valueOf(SafeUnbox.unboxInt(note.currentNote.reactionsCount))}'
                         android:visibility="@{note.currentNote.supportEmojiReaction ? SafeUnbox.unboxInt(note.currentNote.reactionsCount) == 0 ? View.INVISIBLE : View.VISIBLE : View.GONE }"
-
+                        android:textSize="@dimen/note_counter_text_size"
                         />
 
                 <ImageButton

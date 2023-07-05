@@ -6,7 +6,7 @@
         <import type="net.pantasystem.milktea.common_android.ui.SafeUnbox" />
         <variable
                 name="antenna"
-                type="net.pantasystem.milktea.model.antenna.Antenna" />
+                type="net.pantasystem.milktea.antenna.viewmodel.AntennaListItem" />
         <variable
                 name="antennaListViewModel"
                 type="net.pantasystem.milktea.antenna.viewmodel.AntennaListViewModel" />
@@ -28,9 +28,9 @@
                     android:layout_height="wrap_content"
                     tools:text="かわいいどうぶつたち"
                     android:textSize="20sp"
-                    android:text="@{SafeUnbox.unbox(antenna.name)}"
+                    android:text="@{SafeUnbox.unbox(antenna.antenna.name)}"
                     android:layout_marginEnd="8dp"
-                    android:onClick="@{ ()-> antennaListViewModel.openAntennasTimeline(antenna) }"
+                    android:onClick="@{ ()-> antennaListViewModel.openAntennasTimeline(antenna.antenna) }"
                     />
 
             <ImageButton
@@ -42,8 +42,7 @@
                     style="@style/Widget.AppCompat.Button.Borderless"
                     android:contentDescription="@string/add_to_tab"
                     android:layout_below="@id/antennaNameInputLayout"
-                    android:onClick="@{ ()-> antennaListViewModel.toggleTab(antenna) }"
-                    app:pagedAntennaIds="@{antennaListViewModel.pagedAntennaIds}"
+                    android:onClick="@{ ()-> antennaListViewModel.toggleTab(antenna.antenna) }"
                     app:targetAntenna="@{antenna}"
                     app:tint="?attr/normalIconTint" />
 
@@ -56,7 +55,7 @@
                     android:contentDescription="@string/add_to_tab"
                     android:layout_below="@id/antennaNameInputLayout"
                     android:layout_toStartOf="@id/editAntennaButton"
-                    android:onClick="@{ ()-> antennaListViewModel.confirmDeletionAntenna(antenna) }"
+                    android:onClick="@{ ()-> antennaListViewModel.confirmDeletionAntenna(antenna.antenna) }"
                     app:tint="?attr/normalIconTint" />
 
             <ImageButton
@@ -68,7 +67,7 @@
                     android:contentDescription="@string/add_to_tab"
                     android:layout_below="@id/antennaNameInputLayout"
                     android:layout_alignParentEnd="true"
-                    android:onClick="@{ ()-> antennaListViewModel.editAntenna(antenna) }"
+                    android:onClick="@{ ()-> antennaListViewModel.editAntenna(antenna.antenna) }"
                     app:tint="?attr/normalIconTint" />
         </RelativeLayout>
     </androidx.cardview.widget.CardView>

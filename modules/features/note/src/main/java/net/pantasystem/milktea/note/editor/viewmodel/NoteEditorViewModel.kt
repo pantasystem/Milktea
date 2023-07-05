@@ -11,24 +11,25 @@ import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import net.pantasystem.milktea.app_store.account.AccountStore
 import net.pantasystem.milktea.common.*
+import net.pantasystem.milktea.common.text.UrlPatternChecker
 import net.pantasystem.milktea.common_android.eventbus.EventBus
+import net.pantasystem.milktea.common_android_ui.account.viewmodel.AccountViewModelUiStateHelper
 import net.pantasystem.milktea.common_viewmodel.UserViewData
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.account.UnauthorizedException
+import net.pantasystem.milktea.model.ap.ApResolver
+import net.pantasystem.milktea.model.ap.ApResolverRepository
 import net.pantasystem.milktea.model.channel.Channel
 import net.pantasystem.milktea.model.channel.ChannelRepository
-import net.pantasystem.milktea.model.drive.DriveFileRepository
-import net.pantasystem.milktea.model.drive.FileProperty
-import net.pantasystem.milktea.model.drive.FilePropertyDataSource
-import net.pantasystem.milktea.model.drive.UpdateFileProperty
+import net.pantasystem.milktea.model.drive.*
 import net.pantasystem.milktea.model.emoji.Emoji
 import net.pantasystem.milktea.model.file.AppFile
 import net.pantasystem.milktea.model.file.FilePreviewSource
 import net.pantasystem.milktea.model.file.UpdateAppFileSensitiveUseCase
 import net.pantasystem.milktea.model.instance.FeatureEnables
 import net.pantasystem.milktea.model.instance.InstanceInfo
-import net.pantasystem.milktea.model.instance.InstanceInfoRepository
+//import net.pantasystem.milktea.model.instance.InstanceInfoRepository
 import net.pantasystem.milktea.model.instance.InstanceInfoService
 import net.pantasystem.milktea.model.notes.*
 import net.pantasystem.milktea.model.notes.draft.DraftNoteRepository
@@ -37,6 +38,7 @@ import net.pantasystem.milktea.model.notes.reservation.NoteReservationPostExecut
 import net.pantasystem.milktea.model.setting.LocalConfigRepository
 import net.pantasystem.milktea.model.setting.RememberVisibility
 import net.pantasystem.milktea.model.user.User
+import net.pantasystem.milktea.model.user.UserDataSource
 import net.pantasystem.milktea.note.viewmodel.PlaneNoteViewDataCache
 import net.pantasystem.milktea.worker.note.CreateNoteWorkerExecutor
 import java.util.*
@@ -46,7 +48,8 @@ import javax.inject.Inject
 class NoteEditorViewModel @Inject constructor(
     loggerFactory: Logger.Factory,
     planeNoteViewDataCacheFactory: PlaneNoteViewDataCache.Factory,
-    accountStore: AccountStore,
+    userDataSource: UserDataSource,
+    private val accountStore: AccountStore,
     private val getAllMentionUsersUseCase: GetAllMentionUsersUseCase,
     private val filePropertyDataSource: FilePropertyDataSource,
     private val instanceInfoService: InstanceInfoService,
@@ -63,8 +66,9 @@ class NoteEditorViewModel @Inject constructor(
     private val localConfigRepository: LocalConfigRepository,
     private val featureEnables: FeatureEnables,
     private val noteRelationGetter: NoteRelationGetter,
-    private val instanceInfoRepository: InstanceInfoRepository,
+//    private val instanceInfoRepository: InstanceInfoRepository,
     private val updateSensitiveUseCase: UpdateAppFileSensitiveUseCase,
+    private val apResolverRepository: ApResolverRepository,
     private val savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
 
@@ -72,7 +76,8 @@ class NoteEditorViewModel @Inject constructor(
 
     private val logger = loggerFactory.create("NoteEditorViewModel")
 
-    private val currentAccount = MutableStateFlow<Account?>(null)
+    private val _currentAccount = MutableStateFlow<Account?>(null)
+    val currentAccount = _currentAccount.asStateFlow()
 
     val text = savedStateHandle.getStateFlow<String?>(NoteEditorSavedStateKey.Text.name, null)
 
@@ -87,7 +92,7 @@ class NoteEditorViewModel @Inject constructor(
     )
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    val instanceInfoType = currentAccount.filterNotNull().flatMapLatest {
+    val instanceInfoType = _currentAccount.filterNotNull().flatMapLatest {
         instanceInfoService.observe(it.normalizedInstanceUri)
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
 
@@ -139,7 +144,7 @@ class NoteEditorViewModel @Inject constructor(
 
     @OptIn(ExperimentalCoroutinesApi::class)
     val maxTextLength =
-        currentAccount.filterNotNull().flatMapLatest { account ->
+        _currentAccount.filterNotNull().flatMapLatest { account ->
             instanceInfoService.observe(account.normalizedInstanceUri).filterNotNull()
                 .map { meta ->
                     meta.maxNoteTextLength
@@ -151,25 +156,25 @@ class NoteEditorViewModel @Inject constructor(
         )
 
 
-    val enableFeatures = currentAccount.filterNotNull().map {
+    val enableFeatures = _currentAccount.filterNotNull().map {
         featureEnables.enableFeatures(it.normalizedInstanceUri)
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptySet())
 
-    val maxFileCount = currentAccount.filterNotNull().mapNotNull {
+    val maxFileCount = _currentAccount.filterNotNull().mapNotNull {
         instanceInfoService.find(it.normalizedInstanceUri).getOrNull()?.maxFileCount
     }.stateIn(viewModelScope + Dispatchers.IO, started = SharingStarted.Eagerly, initialValue = 4)
 
-    @OptIn(ExperimentalCoroutinesApi::class)
-    val instanceInfo = currentAccount.filterNotNull().flatMapLatest {
-        instanceInfoRepository.observeByHost(it.getHost())
-    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
+//    @OptIn(ExperimentalCoroutinesApi::class)
+//    val instanceInfo = _currentAccount.filterNotNull().flatMapLatest {
+//        instanceInfoRepository.observeByHost(it.getHost())
+//    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
 
 
     private val _visibility = savedStateHandle.getStateFlow<Visibility?>(
         NoteEditorSavedStateKey.Visibility.name,
         null
     )
-    val visibility = combine(_visibility, currentAccount.filterNotNull().map {
+    val visibility = combine(_visibility, _currentAccount.filterNotNull().map {
         localConfigRepository.getRememberVisibility(it.accountId).getOrElse {
             RememberVisibility.None
         }
@@ -224,7 +229,7 @@ class NoteEditorViewModel @Inject constructor(
     }.stateIn(viewModelScope + Dispatchers.IO, started = SharingStarted.Lazily, initialValue = 1500)
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    val channels = currentAccount.filterNotNull().flatMapLatest {
+    val channels = _currentAccount.filterNotNull().flatMapLatest {
         suspend {
             channelRepository.findFollowedChannels(it.accountId).onFailure {
                 logger.error("load channel error", it)
@@ -241,7 +246,7 @@ class NoteEditorViewModel @Inject constructor(
     @FlowPreview
     @ExperimentalCoroutinesApi
     val currentUser: StateFlow<UserViewData?> =
-        currentAccount.filterNotNull().map {
+        _currentAccount.filterNotNull().map {
             val userId = User.Id(it.accountId, it.remoteId)
             userViewDataFactory.create(
                 userId,
@@ -282,7 +287,7 @@ class NoteEditorViewModel @Inject constructor(
         noteEditorSendToState,
         filePreviewSources,
         poll,
-        currentAccount,
+        _currentAccount,
     ) { formState, sendToState, files, poll, account ->
         NoteEditorUiState(
             formState = formState,
@@ -298,7 +303,7 @@ class NoteEditorViewModel @Inject constructor(
     }.asLiveData()
 
     private val cache = planeNoteViewDataCacheFactory.create({
-        requireNotNull(currentAccount.value)
+        requireNotNull(_currentAccount.value)
     }, viewModelScope)
 
     val replyTo = replyId.map { id ->
@@ -308,6 +313,14 @@ class NoteEditorViewModel @Inject constructor(
     }.catch {
         emit(null)
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
+
+    val accountUiState = AccountViewModelUiStateHelper(
+        _currentAccount,
+        accountStore,
+        userDataSource,
+        instanceInfoService,
+        viewModelScope,
+    ).uiState
 
     private val _fileSizeInvalidEvent =
         MutableSharedFlow<FileSizeInvalidEvent>(extraBufferCapacity = 10)
@@ -321,25 +334,8 @@ class NoteEditorViewModel @Inject constructor(
 
     val isSaveNoteAsDraft = EventBus<Long?>()
 
-    init {
-        accountStore.observeCurrentAccount.filterNotNull().map {
-            it to noteEditorSwitchAccountExecutor(
-                currentAccount.value,
-                noteEditorSendToState.value,
-                it
-            )
-        }.onEach { (account, result) ->
-            if (account.accountId != currentAccount.value?.accountId && currentAccount.value != null) {
-                savedStateHandle.setReplyId(result.replyId)
-                savedStateHandle.setRenoteId(result.renoteId)
-                savedStateHandle.setChannelId(result.channelId)
-            }
-            if (currentAccount.value != null) {
-                savedStateHandle.setVisibility(null)
-            }
-            currentAccount.value = account
-        }.launchIn(viewModelScope + Dispatchers.IO)
-    }
+    var focusType: NoteEditorFocusEditTextType = NoteEditorFocusEditTextType.Text
+
 
     fun setRenoteTo(noteId: Note.Id?) {
         savedStateHandle.setRenoteId(noteId)
@@ -388,7 +384,7 @@ class NoteEditorViewModel @Inject constructor(
                     currentAccount = account
                 )
             }.onSuccess { note ->
-                currentAccount.value = note.currentAccount
+                _currentAccount.value = note.currentAccount
                 savedStateHandle.applyBy(note)
             }
         }
@@ -432,7 +428,7 @@ class NoteEditorViewModel @Inject constructor(
 
 
     fun post() {
-        currentAccount.value?.let { account ->
+        _currentAccount.value?.let { account ->
             viewModelScope.launch {
                 val reservationPostingAt =
                     savedStateHandle.getNoteEditingUiState(
@@ -466,7 +462,7 @@ class NoteEditorViewModel @Inject constructor(
     }
 
     fun toggleNsfw(appFile: AppFile) {
-        if (currentAccount.value?.instanceType == Account.InstanceType.MASTODON) {
+        if (_currentAccount.value?.instanceType == Account.InstanceType.MASTODON) {
             return
         }
         when (appFile) {
@@ -488,7 +484,7 @@ class NoteEditorViewModel @Inject constructor(
 
     fun toggleSensitive() {
         val sensitive = savedStateHandle.getSensitive()
-        if (currentAccount.value?.instanceType == Account.InstanceType.MASTODON) {
+        if (_currentAccount.value?.instanceType == Account.InstanceType.MASTODON) {
             viewModelScope.launch {
                 savedStateHandle.setFiles(
                     savedStateHandle.getFiles().mapNotNull { appFile ->
@@ -514,10 +510,7 @@ class NoteEditorViewModel @Inject constructor(
                         driveFileRepository.update(
                             UpdateFileProperty(
                                 fileId = file.id,
-                                comment = file.comment,
-                                folderId = file.folderId,
-                                isSensitive = file.isSensitive,
-                                name = name
+                                name = ValueType.Some(name)
                             )
                         ).getOrThrow()
                     }.onFailure {
@@ -541,10 +534,7 @@ class NoteEditorViewModel @Inject constructor(
                         driveFileRepository.update(
                             UpdateFileProperty(
                                 fileId = file.id,
-                                comment = comment,
-                                folderId = file.folderId,
-                                isSensitive = file.isSensitive,
-                                name = file.name
+                                comment = ValueType.Some(comment),
                             )
                         ).getOrThrow()
                     }.onFailure {
@@ -561,18 +551,18 @@ class NoteEditorViewModel @Inject constructor(
             file
         )
         savedStateHandle.setFiles(files)
-        val account = currentAccount.value ?: return@launch
-        val localFile = when (file) {
-            is AppFile.Local -> file
-            is AppFile.Remote -> return@launch
-        }
-        val instanceInfo =
-            instanceInfoRepository.findByHost(account.getHost()).getOrNull() ?: return@launch
-        val maxFileSize = instanceInfo.clientMaxBodyByteSize ?: return@launch
-
-        if (maxFileSize < (localFile.fileSize ?: 0)) {
-            _fileSizeInvalidEvent.tryEmit(FileSizeInvalidEvent(file, instanceInfo, account))
-        }
+//        val account = _currentAccount.value ?: return@launch
+//        val localFile = when (file) {
+//            is AppFile.Local -> file
+//            is AppFile.Remote -> return@launch
+//        }
+//        val instanceInfo =
+//            instanceInfoRepository.findByHost(account.getHost()).getOrNull() ?: return@launch
+//        val maxFileSize = instanceInfo.clientMaxBodyByteSize ?: return@launch
+//
+//        if (maxFileSize < (localFile.fileSize ?: 0)) {
+//            _fileSizeInvalidEvent.tryEmit(FileSizeInvalidEvent(file, instanceInfo, account))
+//        }
     }
 
 
@@ -629,6 +619,7 @@ class NoteEditorViewModel @Inject constructor(
 
     fun setCw(text: String?) {
         savedStateHandle.setCw(text)
+        focusType = NoteEditorFocusEditTextType.Text
     }
 
     fun setVisibility(visibility: Visibility) {
@@ -682,11 +673,24 @@ class NoteEditorViewModel @Inject constructor(
     }
 
     fun addEmoji(emoji: String, pos: Int): Int {
-        val builder = StringBuilder(savedStateHandle.getText() ?: "")
-        builder.insert(pos, emoji)
-        savedStateHandle.setText(builder.toString())
-        logger.debug("position:${pos + emoji.length - 1}")
-        return pos + emoji.length
+        when(focusType) {
+            NoteEditorFocusEditTextType.Cw -> {
+                val builder = StringBuilder(savedStateHandle.getCw() ?: "")
+                logger.debug("pos:$pos")
+                builder.insert(pos, emoji)
+                savedStateHandle.setCw(builder.toString())
+                logger.debug("position:${pos + emoji.length - 1}")
+                return pos + emoji.length
+            }
+            NoteEditorFocusEditTextType.Text -> {
+                val builder = StringBuilder(savedStateHandle.getText() ?: "")
+                builder.insert(pos, emoji)
+                savedStateHandle.setText(builder.toString())
+                logger.debug("position:${pos + emoji.length - 1}")
+                return pos + emoji.length
+            }
+        }
+
     }
 
     fun setSchedulePostAt(instant: Instant?) {
@@ -701,7 +705,7 @@ class NoteEditorViewModel @Inject constructor(
             return
         }
         viewModelScope.launch {
-            when (val account = currentAccount.value) {
+            when (val account = _currentAccount.value) {
                 null -> Result.failure(UnauthorizedException())
                 else -> Result.success(account)
             }.mapCancellableCatching { account ->
@@ -710,6 +714,28 @@ class NoteEditorViewModel @Inject constructor(
                 isSaveNoteAsDraft.event = result.draftNoteId
             }.onFailure { e ->
                 logger.error("下書き保存に失敗した", e)
+            }
+        }
+    }
+
+    fun onPastePostUrl(text: String, start: Int, beforeText: String, count: Int) = viewModelScope.launch {
+        val urlText = text.substring(start, start + count)
+        val ca = _currentAccount.value ?: return@launch
+        val canQuote = canQuote()
+
+        if (!canQuote) {
+            return@launch
+        }
+
+        if (UrlPatternChecker.isMatch(urlText)) {
+            apResolverRepository.resolve(ca.accountId, urlText).onSuccess {
+                when(it) {
+                    is ApResolver.TypeNote -> {
+                        setRenoteTo(it.note.id)
+                        setText(beforeText)
+                    }
+                    is ApResolver.TypeUser -> return@launch
+                }
             }
         }
     }
@@ -723,10 +749,62 @@ class NoteEditorViewModel @Inject constructor(
         savedStateHandle.applyBy(NoteEditorUiState())
     }
 
+    suspend fun canQuote(): Boolean {
+        val ca = _currentAccount.value ?: return false
+        return instanceInfoService.find(ca.normalizedInstanceUri).map {
+            it.canQuote
+        }.getOrElse { false }
+    }
+
+    fun setAccountId(accountId: Long?) {
+        viewModelScope.launch {
+            (accountId?.let {
+                accountRepository.get(accountId)
+            } ?: accountRepository.getCurrentAccount()).onSuccess {
+                setAccount(it)
+            }.onFailure {
+                logger.error("アカウントの取得に失敗した", it)
+            }
+        }
+    }
+
+    fun setAccountIdAndSwitchCurrentAccount(accountId: Long?) {
+        viewModelScope.launch {
+            (accountId?.let {
+                accountRepository.get(accountId)
+            } ?: accountRepository.getCurrentAccount()).onSuccess {
+                setAccount(it)
+                accountStore.setCurrent(it)
+            }.onFailure {
+                logger.error("アカウントの取得に失敗した", it)
+            }
+        }
+    }
+
     private fun setUpUserViewData(userId: User.Id): UserViewData {
         return userViewDataFactory.create(userId, viewModelScope, dispatcher)
     }
 
+    private suspend fun setAccount(account: Account) = runCancellableCatching<Unit> {
+        val result = noteEditorSwitchAccountExecutor(
+            _currentAccount.value,
+            noteEditorSendToState.value,
+            account,
+        )
+
+        if (account.accountId != _currentAccount.value?.accountId && _currentAccount.value != null) {
+            savedStateHandle.setReplyId(result.replyId)
+            savedStateHandle.setRenoteId(result.renoteId)
+            savedStateHandle.setChannelId(result.channelId)
+        }
+        if (_currentAccount.value != null) {
+            savedStateHandle.setVisibility(null)
+        }
+        logger.debug {
+            "currentAccount:${account.userName}@${account.getHost()}"
+        }
+        _currentAccount.value = account
+    }
 
 }
 
@@ -736,3 +814,7 @@ data class FileSizeInvalidEvent(
     val instanceInfo: InstanceInfo,
     val account: Account
 )
+
+enum class NoteEditorFocusEditTextType {
+    Cw, Text
+}

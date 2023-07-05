@@ -88,6 +88,8 @@ class MetaRepositoryImpl @Inject constructor(
     }
 
     private suspend fun fetchEmojis(instanceDomain: String): List<Emoji>? {
-        return misskeyAPIProvider.get(instanceDomain).getEmojis(EmptyRequest).throwIfHasError().body()?.emojis
+        return misskeyAPIProvider.get(instanceDomain).getEmojis(EmptyRequest).throwIfHasError().body()?.emojis?.map {
+            it.toModel()
+        }
     }
 }

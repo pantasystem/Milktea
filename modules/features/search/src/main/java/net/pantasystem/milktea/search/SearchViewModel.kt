@@ -9,8 +9,11 @@ import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import net.pantasystem.milktea.common.*
+import net.pantasystem.milktea.common.text.UrlPatternChecker
 import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.account.CurrentAccountWatcher
+import net.pantasystem.milktea.model.ap.ApResolver
+import net.pantasystem.milktea.model.ap.ApResolverRepository
 import net.pantasystem.milktea.model.hashtag.HashtagRepository
 import net.pantasystem.milktea.model.search.SearchHistory
 import net.pantasystem.milktea.model.search.SearchHistoryRepository
@@ -28,15 +31,19 @@ class SearchViewModel @Inject constructor(
     private val userDataSource: UserDataSource,
     private val hashtagRepository: HashtagRepository,
     private val searchHistoryRepository: SearchHistoryRepository,
+    private val apResolverRepository: ApResolverRepository,
     private val savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
+    companion object {
+        const val EXTRA_ACCOUNT_ID = "net.pantasystem.milktea.search.SearchViewModel.EXTRA_ACCOUNT_ID"
+    }
     private val logger by lazy {
         loggerFactory.create("SearchViewModel")
     }
 
     val keyword = savedStateHandle.getStateFlow<String>("keyword", "")
-    private val currentAccountWatcher = CurrentAccountWatcher(null, accountRepository)
+    private val currentAccountWatcher = CurrentAccountWatcher(savedStateHandle[EXTRA_ACCOUNT_ID], accountRepository)
 
     @OptIn(ExperimentalCoroutinesApi::class)
     val hashtagResult = keyword.filter {
@@ -46,7 +53,7 @@ class SearchViewModel @Inject constructor(
     }.flatMapLatest {
         suspend {
             hashtagRepository.search(
-                currentAccountWatcher.getAccount().normalizedInstanceUri,
+                currentAccountWatcher.getAccount().accountId,
                 it
             ).getOrThrow()
         }.asLoadingStateFlow()
@@ -144,20 +151,33 @@ class SearchViewModel @Inject constructor(
         savedStateHandle["keyword"] = word
     }
 
-    suspend fun onQueryTextSubmit(word: String) {
+    suspend fun onQueryTextSubmit(word: String): SubmitResult {
         if (word.isBlank()) {
-            return
+            return SubmitResult.Cancelled
         }
+        val accountId = currentAccountWatcher.getAccount().accountId
         runCancellableCatching {
             searchHistoryRepository.add(
                 SearchHistory(
-                    accountId = currentAccountWatcher.getAccount().accountId,
+                    accountId = accountId,
                     keyword = word,
                 )
             ).getOrThrow()
         }.onFailure {
             logger.error("検索履歴の保存に失敗", it)
         }
+        if (!UrlPatternChecker.isMatch(word)) {
+            return SubmitResult.Search(word)
+        }
+
+        return apResolverRepository.resolve(accountId, word).fold(
+            onSuccess = {
+                SubmitResult.ApResolved(it)
+            },
+            onFailure = {
+                SubmitResult.Search(word)
+            }
+        )
     }
 
     fun deleteSearchHistory(id: Long) = viewModelScope.launch {
@@ -182,6 +202,13 @@ private data class States(
     val hashtagsState: ResultState<List<String>>,
 )
 
+sealed interface SubmitResult {
+    data class Search(val query: String) : SubmitResult
+
+    data class ApResolved(val apResolve: ApResolver) : SubmitResult
+
+    object Cancelled : SubmitResult
+}
 private fun String.isHashTagFormat(): Boolean {
     return startsWith("#") && length > 1
 }

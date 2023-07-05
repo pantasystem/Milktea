@@ -22,11 +22,11 @@ import net.pantasystem.milktea.data.infrastructure.streaming.MediatorMainEventDi
 import net.pantasystem.milktea.data.streaming.SocketWithAccountProvider
 import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.account.ClientIdRepository
+import net.pantasystem.milktea.model.notes.NoteDataSource
 import net.pantasystem.milktea.worker.SyncNodeInfoCacheWorker
 import net.pantasystem.milktea.worker.drive.CleanupUnusedDriveCacheWorker
+import net.pantasystem.milktea.worker.emoji.cache.CacheCustomEmojiImageWorker
 import net.pantasystem.milktea.worker.filter.SyncMastodonFilterWorker
-import net.pantasystem.milktea.worker.instance.ScheduleAuthInstancesPostWorker
-import net.pantasystem.milktea.worker.instance.SyncInstanceInfoWorker
 import net.pantasystem.milktea.worker.meta.SyncMetaWorker
 import net.pantasystem.milktea.worker.sw.RegisterAllSubscriptionRegistration
 import net.pantasystem.milktea.worker.user.SyncLoggedInUserInfoWorker
@@ -79,6 +79,8 @@ class MiApplication : Application(), Configuration.Provider {
     @Inject
     internal lateinit var memoryCacheCleaner: MemoryCacheCleaner
 
+    @Inject
+    internal lateinit var noteDataSource: NoteDataSource
 
     @OptIn(ExperimentalCoroutinesApi::class)
     override fun onCreate() {
@@ -189,21 +191,27 @@ class MiApplication : Application(), Configuration.Provider {
                 ExistingPeriodicWorkPolicy.REPLACE,
                 SyncLoggedInUserInfoWorker.createPeriodicWorkRequest(),
             )
-            enqueueUniquePeriodicWork(
-                "scheduleAuthInstancePostWorker",
-                ExistingPeriodicWorkPolicy.REPLACE,
-                ScheduleAuthInstancesPostWorker.createPeriodicWorkRequest(),
-            )
-            enqueueUniquePeriodicWork(
-                "syncInstanceInfoWorker",
-                ExistingPeriodicWorkPolicy.REPLACE,
-                SyncInstanceInfoWorker.createPeriodicWorkRequest(),
-            )
+//            enqueueUniquePeriodicWork(
+//                "scheduleAuthInstancePostWorker",
+//                ExistingPeriodicWorkPolicy.REPLACE,
+//                ScheduleAuthInstancesPostWorker.createPeriodicWorkRequest(),
+//            )
+//            enqueueUniquePeriodicWork(
+//                "syncInstanceInfoWorker",
+//                ExistingPeriodicWorkPolicy.REPLACE,
+//                SyncInstanceInfoWorker.createPeriodicWorkRequest(),
+//            )
             enqueueUniquePeriodicWork(
                 "syncMastodonWordFilter",
                 ExistingPeriodicWorkPolicy.REPLACE,
                 SyncMastodonFilterWorker.createPeriodicWorkerRequest(),
             )
+            enqueueUniquePeriodicWork(
+                "cacheEmojiImages",
+                ExistingPeriodicWorkPolicy.REPLACE,
+                CacheCustomEmojiImageWorker.createPeriodicWorkRequest(),
+            )
+
             enqueue(
                 SyncRenoteMutesWorker.createOneTimeWorkRequest()
             )

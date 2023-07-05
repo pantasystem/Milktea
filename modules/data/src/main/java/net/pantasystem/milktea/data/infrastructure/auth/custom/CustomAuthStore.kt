@@ -63,6 +63,20 @@ class CustomAuthStore(private val sharedPreferences: SharedPreferences){
                     apply()
                 }
             }
+            is TemporarilyAuthState.Pleroma -> {
+                sharedPreferences.edit().apply {
+                    putString(MASTODON_SCOPE, customAuthBridge.scope)
+                    putString(INSTANCE_DOMAIN, customAuthBridge.instanceDomain)
+                    putString(REDIRECT_URI, customAuthBridge.app.redirectUri)
+
+                    putLong(ENABLED_DATE_END, customAuthBridge.enabledDateEnd.time)
+                    putString(MASTODON_APP_CLIENT_ID, customAuthBridge.app.clientId)
+                    putString(MASTODON_APP_CLIENT_SECRET, customAuthBridge.app.clientSecret)
+                    putString(MASTODON_APP_ID, customAuthBridge.app.id)
+                    putString(MASTODON_APP_NAME, customAuthBridge.app.name)
+                    putString(TYPE, "pleroma")
+                }.apply()
+            }
         }
 
 
@@ -96,6 +110,20 @@ class CustomAuthStore(private val sharedPreferences: SharedPreferences){
                 "mastodon" -> {
                     TemporarilyAuthState.Mastodon(
                         app = AppType.Mastodon(
+                            clientId = it.getString(MASTODON_APP_CLIENT_ID, null)?: return null,
+                            clientSecret = it.getString(MASTODON_APP_CLIENT_SECRET, null)?: return null,
+                            redirectUri = it.getString(REDIRECT_URI, null)?: return null,
+                            id = it.getString(MASTODON_APP_ID, null)?: return null,
+                            name = it.getString(MASTODON_APP_NAME, null)?: return null,
+                        ),
+                        instanceDomain = instanceDomain,
+                        enabledDateEnd = enabledDate,
+                        scope = it.getString(MASTODON_SCOPE, null)?: return null
+                    )
+                }
+                "pleroma" -> {
+                    TemporarilyAuthState.Pleroma(
+                        app = AppType.Pleroma(
                             clientId = it.getString(MASTODON_APP_CLIENT_ID, null)?: return null,
                             clientSecret = it.getString(MASTODON_APP_CLIENT_SECRET, null)?: return null,
                             redirectUri = it.getString(REDIRECT_URI, null)?: return null,

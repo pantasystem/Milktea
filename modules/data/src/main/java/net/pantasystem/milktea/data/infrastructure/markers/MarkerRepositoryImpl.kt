@@ -31,7 +31,7 @@ class MarkerRepositoryImpl @Inject constructor(
             val account = accountRepository.get(accountId).getOrThrow()
             when(account.instanceType) {
                 Account.InstanceType.MISSKEY -> throw IllegalArgumentException("Not support markers feature when use misskey.")
-                Account.InstanceType.MASTODON -> {
+                Account.InstanceType.MASTODON, Account.InstanceType.PLEROMA -> {
                     val body = mastodonAPIProvider.get(account).getMarkers(types.map {
                         it.name.lowercase()
                     }).throwIfHasError().body()
@@ -51,7 +51,7 @@ class MarkerRepositoryImpl @Inject constructor(
             val account = accountRepository.get(accountId).getOrThrow()
             when(account.instanceType) {
                 Account.InstanceType.MISSKEY -> throw IllegalArgumentException("Not support markers feature when use misskey.")
-                Account.InstanceType.MASTODON -> {
+                Account.InstanceType.MASTODON, Account.InstanceType.PLEROMA -> {
                     val body = mastodonAPIProvider.get(account).saveMarkers(
                         markers = SaveMarkersRequest(
                             home = params.home?.let {

@@ -32,6 +32,14 @@ internal class CustomEmojiApiAdapterImpl @Inject constructor(
                     it.toEmoji()
                 }
             }
+            is NodeInfo.SoftwareType.Pleroma -> {
+                val emojis = mastodonAPIProvider.get(nodeInfo.host).getCustomEmojis()
+                    .throwIfHasError()
+                    .body()
+                emojis?.map {
+                    it.toEmoji()
+                }
+            }
             is NodeInfo.SoftwareType.Misskey -> {
                 if (
                     nodeInfo.type.getVersion() >= Version("13")
@@ -42,6 +50,8 @@ internal class CustomEmojiApiAdapterImpl @Inject constructor(
                             .throwIfHasError()
                             .body()
                     emojis?.emojis?.map {
+                        it.toModel()
+                    }?.map {
                         it.copy(
                             url = if (it.url == null) V13EmojiUrlResolver.resolve(it, "https://${nodeInfo.host}") else it.url,
                             uri = if (it.uri == null) V13EmojiUrlResolver.resolve(it, "https://${nodeInfo.host}") else it.uri,

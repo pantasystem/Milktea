@@ -4,18 +4,14 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import net.pantasystem.milktea.api.misskey.drive.DeleteFileDTO
 import net.pantasystem.milktea.api.misskey.drive.ShowFile
-import net.pantasystem.milktea.api.misskey.drive.UpdateFileDTO
-import net.pantasystem.milktea.api.misskey.drive.from
+import net.pantasystem.milktea.api.misskey.drive.toJsonObject
 import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.common.throwIfHasError
 import net.pantasystem.milktea.common_android.hilt.IODispatcher
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
 import net.pantasystem.milktea.data.converters.FilePropertyDTOEntityConverter
 import net.pantasystem.milktea.model.account.GetAccount
-import net.pantasystem.milktea.model.drive.DriveFileRepository
-import net.pantasystem.milktea.model.drive.FileProperty
-import net.pantasystem.milktea.model.drive.FilePropertyDataSource
-import net.pantasystem.milktea.model.drive.UpdateFileProperty
+import net.pantasystem.milktea.model.drive.*
 import net.pantasystem.milktea.model.file.AppFile
 import javax.inject.Inject
 
@@ -50,14 +46,10 @@ class DriveFileRepositoryImpl @Inject constructor(
             val api = misskeyAPIProvider.get(account.normalizedInstanceUri)
             val fileProperty = find(id)
             val result = api.updateFile(
-                UpdateFileDTO(
-                    account.token,
-                    fileId = id.fileId,
-                    isSensitive = !fileProperty.isSensitive,
-                    name = fileProperty.name,
-                    folderId = fileProperty.folderId,
-                    comment = fileProperty.comment
-                )
+                UpdateFileProperty(
+                    fileProperty.id,
+                    isSensitive = ValueType.Some(!fileProperty.isSensitive)
+                ).toJsonObject(account.token)
             ).throwIfHasError()
 
             driveFileDataSource.add(
@@ -100,9 +92,8 @@ class DriveFileRepositoryImpl @Inject constructor(
                 val res =
                     misskeyAPIProvider.get(getAccount.get(updateFileProperty.fileId.accountId))
                         .updateFile(
-                            UpdateFileDTO.from(
+                            updateFileProperty.toJsonObject(
                                 getAccount.get(updateFileProperty.fileId.accountId).token,
-                                updateFileProperty,
                             )
                         ).throwIfHasError()
                         .body()!!

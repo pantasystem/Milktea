@@ -6,23 +6,27 @@
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:orientation="horizontal"
-    android:padding="5dp"
+    android:paddingHorizontal="6dp"
+    android:paddingVertical="4dp"
+
 
     android:layout_marginStart="4dp"
     android:layout_marginBottom="2dp"
     android:layout_marginTop="2dp"
     tools:background="@drawable/shape_normal_reaction_backgruond"
-
+    android:gravity="center_vertical"
 
 
     >
     <ImageView
         android:id="@+id/reactionImage"
-        android:layout_width="20dp"
+        android:layout_width="0dp"
+        android:minWidth="20dp"
         android:layout_height="20dp"
         android:layout_marginEnd="4dp"
         tools:ignore="ContentDescription"
-        android:scaleType="fitCenter" />
+        android:scaleType="fitCenter"
+        android:layout_weight="1" />
     <TextView
         android:id="@+id/reactionText"
         android:layout_width="wrap_content"

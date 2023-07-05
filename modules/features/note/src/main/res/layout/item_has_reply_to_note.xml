@@ -72,7 +72,7 @@
                             android:layout_toEndOf="@id/replyToAvatarIcon"
                             android:id="@+id/replyToUserName"
                             android:textStyle="bold"
-                            android:textSize="15sp"
+                            android:textSize="@dimen/note_author_info_text_size"
                             tools:text="userName"
 
                             android:layout_marginEnd="8dp"
@@ -84,7 +84,7 @@
                             android:textStyle="italic"
                             android:singleLine="true"
                             android:ellipsize="end"
-                            android:textSize="15sp"
+                            android:textSize="@dimen/note_author_info_text_size"
                             />
 
                     <TextView
@@ -96,6 +96,7 @@
                             android:layout_toEndOf="@+id/replyToAvatarIcon"
                             android:layout_below="@+id/replyToUserName"
                             android:visibility='@{hasReplyToNote.replyTo.cw == null ? View.GONE : View.VISIBLE}'
+                            android:textSize="@dimen/note_content_text_size"
                             />
 
 
@@ -124,10 +125,11 @@
                         <TextView
                                 android:id="@id/text"
                                 android:layout_width="wrap_content" android:layout_height="wrap_content"
-                                android:textSize="15sp"
+                                android:textSize="@dimen/note_content_text_size"
                                 tools:text="aoiwefjowiaejiowajefihawoefoiawehfioawheoifawoiefioawejfowaoeifjawoiejfoaw"
                                 android:visibility='@{hasReplyToNote.replyTo.text == null ? View.GONE : View.VISIBLE}'
                                 textTypeSource="@{hasReplyToNote.replyTo.textNode}"
+                                customEmojiScale="@{hasReplyToNote.config.noteCustomEmojiScaleSizeInText}"
                                 />
 
                     </RelativeLayout>

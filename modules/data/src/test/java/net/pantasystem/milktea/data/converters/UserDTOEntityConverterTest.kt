@@ -10,6 +10,9 @@ import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.user.User
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
+import org.mockito.kotlin.any
+import org.mockito.kotlin.doReturn
+import org.mockito.kotlin.mock
 import kotlin.time.Duration.Companion.days
 
 class UserDTOEntityConverterTest {
@@ -17,7 +20,23 @@ class UserDTOEntityConverterTest {
     @OptIn(ExperimentalCoroutinesApi::class)
     @Test
     fun converter_GiveDetailedData() = runTest {
-        val converter = UserDTOEntityConverter()
+        val converter = UserDTOEntityConverter(
+            mock() {
+                onBlocking {
+                    getAndConvertToMap(any())
+                } doReturn mapOf()
+            },
+            mock() {
+                onBlocking {
+                    findIn(any())
+                } doReturn Result.success(emptyList())
+            },
+            mock() {
+                onBlocking {
+                    findBySourceUrls(any())
+                } doReturn emptyList()
+            }
+        )
 
         val userDTO = UserDTO(
             id = "test-id",
@@ -89,7 +108,23 @@ class UserDTOEntityConverterTest {
     @Test
     @OptIn(ExperimentalCoroutinesApi::class)
     fun convert_GiveSimpleUser() = runTest {
-        val converter = UserDTOEntityConverter()
+        val converter = UserDTOEntityConverter(
+            mock() {
+                onBlocking {
+                    getAndConvertToMap(any())
+                } doReturn mapOf()
+            },
+            mock() {
+                onBlocking {
+                    findIn(any())
+                } doReturn Result.success(emptyList())
+            },
+            mock() {
+                onBlocking {
+                    findBySourceUrls(any())
+                } doReturn emptyList()
+            }
+        )
 
         val userDTO = UserDTO(
             id = "test-id",

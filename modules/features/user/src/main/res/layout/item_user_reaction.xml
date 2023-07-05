@@ -66,6 +66,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         elapsedTime="@{bindingModel.reaction.createdAt}"
+                        isDisplayTimestampsAsAbsoluteDates="@{bindingModel.config.displayTimestampsAsAbsoluteDates}"
                         android:textColor="?attr/colorPrimary"
                         app:emojiCompatEnabled="false"
                     />

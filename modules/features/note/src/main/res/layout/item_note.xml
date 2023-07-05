@@ -37,6 +37,7 @@
 
                     android:onClick="@{()-> noteCardActionListener.onUserClicked(note.note.user)}"
                     app:statusMessageTargetViewNote="@{note}"
+                    android:textSize="@dimen/note_content_text_size"
             />
             <include
                     android:id="@+id/simpleNote"

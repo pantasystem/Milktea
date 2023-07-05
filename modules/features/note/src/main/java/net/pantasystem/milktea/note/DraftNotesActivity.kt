@@ -11,6 +11,10 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class DraftNotesActivity : AppCompatActivity() {
 
+    companion object {
+        const val EXTRA_DRAFT_NOTE_ID = "DraftNotesActivity.EXTRA_DRAFT_NOTE_ID"
+    }
+
     @Inject
     lateinit var applyTheme: ApplyTheme
 

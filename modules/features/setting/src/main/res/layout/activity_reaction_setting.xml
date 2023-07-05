@@ -20,7 +20,7 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                app:title="@string/reaction_picker"/>
+                app:title="@string/settings_emoji_picker"/>
 
         <ScrollView
                 android:layout_width="0dp"
@@ -51,6 +51,19 @@
                         android:entries="@array/reaction_picker_type"/>
 
                 <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textSize="20sp"
+                    android:textColor="?android:textColorPrimary"
+                    android:text="@string/settings_emoji_display_size"/>
+                <Spinner
+                    android:id="@+id/emojiDisplaySizeSelection"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="16dp"
+                    />
+
+                <TextView
                         android:id="@+id/textView24"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -76,12 +89,15 @@
                         android:focusableInTouchMode="true"
                         android:singleLine="true"
                         android:imeOptions="actionSend"
-                        />
+
+                    />
+
 
                 <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:text="@string/set_the_reaction_displayed_in_the_reaction_picker"/>
+
 
                 <Button
                         android:id="@+id/importReactionFromWebButton"

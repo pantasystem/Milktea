@@ -30,7 +30,10 @@ data class CreateStatus(
     val language: String? = null,
 
     @SerialName("scheduled_at")
-    val scheduledAt: Instant? = null
+    val scheduledAt: Instant? = null,
+
+    @SerialName("quote_id")
+    val quoteId: String? = null,
 ) {
 
     @kotlinx.serialization.Serializable

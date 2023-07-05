@@ -15,7 +15,7 @@ class PageableTemplate(val account: Account?) {
     fun localTimeline(title: String) =
         Page(account?.accountId?: - 1, title, 0, Pageable.LocalTimeline())
 
-    fun homeTimeline(title: String, withFiles: Boolean? = null) = Page(account?.accountId?: - 1, title, 0, Pageable.HomeTimeline(withFiles = withFiles))
+    fun homeTimeline(title: String, withFiles: Boolean? = null) = Page(account?.accountId?: - 1, title, 0, Pageable.HomeTimeline(withFiles = withFiles), isSavePagePosition = true)
 
     fun userListTimeline(listId: String) = Pageable.UserListTimeline(listId = listId)
 
@@ -30,10 +30,16 @@ class PageableTemplate(val account: Account?) {
         return Page(account?.accountId?: - 1, title, 0, Pageable.Show(noteId))
     }
     fun tag(tag: String): Page {
-        return Page(account?.accountId?: - 1, tag, 0, Pageable.SearchByTag(tag.replace("#", "")))
+        return when(account?.instanceType) {
+            Account.InstanceType.MASTODON, Account.InstanceType.PLEROMA -> Page(account.accountId, tag, 0, Pageable.Mastodon.HashTagTimeline(tag.replace("#", "")))
+            else -> Page(account?.accountId?: - 1, tag, 0, Pageable.SearchByTag(tag.replace("#", "")))
+        }
     }
     fun search(query: String): Page {
-        return Page(account?.accountId?: - 1, query, 0, Pageable.Search(query))
+        return when(account?.instanceType) {
+            Account.InstanceType.MASTODON, Account.InstanceType.PLEROMA -> Page(account.accountId, query, 0, Pageable.Mastodon.SearchTimeline(query))
+            else -> Page(account?.accountId?: - 1, query, 0, Pageable.Search(query))
+        }
     }
     fun featured(title: String) = Page(account?.accountId?: - 1, title, 0, Pageable.Featured(null))
     fun notification(title: String) = Page(account?.accountId?: - 1, title, 0, Pageable.Notification())
@@ -51,7 +57,7 @@ class PageableTemplate(val account: Account?) {
         return Page(account?.accountId?: - 1, title, 0, Pageable.Antenna(antennaId))
     }
     fun antenna(antenna: Antenna): Page {
-        return Page(antenna.id.accountId, antenna.name, 0, Pageable.Antenna(antenna.id.antennaId))
+        return Page(account?.accountId ?: antenna.id.accountId, antenna.name, 0, Pageable.Antenna(antenna.id.antennaId))
     }
 
     fun mastodonPublicTimeline(title: String): Page {
@@ -77,7 +83,8 @@ class PageableTemplate(val account: Account?) {
             account?.accountId ?: -1,
             title,
             0,
-            Pageable.Mastodon.HomeTimeline
+            Pageable.Mastodon.HomeTimeline,
+            isSavePagePosition = true,
         )
     }
 

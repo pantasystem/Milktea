@@ -1,23 +1,39 @@
 package net.pantasystem.milktea.auth
 
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.*
+import androidx.compose.material.Button
+import androidx.compose.material.Icon
+import androidx.compose.material.IconButton
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.OutlinedTextField
+import androidx.compose.material.Scaffold
+import androidx.compose.material.Text
+import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import net.pantasystem.milktea.api.misskey.infos.InstanceInfosResponse
+import kotlinx.coroutines.flow.distinctUntilChanged
+import net.pantasystem.milktea.api.misskey.infos.SimpleInstanceInfo
 import net.pantasystem.milktea.auth.viewmodel.SignUpUiState
 import net.pantasystem.milktea.common.ResultState
 import net.pantasystem.milktea.common.StateContent
+import net.pantasystem.milktea.common.ui.isScrolledToTheEnd
 import net.pantasystem.milktea.model.instance.InstanceInfoType
 
 @Composable
@@ -26,9 +42,21 @@ fun SignUpScreen(
     uiState: SignUpUiState,
     onInputKeyword: (String) -> Unit,
     onNextButtonClicked: (InstanceInfoType) -> Unit,
-    onSelected: (InstanceInfosResponse.InstanceInfo) -> Unit,
-    onNavigateUp: () -> Unit
+    onSelected: (SimpleInstanceInfo) -> Unit,
+    onNavigateUp: () -> Unit,
+    onBottomReached: () -> Unit,
 ) {
+
+    val listState = rememberLazyListState()
+    LaunchedEffect(Unit) {
+        snapshotFlow {
+            listState.isScrolledToTheEnd()
+        }.distinctUntilChanged().collect {
+            if (it) {
+                onBottomReached()
+            }
+        }
+    }
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         topBar = {
@@ -60,7 +88,7 @@ fun SignUpScreen(
                     .padding(horizontal = 16.dp),
                 maxLines = 1,
                 label = {
-                    Text(stringResource(R.string.instance_domain))
+                    Text(stringResource(R.string.auth_instance_domain))
                 },
                 trailingIcon = {
                     IconButton(
@@ -78,7 +106,8 @@ fun SignUpScreen(
             LazyColumn(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .weight(1f)
+                    .weight(1f),
+                state = listState,
             ) {
                 items(uiState.filteredInfos) { instance ->
                     MisskeyInstanceInfoCard(
@@ -103,10 +132,11 @@ fun SignUpScreen(
                 Button(
                     shape = RoundedCornerShape(32.dp),
                     onClick = {
-                        when(val content = uiState.instanceInfo.content) {
+                        when (val content = uiState.instanceInfo.content) {
                             is StateContent.Exist -> {
                                 onNextButtonClicked(content.rawContent)
                             }
+
                             is StateContent.NotExist -> Unit
                         }
                     },

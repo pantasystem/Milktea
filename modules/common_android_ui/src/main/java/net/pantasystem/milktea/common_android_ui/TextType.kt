@@ -36,7 +36,7 @@ fun getTextType(account: Account, note: NoteRelation, instanceEmojis: Map<String
                 )
             }
         }
-        Account.InstanceType.MASTODON -> {
+        Account.InstanceType.MASTODON, Account.InstanceType.PLEROMA -> {
             note.note.text?.let {
                 val option = note.note.type as? Note.Type.Mastodon
                 TextType.Mastodon(

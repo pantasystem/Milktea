@@ -24,10 +24,9 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.google.android.material.composethemeadapter.MdcTheme
 import dagger.hilt.android.AndroidEntryPoint
+import getStringFromStringSource
 import net.pantasystem.milktea.common.ResultState
 import net.pantasystem.milktea.common.StateContent
-import net.pantasystem.milktea.model.user.query.*
-import net.pantasystem.milktea.search.R
 import net.pantasystem.milktea.user.UserCardActionHandler
 import net.pantasystem.milktea.user.compose.UserDetailCard
 import net.pantasystem.milktea.user.compose.UserDetailCardAction
@@ -75,7 +74,7 @@ class ExploreFragment : Fragment() {
                                         .fillMaxWidth()
                                 ) {
                                     Text(
-                                        item.title,
+                                        getStringFromStringSource(item.title),
                                         fontSize = 16.sp,
                                         modifier = Modifier.padding(4.dp)
                                     )
@@ -120,48 +119,6 @@ class ExploreFragment : Fragment() {
         }.rootView
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-
-        super.onViewCreated(view, savedInstanceState)
-
-        val queries = when (ExploreType.values()[requireArguments().getInt("type")]) {
-            ExploreType.Local -> {
-                listOf(
-                    ExploreItem(
-                        getString(R.string.trending_users),
-                        FindUsersQuery.trendingUser(),
-                    ),
-                    ExploreItem(
-                        getString(R.string.users_with_recent_activity),
-                        FindUsersQuery.usersWithRecentActivity(),
-                    ),
-                    ExploreItem(
-                        getString(R.string.newly_joined_users),
-                        FindUsersQuery.newlyJoinedUsers()
-                    )
-
-                )
-            }
-            ExploreType.Fediverse -> {
-                listOf(
-                    ExploreItem(
-                        getString(R.string.trending_users),
-                        FindUsersQuery.remoteTrendingUser()
-                    ),
-                    ExploreItem(
-                        getString(R.string.users_with_recent_activity),
-                        FindUsersQuery.remoteUsersWithRecentActivity(),
-                    ),
-                    ExploreItem(
-                        getString(R.string.newly_discovered_users),
-                        FindUsersQuery.newlyDiscoveredUsers()
-                    ),
-                )
-            }
-        }
-        exploreViewModel.setExplores(queries)
-
-    }
 
     fun onAction(event: UserDetailCardAction) {
         UserCardActionHandler(requireActivity(), toggleFollowViewModel)
@@ -170,5 +127,6 @@ class ExploreFragment : Fragment() {
 }
 
 enum class ExploreType {
-    Local, Fediverse,
+    Local, Fediverse, MastodonUserSuggestions, UserSuggestionsByReaction
 }
+

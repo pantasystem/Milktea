@@ -20,13 +20,11 @@ import kotlinx.coroutines.withContext
 import net.pantasystem.milktea.common_android.ui.text.CustomEmojiDecorator
 import net.pantasystem.milktea.model.notes.Note
 import net.pantasystem.milktea.model.notes.reaction.Reaction
-import net.pantasystem.milktea.model.notes.reaction.ReactionHistoryDataSource
 import net.pantasystem.milktea.model.notes.reaction.ReactionHistoryRequest
 import net.pantasystem.milktea.note.R
 import net.pantasystem.milktea.note.databinding.DialogReactionHistoryPagerBinding
 import net.pantasystem.milktea.note.reaction.viewmodel.ReactionHistoryPagerUiState
 import net.pantasystem.milktea.note.reaction.viewmodel.ReactionHistoryPagerViewModel
-import javax.inject.Inject
 
 @AndroidEntryPoint
 class ReactionHistoryPagerDialog : BottomSheetDialogFragment() {
@@ -55,8 +53,6 @@ class ReactionHistoryPagerDialog : BottomSheetDialogFragment() {
 
     private val pagerViewModel by viewModels<ReactionHistoryPagerViewModel>()
 
-    @Inject
-    internal lateinit var reactionHistoryDataSource: ReactionHistoryDataSource
 
     private val aId: Long by lazy(LazyThreadSafetyMode.NONE) {
         requireArguments().getLong(EXTRA_ACCOUNT_ID, -1).apply {
@@ -179,10 +175,4 @@ class ReactionHistoryPagerDialog : BottomSheetDialogFragment() {
         dismissAllowingStateLoss()
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-        requireActivity().lifecycleScope.launch(Dispatchers.IO) {
-            reactionHistoryDataSource.clear(noteId)
-        }
-    }
 }

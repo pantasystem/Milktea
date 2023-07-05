@@ -27,7 +27,7 @@ class FavoriteAPIAdapter @Inject constructor(
                     .throwIfHasError()
                 SuccessfulResponseData.Misskey
             }
-            Account.InstanceType.MASTODON -> {
+            Account.InstanceType.MASTODON, Account.InstanceType.PLEROMA -> {
                 val status = mastodonAPIProvider.get(account).favouriteStatus(noteId.noteId)
                     .throwIfHasError()
                     .body()
@@ -44,7 +44,7 @@ class FavoriteAPIAdapter @Inject constructor(
                     .throwIfHasError()
                 SuccessfulResponseData.Misskey
             }
-            Account.InstanceType.MASTODON -> {
+            Account.InstanceType.MASTODON, Account.InstanceType.PLEROMA -> {
                 val status = mastodonAPIProvider.get(account).unfavouriteStatus(noteId.noteId)
                     .throwIfHasError()
                     .body()

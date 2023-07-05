@@ -64,7 +64,24 @@ data class UserRecord(
 
     @ColumnInfo(name = "id")
     @PrimaryKey(autoGenerate = true) val id: Long = 0L,
-)
+) {
+    companion object {
+        fun from(user: User): UserRecord {
+            return UserRecord(
+                accountId = user.id.accountId,
+                serverId = user.id.id,
+                avatarUrl = user.avatarUrl,
+                host = user.host,
+                isBot = user.isBot,
+                isCat = user.isCat,
+                isSameHost = user.isSameHost,
+                name = user.name,
+                userName = user.userName,
+                avatarBlurhash = user.avatarBlurhash,
+            )
+        }
+    }
+}
 
 @Entity(
     tableName = "user_info_state",
@@ -266,6 +283,12 @@ data class UserEmojiRecord(
     @ColumnInfo(name = "userId")
     val userId: Long,
 
+    @ColumnInfo(name = "aspectRatio")
+    val aspectRatio: Float? = null,
+
+    @ColumnInfo(name = "cachePath")
+    val cachePath: String? = null,
+
     @ColumnInfo(name = "id")
     @PrimaryKey(autoGenerate = true) val id: Long = 0L,
 ) {
@@ -274,7 +297,29 @@ data class UserEmojiRecord(
             name = name,
             url = url,
             uri = uri,
+            aspectRatio = aspectRatio,
+            cachePath = cachePath,
         )
+    }
+
+    fun isEqualToModel(model: Emoji): Boolean {
+        return name == model.name &&
+            url == model.url &&
+            uri == model.uri &&
+            aspectRatio == model.aspectRatio &&
+            cachePath == model.cachePath
+    }
+}
+
+fun List<UserEmojiRecord>?.isEqualToModels(models: List<Emoji>): Boolean {
+    if (this == null && models.isEmpty()) return true
+    if (this == null) return false
+    if (size != models.size) return false
+    val records = this.toSet()
+    return models.all {  model ->
+        records.any { record ->
+            record.isEqualToModel(model)
+        }
     }
 }
 

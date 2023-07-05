@@ -17,7 +17,7 @@ data class Account(
 ) : Serializable {
 
     enum class InstanceType {
-        MISSKEY, MASTODON
+        MISSKEY, MASTODON, PLEROMA
     }
 
     constructor(
@@ -54,6 +54,10 @@ data class Account(
         return UrlHelper.getHost(instanceDomain).also {
             _host = it
         }
+    }
+
+    fun getAcct(): String {
+        return "@$userName@${getHost()}"
     }
 
 }

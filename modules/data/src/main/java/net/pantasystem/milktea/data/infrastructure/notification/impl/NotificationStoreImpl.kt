@@ -62,7 +62,7 @@ class NotificationStoreImpl(
                     misskeyAPIProvider = misskeyAPIProvider,
                 )
             }
-            Account.InstanceType.MASTODON -> {
+            Account.InstanceType.MASTODON, Account.InstanceType.PLEROMA -> {
                 MstNotificationEntityLoader(
                     account = account,
                     mastodonAPIProvider = mastodonAPIProvider,

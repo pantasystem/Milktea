@@ -40,14 +40,7 @@ open class PlaneNoteViewData(
 
     var filterResult: FilterResult = FilterResult.NotExecuted
 
-    val toShowNote: NoteRelation
-        get() {
-            return if (note.note.isRenote() && !note.note.hasContent()) {
-                note.renote ?: note
-            } else {
-                note
-            }
-        }
+    val toShowNote: NoteRelation = note.contentNote
 
     val currentNote: StateFlow<Note> = noteDataSource.observeOne(toShowNote.note.id).map {
         it ?: toShowNote.note

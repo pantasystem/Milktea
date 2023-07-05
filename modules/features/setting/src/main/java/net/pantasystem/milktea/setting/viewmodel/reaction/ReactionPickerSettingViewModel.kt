@@ -6,16 +6,20 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import net.pantasystem.milktea.app_store.account.AccountStore
 import net.pantasystem.milktea.app_store.setting.SettingStore
 import net.pantasystem.milktea.common_android.eventbus.EventBus
+import net.pantasystem.milktea.data.infrastructure.notes.reaction.impl.usercustom.ReactionUserSetting
+import net.pantasystem.milktea.data.infrastructure.notes.reaction.impl.usercustom.ReactionUserSettingDao
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.notes.reaction.LegacyReaction
 import net.pantasystem.milktea.model.notes.reaction.ReactionSelection
-import net.pantasystem.milktea.data.infrastructure.notes.reaction.impl.usercustom.ReactionUserSetting
-import net.pantasystem.milktea.data.infrastructure.notes.reaction.impl.usercustom.ReactionUserSettingDao
+import net.pantasystem.milktea.model.setting.DefaultConfig
+import net.pantasystem.milktea.model.setting.LocalConfigRepository
 import net.pantasystem.milktea.model.setting.ReactionPickerType
 import javax.inject.Inject
 
@@ -24,6 +28,7 @@ class ReactionPickerSettingViewModel @Inject constructor(
     private val reactionUserSettingDao: ReactionUserSettingDao,
     private val settingStore: SettingStore,
     val accountStore: AccountStore,
+    private val configRepository: LocalConfigRepository,
 ) : ViewModel(), ReactionSelection {
 
 
@@ -36,6 +41,12 @@ class ReactionPickerSettingViewModel @Inject constructor(
 
     private var mExistingSettingList: List<ReactionUserSetting>? = null
     private val mReactionSettingReactionNameMap = LinkedHashMap<String, ReactionUserSetting>()
+
+    val config = configRepository.observe().stateIn(
+        viewModelScope,
+        SharingStarted.WhileSubscribed(5_000),
+        configRepository.get().getOrNull() ?: DefaultConfig.config
+    )
 
     init {
         viewModelScope.launch(Dispatchers.IO) {
@@ -136,10 +147,21 @@ class ReactionPickerSettingViewModel @Inject constructor(
         reactionPickerType = type
     }
 
+    fun onEmojiSizeSelected(size: Int) {
+        viewModelScope.launch {
+            val c = configRepository.get().getOrNull() ?: DefaultConfig.config
+            configRepository.save(
+                c.copy(
+                    emojiPickerEmojiDisplaySize = size
+                )
+            )
+        }
+    }
+
     private fun toReactionUserSettingFromTextTypeReaction(
         account: Account,
         index: Int,
-        reaction: String
+        reaction: String,
     ): ReactionUserSetting {
         return ReactionUserSetting(
             reaction,

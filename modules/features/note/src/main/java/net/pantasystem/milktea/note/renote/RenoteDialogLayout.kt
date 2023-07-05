@@ -47,11 +47,14 @@ fun RenoteDialogContent(
 
             }
 
-            NormalBottomSheetDialogSelectionLayout(
-                onClick = onQuoteRenoteButtonClicked,
-                icon = Icons.Default.FormatQuote,
-                text = stringResource(id = R.string.quote_renote)
-            )
+
+            if (uiState.canQuote) {
+                NormalBottomSheetDialogSelectionLayout(
+                    onClick = onQuoteRenoteButtonClicked,
+                    icon = Icons.Default.FormatQuote,
+                    text = stringResource(id = R.string.quote_renote)
+                )
+            }
         }
     }
 }

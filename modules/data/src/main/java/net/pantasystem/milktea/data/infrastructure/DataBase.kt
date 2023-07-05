@@ -18,7 +18,6 @@ import net.pantasystem.milktea.data.infrastructure.drive.DriveFileRecordDao
 import net.pantasystem.milktea.data.infrastructure.emoji.Utf8EmojiDTO
 import net.pantasystem.milktea.data.infrastructure.emoji.Utf8EmojisDAO
 import net.pantasystem.milktea.data.infrastructure.emoji.db.CustomEmojiAliasRecord
-import net.pantasystem.milktea.data.infrastructure.emoji.db.CustomEmojiDAO
 import net.pantasystem.milktea.data.infrastructure.emoji.db.CustomEmojiRecord
 import net.pantasystem.milktea.data.infrastructure.filter.db.MastodonFilterDao
 import net.pantasystem.milktea.data.infrastructure.filter.db.MastodonWordFilterRecord
@@ -114,8 +113,10 @@ import net.pantasystem.milktea.data.infrastructure.user.renote.mute.db.RenoteMut
         RenoteMuteRecord::class,
 
         FedibirdCapabilitiesRecord::class,
+
+        PleromaMetadataFeatures::class,
     ],
-    version = 42,
+    version = 49,
     exportSchema = true,
     autoMigrations = [
         AutoMigration(from = 11, to = 12),
@@ -149,6 +150,13 @@ import net.pantasystem.milktea.data.infrastructure.user.renote.mute.db.RenoteMut
         AutoMigration(from = 39, to = 40),
         AutoMigration(from = 40, to = 41),
         AutoMigration(from = 41, to = 42),
+        AutoMigration(from = 42, to = 43),
+        AutoMigration(from = 43, to = 44),
+        AutoMigration(from = 44, to = 45),
+        AutoMigration(from = 45, to = 46),
+        AutoMigration(from = 46, to = 47),
+        AutoMigration(from = 47, to = 48),
+        AutoMigration(from = 48, to = 49),
     ],
     views = [UserView::class, GroupMemberView::class, UserListMemberView::class]
 )
@@ -206,7 +214,7 @@ abstract class DataBase : RoomDatabase() {
 
     abstract fun mastodonInstanceInfoDao(): MastodonInstanceInfoDAO
 
-    abstract fun customEmojiDao(): CustomEmojiDAO
+//    abstract fun customEmojiDao(): CustomEmojiDAO
 
     abstract fun notificationJsonCacheRecordDAO(): NotificationJsonCacheRecordDAO
 

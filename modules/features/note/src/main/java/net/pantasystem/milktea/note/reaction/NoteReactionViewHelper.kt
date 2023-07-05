@@ -5,27 +5,33 @@ import android.view.View
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
-import androidx.databinding.BindingAdapter
 import dagger.hilt.android.EntryPointAccessors
 import net.pantasystem.milktea.common.glide.GlideApp
+import net.pantasystem.milktea.common_android.ui.FontSizeHelper.setMemoFontPxSize
 import net.pantasystem.milktea.common_android.ui.VisibilityHelper.setMemoVisibility
 import net.pantasystem.milktea.common_android_ui.BindingProvider
 import net.pantasystem.milktea.model.notes.reaction.LegacyReaction
 import net.pantasystem.milktea.model.notes.reaction.Reaction
+import net.pantasystem.milktea.note.reaction.CustomEmojiImageViewSizeHelper.applySizeByAspectRatio
+import net.pantasystem.milktea.note.reaction.CustomEmojiImageViewSizeHelper.calculateImageWidthAndHeightSize
 import net.pantasystem.milktea.note.viewmodel.PlaneNoteViewData
+
 
 object NoteReactionViewHelper {
 
-    @JvmStatic
-    @BindingAdapter("reactionTextTypeView", "reactionImageTypeView", "reaction")
+//    const val REACTION_IMAGE_WIDTH_SIZE_DP = 20
+
     fun LinearLayout.bindReactionCount(
         reactionTextTypeView: TextView,
         reactionImageTypeView: ImageView,
         reaction: ReactionViewData,
+        reactionBaseSizeSp: Float,
     ) {
         val textReaction = reaction.reaction
 
         val emoji = reaction.emoji
+
+        val baseHeightPx = context.resources.displayMetrics.scaledDensity * reactionBaseSizeSp
 
 
         if (emoji == null) {
@@ -33,18 +39,47 @@ object NoteReactionViewHelper {
 
             reactionTextTypeView.setMemoVisibility(View.VISIBLE)
             reactionTextTypeView.text = textReaction
+            reactionTextTypeView.setMemoFontPxSize(baseHeightPx)
         } else {
             reactionImageTypeView.setMemoVisibility(View.VISIBLE)
             reactionTextTypeView.setMemoVisibility(View.GONE)
 
-            GlideApp.with(reactionImageTypeView.context)
-                .load(emoji.url ?: emoji.uri)
-                // FIXME: webpの場合エラーが発生してうまく表示できなくなってしまう
-//                .fitCenter()
-                .into(reactionImageTypeView)
+            val imageAspectRatio =
+                ImageAspectRatioCache.get(emoji.url ?: emoji.uri) ?: emoji.aspectRatio
+
+            val (imageViewWidthPx, imageViewHeightPx) = calculateImageWidthAndHeightSize(
+                baseHeightPx,
+                imageAspectRatio
+            )
+            reactionImageTypeView.applySizeByAspectRatio<LinearLayout.LayoutParams>(
+                baseHeightPx * 1.2f,
+                imageAspectRatio
+            )
+
+
+            if (emoji.cachePath == null) {
+                GlideApp.with(reactionImageTypeView.context)
+                    .load(emoji.url ?: emoji.uri)
+                    .override(imageViewWidthPx.toInt(), imageViewHeightPx.toInt())
+                    .addListener(SaveImageAspectRequestListener(emoji, context))
+                    .into(reactionImageTypeView)
+            } else {
+                GlideApp.with(reactionImageTypeView.context)
+                    .load(emoji.cachePath)
+                    .error(
+                        GlideApp.with(reactionImageTypeView.context)
+                            .load(emoji.url ?: emoji.uri)
+                            .override(imageViewWidthPx.toInt(), imageViewHeightPx.toInt())
+                            .addListener(SaveImageAspectRequestListener(emoji, context))
+                    )
+                    .override(imageViewWidthPx.toInt(), imageViewHeightPx.toInt())
+                    .addListener(SaveImageAspectRequestListener(emoji, context))
+                    .into(reactionImageTypeView)
+            }
+
         }
     }
-    
+
 
     @JvmStatic
     fun setReactionCount(
@@ -52,7 +87,7 @@ object NoteReactionViewHelper {
         reactionTextTypeView: TextView,
         reactionImageTypeView: ImageView,
         reaction: String,
-        note: PlaneNoteViewData
+        note: PlaneNoteViewData,
     ) {
         val entryPoint = EntryPointAccessors.fromApplication(
             context.applicationContext,
@@ -77,11 +112,15 @@ object NoteReactionViewHelper {
             reactionTextTypeView.setMemoVisibility(View.GONE)
 
             GlideApp.with(reactionImageTypeView.context)
-                .load(emoji.url ?: emoji.uri)
-                // FIXME: webpの場合エラーが発生してうまく表示できなくなってしまう
-//                .fitCenter()
+                .load(emoji.getLoadUrl())
+                .error(
+                    GlideApp.with(reactionImageTypeView.context)
+                        .load(emoji.url ?: emoji.uri)
+                )
                 .into(reactionImageTypeView)
         }
 
     }
+
+
 }

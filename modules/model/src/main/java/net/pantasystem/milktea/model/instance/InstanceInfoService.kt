@@ -12,14 +12,14 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class InstanceInfoService @Inject constructor(
+open class InstanceInfoService @Inject constructor(
     private val mastodonInstanceInfoRepository: MastodonInstanceInfoRepository,
     private val metaRepository: MetaRepository,
     private val nodeInfoRepository: NodeInfoRepository,
     private val customEmojiRepository: CustomEmojiRepository,
 ) {
 
-    suspend fun find(instanceDomain: String): Result<InstanceInfoType> {
+    open suspend fun find(instanceDomain: String): Result<InstanceInfoType> {
         return nodeInfoRepository.find(URL(instanceDomain).host).mapCancellableCatching {
             when(it.type) {
                 is NodeInfo.SoftwareType.Mastodon -> {
@@ -32,12 +32,17 @@ class InstanceInfoService @Inject constructor(
                         metaRepository.find(instanceDomain).getOrThrow()
                     )
                 }
+                is NodeInfo.SoftwareType.Pleroma -> {
+                    InstanceInfoType.Pleroma(
+                        mastodonInstanceInfoRepository.find(instanceDomain).getOrThrow()
+                    )
+                }
                 is NodeInfo.SoftwareType.Other -> throw NoSuchElementException()
             }
         }
     }
 
-    suspend fun sync(instanceDomain: String): Result<Unit> {
+    open suspend fun sync(instanceDomain: String): Result<Unit> {
         return nodeInfoRepository.find(URL(instanceDomain).host).mapCancellableCatching {
             when(it.type) {
                 is NodeInfo.SoftwareType.Mastodon -> {
@@ -48,13 +53,17 @@ class InstanceInfoService @Inject constructor(
                     metaRepository.sync(instanceDomain)
                     customEmojiRepository.sync(it.host).getOrThrow()
                 }
+                is NodeInfo.SoftwareType.Pleroma -> {
+                    mastodonInstanceInfoRepository.sync(instanceDomain).getOrThrow()
+                    customEmojiRepository.sync(it.host)
+                }
                 is NodeInfo.SoftwareType.Other -> throw NoSuchElementException()
             }
         }
     }
 
     @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
-    fun observe(instanceDomain: String): Flow<InstanceInfoType?> {
+    open fun observe(instanceDomain: String): Flow<InstanceInfoType?> {
         return suspend {
             nodeInfoRepository.find(URL(instanceDomain).host).getOrNull()
         }.asFlow().flatMapLatest { nodeInfo ->

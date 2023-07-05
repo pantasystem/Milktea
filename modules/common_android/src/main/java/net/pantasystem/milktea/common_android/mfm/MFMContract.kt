@@ -16,4 +16,10 @@ object MFMContract {
         "motion" to TagType.MOTION,
         "jump" to TagType.JUMP*/
     )
+
+    val fnTypeTagNameMap = mapOf(
+        "x2" to ElementType.FnX2,
+        "x3" to ElementType.FnX3,
+        "x4" to ElementType.FnX4
+    )
 }

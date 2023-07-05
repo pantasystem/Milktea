@@ -34,7 +34,7 @@ fun NoteFilePreview(
 ) {
     val uiState by noteEditorViewModel.uiState.collectAsState()
     val maxFileCount by noteEditorViewModel.maxFileCount.asLiveData().observeAsState()
-    val instanceInfo by noteEditorViewModel.instanceInfo.collectAsState()
+//    val instanceInfo by noteEditorViewModel.instanceInfo.collectAsState()
     val instanceInfoType by noteEditorViewModel.instanceInfoType.collectAsState()
     val isSensitive by noteEditorViewModel.isSensitiveMedia.collectAsState()
 
@@ -57,7 +57,7 @@ fun NoteFilePreview(
                 files = uiState.files,
                 modifier = Modifier.weight(1f),
                 isMisskey = instanceInfoType is InstanceInfoType.Misskey,
-                allowMaxFileSize = instanceInfo?.clientMaxBodyByteSize,
+                allowMaxFileSize = null/* instanceInfo?.clientMaxBodyByteSize */,
                 onToggleSensitive = {
                     noteEditorViewModel.toggleNsfw(it.file)
                 },

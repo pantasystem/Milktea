@@ -29,7 +29,8 @@ data class MastodonInstanceInfoRecord(
 
     data class Configuration(
         @Embedded(prefix = "statuses_") val statuses: Statuses? = null,
-        @Embedded(prefix = "polls_")val polls: Polls? = null
+        @Embedded(prefix = "polls_")val polls: Polls? = null,
+        @Embedded(prefix = "emoji_reactions_") val emojiReactions: EmojiReactions? = null,
     ) {
 
         data class Statuses(
@@ -51,6 +52,13 @@ data class MastodonInstanceInfoRecord(
             val maxExpiration: Int? = null,
         )
 
+        data class EmojiReactions(
+            @ColumnInfo(name = "myReactions")
+            val maxReactions: Int? = null,
+
+            @ColumnInfo(name = "maxReactionsPerAccount")
+            val maxReactionsPerAccount: Int? = null,
+        )
     }
 
     data class Urls(
@@ -82,6 +90,28 @@ data class FedibirdCapabilitiesRecord(
     val uri: String
 )
 
+@Entity(
+    tableName = "pleroma_metadata_features",
+    foreignKeys = [
+        ForeignKey(
+            parentColumns = ["uri"],
+            childColumns = ["uri"],
+            entity = MastodonInstanceInfoRecord::class,
+            onDelete = ForeignKey.CASCADE,
+            onUpdate = ForeignKey.CASCADE,
+        )
+    ],
+    indices = [Index("uri")],
+    primaryKeys = ["uri", "type"]
+)
+data class PleromaMetadataFeatures(
+    @ColumnInfo(name = "type")
+    val type: String,
+
+    @ColumnInfo(name = "uri")
+    val uri: String
+)
+
 data class MastodonInstanceInfoRelated(
     @Embedded val info: MastodonInstanceInfoRecord,
     @Relation(
@@ -89,7 +119,14 @@ data class MastodonInstanceInfoRelated(
         entityColumn = "uri",
         entity = FedibirdCapabilitiesRecord::class
     )
-    val fedibirdCapabilities: List<FedibirdCapabilitiesRecord>?
+    val fedibirdCapabilities: List<FedibirdCapabilitiesRecord>?,
+
+    @Relation(
+        parentColumn = "uri",
+        entityColumn = "uri",
+        entity = PleromaMetadataFeatures::class
+    )
+    val pleromaMetadataFeatures: List<PleromaMetadataFeatures>?
 )
 
 fun MastodonInstanceInfoRecord.Companion.from(model: MastodonInstanceInfo): MastodonInstanceInfoRecord {
@@ -118,6 +155,12 @@ fun MastodonInstanceInfoRecord.Companion.from(model: MastodonInstanceInfo): Mast
                         maxCharactersPerOption = it.maxCharactersPerOption,
                         maxExpiration = it.maxExpiration,
                         minExpiration = it.minExpiration,
+                    )
+                },
+                emojiReactions = config.emojiReactions?.let {
+                    MastodonInstanceInfoRecord.Configuration.EmojiReactions(
+                        maxReactions = it.maxReactions,
+                        maxReactionsPerAccount = it.maxReactionsPerAccount
                     )
                 }
             )
@@ -153,9 +196,24 @@ fun MastodonInstanceInfoRelated.toModel(): MastodonInstanceInfo {
                         maxExpiration = it.maxExpiration,
                         minExpiration = it.minExpiration,
                     )
+                },
+                emojiReactions = config.emojiReactions?.let {
+                    MastodonInstanceInfo.Configuration.EmojiReactions(
+                        maxReactions = it.maxReactions,
+                        maxReactionsPerAccount = it.maxReactionsPerAccount
+                    )
                 }
             )
         },
-        fedibirdCapabilities = fedibirdCapabilities?.map { it.type }
+        fedibirdCapabilities = fedibirdCapabilities?.map { it.type },
+        pleroma = pleromaMetadataFeatures?.let {
+            MastodonInstanceInfo.Pleroma(
+                metadata = MastodonInstanceInfo.Pleroma.Metadata(
+                    features = it.map { feature ->
+                        feature.type
+                    }
+                )
+            )
+        }
     )
 }

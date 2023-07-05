@@ -19,9 +19,11 @@ interface NoteRepository {
 
     suspend fun vote(noteId: Note.Id, choice: Poll.Choice): Result<Unit>
 
-    suspend fun syncConversation(noteId: Note.Id): Result<Unit>
+//    suspend fun syncConversation(noteId: Note.Id): Result<Unit>
+//
+//    suspend fun syncChildren(noteId: Note.Id): Result<Unit>
 
-    suspend fun syncChildren(noteId: Note.Id): Result<Unit>
+    suspend fun syncThreadContext(noteId: Note.Id): Result<Unit>
 
     suspend fun sync(noteId: Note.Id): Result<Unit>
 
@@ -34,5 +36,7 @@ interface NoteRepository {
     fun observeIn(noteIds: List<Note.Id>): Flow<List<Note>>
 
     fun observeOne(noteId: Note.Id): Flow<Note?>
+
+    fun observeThreadContext(noteId: Note.Id): Flow<NoteThreadContext>
 
 }

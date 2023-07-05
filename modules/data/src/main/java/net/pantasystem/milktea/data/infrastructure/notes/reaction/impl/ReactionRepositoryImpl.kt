@@ -23,6 +23,7 @@ import net.pantasystem.milktea.model.notes.Note
 import net.pantasystem.milktea.model.notes.NoteDataSource
 import net.pantasystem.milktea.model.notes.NoteRepository
 import net.pantasystem.milktea.model.notes.reaction.CreateReaction
+import net.pantasystem.milktea.model.notes.reaction.DeleteReaction
 import net.pantasystem.milktea.model.notes.reaction.Reaction
 import net.pantasystem.milktea.model.notes.reaction.ReactionRepository
 import javax.inject.Inject
@@ -54,7 +55,7 @@ class ReactionRepositoryImpl @Inject constructor(
                                 noteDataSource.add(note.onIReacted(createReaction.reaction))
                             }
                         }
-                        Account.InstanceType.MASTODON -> {
+                        Account.InstanceType.MASTODON, Account.InstanceType.PLEROMA -> {
                             if (nodeInfoRepository.find(account.getHost())
                                     .getOrThrow().type !is NodeInfo.SoftwareType.Mastodon.Fedibird
                             ) {
@@ -83,38 +84,45 @@ class ReactionRepositoryImpl @Inject constructor(
             }
         }
 
-    override suspend fun delete(noteId: Note.Id): Result<Boolean> = runCancellableCatching {
-        withContext(ioDispatcher) {
-            val note = noteRepository.find(noteId).getOrThrow()
-            val account = getAccount.get(noteId.accountId)
-            when (account.instanceType) {
-                Account.InstanceType.MISSKEY -> {
-                    postUnReaction(noteId)
-                            && (noteCaptureAPIProvider.get(account)
-                        ?.isCaptured(noteId.noteId) == true
-                            || (note.myReaction != null
-                            && noteDataSource.add(note.onIUnReacted())
-                        .getOrThrow() != AddResult.Canceled))
-                }
-                Account.InstanceType.MASTODON -> {
-                    if (nodeInfoRepository.find(account.getHost())
-                            .getOrThrow().type !is NodeInfo.SoftwareType.Mastodon.Fedibird
-                    ) {
-                        if (!note.isSupportEmojiReaction) {
-                            return@withContext false
-                        }
+    override suspend fun delete(deleteReaction: DeleteReaction): Result<Boolean> =
+        runCancellableCatching {
+            withContext(ioDispatcher) {
+                val note = noteRepository.find(deleteReaction.noteId).getOrThrow()
+                val account = getAccount.get(deleteReaction.noteId.accountId)
+                when (account.instanceType) {
+                    Account.InstanceType.MISSKEY -> {
+                        postUnReaction(deleteReaction.noteId)
+                                && (noteCaptureAPIProvider.get(account)
+                            ?.isCaptured(deleteReaction.noteId.noteId) == true
+                                || (note.reactionCounts.any { it.me }
+                                && noteDataSource.add(note.onIUnReacted())
+                            .getOrThrow() != AddResult.Canceled))
                     }
-                    val res = mastodonAPIProvider.get(account)
-                        .unreaction(noteId.noteId)
-                        .throwIfHasError()
-                        .body()
-                    noteDataSourceAdder.addTootStatusDtoIntoDataSource(account, requireNotNull(res))
-                    true
+                    Account.InstanceType.MASTODON, Account.InstanceType.PLEROMA -> {
+                        if (nodeInfoRepository.find(account.getHost())
+                                .getOrThrow().type !is NodeInfo.SoftwareType.Mastodon.Fedibird
+                        ) {
+                            if (!note.isSupportEmojiReaction) {
+                                return@withContext false
+                            }
+                        }
+                        val res = mastodonAPIProvider.get(account)
+                            .deleteReaction(
+                                deleteReaction.noteId.noteId,
+                                Reaction(deleteReaction.reaction).getNameAndHost()
+                            )
+                            .throwIfHasError()
+                            .body()
+                        noteDataSourceAdder.addTootStatusDtoIntoDataSource(
+                            account,
+                            requireNotNull(res)
+                        )
+                        true
+                    }
                 }
-            }
 
+            }
         }
-    }
 
 
     private suspend fun postReaction(createReaction: CreateReaction): Boolean {

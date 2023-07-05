@@ -5,10 +5,12 @@ sealed interface Theme {
     object Black : Theme
     object Dark : Theme
     object Bread : Theme
+
+    object ElephantDark : Theme
     companion object
 }
 
 
 fun Theme.isNightTheme(): Boolean {
-    return this is Theme.Black || this is Theme.Dark
+    return this is Theme.Black || this is Theme.Dark || this is Theme.ElephantDark
 }

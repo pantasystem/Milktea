@@ -1,15 +1,11 @@
 package net.pantasystem.milktea.api.misskey.infos
 
-import kotlinx.datetime.Instant
 import kotlinx.serialization.SerialName
 import net.pantasystem.milktea.api.activitypub.NodeInfoDTO
 import net.pantasystem.milktea.model.instance.Meta
 
 @kotlinx.serialization.Serializable
 data class InstanceInfosResponse(
-    @SerialName("date")
-    val date: Instant,
-
     @SerialName("instancesInfos")
     val instancesInfos: List<InstanceInfo>
 ) {
@@ -27,8 +23,8 @@ data class InstanceInfosResponse(
         @SerialName("url")
         val url: String,
 
-        @SerialName("value")
-        val value: Double,
+//        @SerialName("value")
+//        val value: Double,
 
         @SerialName("meta")
         val meta: Meta,
@@ -44,13 +40,13 @@ data class InstanceInfosResponse(
         @SerialName("isAlive")
         val isAlive: Boolean,
 
-        @SerialName("banner")
-        val banner: Boolean,
+//        @SerialName("banner")
+//        val banner: Boolean,
 
-        @SerialName("icon")
-        val icon: Boolean,
-
-        @SerialName("background")
-        val background: Boolean
+//        @SerialName("icon")
+//        val icon: Boolean,
+//
+//        @SerialName("background")
+//        val background: Boolean
     )
 }

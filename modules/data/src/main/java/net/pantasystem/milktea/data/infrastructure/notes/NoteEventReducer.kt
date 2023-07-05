@@ -3,57 +3,75 @@ package net.pantasystem.milktea.data.infrastructure.notes
 import net.pantasystem.milktea.api_streaming.NoteUpdated
 import net.pantasystem.milktea.api_streaming.mastodon.EmojiReaction
 import net.pantasystem.milktea.model.account.Account
+import net.pantasystem.milktea.model.emoji.CustomEmojiAspectRatio
+import net.pantasystem.milktea.model.image.ImageCache
 import net.pantasystem.milktea.model.notes.Note
 import net.pantasystem.milktea.model.notes.reaction.ReactionCount
 
 fun Note.onUnReacted(account: Account, e: NoteUpdated.Body.Unreacted): Note {
     val list = this.reactionCounts.toMutableList()
     val newList = list.asSequence().map {
-        if(it.reaction == e.body.reaction) {
+        if (it.reaction == e.body.reaction) {
             it.copy(count = it.count - 1)
-        }else{
+        } else {
             it
         }
     }.filter {
         it.count > 0
     }.toList()
 
+    val myReaction = if (e.body.userId == account.remoteId) null else this.myReaction
     return this.copy(
-        reactionCounts = newList,
-        myReaction = if(e.body.userId == account.remoteId) null else this.myReaction
+        reactionCounts = newList.map {
+            it.copy(me = it.reaction == myReaction)
+        },
+        myReaction = myReaction
     )
 }
 
-fun Note.onReacted(account: Account, e: NoteUpdated.Body.Reacted): Note {
+fun Note.onReacted(
+    account: Account,
+    e: NoteUpdated.Body.Reacted,
+    aspectRatio: CustomEmojiAspectRatio?,
+    imageCache: ImageCache?,
+): Note {
     val hasItem = this.reactionCounts.any { count ->
         count.reaction == e.body.reaction
     }
     var list = this.reactionCounts.map { count ->
-        if(count.reaction == e.body.reaction) {
+        if (count.reaction == e.body.reaction) {
             count.copy(count = count.count + 1)
-        }else{
+        } else {
             count
         }
     }
 
-    if(!hasItem) {
-        list = list + ReactionCount(reaction = e.body.reaction, count = 1)
+    if (!hasItem) {
+        list = list + ReactionCount(reaction = e.body.reaction, count = 1, me = false)
     }
 
-    val emojis =when (val emoji = e.body.emoji) {
+    val emojis = when (val emoji = e.body.emoji?.copy(
+        aspectRatio = aspectRatio?.aspectRatio,
+        cachePath = imageCache?.cachePath
+    )) {
         null -> this.emojis
         else -> (this.emojis ?: emptyList()) + emoji
     }
 
+    val myReaction = if (e.body.userId == account.remoteId) e.body.reaction else this.myReaction
     return this.copy(
-        reactionCounts = list,
-        myReaction = if(e.body.userId == account.remoteId) e.body.reaction else this.myReaction,
+        reactionCounts = list.map {
+            it.copy(
+                me = myReaction == it.reaction
+            )
+        },
+        myReaction = myReaction,
         emojis = emojis?.distinct()
     )
 }
 
-fun Note.onEmojiReacted(account: Account, e: EmojiReaction): Note {
-    val reactionCount = ReactionCount(e.reaction, e.count)
+fun Note.onEmojiReacted(account: Account, e: EmojiReaction, imageCache: ImageCache?): Note {
+    val reactionCount = ReactionCount(e.reaction, e.count, me = false)
     val hasItem = reactionCounts.any {
         it.reaction == e.reaction
     }
@@ -69,13 +87,17 @@ fun Note.onEmojiReacted(account: Account, e: EmojiReaction): Note {
         list = list + reactionCount
     }
 
-    val emojis = when(val emoji = e.toEmoji()) {
+    val emojis = when (val emoji = e.toEmoji(imageCache?.cachePath)) {
         null -> this.emojis
         else -> (this.emojis ?: emptyList()) + emoji
     }
     return this.copy(
         reactionCounts = list.filter {
             it.count > 0
+        }.map {
+            it.copy(
+                me = it.reaction == e.myReaction(account.remoteId)
+            )
         },
         myReaction = e.myReaction(account.remoteId),
         emojis = emojis
@@ -84,16 +106,16 @@ fun Note.onEmojiReacted(account: Account, e: EmojiReaction): Note {
 
 fun Note.onPollVoted(account: Account, e: NoteUpdated.Body.PollVoted): Note {
     val poll = this.poll
-    requireNotNull(poll){
+    requireNotNull(poll) {
         "pollがNULLです"
     }
     val updatedChoices = poll.choices.mapIndexed { index, choice ->
-        if(index == e.body.choice) {
+        if (index == e.body.choice) {
             choice.copy(
                 votes = choice.votes + 1,
-                isVoted = if(e.body.userId == account.remoteId) true else choice.isVoted
+                isVoted = if (e.body.userId == account.remoteId) true else choice.isVoted
             )
-        }else{
+        } else {
             choice
         }
     }
@@ -102,35 +124,37 @@ fun Note.onPollVoted(account: Account, e: NoteUpdated.Body.PollVoted): Note {
     )
 }
 
-fun Note.onIReacted(reaction: String) : Note {
+fun Note.onIReacted(reaction: String): Note {
     var hasItem = false
     var list = this.reactionCounts.map { count ->
-        if(count.reaction == reaction) {
+        if (count.reaction == reaction) {
             hasItem = true
             count.copy(count = count.count + 1)
-        }else{
+        } else {
             count
         }
     }
-    if(!hasItem) {
+    if (!hasItem) {
         val added = list.toMutableList()
-        added.add(ReactionCount(reaction = reaction, count = 1))
+        added.add(ReactionCount(reaction = reaction, count = 1, me = false))
         list = added
     }
 
     return this.copy(
-        reactionCounts = list,
+        reactionCounts = list.map {
+            it.copy(me = it.reaction == reaction)
+        },
         myReaction = reaction,
         emojis = emojis
     )
 }
 
-fun Note.onIUnReacted() : Note {
+fun Note.onIUnReacted(): Note {
     val list = this.reactionCounts.toMutableList()
     val newList = list.asSequence().map {
-        if(it.reaction == myReaction) {
+        if (it.reaction == myReaction) {
             it.copy(count = it.count - 1)
-        }else{
+        } else {
             it
         }
     }.filter {
@@ -138,7 +162,9 @@ fun Note.onIUnReacted() : Note {
     }.toList()
 
     return this.copy(
-        reactionCounts = newList,
+        reactionCounts = newList.map {
+            it.copy(me = false)
+        },
         myReaction = null
 
     )

@@ -33,23 +33,21 @@ class UserListDetailActivity : AppCompatActivity(), UserListEditorDialog.OnSubmi
 
     companion object {
         private const val TAG = "UserListDetailActivity"
-        private const val EXTRA_LIST_ID = "jp.panta.misskeyandroidclient.EXTRA_LIST_ID"
 
 
         const val ACTION_SHOW = "ACTION_SHOW"
         const val ACTION_EDIT_NAME = "ACTION_EDIT_NAME"
 
 
-        fun newIntent(context: Context, listId: UserList.Id): Intent {
+        fun newIntent(context: Context, listId: UserList.Id, addTabToAccountId: Long? = null): Intent {
             return Intent(context, UserListDetailActivity::class.java).apply {
-                putExtra(EXTRA_LIST_ID, listId)
+                putExtra(UserListDetailViewModel.EXTRA_LIST_ID, listId)
+                putExtra(UserListDetailViewModel.EXTRA_ADD_TAB_TO_ACCOUNT_ID, addTabToAccountId)
             }
         }
     }
 
 
-    @Inject
-    lateinit var assistedFactory: UserListDetailViewModel.ViewModelAssistedFactory
 
     @Inject
     lateinit var settingStore: SettingStore
@@ -69,12 +67,7 @@ class UserListDetailActivity : AppCompatActivity(), UserListEditorDialog.OnSubmi
     @Inject
     lateinit var applyMenuTint: ApplyMenuTint
 
-    private val listId by lazy {
-        intent.getSerializableExtra(EXTRA_LIST_ID) as UserList.Id
-    }
-    private val mUserListDetailViewModel: UserListDetailViewModel by viewModels {
-        UserListDetailViewModel.provideFactory(assistedFactory, listId)
-    }
+    private val mUserListDetailViewModel: UserListDetailViewModel by viewModels()
 
     val notesViewModel by viewModels<NotesViewModel>()
 
@@ -99,8 +92,8 @@ class UserListDetailActivity : AppCompatActivity(), UserListEditorDialog.OnSubmi
                 val account by mUserListDetailViewModel.account.collectAsState()
 
                 UserListDetailScreen(
-                    listId = listId,
-                    userList = userList,
+                    listId = mUserListDetailViewModel.getUserListId(),
+                    userList = userList?.userList,
                     users = users,
                     isAddedTab = isAddedTab,
                     onNavigateUp = {
@@ -122,7 +115,8 @@ class UserListDetailActivity : AppCompatActivity(), UserListEditorDialog.OnSubmi
                             }
                         val intent = searchAndSelectUserNavigation.newIntent(
                             SearchAndSelectUserNavigationArgs(
-                                selectedUserIds = selected
+                                selectedUserIds = selected,
+                                accountId = mUserListDetailViewModel.getUserListId().accountId
                             )
                         )
                         requestSelectUserResult.launch(intent)
@@ -178,8 +172,8 @@ class UserListDetailActivity : AppCompatActivity(), UserListEditorDialog.OnSubmi
 
     private fun showEditUserListDialog() {
         val dialog = UserListEditorDialog.newInstance(
-            listId.userListId,
-            mUserListDetailViewModel.userList.value?.name ?: ""
+            mUserListDetailViewModel.getUserListId().userListId,
+            mUserListDetailViewModel.userList.value?.userList?.name ?: ""
         )
         dialog.show(supportFragmentManager, "")
     }

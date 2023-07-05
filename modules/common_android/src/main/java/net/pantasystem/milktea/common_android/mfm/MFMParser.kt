@@ -1,5 +1,6 @@
 package net.pantasystem.milktea.common_android.mfm
 
+import android.util.Log
 import jp.panta.misskeyandroidclient.mfm.*
 import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.common_android.emoji.V13EmojiUrlResolver
@@ -27,6 +28,8 @@ object MFMParser {
     private val hashTagPattern = Pattern.compile("""#[^\s.,!?'"#:/\[\]【】@]+""")
 
     private val idPattern = Pattern.compile("""^([a-zA-Z0-9]+)$""")
+
+    private val fnPattern = Pattern.compile("""\A\$\[([a-z\d]+) (.+?)]""", Pattern.DOTALL)
 
 
     fun parse(
@@ -116,13 +119,14 @@ object MFMParser {
             '>' to listOf(::parseQuote), //引用
             '*' to listOf(::parseTypeStar),  // 横伸縮対称揺れ, 太字
             '【' to listOf(::parseTitle),//タイトル
+            '$' to listOf(::parseFn),
             '[' to listOf(::parseSearch, ::parseLink, ::parseTitle),
             '?' to listOf(::parseLink),
             'S' to listOf(::parseSearch),
             ':' to listOf(::parseEmoji),
             '@' to listOf(::parseMention),
             '#' to listOf(::parseHashTag),
-            'h' to listOf(::parseUrl)
+            'h' to listOf(::parseUrl),
 
         )
 
@@ -249,6 +253,30 @@ object MFMParser {
 
 
             }
+        }
+
+        private fun parseFn(): Node? {
+            Log.d("parseFn", "parseFn: ${sourceText.substring(position, parent.insideEnd)}")
+            // $[x2 任意のテキスト]みたいのをParseする
+            val matcher = fnPattern.matcher(sourceText.substring(position, parent.insideEnd))
+
+            if (!matcher.find()) {
+                return null
+            }
+            val tagName = matcher.nullableGroup(1).also {
+                Log.d("parseFn", "parseFn: $it, ${matcher.nullableGroup(0)}")
+            } ?: return null
+            val tag = MFMContract.fnTypeTagNameMap[tagName] ?: return null
+            if (parent.elementType.elementClass.weight < tag.elementClass.weight) {
+                return null
+            }
+            return Node(
+                start = position,
+                end = position + matcher.end(),
+                insideStart = position + tagName.length + 3,
+                insideEnd = position + matcher.end(2),
+                elementType = tag
+            )
         }
 
         private fun parseStrike(): Node? {

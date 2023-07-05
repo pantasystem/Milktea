@@ -10,6 +10,7 @@ import androidx.fragment.app.activityViewModels
 import dagger.hilt.android.AndroidEntryPoint
 import net.pantasystem.milktea.model.account.page.CanOnlyMedia
 import net.pantasystem.milktea.model.account.page.Pageable
+import net.pantasystem.milktea.model.account.page.UntilPaginate
 import net.pantasystem.milktea.setting.databinding.DialogEditTabNameBinding
 import net.pantasystem.milktea.setting.viewmodel.page.PageSettingViewModel
 
@@ -42,12 +43,20 @@ class EditTabSettingDialog : AppCompatDialogFragment(){
             }
         }
 
+        if (page.pageable() is UntilPaginate) {
+            binding.toggleSavePagePosition.isVisible = true
+            binding.toggleSavePagePosition.isChecked = page.isSavePagePosition
+        } else {
+            binding.toggleSavePagePosition.isVisible = false
+        }
 
 
         binding.okButton.setOnClickListener {
             val name = binding.editTabName.text?.toString()
             if(name?.isNotBlank() == true){
-                var target = page
+                var target = page.copy(
+                    isSavePagePosition = binding.toggleSavePagePosition.isChecked
+                )
                 when(val pageable = target.pageable()) {
                     is CanOnlyMedia<*> -> {
                         target = target.copy(

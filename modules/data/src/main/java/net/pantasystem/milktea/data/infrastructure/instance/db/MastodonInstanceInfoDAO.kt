@@ -35,4 +35,12 @@ abstract class MastodonInstanceInfoDAO {
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     abstract fun insertFedibirdCapabilities(list: List<FedibirdCapabilitiesRecord>): List<Long>
 
+    @Query("""
+        delete from pleroma_metadata_features where uri = :uri
+    """)
+    abstract fun clearPleromaMetadataFeatures(uri: String)
+
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    abstract fun insertPleromaMetadataFeatures(list: List<PleromaMetadataFeatures>): List<Long>
+
 }

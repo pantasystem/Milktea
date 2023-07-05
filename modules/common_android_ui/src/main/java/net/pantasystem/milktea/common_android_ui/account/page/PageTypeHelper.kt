@@ -36,12 +36,14 @@ object PageTypeHelper{
             MASTODON_LOCAL_TIMELINE -> context.getString(R.string.local_timeline)
             MASTODON_PUBLIC_TIMELINE -> context.getString(R.string.global_timeline)
             MASTODON_HOME_TIMELINE -> context.getString(R.string.home_timeline)
-            MASTODON_HASHTAG_TIMELINE -> context.getString(R.string.tag)
             MASTODON_LIST_TIMELINE -> context.getString(R.string.list)
             MASTODON_USER_TIMELINE -> context.getString(R.string.user)
             CALCKEY_RECOMMENDED_TIMELINE -> context.getString(R.string.calckey_recomended_timeline)
             CLIP_NOTES -> context.getString(R.string.clip)
             MASTODON_BOOKMARK_TIMELINE -> context.getString(R.string.bookmark)
+            MASTODON_SEARCH_TIMELINE -> context.getString(R.string.search)
+            MASTODON_TAG_TIMELINE -> context.getString(R.string.tag)
+            MASTODON_TREND_TIMELINE -> context.getString(R.string.featured)
         }
     }
 }

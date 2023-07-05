@@ -11,6 +11,8 @@ import net.pantasystem.milktea.common.mapCancellableCatching
 import net.pantasystem.milktea.data.streaming.StreamingAPIProvider
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.AccountRepository
+import net.pantasystem.milktea.model.emoji.CustomEmojiAspectRatioDataSource
+import net.pantasystem.milktea.model.image.ImageCacheRepository
 import net.pantasystem.milktea.model.notes.Note
 import net.pantasystem.milktea.model.notes.NoteCaptureAPIAdapter
 import net.pantasystem.milktea.model.notes.NoteDataSource
@@ -26,6 +28,8 @@ class NoteCaptureAPIAdapterImpl(
     private val noteCaptureAPIWithAccountProvider: NoteCaptureAPIWithAccountProvider,
     private val streamingAPIProvider: StreamingAPIProvider,
     private val noteDataSourceAdder: NoteDataSourceAdder,
+    private val customEmojiAspectRatioDataSource: CustomEmojiAspectRatioDataSource,
+    private val imageCacheRepository: ImageCacheRepository,
     loggerFactory: Logger.Factory,
     cs: CoroutineScope,
     dispatcher: CoroutineDispatcher = Dispatchers.IO,
@@ -48,13 +52,19 @@ class NoteCaptureAPIAdapterImpl(
     /**
      * mastodonのStreaming APIから流れてきたEventがここに入る
      */
-    private val streamingEventDispatcher = MutableSharedFlow<Pair<Account, Event>>(extraBufferCapacity = 1000, onBufferOverflow = BufferOverflow.DROP_OLDEST)
+    private val streamingEventDispatcher = MutableSharedFlow<Pair<Account, Event>>(
+        extraBufferCapacity = 1000,
+        onBufferOverflow = BufferOverflow.DROP_OLDEST
+    )
 
     /**
      * Noteのキャプチャーによって発生したイベントのQueue。
      * ここから順番にイベントを取り出し、キャッシュに反映させるなどをしている。
      */
-    private val noteUpdatedDispatcher = MutableSharedFlow<Pair<Account, NoteUpdated.Body>>(extraBufferCapacity = 1000, onBufferOverflow = BufferOverflow.DROP_OLDEST)
+    private val noteUpdatedDispatcher = MutableSharedFlow<Pair<Account, NoteUpdated.Body>>(
+        extraBufferCapacity = 1000,
+        onBufferOverflow = BufferOverflow.DROP_OLDEST
+    )
 
 //    /**
 //     * 使用されなくなったNoteのリソースが順番に入れられるQueue。
@@ -128,12 +138,13 @@ class NoteCaptureAPIAdapterImpl(
                             }.launchIn(coroutineScope)
                         noteIdWithJob[id] = job
                     }
-                    Account.InstanceType.MASTODON -> {
-                        val job = requireNotNull(streamingAPIProvider.get(account)).connectUser().catch { e ->
-                            logger.error("ノート更新イベント受信中にエラー発生", e = e)
-                        }.onEach {
-                            streamingEventDispatcher.tryEmit(account to it)
-                        }.launchIn(coroutineScope)
+                    Account.InstanceType.MASTODON, Account.InstanceType.PLEROMA -> {
+                        val job = requireNotNull(streamingAPIProvider.get(account)).connectUser()
+                            .catch { e ->
+                                logger.error("ノート更新イベント受信中にエラー発生", e = e)
+                            }.onEach {
+                                streamingEventDispatcher.tryEmit(account to it)
+                            }.launchIn(coroutineScope)
                         noteIdWithJob[id] = job
                     }
                 }
@@ -170,7 +181,7 @@ class NoteCaptureAPIAdapterImpl(
      */
     private fun addRepositoryEventListener(
         noteId: Note.Id,
-        listener: (NoteDataSource.Event) -> Unit
+        listener: (NoteDataSource.Event) -> Unit,
     ): Boolean {
         synchronized(noteIdWithListeners) {
             val listeners = noteIdWithListeners[noteId]
@@ -191,7 +202,7 @@ class NoteCaptureAPIAdapterImpl(
      */
     private fun removeRepositoryEventListener(
         noteId: Note.Id,
-        listener: (NoteDataSource.Event) -> Unit
+        listener: (NoteDataSource.Event) -> Unit,
     ): Boolean {
 
         synchronized(noteIdWithListeners) {
@@ -226,7 +237,22 @@ class NoteCaptureAPIAdapterImpl(
                     noteDataSource.delete(noteId)
                 }
                 is NoteUpdated.Body.Reacted -> {
-                    noteDataSource.add(note.onReacted(account, e))
+                    noteDataSource.add(
+                        note.onReacted(
+                            account,
+                            e,
+                            aspectRatio = (e.body.emoji?.url ?: e.body.emoji?.url)?.let {
+                                customEmojiAspectRatioDataSource.findOne(
+                                    it
+                                ).getOrNull()
+                            },
+                            imageCache = (e.body.emoji?.url ?: e.body.emoji?.url)?.let {
+                                imageCacheRepository.findBySourceUrl(
+                                    it
+                                )
+                            },
+                        )
+                    )
                 }
                 is NoteUpdated.Body.Unreacted -> {
                     noteDataSource.add(note.onUnReacted(account, e))
@@ -245,7 +271,7 @@ class NoteCaptureAPIAdapterImpl(
 
     private suspend fun handleMastodonRemoteEvent(account: Account, e: Event) {
         try {
-            when(e) {
+            when (e) {
                 is Event.Delete -> {
                     noteDataSource.remove(Note.Id(account.accountId, e.id))
                 }
@@ -257,7 +283,14 @@ class NoteCaptureAPIAdapterImpl(
                     val noteId = Note.Id(account.accountId, e.reaction.statusId)
 
                     noteDataSource.get(noteId).mapCancellableCatching { note ->
-                        noteDataSource.add(note.onEmojiReacted(account, e.reaction))
+                        noteDataSource.add(
+                            note.onEmojiReacted(
+                                account, e.reaction,
+                                (e.reaction.url ?: e.reaction.staticUrl)?.let {
+                                    imageCacheRepository.findBySourceUrl(it)
+                                }
+                            ),
+                        )
                     }.getOrThrow()
 
                 }

@@ -1,11 +1,11 @@
 package net.pantasystem.milktea.channel
 
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import net.pantasystem.milktea.app_store.account.AccountStore
 import net.pantasystem.milktea.common.Logger
@@ -14,6 +14,7 @@ import net.pantasystem.milktea.common.paginator.PreviousPagingController
 import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.data.infrastructure.channel.ChannelListType
 import net.pantasystem.milktea.data.infrastructure.channel.ChannelPagingModel
+import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.account.page.Pageable
 import net.pantasystem.milktea.model.account.page.newPage
@@ -28,7 +29,13 @@ class ChannelViewModel @Inject constructor(
     private val accountRepository: AccountRepository,
     channelPagingModelFactory: ChannelPagingModel.Factory,
     loggerFactory: Logger.Factory,
+    private val savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
+
+    companion object {
+        const val EXTRA_SPECIFIED_ACCOUNT_ID = "ChannelViewModel.EXTRA_SPECIFIED_ACCOUNT_ID"
+        const val EXTRA_ADD_TAB_TO_ACCOUNT_ID = "ChannelViewModel.EXTRA_ADD_TAB_TO_ACCOUNT_ID"
+    }
 
     val logger: Logger by lazy {
         loggerFactory.create("ChannelViewModel")
@@ -37,27 +44,55 @@ class ChannelViewModel @Inject constructor(
 
     private val featuredChannelPagingModel =
         channelPagingModelFactory.create(ChannelListType.FEATURED) {
-            accountRepository.getCurrentAccount().getOrThrow()
+            getAccount()
         }
 
     private val followedChannelPagingModel =
         channelPagingModelFactory.create(ChannelListType.FOLLOWED) {
-            accountRepository.getCurrentAccount().getOrThrow()
+            getAccount()
         }
 
     private val ownedChannelPagingModel = channelPagingModelFactory.create(ChannelListType.OWNED) {
-        accountRepository.getCurrentAccount().getOrThrow()
+        getAccount()
     }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    private val currentAccount = savedStateHandle.getStateFlow<Long?>(
+        EXTRA_SPECIFIED_ACCOUNT_ID,
+        null
+    ).flatMapLatest { accountId ->
+        accountStore.state.map { state ->
+            accountId?.let {
+                state.get(accountId)
+            } ?: state.currentAccount
+        }
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    private val tabToAddAccount = savedStateHandle.getStateFlow<Long?>(
+        EXTRA_ADD_TAB_TO_ACCOUNT_ID,
+        null
+    ).flatMapLatest { accountId ->
+        accountStore.state.map { state ->
+            accountId?.let {
+                state.get(it)
+            } ?: state.currentAccount
+        }
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
 
     val uiState = combine(
         featuredChannelPagingModel.observeChannels(),
         followedChannelPagingModel.observeChannels(),
-        ownedChannelPagingModel.observeChannels()
-    ) { featured, followed, owned ->
-        ChannelListUiState(
-            featuredChannels = featured,
-            followedChannels = followed,
-            ownedChannels = owned,
+        ownedChannelPagingModel.observeChannels(),
+        currentAccount,
+        tabToAddAccount,
+    ) { featured, followed, owned, currentAccount, tabToAddAccount ->
+        ChannelListUiState.from(
+            featured = featured,
+            followed = followed,
+            owned = owned,
+            currentAccount = currentAccount,
+            tabToAddAccount = tabToAddAccount,
         )
     }.stateIn(
         viewModelScope,
@@ -66,10 +101,9 @@ class ChannelViewModel @Inject constructor(
     )
 
 
-
     fun clearAndLoad(type: ChannelListType) {
         viewModelScope.launch {
-            val model = when(type) {
+            val model = when (type) {
                 ChannelListType.OWNED -> ownedChannelPagingModel
                 ChannelListType.FOLLOWED -> followedChannelPagingModel
                 ChannelListType.FEATURED -> featuredChannelPagingModel
@@ -107,11 +141,19 @@ class ChannelViewModel @Inject constructor(
     fun toggleTab(channelId: Channel.Id) {
         viewModelScope.launch {
             runCancellableCatching {
-                val account = accountRepository.get(channelId.accountId).getOrThrow()
+                val account = getAddTabToAccount()
                 val channel = channelRepository.findOne(channelId).getOrThrow()
+                val relatedAccount = accountRepository.get(channel.id.accountId).getOrThrow()
                 val page = account.newPage(
                     Pageable.ChannelTimeline(channelId = channelId.channelId),
-                    channel.name
+                    channel.name,
+                ).copy(
+                    attachedAccountId = getSpecifiedAccountId(),
+                    title = if (account.accountId == relatedAccount.accountId) {
+                        channel.name
+                    } else {
+                        "${channel.name}(${relatedAccount.getAcct()})"
+                    }
                 )
                 val first =
                     account.pages.firstOrNull { (it.pageable() as? Pageable.ChannelTimeline)?.channelId == channelId.channelId }
@@ -123,15 +165,101 @@ class ChannelViewModel @Inject constructor(
             }
         }
     }
+
+    //
+//    fun setSpecifiedAccountId(accountId: Long) {
+//        savedStateHandle[EXTRA_SPECIFIED_ACCOUNT_ID] = accountId
+//    }
+//
+//    fun setAddTabToAccountId(accountId: Long) {
+//        savedStateHandle[EXTRA_ADD_TAB_TO_ACCOUNT_ID] = accountId
+//    }
+//
+    private fun getSpecifiedAccountId(): Long? {
+        return savedStateHandle[EXTRA_SPECIFIED_ACCOUNT_ID]
+    }
+
+    private fun getAddToTabAccountId(): Long? {
+        return savedStateHandle[EXTRA_ADD_TAB_TO_ACCOUNT_ID]
+    }
+
+    private suspend fun getAccount(): Account {
+        val accountId = getSpecifiedAccountId()
+        if (accountId != null) {
+            return accountRepository.get(accountId).getOrThrow()
+        }
+        return accountRepository.getCurrentAccount().getOrThrow()
+    }
+
+    private suspend fun getAddTabToAccount(): Account {
+        val accountId = getAddToTabAccountId()
+        if (accountId != null) {
+            return accountRepository.get(accountId).getOrThrow()
+        }
+        return accountRepository.getCurrentAccount().getOrThrow()
+    }
 }
 
 data class ChannelListUiState(
-    val featuredChannels: PageableState<List<Channel>> = PageableState.Loading.Init(),
-    val followedChannels: PageableState<List<Channel>> = PageableState.Loading.Init(),
-    val ownedChannels: PageableState<List<Channel>> = PageableState.Loading.Init(),
+    val currentAccount: Account? = null,
+    val featuredChannels: PageableState<List<ChannelListItem>> = PageableState.Loading.Init(),
+    val followedChannels: PageableState<List<ChannelListItem>> = PageableState.Loading.Init(),
+    val ownedChannels: PageableState<List<ChannelListItem>> = PageableState.Loading.Init(),
 ) {
-    fun getByType(type: ChannelListType): PageableState<List<Channel>> {
-        return when(type) {
+
+    companion object {
+        fun from(
+            featured: PageableState<List<Channel>>,
+            followed: PageableState<List<Channel>>,
+            owned: PageableState<List<Channel>>,
+            currentAccount: Account?,
+            tabToAddAccount: Account?,
+        ): ChannelListUiState {
+            return ChannelListUiState(
+                currentAccount = currentAccount,
+                featuredChannels = featured.convert { list ->
+                    list.map { channel ->
+                        ChannelListItem(
+                            channel,
+                            isAddedTab = tabToAddAccount?.pages?.any { page ->
+                                page.pageParams.channelId == channel.id.channelId
+                                        && channel.id.accountId == (
+                                        page.attachedAccountId ?: page.accountId)
+                            } ?: false
+                        )
+                    }
+                },
+                followedChannels = followed.convert { list ->
+                    list.map { channel ->
+                        ChannelListItem(
+                            channel,
+                            isAddedTab = tabToAddAccount?.pages?.any { page ->
+                                page.pageParams.channelId == channel.id.channelId
+                                        && channel.id.accountId == (
+                                        page.attachedAccountId ?: page.accountId)
+                            } ?: false
+                        )
+                    }
+                },
+                ownedChannels = owned.convert { list ->
+                    list.map { channel ->
+                        ChannelListItem(
+                            channel,
+                            isAddedTab = tabToAddAccount?.pages?.any { page ->
+                                page.pageParams.channelId == channel.id.channelId
+                                        && channel.id.accountId == (
+                                        page.attachedAccountId ?: page.accountId)
+                            } ?: false
+                        )
+
+                    }
+                },
+            )
+        }
+    }
+
+    fun getByType(type: ChannelListType): PageableState<List<ChannelListItem>> {
+        return when (type) {
             ChannelListType.OWNED -> ownedChannels
             ChannelListType.FOLLOWED -> followedChannels
             ChannelListType.FEATURED -> featuredChannels
@@ -139,3 +267,7 @@ data class ChannelListUiState(
     }
 }
 
+data class ChannelListItem(
+    val channel: Channel,
+    val isAddedTab: Boolean,
+)

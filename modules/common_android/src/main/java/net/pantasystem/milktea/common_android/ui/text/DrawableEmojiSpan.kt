@@ -9,10 +9,13 @@ import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
 import com.github.penfeizhou.animation.apng.APNGDrawable
 
-class DrawableEmojiSpan(var adapter: EmojiAdapter?, k: Any?) : EmojiSpan<Any?>(k){
+class DrawableEmojiSpan(
+    var adapter: EmojiAdapter?,
+    k: Any?,
+    aspectRatio: Float? = null,
+    emojiScale: Float = 1f,
+) : EmojiSpan<Any?>(k, aspectRatio = aspectRatio, emojiScale = emojiScale) {
     //val weakReference: WeakReference<View> = WeakReference(view)
-
-
 
 
 //    /**
@@ -74,11 +77,11 @@ class DrawableEmojiSpan(var adapter: EmojiAdapter?, k: Any?) : EmojiSpan<Any?>(k
 }
 
 private class DrawableEmojiTarget(
-    val span: DrawableEmojiSpan
+    val span: DrawableEmojiSpan,
 ) : CustomTarget<Drawable>() {
     override fun onResourceReady(
         resource: Drawable,
-        transition: Transition<in Drawable>?
+        transition: Transition<in Drawable>?,
     ) {
         span.imageDrawable = resource
 
@@ -118,6 +121,7 @@ private class DrawableEmojiTarget(
             }
         }
     }
+
     override fun onLoadCleared(placeholder: Drawable?) {
 
     }

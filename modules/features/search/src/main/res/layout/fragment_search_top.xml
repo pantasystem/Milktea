@@ -35,12 +35,14 @@
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
+                    app:tabMode="scrollable"
+                    app:tabGravity="fill"
                     >
 
 
             </com.google.android.material.tabs.TabLayout>
 
-            <androidx.viewpager.widget.ViewPager
+            <androidx.viewpager2.widget.ViewPager2
                     android:id="@+id/search_view_pager"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"

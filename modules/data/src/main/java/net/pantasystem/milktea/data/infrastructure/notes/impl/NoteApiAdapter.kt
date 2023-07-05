@@ -61,7 +61,7 @@ class NoteApiAdapter @Inject constructor(
                 val noteDTO = result.getOrThrow()
                 NoteResultType.Misskey(requireNotNull(noteDTO))
             }
-            Account.InstanceType.MASTODON -> {
+            Account.InstanceType.MASTODON, Account.InstanceType.PLEROMA -> {
                 val fileIds = coroutineScope {
                     createNote.files?.map { appFile ->
                         async {
@@ -94,6 +94,7 @@ class NoteApiAdapter @Inject constructor(
                                 }?.toInt() ?: (5 * 60),
                             )
                         },
+                        quoteId = createNote.renoteId?.noteId,
                     )
                 ).throwIfHasError().body()
                 NoteResultType.Mastodon(requireNotNull(body))
@@ -113,7 +114,7 @@ class NoteApiAdapter @Inject constructor(
                 ).throwIfHasError().body()
                 NoteResultType.Misskey(requireNotNull(body))
             }
-            Account.InstanceType.MASTODON -> {
+            Account.InstanceType.MASTODON, Account.InstanceType.PLEROMA -> {
                 val body = mastodonAPIProvider.get(account)
                     .getStatus(noteId.noteId)
                     .throwIfHasError().body()
@@ -134,7 +135,7 @@ class NoteApiAdapter @Inject constructor(
                 ).throwIfHasError()
                 DeleteNoteResultType.Misskey
             }
-            Account.InstanceType.MASTODON -> {
+            Account.InstanceType.MASTODON, Account.InstanceType.PLEROMA -> {
                 val body = mastodonAPIProvider.get(account).deleteStatus(noteId.noteId)
                     .throwIfHasError()
                     .body()
@@ -155,7 +156,7 @@ class NoteApiAdapter @Inject constructor(
                 ).throwIfHasError()
                 ToggleThreadMuteResultType.Misskey
             }
-            Account.InstanceType.MASTODON -> {
+            Account.InstanceType.MASTODON, Account.InstanceType.PLEROMA -> {
                 val body = mastodonAPIProvider.get(account)
                     .muteConversation(noteId.noteId)
                     .throwIfHasError()
@@ -177,7 +178,7 @@ class NoteApiAdapter @Inject constructor(
                 ).throwIfHasError()
                 ToggleThreadMuteResultType.Misskey
             }
-            Account.InstanceType.MASTODON -> {
+            Account.InstanceType.MASTODON, Account.InstanceType.PLEROMA -> {
                 val body = mastodonAPIProvider.get(account).unmuteConversation(noteId.noteId)
                     .throwIfHasError()
                     .body()

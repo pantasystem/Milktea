@@ -72,7 +72,7 @@ class OkHttpFileUploaderProvider(
                         instances[account.accountId]
                             ?: throw IllegalStateException("生成したはずのインスタンスが消滅しました！！")
                     }
-                    Account.InstanceType.MASTODON -> {
+                    Account.InstanceType.MASTODON, Account.InstanceType.PLEROMA -> {
                         map[account.accountId] = MastodonOkHttpFileUploader(
                             context,
                             account,

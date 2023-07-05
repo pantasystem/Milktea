@@ -17,7 +17,11 @@ import com.wada811.databinding.dataBinding
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import net.pantasystem.milktea.common.ui.ApplyTheme
+import net.pantasystem.milktea.common_navigation.UserDetailNavigation
+import net.pantasystem.milktea.common_navigation.UserDetailNavigationArgs
+import net.pantasystem.milktea.model.ap.ApResolver
 import net.pantasystem.milktea.model.user.User
+import net.pantasystem.milktea.note.NoteDetailActivity
 import net.pantasystem.milktea.search.databinding.ActivitySearchBinding
 import net.pantasystem.milktea.user.activity.UserDetailActivity
 import javax.inject.Inject
@@ -33,10 +37,14 @@ class SearchActivity : AppCompatActivity() {
     @Inject
     internal lateinit var applyTheme: ApplyTheme
 
+    @Inject
+    internal lateinit var userDetailNavigation: UserDetailNavigation
+
 
     private var mSearchView: SearchView? = null
 
     private var mSearchWord: String? = null
+    private var mAcct: String? = null
 
     private val binding: ActivitySearchBinding by dataBinding()
 
@@ -53,6 +61,7 @@ class SearchActivity : AppCompatActivity() {
 
         supportActionBar?.setDisplayShowTitleEnabled(false)
         mSearchWord = intent.getStringExtra(EXTRA_SEARCH_WORD)
+        mAcct = intent.getStringExtra(SearchResultViewModel.EXTRA_ACCT)
 
         findViewById<ComposeView>(R.id.composeBase).setContent {
             MdcTheme {
@@ -119,12 +128,43 @@ class SearchActivity : AppCompatActivity() {
 
     fun showSearchResult(searchWord: String) {
         lifecycleScope.launch {
-            val intent = Intent(this@SearchActivity, SearchResultActivity::class.java)
-            intent.putExtra(SearchResultActivity.EXTRA_SEARCH_WORLD, searchWord)
-            searchViewModel.onQueryTextSubmit(searchWord)
-            startActivity(intent)
-            overridePendingTransition(0, 0)
-            finish()
+
+            when (val result = searchViewModel.onQueryTextSubmit(searchWord)) {
+                is SubmitResult.ApResolved -> {
+                    when (result.apResolve) {
+                        is ApResolver.TypeNote -> {
+                            startActivity(
+                                NoteDetailActivity.newIntent(
+                                    this@SearchActivity,
+                                    result.apResolve.note.id
+                                ),
+                            )
+                            finish()
+                        }
+                        is ApResolver.TypeUser -> {
+                            startActivity(
+                                userDetailNavigation.newIntent(
+                                    UserDetailNavigationArgs.UserId(
+                                        result.apResolve.user.id
+                                    ),
+                                ),
+                            )
+                            finish()
+                        }
+                    }
+                }
+                is SubmitResult.Search -> {
+                    val intent = Intent(this@SearchActivity, SearchResultActivity::class.java)
+                    intent.putExtra(SearchResultActivity.EXTRA_SEARCH_WORLD, searchWord)
+                    intent.putExtra(SearchResultViewModel.EXTRA_ACCT, mAcct)
+                    startActivity(intent)
+                    overridePendingTransition(0, 0)
+                    finish()
+                }
+                SubmitResult.Cancelled -> return@launch
+
+            }
+
         }
 
     }

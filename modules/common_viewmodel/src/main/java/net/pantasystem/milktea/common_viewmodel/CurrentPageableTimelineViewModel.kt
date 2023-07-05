@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import net.pantasystem.milktea.model.account.page.Pageable
 import javax.inject.Inject
 
@@ -34,12 +35,16 @@ class CurrentPageableTimelineViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val _currentType = MutableStateFlow<CurrentPageType>(
-        CurrentPageType.Page(Pageable.HomeTimeline()))
+        CurrentPageType.Page(null, Pageable.HomeTimeline()))
 
     val currentType: StateFlow<CurrentPageType> = _currentType
 
-    fun setCurrentPageable(pageable: Pageable) {
-        _currentType.value = CurrentPageType.Page(pageable)
+
+    private val _currentAccountId = MutableStateFlow<Long?>(null)
+    val currentAccountId = _currentAccountId.asStateFlow()
+
+    fun setCurrentPageable(accountId: Long?, pageable: Pageable) {
+        _currentType.value = CurrentPageType.Page(accountId, pageable)
     }
 
     fun setCurrentPageType(type: CurrentPageType) {
@@ -49,6 +54,6 @@ class CurrentPageableTimelineViewModel @Inject constructor(
 }
 
 sealed interface CurrentPageType {
-    data class Page(val pageable: Pageable) : CurrentPageType
+    data class Page(val accountId: Long?, val pageable: Pageable) : CurrentPageType
     object Account : CurrentPageType
 }

@@ -1,6 +1,0 @@
-<resources>
-    <string name="download">Download</string>
-    <string name="start_downloading_placeholder">Start downloading %s</string>
-    <string name="success_download_file_message">Download successful</string>
-    <string name="failed_download_file_message">Download failed</string>
-</resources>

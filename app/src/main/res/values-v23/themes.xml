@@ -32,7 +32,6 @@
 
 
 
-        <item name="android:navigationBarColor">#FFFFFF</item>
 
         <item name="textInputStyle">@style/TextInputLayoutStyle</item>
 
@@ -40,6 +39,7 @@
 
         <item name="colorDotTabSelected">#575DAE</item>
         <item name="colorDotTabNormal">@color/colorItemNotSelected</item>
+        <item name="android:windowLightStatusBar">true</item>
     </style>
 
     <style name="AppThemeDark" parent="Theme.MaterialComponents.DayNight.NoActionBar">

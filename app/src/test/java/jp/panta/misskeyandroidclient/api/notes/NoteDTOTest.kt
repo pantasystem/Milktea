@@ -3,10 +3,10 @@ package jp.panta.misskeyandroidclient.api.notes
 
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
+import net.pantasystem.milktea.api.misskey.emoji.CustomEmojiNetworkDTO
 import net.pantasystem.milktea.api.misskey.emoji.EmojisType
 import net.pantasystem.milktea.api.misskey.emoji.TestNoteObject
 import net.pantasystem.milktea.api.misskey.notes.NoteDTO
-import net.pantasystem.milktea.model.emoji.Emoji
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 
@@ -869,7 +869,7 @@ class NoteDTOTest {
             [{"name": "hoge", "url": "https://example.com"}]
         """.trimIndent()
         val result = builder.decodeFromString<EmojisType>(json1)
-        Assertions.assertEquals(EmojisType.TypeArray(listOf(Emoji(name = "hoge", url = "https://example.com"))), result)
+        Assertions.assertEquals(EmojisType.TypeArray(listOf(CustomEmojiNetworkDTO(name = "hoge", url = "https://example.com"))), result)
 
     }
 
@@ -896,7 +896,7 @@ class NoteDTOTest {
         """.trimIndent()
         val result = builder.decodeFromString<TestNoteObject>(json1)
         Assertions.assertEquals(TestNoteObject(EmojisType.TypeArray(
-            listOf(Emoji(name = "hoge", url = "https://example.com"))
+            listOf(CustomEmojiNetworkDTO(name = "hoge", url = "https://example.com"))
         )), result)
     }
 

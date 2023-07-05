@@ -1,13 +1,24 @@
 package net.pantasystem.milktea.data.infrastructure.notes.impl
 
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.data.infrastructure.MemoryCacheCleaner
 import net.pantasystem.milktea.model.AddResult
-import net.pantasystem.milktea.model.notes.*
+import net.pantasystem.milktea.model.notes.Note
+import net.pantasystem.milktea.model.notes.NoteDataSource
+import net.pantasystem.milktea.model.notes.NoteDataSourceState
+import net.pantasystem.milktea.model.notes.NoteDeletedException
+import net.pantasystem.milktea.model.notes.NoteNotFoundException
+import net.pantasystem.milktea.model.notes.NoteRemovedException
+import net.pantasystem.milktea.model.notes.NoteThreadContext
 import net.pantasystem.milktea.model.user.User
 import javax.inject.Inject
 
@@ -27,9 +38,6 @@ class InMemoryNoteDataSource @Inject constructor(
 
     private var deleteNoteIds = mutableSetOf<Note.Id>()
     private var removedNoteIds = mutableSetOf<Note.Id>()
-
-    override val state: StateFlow<NoteDataSourceState>
-        get() = _state
 
     init {
         addEventListener {
@@ -145,6 +153,15 @@ class InMemoryNoteDataSource @Inject constructor(
         }.distinctUntilChanged()
     }
 
+
+    override suspend fun findByReplyId(id: Note.Id): Result<List<Note>> {
+        return Result.success(
+            _state.value.map.values.filter {
+                it.replyId == id
+            }
+        )
+    }
+
     override fun observeOne(noteId: Note.Id): Flow<Note?> {
         return _state.map {
             it.getOrNull(noteId)
@@ -171,12 +188,37 @@ class InMemoryNoteDataSource @Inject constructor(
         }
     }
 
+    override suspend fun clear(): Result<Unit> = runCancellableCatching {
+        mutex.withLock {
+            notes = emptyMap()
+        }
+    }
+
+    override suspend fun addNoteThreadContext(
+        noteId: Note.Id,
+        context: NoteThreadContext
+    ): Result<Unit> = Result.success(Unit)
+
+    override fun observeNoteThreadContext(noteId: Note.Id): Flow<NoteThreadContext?> {
+        return emptyFlow()
+    }
+
+    override suspend fun findNoteThreadContext(noteId: Note.Id): Result<NoteThreadContext> = Result.success(
+        NoteThreadContext(emptyList(), emptyList())
+    )
+
+    override suspend fun clearNoteThreadContext(noteId: Note.Id): Result<Unit> = Result.success(Unit)
+
     private fun publish(ev: NoteDataSource.Event) = runBlocking {
         listenersLock.withLock {
             listeners.forEach {
                 it.on(ev)
             }
         }
+    }
+
+    override suspend fun findLocalCount(): Result<Long> {
+        return Result.success(notes.size.toLong())
     }
 
 }

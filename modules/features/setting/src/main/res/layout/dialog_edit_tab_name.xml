@@ -13,7 +13,7 @@
                 android:textSize="24sp"
                 android:textColor="?android:attr/textColorPrimary"
                 android:layout_marginBottom="8dp"
-                android:text="@string/edit_tab_name"
+                android:text="@string/edit_tab"
                 />
 
         <com.google.android.material.switchmaterial.SwitchMaterial
@@ -23,18 +23,25 @@
                 android:layout_below="@id/titleView"
                 android:text="@string/settings_edit_tab_only_media"/>
 
+        <com.google.android.material.switchmaterial.SwitchMaterial
+            android:id="@+id/toggleSavePagePosition"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/toggleOnlyMedia"
+            android:text="@string/remember_scroll_position"/>
+
         <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/tabNameInput"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="8dp"
-                android:layout_below="@id/toggleOnlyMedia"
+                android:layout_below="@id/toggleSavePagePosition"
                 >
             <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/editTabName"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="@string/edit_tab_name"
+                    android:hint="@string/edit_tab"
                     android:singleLine="true"/>
         </com.google.android.material.textfield.TextInputLayout>
 

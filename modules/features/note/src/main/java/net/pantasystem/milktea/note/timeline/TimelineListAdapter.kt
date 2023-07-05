@@ -19,6 +19,8 @@ import com.google.android.flexbox.FlexboxLayoutManager
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import net.pantasystem.milktea.model.setting.DefaultConfig
+import net.pantasystem.milktea.model.setting.LocalConfigRepository
 import net.pantasystem.milktea.note.R
 import net.pantasystem.milktea.note.databinding.ItemHasReplyToNoteBinding
 import net.pantasystem.milktea.note.databinding.ItemNoteBinding
@@ -33,6 +35,7 @@ import net.pantasystem.milktea.note.viewmodel.HasReplyToNoteViewData
 import net.pantasystem.milktea.note.viewmodel.PlaneNoteViewData
 
 class TimelineListAdapter(
+    private val configRepository: LocalConfigRepository,
     private val lifecycleOwner: LifecycleOwner,
     val onRefreshAction: () -> Unit,
     val onReauthenticateAction: () -> Unit,
@@ -98,11 +101,11 @@ class TimelineListAdapter(
 
         fun unbind() {
             job?.cancel()
+            reactionCountsView.itemAnimator?.endAnimations()
 
             mCurrentNote = null
         }
 
-        @Suppress("ObjectLiteralToLambda")
         private fun bindReactionCounter() {
             val reactionCountAdapter = ReactionCountAdapter {
                 noteCardActionListenerAdapter.onReactionCountAction(it)
@@ -111,13 +114,14 @@ class TimelineListAdapter(
             reactionCountAdapter.note = note
 
             val reactionList = note.reactionCountsViewData.value
-
+            reactionCountsView.itemAnimator = null
             reactionCountsView.layoutManager = getLayoutManager()
             reactionCountsView.adapter = reactionCountAdapter
             reactionCountsView.isNestedScrollingEnabled = false
             reactionCountAdapter.submitList(reactionList)
             job = note.reactionCountsViewData.onEach { counts ->
                 if(reactionCountAdapter.note?.id == mCurrentNote?.id) {
+                    reactionCountsView.itemAnimator?.endAnimations()
                     bindReactionCountVisibility(counts)
                     reactionCountAdapter.submitList(counts)
                 }
@@ -254,12 +258,19 @@ class TimelineListAdapter(
     }
 
     override fun onCreateViewHolder(p0: ViewGroup, p1: Int): TimelineListItemViewHolderBase {
+        val config = configRepository.get().getOrElse {
+            DefaultConfig.config
+        }
         return when(ViewHolderType.values()[p1]) {
             ViewHolderType.NormalNote -> {
                 val binding = DataBindingUtil.inflate<ItemNoteBinding>(LayoutInflater.from(p0.context), R.layout.item_note, p0, false)
                 binding.simpleNote.reactionView.setRecycledViewPool(reactionCounterRecyclerViewPool)
                 binding.simpleNote.urlPreviewList.setRecycledViewPool(urlPreviewListRecyclerViewPool)
                 binding.simpleNote.manyFilePreviewListView.setRecycledViewPool(manyFilePreviewListViewRecyclerViewPool)
+                NoteFontSizeBinder.from(binding.simpleNote).bind(
+                    headerFontSize = config.noteHeaderFontSize,
+                    contentFontSize = config.noteContentFontSize,
+                )
                 NoteViewHolder(binding)
             }
             ViewHolderType.HasReplyToNote -> {
@@ -267,6 +278,10 @@ class TimelineListAdapter(
                 binding.simpleNote.reactionView.setRecycledViewPool(reactionCounterRecyclerViewPool)
                 binding.simpleNote.urlPreviewList.setRecycledViewPool(urlPreviewListRecyclerViewPool)
                 binding.simpleNote.manyFilePreviewListView.setRecycledViewPool(manyFilePreviewListViewRecyclerViewPool)
+                NoteFontSizeBinder.from(binding.simpleNote).bind(
+                    headerFontSize = config.noteHeaderFontSize,
+                    contentFontSize = config.noteContentFontSize,
+                )
                 HasReplyToNoteViewHolder(binding)
             }
             ViewHolderType.Loading -> {
@@ -310,6 +325,7 @@ class TimelineListAdapter(
             simpleNote.subNoteMediaPreview.thumbnailBottomRight,
 
         )
+        simpleNote.reactionView.itemAnimator?.endAnimations()
 
         imageViews.map {
             Glide.with(simpleNote.avatarIcon).clear(it)

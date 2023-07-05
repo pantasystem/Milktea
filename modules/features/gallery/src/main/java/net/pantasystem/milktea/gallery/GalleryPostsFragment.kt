@@ -68,13 +68,14 @@ class GalleryPostsFragment : Fragment() {
     @Inject
     lateinit var authorizationNavigation: AuthorizationNavigation
 
+    private val accountId: Long? by lazy {
+        arguments?.getLong(EXTRA_ACCOUNT_ID, -1)?.takeIf {
+            it > 0
+        }
+    }
+
     val viewModel: GalleryPostsViewModel by viewModels {
         val pageable = arguments?.getSerializable(EXTRA_PAGEABLE) as Pageable.Gallery
-        var accountId = arguments?.getLong(EXTRA_ACCOUNT_ID, -1)
-        if (accountId == -1L) {
-            accountId = null
-        }
-
         GalleryPostsViewModel.provideFactory(viewModelFactory, pageable, accountId)
     }
 
@@ -147,7 +148,7 @@ class GalleryPostsFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
-        currentTimelineViewModel.setCurrentPageable(pageable)
+        currentTimelineViewModel.setCurrentPageable(accountId, pageable)
     }
 
 }

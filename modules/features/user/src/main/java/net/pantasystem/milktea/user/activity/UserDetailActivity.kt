@@ -113,6 +113,9 @@ class UserDetailActivity : AppCompatActivity() {
     @Inject
     lateinit var pageableFragmentFactory: PageableFragmentFactory
 
+    @Inject
+    lateinit var searchNavigation: SearchNavigation
+
 
     @ExperimentalCoroutinesApi
     val mViewModel: UserDetailViewModel by viewModels {
@@ -400,6 +403,16 @@ class UserDetailActivity : AppCompatActivity() {
             R.id.renoteMute -> {
                 mViewModel.muteRenotes()
             }
+            R.id.nav_search_by_user -> {
+                startActivity(searchNavigation.newIntent(
+                    SearchNavType.SearchScreen(
+                        acct = mViewModel.userState.value?.let {
+                                "@${it.userName}@${it.host}"
+                            }
+                        )
+                    )
+                )
+            }
             else -> return false
 
         }
@@ -429,7 +442,7 @@ class UserDetailActivity : AppCompatActivity() {
 
     private fun applyRemoteUserStateLayoutBackgroundColor(
         binding: ActivityUserDetailBinding,
-        config: Config
+        config: Config,
     ) {
         val typed = TypedValue()
         if (config.theme is Theme.Bread) {
@@ -463,6 +476,7 @@ class UserTimelinePagerAdapterV2(
                 Pageable.Gallery.User(tab.userId.id),
             )
             is UserDetailTabType.Media -> pageableFragmentFactory.create(
+                tab.userId.accountId,
                 Pageable.UserTimeline(
                     tab.userId.id,
                     withFiles = true
@@ -471,34 +485,53 @@ class UserTimelinePagerAdapterV2(
             is UserDetailTabType.PinNote -> userPinnedNotesFragmentFactory.create(tab.userId)
             is UserDetailTabType.Reactions -> UserReactionsFragment.newInstance(tab.userId)
             is UserDetailTabType.UserTimeline -> pageableFragmentFactory.create(
+                tab.userId.accountId,
                 Pageable.UserTimeline(
                     tab.userId.id,
                     includeReplies = false
                 )
             )
             is UserDetailTabType.UserTimelineWithReplies -> pageableFragmentFactory.create(
+                tab.userId.accountId,
                 Pageable.UserTimeline(
                     tab.userId.id,
                     includeReplies = true
                 )
             )
             is UserDetailTabType.MastodonMedia -> pageableFragmentFactory.create(
+                tab.userId.accountId,
                 Pageable.Mastodon.UserTimeline(
                     tab.userId.id,
                     isOnlyMedia = true,
                 )
             )
             is UserDetailTabType.MastodonUserTimeline -> pageableFragmentFactory.create(
+                tab.userId.accountId,
                 Pageable.Mastodon.UserTimeline(
                     tab.userId.id,
                     excludeReplies = true,
                 )
             )
             is UserDetailTabType.MastodonUserTimelineWithReplies -> pageableFragmentFactory.create(
+                tab.userId.accountId,
                 Pageable.Mastodon.UserTimeline(
                     tab.userId.id,
                     excludeReplies = false,
                 )
+            )
+            is UserDetailTabType.MastodonUserTimelineOnlyPosts -> pageableFragmentFactory.create(
+                tab.userId.accountId,
+                Pageable.Mastodon.UserTimeline(
+                    tab.userId.id,
+                    excludeReblogs = true,
+                )
+            )
+            is UserDetailTabType.UserTimelineOnlyPosts -> pageableFragmentFactory.create(
+                tab.userId.accountId,
+                Pageable.UserTimeline(
+                    tab.userId.id,
+                    includeMyRenotes = false,
+                ),
             )
         }
 

@@ -32,12 +32,12 @@ internal class NodeInfoFetcherImplTest {
         assertNotNull(impl.fetch("misskey.io"))
     }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
-    @Test
-    fun fetch_GiveMisskeyDev() = runTest {
-        val impl = NodeInfoFetcherImpl(NodeInfoAPIBuilderImpl(DefaultOkHttpClientProvider()), loggerFactory)
-        assertNotNull(impl.fetch("misskey.dev"))
-    }
+//    @OptIn(ExperimentalCoroutinesApi::class)
+//    @Test
+//    fun fetch_GiveMisskeyDev() = runTest {
+//        val impl = NodeInfoFetcherImpl(NodeInfoAPIBuilderImpl(DefaultOkHttpClientProvider()), loggerFactory)
+//        assertNotNull(impl.fetch("misskey.dev"))
+//    }
 
     @OptIn(ExperimentalCoroutinesApi::class)
     @Test

@@ -23,6 +23,7 @@ import net.pantasystem.milktea.model.notes.draft.DraftNote
 import net.pantasystem.milktea.model.notes.favorite.FavoriteRepository
 import net.pantasystem.milktea.model.notes.favorite.ToggleFavoriteUseCase
 import net.pantasystem.milktea.model.notes.poll.Poll
+import net.pantasystem.milktea.model.notes.reaction.DeleteReactionsUseCase
 import net.pantasystem.milktea.model.notes.reaction.ToggleReactionUseCase
 import net.pantasystem.milktea.model.user.report.Report
 import net.pantasystem.milktea.note.R
@@ -39,6 +40,7 @@ class NotesViewModel @Inject constructor(
     private val bookmarkRepository: BookmarkRepository,
     private val toggleFavoriteUseCase: ToggleFavoriteUseCase,
     private val deleteAndEditUseCase: DeleteAndEditUseCase,
+    private val deleteReactionUseCase: DeleteReactionsUseCase,
     loggerFactory: Logger.Factory
 ) : ViewModel() {
     private val logger by lazy {
@@ -94,6 +96,14 @@ class NotesViewModel @Inject constructor(
         viewModelScope.launch {
             toggleReactionUseCase(noteId, reaction).onFailure {
                 logger.error("リアクション失敗", it)
+            }
+        }
+    }
+
+    fun deleteReactions(noteId: Note.Id) {
+        viewModelScope.launch {
+            deleteReactionUseCase(noteId).onFailure {
+                logger.error("リアクションの解除に失敗", it)
             }
         }
     }

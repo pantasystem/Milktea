@@ -1,11 +1,10 @@
 package net.pantasystem.milktea.auth.viewmodel.app
 
-import net.pantasystem.milktea.api.misskey.infos.InstanceInfosResponse
+import net.pantasystem.milktea.api.misskey.infos.SimpleInstanceInfo
 import net.pantasystem.milktea.common.ResultState
 import net.pantasystem.milktea.common.StateContent
 import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.data.infrastructure.auth.Authorization
-import net.pantasystem.milktea.model.instance.InstanceInfo
 import net.pantasystem.milktea.model.instance.MastodonInstanceInfo
 import net.pantasystem.milktea.model.instance.Meta
 import net.pantasystem.milktea.model.nodeinfo.NodeInfo
@@ -56,6 +55,11 @@ sealed interface InstanceType {
         val instance: Meta,
         override val softwareType: NodeInfo.SoftwareType.Misskey?,
     ) : InstanceType
+
+    data class Pleroma(
+        val instance: MastodonInstanceInfo,
+        override val softwareType: NodeInfo.SoftwareType?
+    ) : InstanceType
 }
 
 sealed interface GenerateTokenResult {
@@ -75,8 +79,7 @@ data class AuthUiState(
         StateContent.NotExist()
     ),
     val clientId: String = "",
-    val instances: List<InstanceInfo> = emptyList(),
-    val misskeyInstanceInfosResponse: InstanceInfosResponse?
+    val misskeyInstanceInfosResponse: List<SimpleInstanceInfo>,
 ) {
     val isProgress by lazy {
         metaState is ResultState.Loading || waiting4ApproveState is ResultState.Loading
