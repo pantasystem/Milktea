@@ -406,7 +406,7 @@ class DriveViewModel @Inject constructor(
                 }
             }
             savedStateHandle[STATE_SELECTED_FILE_PROPERTY_IDS] = emptyList<FileProperty.Id>()
-            if (uiState.value.requireSelectedResult) {
+            if (!uiState.value.requireSelectedResult) {
                 savedStateHandle[STATE_SELECTABLE_MODE] = false
             }
             refresh()
