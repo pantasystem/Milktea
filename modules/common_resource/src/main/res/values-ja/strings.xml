@@ -608,6 +608,7 @@
     <string name="settings_cache_config">キャッシュ設定</string>
     <string name="settings_note_cache">ノートのキャッシュ</string>
     <string name="settings_custom_emoji_cache">カスタム絵文字のキャッシュ</string>
+    <string name="move_files_here">ここにファイルを移動</string>
     <!-- User -->
 
 

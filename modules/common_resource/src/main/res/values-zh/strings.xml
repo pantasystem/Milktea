@@ -600,6 +600,7 @@
     <string name="settings_cache_config">缓存设置</string>
     <string name="settings_note_cache">帖子缓存</string>
     <string name="settings_custom_emoji_cache">自定义表情缓存</string>
+    <string name="move_files_here">将文件移至此处</string>
     <!-- User -->
 
 </resources>

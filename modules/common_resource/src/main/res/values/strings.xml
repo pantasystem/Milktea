@@ -605,4 +605,5 @@
     <string name="settings_cache_config">Cache settings</string>
     <string name="settings_note_cache">Note cache</string>
     <string name="settings_custom_emoji_cache">Custom emoji cache</string>
+    <string name="move_files_here">Move files here</string>
 </resources>
