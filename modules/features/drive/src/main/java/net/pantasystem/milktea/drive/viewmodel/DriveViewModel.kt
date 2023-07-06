@@ -205,8 +205,8 @@ class DriveViewModel @Inject constructor(
         }.launchIn(viewModelScope)
     }
 
-    fun getSelectedFileIds(): Set<FileProperty.Id>? {
-        return savedStateHandle.get<List<FileProperty.Id>>(STATE_SELECTED_FILE_PROPERTY_IDS)?.toSet()
+    fun getSelectedFileIds(): List<FileProperty.Id>? {
+        return savedStateHandle.get<List<FileProperty.Id>>(STATE_SELECTED_FILE_PROPERTY_IDS)
     }
 
 
@@ -329,7 +329,7 @@ class DriveViewModel @Inject constructor(
 
     fun toggleSelect(id: FileProperty.Id) {
         val maxSelectableSize: Int? = savedStateHandle[EXTRA_INT_SELECTABLE_FILE_MAX_SIZE]
-        savedStateHandle[STATE_SELECTED_FILE_PROPERTY_IDS] = (savedStateHandle.get<List<FileProperty.Id>>(STATE_SELECTED_FILE_PROPERTY_IDS) ?: emptyList()).let { list ->
+        val newList = (savedStateHandle.get<List<FileProperty.Id>>(STATE_SELECTED_FILE_PROPERTY_IDS) ?: emptyList()).let { list ->
             if (list.contains(id)) {
                 list - id
             } else {
@@ -339,6 +339,10 @@ class DriveViewModel @Inject constructor(
                     list + id
                 }
             }
+        }
+        savedStateHandle[STATE_SELECTED_FILE_PROPERTY_IDS] = newList
+        if (!uiState.value.requireSelectedResult && newList.isEmpty()) {
+            savedStateHandle[STATE_SELECTABLE_MODE] = false
         }
     }
 
@@ -385,6 +389,41 @@ class DriveViewModel @Inject constructor(
 
     }
 
+    fun onFileMoveToHereButtonClicked() {
+        viewModelScope.launch {
+            val currentDir = getCurrentDirId()
+            val selectedFileIds = getSelectedFileIds()
+            if (selectedFileIds.isNullOrEmpty()) {
+                return@launch
+            }
+            selectedFileIds.map { id ->
+                filePropertyRepository.update(
+                    filePropertyRepository.find(id).update(
+                        folderId = currentDir
+                    )
+                ).onFailure {
+                    logger.error("error move file", it)
+                }
+            }
+            savedStateHandle[STATE_SELECTED_FILE_PROPERTY_IDS] = emptyList<FileProperty.Id>()
+            if (uiState.value.requireSelectedResult) {
+                savedStateHandle[STATE_SELECTABLE_MODE] = false
+            }
+            refresh()
+        }
+    }
+
+    fun selectAndSelectMode(fileProperty: FileProperty) {
+        if (uiState.value.requireSelectedResult) {
+            return
+        }
+        if (uiState.value.isSelectMode) {
+            return
+        }
+        savedStateHandle[STATE_SELECTABLE_MODE] = true
+        toggleSelect(fileProperty.id)
+    }
+
     private fun getCurrentDirId(): String? {
         return savedStateHandle.get<String>(STATE_CURRENT_DIRECTORY_ID)
     }
@@ -396,13 +435,19 @@ class DriveViewModel @Inject constructor(
         filePagingStore.setCurrentAccount(account)
         directoryPagingStore.setAccount(account)
 
+        refresh()
+    }
+
+    private fun refresh() {
         viewModelScope.launch {
+            filePagingStore.clear()
             filePagingStore.loadPrevious().onFailure {
                 logger.error("refreshPagingState error", it)
             }
         }
 
         viewModelScope.launch {
+            directoryPagingStore.clear()
             directoryPagingStore.loadPrevious().onFailure {
                 logger.error("refreshPagingState error", it)
             }
@@ -429,6 +474,14 @@ data class DriveUiState(
     enum class ViewMode {
         List,
         Grid,
+    }
+
+    val requireSelectedResult: Boolean by lazy {
+        isSelectMode && maxSelectableSize != null
+    }
+
+    val canFileMove: Boolean by lazy {
+        isSelectMode && maxSelectableSize == null && selectedFilePropertyIds.isNotEmpty()
     }
 }
 

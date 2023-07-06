@@ -2,6 +2,7 @@ package net.pantasystem.milktea.drive
 
 
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
@@ -12,11 +13,13 @@ import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.Button
 import androidx.compose.material.Card
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -49,9 +52,15 @@ fun DirectoryListScreen(driveViewModel: DriveViewModel) {
         },
         Modifier.fillMaxHeight()
     ) {
-        DirectoryListView(directories, listState = listState) {
-            driveViewModel.push(it)
-        }
+        DirectoryListView(
+            uiState.canFileMove,
+            directories,
+            listState = listState,
+            onDirectorySelected = {
+                driveViewModel.push(it)
+            },
+            onMoveToFileHereButtonClicked = driveViewModel::onFileMoveToHereButtonClicked
+        )
     }
 
 
@@ -81,14 +90,36 @@ fun DirectoryListTile(directory: Directory, onClick:()->Unit) {
 
 @Composable
 fun DirectoryListView(
+    canFileMove: Boolean,
     directories: List<Directory>,
     listState: LazyListState = rememberLazyListState(),
-    onDirectorySelected: (Directory)->Unit
+    onDirectorySelected: (Directory)->Unit,
+    onMoveToFileHereButtonClicked: ()->Unit = {}
 ) {
     LazyColumn(
         state = listState,
         modifier = Modifier.fillMaxSize()
     ) {
+        if (canFileMove) {
+            item {
+                Box(
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    Button(
+                        onClick = onMoveToFileHereButtonClicked,
+                        Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 8.dp, horizontal = 32.dp),
+                        shape = RoundedCornerShape(32.dp)
+                    ) {
+                        Text("ファイルをここに移動")
+                    }
+                }
+            }
+        }
         this.itemsIndexed(directories, { index, _ ->
             directories[index].id
         }){ _, item ->

@@ -116,6 +116,10 @@ fun FilePropertyListScreen(
             is FilePropertyCardAction.OnSelectEditFileNameMenuItem -> {
                 editNameTargetFile = cardAction.file
             }
+
+            is FilePropertyCardAction.OnLongClicked -> {
+                driveViewModel.selectAndSelectMode(cardAction.file)
+            }
         }
     }
 
