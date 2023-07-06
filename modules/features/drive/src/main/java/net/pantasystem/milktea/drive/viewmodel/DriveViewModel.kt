@@ -201,26 +201,7 @@ class DriveViewModel @Inject constructor(
         combine(currentAccount, currentDirectory) { ac, dir ->
             ac to dir
         }.onEach { (ac, dir) ->
-            filePagingStore.setCurrentAccount(ac)
-            filePagingStore.setCurrentDirectory(dir)
-            directoryPagingStore.setAccount(ac)
-            directoryPagingStore.setCurrentDirectory(dir)
-            viewModelScope.launch {
-                filePagingStore.loadPrevious()
-            }
-            viewModelScope.launch {
-                directoryPagingStore.loadPrevious()
-            }
-        }.launchIn(viewModelScope)
-        currentDirectory.onEach { dir ->
-            filePagingStore.setCurrentDirectory(dir)
-            directoryPagingStore.setCurrentDirectory(dir)
-            viewModelScope.launch {
-                filePagingStore.loadPrevious()
-            }
-            viewModelScope.launch {
-                directoryPagingStore.loadPrevious()
-            }
+            refreshPagingState(ac, dir)
         }.launchIn(viewModelScope)
     }
 
@@ -364,7 +345,7 @@ class DriveViewModel @Inject constructor(
     fun uploadFile(file: AppFile.Local) {
         viewModelScope.launch {
             try {
-                val currentDir = savedStateHandle.get<String>(STATE_CURRENT_DIRECTORY_ID)
+                val currentDir = getCurrentDirId()
                 val accountId = savedStateHandle.get<Long>(EXTRA_ACCOUNT_ID)
                     ?: accountRepository.getCurrentAccount().getOrThrow().accountId
                 val e = filePropertyRepository.create(
@@ -385,7 +366,7 @@ class DriveViewModel @Inject constructor(
                 val accountId = savedStateHandle.get<Long>(EXTRA_ACCOUNT_ID)
                     ?: accountRepository.getCurrentAccount().getOrNull()?.accountId
                     ?: return@launch
-                val currentDir = savedStateHandle.get<String>(STATE_CURRENT_DIRECTORY_ID)
+                val currentDir = getCurrentDirId()
 
                 directoryRepository.create(
                     CreateDirectory(
@@ -404,6 +385,29 @@ class DriveViewModel @Inject constructor(
 
     }
 
+    private fun getCurrentDirId(): String? {
+        return savedStateHandle.get<String>(STATE_CURRENT_DIRECTORY_ID)
+    }
+
+    private suspend fun refreshPagingState(account: Account?, currentDirectory: Directory?) {
+        filePagingStore.setCurrentDirectory(currentDirectory)
+        directoryPagingStore.setCurrentDirectory(currentDirectory)
+
+        filePagingStore.setCurrentAccount(account)
+        directoryPagingStore.setAccount(account)
+
+        viewModelScope.launch {
+            filePagingStore.loadPrevious().onFailure {
+                logger.error("refreshPagingState error", it)
+            }
+        }
+
+        viewModelScope.launch {
+            directoryPagingStore.loadPrevious().onFailure {
+                logger.error("refreshPagingState error", it)
+            }
+        }
+    }
 }
 
 data class DriveUiState(
