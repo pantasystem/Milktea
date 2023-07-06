@@ -43,7 +43,6 @@ import net.pantasystem.milktea.model.notes.poll.Vote
 import net.pantasystem.milktea.model.sw.register.SubscriptionState
 import retrofit2.Response
 import retrofit2.http.Body
-import retrofit2.http.GET
 import retrofit2.http.POST
 
 interface MisskeyAPI {
@@ -213,7 +212,7 @@ interface MisskeyAPI {
     @POST("api/drive/folders/create")
     suspend fun createFolder(@Body createFolder: CreateFolder): Response<DirectoryNetworkDTO>
 
-    @GET("api/drive/folders/show")
+    @POST("api/drive/folders/show")
     suspend fun showFolder(@Body req: ShowFolderRequest): Response<DirectoryNetworkDTO>
 
 
