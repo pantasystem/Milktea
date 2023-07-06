@@ -141,7 +141,7 @@ class DriveViewModel @Inject constructor(
         PageableState.Loading.Init(),
     )
 
-    val isSelectMode = savedStateHandle.getStateFlow<Boolean>(
+    private val isSelectMode = savedStateHandle.getStateFlow<Boolean>(
         STATE_SELECTABLE_MODE,
         false,
     )
@@ -151,8 +151,10 @@ class DriveViewModel @Inject constructor(
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), false)
 
 
-    private val modes = combine(isSelectMode, isUsingGridView) { select, grid ->
+    private val modes = combine(isSelectMode, maxSelectableSize, isUsingGridView) { select, size, grid ->
         Modes(
+            isSelectMode = select,
+            maxSelectableSize = size,
             actionMode = if (select) DriveUiState.ActionMode.Selectable else DriveUiState.ActionMode.Normal,
             viewMode = if (grid) DriveUiState.ViewMode.Grid else DriveUiState.ViewMode.List,
         )
@@ -188,8 +190,11 @@ class DriveViewModel @Inject constructor(
             currentDirectory = dir,
             directoriesState = pagingState.directoriesState,
             driveFilesState = pagingState.driveFilesState,
+            selectedFilePropertyIds = selected,
             actionMode = mode.actionMode,
             viewMode = mode.viewMode,
+            isSelectMode = mode.isSelectMode || mode.maxSelectableSize != null && mode.maxSelectableSize > 0,
+            maxSelectableSize = mode.maxSelectableSize,
         )
     }.stateIn(
         viewModelScope,
@@ -347,11 +352,16 @@ class DriveViewModel @Inject constructor(
     }
 
     fun toggleSelect(id: FileProperty.Id) {
+        val maxSelectableSize: Int? = savedStateHandle[EXTRA_INT_SELECTABLE_FILE_MAX_SIZE]
         savedStateHandle[STATE_SELECTED_FILE_PROPERTY_IDS] = (savedStateHandle.get<List<FileProperty.Id>>(STATE_SELECTED_FILE_PROPERTY_IDS) ?: emptyList()).let { list ->
             if (list.contains(id)) {
                 list - id
             } else {
-                list + id
+                if (list.size >= (maxSelectableSize ?: Int.MAX_VALUE)) {
+                    list
+                } else {
+                    list + id
+                }
             }
         }
     }
@@ -366,6 +376,8 @@ data class DriveUiState(
     val actionMode: ActionMode = ActionMode.Normal,
     val viewMode: ViewMode = ViewMode.List,
     val selectedFilePropertyIds: List<FileProperty.Id> = emptyList(),
+    val maxSelectableSize: Int? = null,
+    val isSelectMode: Boolean = false,
 ) {
     enum class ActionMode {
         Normal,
@@ -379,6 +391,8 @@ data class DriveUiState(
 }
 
 private data class Modes(
+    val isSelectMode: Boolean = false,
+    val maxSelectableSize: Int? = null,
     val actionMode: DriveUiState.ActionMode = DriveUiState.ActionMode.Normal,
     val viewMode: DriveUiState.ViewMode = DriveUiState.ViewMode.List,
 )

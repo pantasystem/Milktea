@@ -13,14 +13,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.asLiveData
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -47,8 +45,7 @@ fun FilePropertyListScreen(
     val swipeRefreshState = rememberSwipeRefreshState(
         isRefreshing = filesState is PageableState.Loading.Init || filesState is PageableState.Loading.Future
     )
-    val isSelectMode: Boolean by driveViewModel.isSelectMode.asLiveData()
-        .observeAsState(initial = false)
+    val isSelectMode: Boolean = uiState.isSelectMode
     val files = (filesState.content as? StateContent.Exist)?.rawContent ?: emptyList()
 
     var confirmDeleteTarget: FileProperty? by remember {

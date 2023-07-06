@@ -67,15 +67,12 @@ fun DriveScreen(
     require(tabTitles.size == 2)
 
     val isGridMode: Boolean by driveViewModel.isUsingGridView.collectAsState()
-
-    val isSelectMode: Boolean by driveViewModel.isSelectMode.collectAsState()
-
-//    val selectableMaxCount = driveViewModel.selectable?.selectableMaxSize
-//    val path: List<PathViewData> by driveViewModel.path.asLiveData()
-//        .observeAsState(initial = emptyList())
-    val selectableMaxCount = driveViewModel.maxSelectableSize.collectAsState()
-
     val uiState by driveViewModel.uiState.collectAsState()
+
+    val isSelectMode: Boolean = uiState.isSelectMode
+
+    val selectableMaxCount = uiState.maxSelectableSize
+
     val selectedFileIds: Set<FileProperty.Id> = uiState.selectedFilePropertyIds.toSet()
     val pagerState = rememberPagerState(pageCount = tabTitles.size)
     val scope = rememberCoroutineScope()
@@ -89,7 +86,7 @@ fun DriveScreen(
 
                 TopAppBar(
                     title = {
-                        if (isSelectMode) {
+                        if (isSelectMode && selectableMaxCount != null && selectableMaxCount > 0) {
                             Text("${stringResource(R.string.selected)} ${selectedFileIds.size}/${selectableMaxCount}")
                         } else {
                             Text(stringResource(id = R.string.drive))
