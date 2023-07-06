@@ -7,7 +7,7 @@ import net.pantasystem.milktea.model.drive.Directory
 
 interface DriveDirectoryPagingStore {
     val state: Flow<PageableState<List<Directory>>>
-    suspend fun loadPrevious()
+    suspend fun loadPrevious(): Result<Int>
     suspend fun clear()
     suspend fun setAccount(account: Account?)
     suspend fun setCurrentDirectory(directory: Directory?)

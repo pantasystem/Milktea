@@ -50,8 +50,8 @@ class DriveDirectoryPagingStoreImpl @Inject constructor(
         pagingImpl.setState(PageableState.Fixed(StateContent.NotExist()))
     }
 
-    override suspend fun loadPrevious() {
-        controller.loadPrevious()
+    override suspend fun loadPrevious(): Result<Int> {
+        return controller.loadPrevious()
     }
 
     override suspend fun setAccount(account: Account?) {

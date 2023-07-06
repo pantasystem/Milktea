@@ -62,8 +62,8 @@ class FilePropertyPagingStoreImpl @Inject constructor(
 
     override val isLoading: Boolean get() = this.filePropertyPagingImpl.mutex.isLocked
 
-    override suspend fun loadPrevious() {
-        previousPagingController.loadPrevious()
+    override suspend fun loadPrevious(): Result<Int> {
+        return previousPagingController.loadPrevious()
     }
 
     override suspend fun clear() {

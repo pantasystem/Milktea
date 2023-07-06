@@ -125,11 +125,7 @@ class DriveActivity : AppCompatActivity() {
         FileViewModel.provideFactory(fileViewModelFactory, driveStore)
     }
 
-    @Inject
-    lateinit var driveViewModelFactory: DriveViewModel.AssistedViewModelFactory
-    private val _driveViewModel: DriveViewModel by viewModels {
-        DriveViewModel.provideViewModel(driveViewModelFactory, driveStore, driveSelectableMode)
-    }
+    private val _driveViewModel: DriveViewModel by viewModels()
 
     @Inject
     lateinit var setTheme: ApplyTheme
@@ -146,14 +142,11 @@ class DriveActivity : AppCompatActivity() {
         ViewTreeLifecycleOwner.set(window.decorView, this)
 
 
-
-
         setContent {
             MdcTheme {
                 DriveScreen(
                     driveViewModel = _driveViewModel,
                     fileViewModel = _fileViewModel,
-                    directoryViewModel = _directoryViewModel,
                     onNavigateUp = { finish() },
                     onFixSelected = {
                         val ids = _driveViewModel.getSelectedFileIds()

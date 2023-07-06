@@ -1,5 +1,7 @@
 package net.pantasystem.milktea.model.drive
 
+import java.io.Serializable
+
 data class Directory(
     val id: DirectoryId,
     val createdAt: String,
@@ -10,4 +12,4 @@ data class Directory(
     val parent: Directory? = null
 )
 
-data class DirectoryId(val accountId: Long, val directoryId: String)
+data class DirectoryId(val accountId: Long, val directoryId: String) : Serializable

@@ -1,17 +1,39 @@
 package net.pantasystem.milktea.drive
 
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.*
+import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.FloatingActionButton
+import androidx.compose.material.Icon
+import androidx.compose.material.IconButton
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Scaffold
+import androidx.compose.material.Surface
+import androidx.compose.material.Tab
+import androidx.compose.material.TabRow
+import androidx.compose.material.Text
+import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.AddAPhoto
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.ArrowRight
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Grid3x3
+import androidx.compose.material.icons.filled.List
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -24,10 +46,9 @@ import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.rememberPagerState
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
-import net.pantasystem.milktea.drive.viewmodel.DirectoryViewModel
 import net.pantasystem.milktea.drive.viewmodel.DriveViewModel
 import net.pantasystem.milktea.drive.viewmodel.FileViewModel
-import net.pantasystem.milktea.drive.viewmodel.PathViewData
+import net.pantasystem.milktea.model.drive.Directory
 import net.pantasystem.milktea.model.drive.FileProperty
 
 
@@ -38,7 +59,6 @@ import net.pantasystem.milktea.model.drive.FileProperty
 fun DriveScreen(
     driveViewModel: DriveViewModel,
     fileViewModel: FileViewModel,
-    directoryViewModel: DirectoryViewModel,
     onNavigateUp: () -> Unit,
     onFixSelected: () -> Unit,
     onShowLocalFilePicker: () -> Unit,
@@ -52,15 +72,16 @@ fun DriveScreen(
 
     val isGridMode: Boolean by driveViewModel.isUsingGridView.collectAsState()
 
-    val isSelectMode: Boolean by driveViewModel.isSelectMode.asLiveData()
-        .observeAsState(initial = false)
+    val isSelectMode: Boolean by driveViewModel.isSelectMode.collectAsState()
 
-    val selectableMaxCount = driveViewModel.selectable?.selectableMaxSize
+//    val selectableMaxCount = driveViewModel.selectable?.selectableMaxSize
     val selectedFileIds: Set<FileProperty.Id>? by fileViewModel.selectedFileIds.asLiveData()
         .observeAsState(initial = emptySet())
-    val path: List<PathViewData> by driveViewModel.path.asLiveData()
-        .observeAsState(initial = emptyList())
+//    val path: List<PathViewData> by driveViewModel.path.asLiveData()
+//        .observeAsState(initial = emptyList())
+    val selectableMaxCount = driveViewModel.maxSelectableSize.collectAsState()
 
+    val uiState by driveViewModel.uiState.collectAsState()
     val pagerState = rememberPagerState(pageCount = tabTitles.size)
     val scope = rememberCoroutineScope()
 
@@ -100,8 +121,8 @@ fun DriveScreen(
 
                 )
                 Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-                    PathHorizontalView(path = path, modifier = Modifier.weight(1f)) { dir ->
-                        driveViewModel.popUntil(dir.folder)
+                    PathHorizontalView(currentDir = uiState.currentDirectory, modifier = Modifier.weight(1f)) { dir ->
+                        driveViewModel.popUntil(dir)
                     }
                     ToggleViewMode(isGridMode = isGridMode) {
                         driveViewModel.setUsingGridView(!isGridMode)
@@ -149,12 +170,11 @@ fun DriveScreen(
         HorizontalPager(state = pagerState, modifier = Modifier.padding(padding)) { page ->
             if (page == 0) {
                 FilePropertyListScreen(
-                    fileViewModel = fileViewModel,
                     driveViewModel = driveViewModel,
                     isGridMode = isGridMode
                 )
             } else {
-                DirectoryListScreen(viewModel = directoryViewModel, driveViewModel = driveViewModel)
+                DirectoryListScreen(driveViewModel = driveViewModel)
             }
         }
     }
@@ -164,9 +184,20 @@ fun DriveScreen(
 @Composable
 fun PathHorizontalView(
     modifier: Modifier = Modifier,
-    path: List<PathViewData>,
-    onSelected: (PathViewData) -> Unit
+    currentDir: Directory?,
+    onSelected: (Directory?) -> Unit
 ) {
+
+    val path = remember(currentDir) {
+        val path = mutableListOf<Directory>()
+        var dir = currentDir
+        while (dir != null) {
+            path.add(0, dir)
+            dir = dir.parent
+        }
+        path
+    }
+
     Surface(
         modifier = modifier,
         color = MaterialTheme.colors.surface,
@@ -175,6 +206,22 @@ fun PathHorizontalView(
             Modifier
                 .fillMaxWidth(),
         ) {
+            item {
+                Row(
+                    modifier = Modifier
+                        .padding(4.dp)
+                        .clickable {
+                            onSelected.invoke(null)
+                        }
+
+                ) {
+                    Text(text = "root")
+                    Icon(imageVector = Icons.Filled.ArrowRight, contentDescription = null)
+
+                }
+            }
+
+
             this.items(path, key = {
                 it.id to it.name
             }) { dir ->
