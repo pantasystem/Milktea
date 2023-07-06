@@ -27,12 +27,10 @@ import net.pantasystem.milktea.common_navigation.DriveNavigationArgs
 import net.pantasystem.milktea.common_navigation.EXTRA_ACCOUNT_ID
 import net.pantasystem.milktea.common_navigation.EXTRA_INT_SELECTABLE_FILE_MAX_SIZE
 import net.pantasystem.milktea.common_navigation.EXTRA_SELECTED_FILE_PROPERTY_IDS
-import net.pantasystem.milktea.drive.viewmodel.DirectoryViewModel
 import net.pantasystem.milktea.drive.viewmodel.DriveSelectableMode
 import net.pantasystem.milktea.drive.viewmodel.DriveViewModel
 import net.pantasystem.milktea.drive.viewmodel.FileViewModel
 import net.pantasystem.milktea.drive.viewmodel.provideFactory
-import net.pantasystem.milktea.drive.viewmodel.provideViewModel
 import net.pantasystem.milktea.model.drive.DirectoryPath
 import net.pantasystem.milktea.model.drive.FileProperty
 import net.pantasystem.milktea.model.drive.SelectedFilePropertyIds
@@ -112,11 +110,6 @@ class DriveActivity : AppCompatActivity() {
         ))
     }
 
-    @Inject
-    lateinit var directoryViewModelFactory: DirectoryViewModel.ViewModelAssistedFactory
-    private val _directoryViewModel: DirectoryViewModel by viewModels {
-        DirectoryViewModel.provideViewModel(directoryViewModelFactory, driveStore)
-    }
 
     @Inject
     lateinit var fileViewModelFactory: FileViewModel.AssistedViewModelFactory
@@ -146,7 +139,6 @@ class DriveActivity : AppCompatActivity() {
             MdcTheme {
                 DriveScreen(
                     driveViewModel = _driveViewModel,
-                    fileViewModel = _fileViewModel,
                     onNavigateUp = { finish() },
                     onFixSelected = {
                         val ids = _driveViewModel.getSelectedFileIds()

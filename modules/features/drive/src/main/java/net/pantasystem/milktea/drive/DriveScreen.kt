@@ -32,7 +32,6 @@ import androidx.compose.material.icons.filled.List
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
@@ -40,14 +39,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.asLiveData
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.rememberPagerState
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
 import net.pantasystem.milktea.drive.viewmodel.DriveViewModel
-import net.pantasystem.milktea.drive.viewmodel.FileViewModel
 import net.pantasystem.milktea.model.drive.Directory
 import net.pantasystem.milktea.model.drive.FileProperty
 
@@ -58,7 +55,6 @@ import net.pantasystem.milktea.model.drive.FileProperty
 @Composable
 fun DriveScreen(
     driveViewModel: DriveViewModel,
-    fileViewModel: FileViewModel,
     onNavigateUp: () -> Unit,
     onFixSelected: () -> Unit,
     onShowLocalFilePicker: () -> Unit,
@@ -75,13 +71,12 @@ fun DriveScreen(
     val isSelectMode: Boolean by driveViewModel.isSelectMode.collectAsState()
 
 //    val selectableMaxCount = driveViewModel.selectable?.selectableMaxSize
-    val selectedFileIds: Set<FileProperty.Id>? by fileViewModel.selectedFileIds.asLiveData()
-        .observeAsState(initial = emptySet())
 //    val path: List<PathViewData> by driveViewModel.path.asLiveData()
 //        .observeAsState(initial = emptyList())
     val selectableMaxCount = driveViewModel.maxSelectableSize.collectAsState()
 
     val uiState by driveViewModel.uiState.collectAsState()
+    val selectedFileIds: Set<FileProperty.Id> = uiState.selectedFilePropertyIds.toSet()
     val pagerState = rememberPagerState(pageCount = tabTitles.size)
     val scope = rememberCoroutineScope()
 
@@ -95,7 +90,7 @@ fun DriveScreen(
                 TopAppBar(
                     title = {
                         if (isSelectMode) {
-                            Text("${stringResource(R.string.selected)} ${selectedFileIds?.size ?: 0}/${selectableMaxCount}")
+                            Text("${stringResource(R.string.selected)} ${selectedFileIds.size}/${selectableMaxCount}")
                         } else {
                             Text(stringResource(id = R.string.drive))
                         }

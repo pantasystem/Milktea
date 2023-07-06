@@ -10,7 +10,9 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import net.pantasystem.milktea.app_store.account.AccountStore
@@ -197,6 +199,22 @@ class DriveViewModel @Inject constructor(
         DriveUiState()
     )
 
+    init {
+        combine(currentAccount, currentDirectory) { ac, dir ->
+            ac to dir
+        }.onEach { (ac, dir) ->
+            filePagingStore.setCurrentAccount(ac)
+            filePagingStore.setCurrentDirectory(dir)
+            directoryPagingStore.setAccount(ac)
+            directoryPagingStore.setCurrentDirectory(dir)
+            viewModelScope.launch {
+                filePagingStore.loadPrevious()
+            }
+            viewModelScope.launch {
+                directoryPagingStore.loadPrevious()
+            }
+        }.launchIn(viewModelScope)
+    }
 
     fun getSelectedFileIds(): Set<FileProperty.Id>? {
 //        return this.driveStore.state.value.selectedFilePropertyIds?.selectedIds
