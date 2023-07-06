@@ -36,7 +36,6 @@ import net.pantasystem.milktea.api.misskey.users.renote.mute.RenoteMuteDTO
 import net.pantasystem.milktea.api.misskey.users.renote.mute.RenoteMutesRequest
 import net.pantasystem.milktea.api.misskey.users.report.ReportDTO
 import net.pantasystem.milktea.api.misskey.v13.EmojisResponse
-import net.pantasystem.milktea.model.drive.Directory
 import net.pantasystem.milktea.model.instance.Meta
 import net.pantasystem.milktea.model.instance.RequestMeta
 import net.pantasystem.milktea.model.messaging.RequestMessageHistory
@@ -208,10 +207,13 @@ interface MisskeyAPI {
     suspend fun showFile(@Body req: ShowFile) : Response<FilePropertyDTO>
 
     @POST("api/drive/folders")
-    suspend fun getFolders(@Body folderRequest: RequestFolder): Response<List<Directory>>
+    suspend fun getFolders(@Body folderRequest: RequestFolder): Response<List<DirectoryNetworkDTO>>
 
     @POST("api/drive/folders/create")
-    suspend fun createFolder(@Body createFolder: CreateFolder): Response<Directory>
+    suspend fun createFolder(@Body createFolder: CreateFolder): Response<DirectoryNetworkDTO>
+
+    @POST("api/drive/folders/show")
+    suspend fun showFolder(@Body req: ShowFolderRequest): Response<DirectoryNetworkDTO>
 
 
     //meta

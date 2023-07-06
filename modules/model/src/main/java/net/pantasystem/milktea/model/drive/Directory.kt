@@ -1,15 +1,15 @@
 package net.pantasystem.milktea.model.drive
 
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
+import java.io.Serializable
 
-@Serializable
 data class Directory(
-    @SerialName("id") val id: String,
-    @SerialName("createdAt") val createdAt: String,
-    @SerialName("name") val name: String,
-    @SerialName("foldersCount") val foldersCount: Int? = null,
-    @SerialName("filesCount") val filesCount: Int? = null,
-    @SerialName("parentId") val parentId: String? = null,
-    @SerialName("parent") val parent: Directory? = null
+    val id: DirectoryId,
+    val createdAt: String,
+    val name: String,
+    val foldersCount: Int? = null,
+    val filesCount: Int? = null,
+    val parentId: DirectoryId? = null,
+    val parent: Directory? = null
 )
+
+data class DirectoryId(val accountId: Long, val directoryId: String) : Serializable

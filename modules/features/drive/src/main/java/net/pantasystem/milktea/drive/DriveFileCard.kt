@@ -1,7 +1,16 @@
 package net.pantasystem.milktea.drive
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
 import androidx.compose.material.ExperimentalMaterialApi
@@ -20,6 +29,7 @@ import net.pantasystem.milktea.drive.viewmodel.FileViewData
 import net.pantasystem.milktea.model.drive.FileProperty
 
 
+@OptIn(ExperimentalFoundationApi::class)
 @ExperimentalMaterialApi
 @Composable
 fun FilePropertySimpleCard(
@@ -27,23 +37,25 @@ fun FilePropertySimpleCard(
     isSelectMode: Boolean = false,
     onAction: (FilePropertyCardAction) -> Unit,
 ) {
-
     Card(
         shape = RoundedCornerShape(0.dp),
-        modifier = Modifier.padding(0.5.dp),
+        modifier = Modifier.padding(0.5.dp).combinedClickable(
+            onClick = {
+                if (isSelectMode) {
+                    onAction(FilePropertyCardAction.OnToggleSelectItem(file.fileProperty.id, !file.isSelected))
+                } else {
+                    onAction(FilePropertyCardAction.OnOpenDropdownMenu(file.fileProperty.id))
+                }
+            },
+            onLongClick = {
+                onAction(FilePropertyCardAction.OnLongClicked(file.fileProperty))
+            }
+        ),
         backgroundColor = if (file.isSelected) {
             MaterialTheme.colors.primary
         } else {
             MaterialTheme.colors.surface
         },
-        onClick = {
-            if (isSelectMode) {
-                onAction(FilePropertyCardAction.OnToggleSelectItem(file.fileProperty.id, !file.isSelected))
-            } else {
-                onAction(FilePropertyCardAction.OnOpenDropdownMenu(file.fileProperty.id))
-            }
-
-        }
     ) {
         Column(
             modifier = Modifier
@@ -146,4 +158,6 @@ sealed interface FilePropertyCardAction {
     data class OnSelectDeletionMenuItem(val file: FileProperty) : FilePropertyCardAction
     data class OnSelectEditCaptionMenuItem(val file: FileProperty) : FilePropertyCardAction
     data class OnSelectEditFileNameMenuItem(val file: FileProperty) : FilePropertyCardAction
+
+    data class OnLongClicked(val file: FileProperty) : FilePropertyCardAction
 }

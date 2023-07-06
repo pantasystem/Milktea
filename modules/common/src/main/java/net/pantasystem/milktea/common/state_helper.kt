@@ -1,5 +1,10 @@
 package net.pantasystem.milktea.common
 
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.map
+
 
 sealed class ResultState<out T>(val content: StateContent<T>) {
     class Fixed<out T>(content: StateContent<T>) : ResultState<T>(content)
@@ -127,4 +132,16 @@ sealed class PageableState<T>(val content: StateContent<T>) {
         }
     }
 
+}
+
+@OptIn(ExperimentalCoroutinesApi::class)
+fun<T, R> Flow<PageableState<T>>.convert(converter: suspend (T?) -> Flow<R>): Flow<PageableState<R>> {
+    return flatMapLatest { state ->
+        val content = (state.content as? StateContent.Exist)?.rawContent
+        converter(content).map { convertTo ->
+            state.convert {
+                convertTo
+            }
+        }
+    }
 }

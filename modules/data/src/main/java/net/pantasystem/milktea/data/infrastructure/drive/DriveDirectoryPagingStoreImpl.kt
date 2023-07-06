@@ -4,14 +4,23 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.sync.Mutex
 import net.pantasystem.milktea.api.misskey.drive.RequestFolder
-import net.pantasystem.milktea.common.*
-import net.pantasystem.milktea.common.paginator.*
+import net.pantasystem.milktea.app_store.drive.DriveDirectoryPagingStore
+import net.pantasystem.milktea.common.Encryption
+import net.pantasystem.milktea.common.PageableState
+import net.pantasystem.milktea.common.StateContent
+import net.pantasystem.milktea.common.paginator.EntityConverter
+import net.pantasystem.milktea.common.paginator.IdGetter
+import net.pantasystem.milktea.common.paginator.PaginationState
+import net.pantasystem.milktea.common.paginator.PreviousLoader
+import net.pantasystem.milktea.common.paginator.PreviousPagingController
+import net.pantasystem.milktea.common.paginator.StateLocker
+import net.pantasystem.milktea.common.runCancellableCatching
+import net.pantasystem.milktea.common.throwIfHasError
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.account.UnauthorizedException
 import net.pantasystem.milktea.model.drive.Directory
-import net.pantasystem.milktea.app_store.drive.DriveDirectoryPagingStore
 import javax.inject.Inject
 
 class DriveDirectoryPagingStoreImpl @Inject constructor(
@@ -41,8 +50,8 @@ class DriveDirectoryPagingStoreImpl @Inject constructor(
         pagingImpl.setState(PageableState.Fixed(StateContent.NotExist()))
     }
 
-    override suspend fun loadPrevious() {
-        controller.loadPrevious()
+    override suspend fun loadPrevious(): Result<Int> {
+        return controller.loadPrevious()
     }
 
     override suspend fun setAccount(account: Account?) {
@@ -100,20 +109,29 @@ class DriveDirectoryPagingImpl(
     }
 
     override suspend fun getSinceId(): String? {
-        return (_state.value.content as? StateContent.Exist)?.rawContent?.firstOrNull()?.id
+        return (_state.value.content as? StateContent.Exist)?.rawContent?.firstOrNull()?.id?.directoryId
     }
 
     override suspend fun getUntilId(): String? {
-        return (_state.value.content as? StateContent.Exist)?.rawContent?.lastOrNull()?.id
+        return (_state.value.content as? StateContent.Exist)?.rawContent?.lastOrNull()?.id?.directoryId
     }
 
     override suspend fun loadPrevious(): Result<List<Directory>> {
         return runCancellableCatching {
             val account = account ?: throw UnauthorizedException()
             misskeyAPIProvider.get(account)
-                .getFolders(RequestFolder(i = account.token, untilId = getUntilId(), folderId = directory?.id))
+                .getFolders(
+                    RequestFolder(
+                        i = account.token,
+                        untilId = getUntilId(),
+                        folderId = directory?.id?.directoryId
+                    )
+                )
                 .throwIfHasError()
                 .body()!!
+                .map {
+                    it.toModel(account)
+                }
         }
     }
 

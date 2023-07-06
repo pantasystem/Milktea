@@ -3,6 +3,7 @@ package net.pantasystem.milktea.data.infrastructure.drive
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import net.pantasystem.milktea.api.misskey.drive.CreateFolder
+import net.pantasystem.milktea.api.misskey.drive.ShowFolderRequest
 import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.common.throwIfHasError
 import net.pantasystem.milktea.common_android.hilt.IODispatcher
@@ -10,6 +11,7 @@ import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
 import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.drive.CreateDirectory
 import net.pantasystem.milktea.model.drive.Directory
+import net.pantasystem.milktea.model.drive.DirectoryId
 import net.pantasystem.milktea.model.drive.DriveDirectoryRepository
 import javax.inject.Inject
 
@@ -28,8 +30,23 @@ class DriveDirectoryRepositoryImpl @Inject constructor(
                     i = account.token,
                     name = createDirectory.directoryName,
                     parentId = createDirectory.parentId
-                )).throwIfHasError().body()!!
+                )).throwIfHasError().body()!!.toModel(account)
             }
         }
     }
+
+    override suspend fun findOne(id: DirectoryId): Result<Directory> = runCancellableCatching {
+        withContext(ioDispatcher) {
+            val account = accountRepository.get(id.accountId).getOrThrow()
+            val api = misskeyAPIProvider.get(account)
+            api.showFolder(
+                ShowFolderRequest(
+                    i = account.token,
+                    folderId = id.directoryId
+                )
+            ).throwIfHasError().body()!!.toModel(account)
+        }
+    }
+
+
 }

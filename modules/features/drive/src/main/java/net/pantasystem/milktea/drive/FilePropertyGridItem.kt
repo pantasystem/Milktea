@@ -1,8 +1,9 @@
 package net.pantasystem.milktea.drive
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.*
@@ -20,6 +21,7 @@ import coil.compose.rememberAsyncImagePainter
 import net.pantasystem.milktea.common_compose.SensitiveIcon
 import net.pantasystem.milktea.drive.viewmodel.FileViewData
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 @Stable
 fun FilePropertyGridItem(
@@ -32,18 +34,23 @@ fun FilePropertyGridItem(
             .fillMaxWidth()
             .padding(1.dp)
             .aspectRatio(1f)
-            .clickable {
-                if (isSelectMode) {
-                    onAction(
-                        FilePropertyCardAction.OnToggleSelectItem(
-                            fileViewData.fileProperty.id,
-                            !fileViewData.isSelected
+            .combinedClickable(
+                onClick = {
+                    if (isSelectMode) {
+                        onAction(
+                            FilePropertyCardAction.OnToggleSelectItem(
+                                fileViewData.fileProperty.id,
+                                !fileViewData.isSelected
+                            )
                         )
-                    )
-                } else {
-                    onAction(FilePropertyCardAction.OnOpenDropdownMenu(fileViewData.fileProperty.id))
+                    } else {
+                        onAction(FilePropertyCardAction.OnOpenDropdownMenu(fileViewData.fileProperty.id))
+                    }
+                },
+                onLongClick = {
+                    onAction(FilePropertyCardAction.OnLongClicked(fileViewData.fileProperty))
                 }
-            }
+            )
     ) {
 
         Box(
