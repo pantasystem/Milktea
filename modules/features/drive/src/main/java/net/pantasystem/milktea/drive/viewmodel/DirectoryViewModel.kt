@@ -13,15 +13,15 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.plus
+import net.pantasystem.milktea.app_store.account.AccountStore
+import net.pantasystem.milktea.app_store.drive.DriveDirectoryPagingStore
+import net.pantasystem.milktea.app_store.drive.DriveStore
 import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.common.PageableState
 import net.pantasystem.milktea.model.account.AccountRepository
-import net.pantasystem.milktea.app_store.account.AccountStore
 import net.pantasystem.milktea.model.account.CurrentAccountWatcher
 import net.pantasystem.milktea.model.drive.CreateDirectory
-import net.pantasystem.milktea.app_store.drive.DriveDirectoryPagingStore
 import net.pantasystem.milktea.model.drive.DriveDirectoryRepository
-import net.pantasystem.milktea.app_store.drive.DriveStore
 
 
 class DirectoryViewModel @AssistedInject constructor(
@@ -103,7 +103,7 @@ class DirectoryViewModel @AssistedInject constructor(
                     CreateDirectory(
                         accountId = accountWatcher.getAccount().accountId,
                         directoryName = folderName,
-                        parentId = driveStore.state.value.path.path.lastOrNull()?.id
+                        parentId = driveStore.state.value.path.path.lastOrNull()?.id?.directoryId
                     )
                 ).onFailure {
                     Log.e("FolderViewModel", "error create folder", it)

@@ -22,8 +22,17 @@ import net.pantasystem.milktea.app_store.drive.DriveState
 import net.pantasystem.milktea.app_store.drive.DriveStore
 import net.pantasystem.milktea.common.ui.ApplyTheme
 import net.pantasystem.milktea.common_android.platform.PermissionUtil
-import net.pantasystem.milktea.common_navigation.*
-import net.pantasystem.milktea.drive.viewmodel.*
+import net.pantasystem.milktea.common_navigation.DriveNavigation
+import net.pantasystem.milktea.common_navigation.DriveNavigationArgs
+import net.pantasystem.milktea.common_navigation.EXTRA_ACCOUNT_ID
+import net.pantasystem.milktea.common_navigation.EXTRA_INT_SELECTABLE_FILE_MAX_SIZE
+import net.pantasystem.milktea.common_navigation.EXTRA_SELECTED_FILE_PROPERTY_IDS
+import net.pantasystem.milktea.drive.viewmodel.DirectoryViewModel
+import net.pantasystem.milktea.drive.viewmodel.DriveSelectableMode
+import net.pantasystem.milktea.drive.viewmodel.DriveViewModel
+import net.pantasystem.milktea.drive.viewmodel.FileViewModel
+import net.pantasystem.milktea.drive.viewmodel.provideFactory
+import net.pantasystem.milktea.drive.viewmodel.provideViewModel
 import net.pantasystem.milktea.model.drive.DirectoryPath
 import net.pantasystem.milktea.model.drive.FileProperty
 import net.pantasystem.milktea.model.drive.SelectedFilePropertyIds
@@ -211,7 +220,7 @@ class DriveActivity : AppCompatActivity() {
         }
     }
 
-    val registerForOpenFileActivityResult =
+    private val registerForOpenFileActivityResult =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             val uri = result.data?.data
             if (uri != null) {
@@ -219,7 +228,7 @@ class DriveActivity : AppCompatActivity() {
             }
         }
 
-    val registerForReadExternalStoragePermissionResult =
+    private val registerForReadExternalStoragePermissionResult =
         registerForActivityResult(ActivityResultContracts.RequestPermission()) {
             if (it) {
                 showFileManager()

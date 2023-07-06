@@ -174,7 +174,7 @@ class FileViewModel @AssistedInject constructor(
                 val account = currentAccountWatcher.getAccount()
                 val e = filePropertyRepository.create(
                     account.accountId,
-                    file.copy(folderId = currentDir)
+                    file.copy(folderId = currentDir?.directoryId)
                 ).getOrThrow()
                 filePropertyPagingStore.onCreated(e.id)
             } catch (e: Exception) {

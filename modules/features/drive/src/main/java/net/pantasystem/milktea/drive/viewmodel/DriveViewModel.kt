@@ -29,11 +29,14 @@ data class DriveSelectableMode(
 class DriveViewModel @AssistedInject constructor(
     private val configRepository: LocalConfigRepository,
     loggerFactory: Logger.Factory,
+//    private val savedStateHandle: SavedStateHandle,
     @Assisted val driveStore: DriveStore,
     @Assisted val selectable: DriveSelectableMode?,
 ) : ViewModel() {
 
-    companion object;
+    companion object {
+        const val STATE_CURRENT_DIRECTORY_ID = "STATE_CURRENT_DIRECTORY_ID"
+    }
     @AssistedFactory
     interface AssistedViewModelFactory {
         fun create(driveStore: DriveStore, selectable: DriveSelectableMode?): DriveViewModel
