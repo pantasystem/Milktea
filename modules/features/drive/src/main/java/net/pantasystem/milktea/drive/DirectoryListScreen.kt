@@ -23,6 +23,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.google.accompanist.swiperefresh.SwipeRefresh
@@ -126,7 +127,7 @@ fun DirectoryListView(
                             .padding(vertical = 8.dp, horizontal = 32.dp),
                         shape = RoundedCornerShape(32.dp)
                     ) {
-                        Text("ファイルをここに移動")
+                        Text(stringResource(id = R.string.move_files_here))
                     }
                 }
             }
