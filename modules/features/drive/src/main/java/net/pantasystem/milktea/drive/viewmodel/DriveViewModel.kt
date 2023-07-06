@@ -21,6 +21,7 @@ import net.pantasystem.milktea.app_store.drive.FilePropertyPagingStore
 import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.common.PageableState
 import net.pantasystem.milktea.common.convert
+import net.pantasystem.milktea.common.mapCancellableCatching
 import net.pantasystem.milktea.common_navigation.EXTRA_ACCOUNT_ID
 import net.pantasystem.milktea.common_navigation.EXTRA_INT_SELECTABLE_FILE_MAX_SIZE
 import net.pantasystem.milktea.model.account.Account
@@ -47,15 +48,12 @@ class DriveViewModel @Inject constructor(
     private val accountStore: AccountStore,
     private val filePropertyDataSource: FilePropertyDataSource,
 
-    configRepository: LocalConfigRepository,
-    savedStateHandle: SavedStateHandle,
+    private val configRepository: LocalConfigRepository,
+    private val savedStateHandle: SavedStateHandle,
     private val directoryPagingStore: DriveDirectoryPagingStore,
     private val filePagingStore: FilePropertyPagingStore,
     private val filePropertyRepository: DriveFileRepository,
     loggerFactory: Logger.Factory,
-//    private val savedStateHandle: SavedStateHandle,
-//    @Assisted val driveStore: DriveStore,
-//    @Assisted val selectable: DriveSelectableMode?,
 ) : ViewModel() {
 
     companion object {
@@ -214,47 +212,53 @@ class DriveViewModel @Inject constructor(
                 directoryPagingStore.loadPrevious()
             }
         }.launchIn(viewModelScope)
+        currentDirectory.onEach { dir ->
+            filePagingStore.setCurrentDirectory(dir)
+            directoryPagingStore.setCurrentDirectory(dir)
+            viewModelScope.launch {
+                filePagingStore.loadPrevious()
+            }
+            viewModelScope.launch {
+                directoryPagingStore.loadPrevious()
+            }
+        }.launchIn(viewModelScope)
     }
 
     fun getSelectedFileIds(): Set<FileProperty.Id>? {
-//        return this.driveStore.state.value.selectedFilePropertyIds?.selectedIds
-        // TODO
-        return null
+        return savedStateHandle.get<List<FileProperty.Id>>(STATE_SELECTED_FILE_PROPERTY_IDS)?.toSet()
     }
 
 
     fun push(directory: Directory) {
-//        this.driveStore.push(directory)
-        TODO()
+        savedStateHandle[STATE_CURRENT_DIRECTORY_ID] = directory.id.directoryId
+        logger.debug {
+            "push directory:${directory.name} id:${directory.id.directoryId} parentId:${directory.parent?.id?.directoryId}"
+        }
     }
 
 
     fun pop(): Boolean {
-//        val path = driveStore.state.value.path.path
-//        if (path.isEmpty()) {
-//            return false
-//        }
-//
-//        return driveStore.pop()
-        TODO()
+        val currentDir = currentDirectory.value
+        val dir = currentDir?.parentId?.directoryId
+        savedStateHandle[STATE_CURRENT_DIRECTORY_ID] = dir
+
+        return currentDir != null
     }
 
     fun popUntil(directory: Directory?) {
-//        driveStore.popUntil(directory)
-        TODO()
+        savedStateHandle[STATE_CURRENT_DIRECTORY_ID] = directory?.parent?.parent?.id
     }
 
     fun setUsingGridView(value: Boolean) {
-//        viewModelScope.launch {
-//            configRepository.get().mapCancellableCatching { config ->
-//                configRepository.save(
-//                    config.copy(isDriveUsingGridView = value)
-//                )
-//            }.onFailure {
-//                logger.error("setUsingGridView error value:$value", it)
-//            }
-//        }
-        TODO()
+        viewModelScope.launch {
+            configRepository.get().mapCancellableCatching { config ->
+                configRepository.save(
+                    config.copy(isDriveUsingGridView = value)
+                )
+            }.onFailure {
+                logger.error("setUsingGridView error value:$value", it)
+            }
+        }
     }
 
     fun onFileListViewBottomReached() {
@@ -343,7 +347,13 @@ class DriveViewModel @Inject constructor(
     }
 
     fun toggleSelect(id: FileProperty.Id) {
-
+        savedStateHandle[STATE_SELECTED_FILE_PROPERTY_IDS] = (savedStateHandle.get<List<FileProperty.Id>>(STATE_SELECTED_FILE_PROPERTY_IDS) ?: emptyList()).let { list ->
+            if (list.contains(id)) {
+                list - id
+            } else {
+                list + id
+            }
+        }
     }
 
 }
