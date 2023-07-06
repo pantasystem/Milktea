@@ -17,14 +17,19 @@ import androidx.compose.material.Button
 import androidx.compose.material.Card
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import net.pantasystem.milktea.common.PageableState
 import net.pantasystem.milktea.common.StateContent
 import net.pantasystem.milktea.common.ui.isScrolledToTheEnd
@@ -41,10 +46,16 @@ fun DirectoryListScreen(driveViewModel: DriveViewModel) {
     val swipeRefreshState = rememberSwipeRefreshState(isRefreshing = isLoading)
     val listState = rememberLazyListState()
 
-
-    if(listState.isScrolledToTheEnd() && listState.layoutInfo.visibleItemsInfo.size !=  listState.layoutInfo.totalItemsCount && listState.isScrollInProgress){
-        driveViewModel.onDirectoryListViewBottomReached()
+    LaunchedEffect(Unit) {
+        snapshotFlow {
+            listState.isScrolledToTheEnd()
+        }.distinctUntilChanged().onEach {
+            if (it) {
+                driveViewModel.onDirectoryListViewBottomReached()
+            }
+        }.launchIn(this)
     }
+
     SwipeRefresh(
         state = swipeRefreshState,
         onRefresh = {
