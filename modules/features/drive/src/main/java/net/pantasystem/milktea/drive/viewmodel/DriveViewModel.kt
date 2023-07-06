@@ -26,6 +26,7 @@ import net.pantasystem.milktea.common_navigation.EXTRA_ACCOUNT_ID
 import net.pantasystem.milktea.common_navigation.EXTRA_INT_SELECTABLE_FILE_MAX_SIZE
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.AccountRepository
+import net.pantasystem.milktea.model.drive.CreateDirectory
 import net.pantasystem.milktea.model.drive.Directory
 import net.pantasystem.milktea.model.drive.DirectoryId
 import net.pantasystem.milktea.model.drive.DriveDirectoryRepository
@@ -34,15 +35,7 @@ import net.pantasystem.milktea.model.drive.FileProperty
 import net.pantasystem.milktea.model.drive.FilePropertyDataSource
 import net.pantasystem.milktea.model.file.AppFile
 import net.pantasystem.milktea.model.setting.LocalConfigRepository
-import java.io.Serializable
 import javax.inject.Inject
-
-
-data class DriveSelectableMode(
-    val selectableMaxSize: Int,
-    val selectedFilePropertyIds: List<FileProperty.Id>,
-    val accountId: Long,
-) : Serializable
 
 @HiltViewModel
 class DriveViewModel @Inject constructor(
@@ -383,6 +376,32 @@ class DriveViewModel @Inject constructor(
                 logger.info("ファイルアップロードに失敗した")
             }
         }
+    }
+
+
+    fun createDirectory(folderName: String) {
+        if (folderName.isNotBlank()) {
+            viewModelScope.launch {
+                val accountId = savedStateHandle.get<Long>(EXTRA_ACCOUNT_ID)
+                    ?: accountRepository.getCurrentAccount().getOrNull()?.accountId
+                    ?: return@launch
+                val currentDir = savedStateHandle.get<String>(STATE_CURRENT_DIRECTORY_ID)
+
+                directoryRepository.create(
+                    CreateDirectory(
+                        accountId = accountId,
+                        directoryName = folderName,
+                        parentId = currentDir,
+                    )
+                ).onFailure {
+                    logger.error("error create folder", it)
+                }.onSuccess {
+                    directoryPagingStore.onCreated(it)
+                }
+            }
+
+        }
+
     }
 
 }
