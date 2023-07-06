@@ -25,12 +25,14 @@ import net.pantasystem.milktea.common.mapCancellableCatching
 import net.pantasystem.milktea.common_navigation.EXTRA_ACCOUNT_ID
 import net.pantasystem.milktea.common_navigation.EXTRA_INT_SELECTABLE_FILE_MAX_SIZE
 import net.pantasystem.milktea.model.account.Account
+import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.drive.Directory
 import net.pantasystem.milktea.model.drive.DirectoryId
 import net.pantasystem.milktea.model.drive.DriveDirectoryRepository
 import net.pantasystem.milktea.model.drive.DriveFileRepository
 import net.pantasystem.milktea.model.drive.FileProperty
 import net.pantasystem.milktea.model.drive.FilePropertyDataSource
+import net.pantasystem.milktea.model.file.AppFile
 import net.pantasystem.milktea.model.setting.LocalConfigRepository
 import java.io.Serializable
 import javax.inject.Inject
@@ -47,7 +49,7 @@ class DriveViewModel @Inject constructor(
     private val directoryRepository: DriveDirectoryRepository,
     private val accountStore: AccountStore,
     private val filePropertyDataSource: FilePropertyDataSource,
-
+    private val accountRepository: AccountRepository,
     private val configRepository: LocalConfigRepository,
     private val savedStateHandle: SavedStateHandle,
     private val directoryPagingStore: DriveDirectoryPagingStore,
@@ -362,6 +364,23 @@ class DriveViewModel @Inject constructor(
                 } else {
                     list + id
                 }
+            }
+        }
+    }
+
+    fun uploadFile(file: AppFile.Local) {
+        viewModelScope.launch {
+            try {
+                val currentDir = savedStateHandle.get<String>(STATE_CURRENT_DIRECTORY_ID)
+                val accountId = savedStateHandle.get<Long>(EXTRA_ACCOUNT_ID)
+                    ?: accountRepository.getCurrentAccount().getOrThrow().accountId
+                val e = filePropertyRepository.create(
+                    accountId,
+                    file.copy(folderId = currentDir)
+                ).getOrThrow()
+                filePagingStore.onCreated(e.id)
+            } catch (e: Exception) {
+                logger.info("ファイルアップロードに失敗した")
             }
         }
     }
