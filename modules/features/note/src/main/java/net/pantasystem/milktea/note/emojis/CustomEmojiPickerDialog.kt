@@ -35,7 +35,7 @@ class CustomEmojiPickerDialog : BottomSheetDialogFragment(), EmojiPickerFragment
     lateinit var metaRepository: MetaRepository
 
     private val accountId: Long? by lazy(LazyThreadSafetyMode.NONE) {
-        requireArguments().getLong("ACCOUNT_ID").takeIf {
+        arguments?.getLong("ACCOUNT_ID")?.takeIf {
             it > 0
         }
     }
