@@ -97,7 +97,7 @@
     <string name="dummy_button">Dummy Button</string>
     <string name="dummy_content">DUMMY\nCONTENT</string>
 
-    <string name="sensitive_content">回覧注意</string>
+    <string name="sensitive_content">閲覧注意</string>
 
     <string name="thumbnail">サムネイル</string>
     <string name="play_media">メディアを再生する</string>
