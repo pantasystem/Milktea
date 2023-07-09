@@ -228,7 +228,7 @@ class DriveViewModel @Inject constructor(
     }
 
     fun popUntil(directory: Directory?) {
-        savedStateHandle[STATE_CURRENT_DIRECTORY_ID] = directory?.parent?.parent?.id
+        savedStateHandle[STATE_CURRENT_DIRECTORY_ID] = directory?.id?.directoryId
     }
 
     fun setUsingGridView(value: Boolean) {
