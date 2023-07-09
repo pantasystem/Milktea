@@ -1,11 +1,18 @@
 package net.pantasystem.milktea.data.infrastructure.notes.draft.db
 
-import androidx.room.*
+import androidx.room.ColumnInfo
+import androidx.room.Embedded
+import androidx.room.Entity
+import androidx.room.ForeignKey
+import androidx.room.Ignore
+import androidx.room.Index
+import androidx.room.PrimaryKey
 import net.pantasystem.milktea.data.infrastructure.account.db.AccountRecord
 import net.pantasystem.milktea.model.channel.Channel
+import net.pantasystem.milktea.model.notes.ReactionAcceptanceType
 import net.pantasystem.milktea.model.notes.draft.DraftNote
 import net.pantasystem.milktea.model.notes.draft.DraftNoteFile
-import java.util.*
+import java.util.Date
 
 @Entity(
     tableName = "draft_note_table", foreignKeys = [
@@ -68,6 +75,8 @@ data class DraftNoteDTO(
     @ColumnInfo(name = "isSensitive")
     val isSensitive: Boolean? = null,
 
+    @ColumnInfo(name = "reactionAcceptanceType")
+    val reactionAcceptanceType: String? = null,
 ) {
 
 
@@ -90,7 +99,8 @@ data class DraftNoteDTO(
                 draftNote.reservationPostingAt,
                 DraftPollDTO.make(draftNote.draftPoll),
                 draftNoteId = if(draftNote.draftNoteId == 0L) null else draftNote.draftNoteId,
-                isSensitive = draftNote.isSensitive
+                isSensitive = draftNote.isSensitive,
+                reactionAcceptanceType = draftNote.reactionAcceptanceType?.name,
             )
         }
     }
@@ -125,6 +135,11 @@ data class DraftNoteDTO(
             draftNoteId = draftNoteId ?: 0L,
             reservationPostingAt = scheduleWillPostAt,
             isSensitive = isSensitive,
+            reactionAcceptanceType = reactionAcceptanceType?.let { type ->
+                ReactionAcceptanceType.values().find {
+                    it.name == type
+                }
+            },
         )
     }
 

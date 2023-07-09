@@ -7,10 +7,11 @@ import net.pantasystem.milktea.model.file.FilePreviewSource
 import net.pantasystem.milktea.model.file.from
 import net.pantasystem.milktea.model.notes.Note
 import net.pantasystem.milktea.model.notes.NoteRelation
+import net.pantasystem.milktea.model.notes.ReactionAcceptanceType
 import net.pantasystem.milktea.model.notes.getName
 import net.pantasystem.milktea.model.notes.isLocalOnly
 import java.io.Serializable
-import java.util.*
+import java.util.Date
 
 
 data class DraftNote(
@@ -31,6 +32,7 @@ data class DraftNote(
     val reservationPostingAt: Date? = null,
     val channelId: Channel.Id? = null,
     val isSensitive: Boolean? = null,
+    val reactionAcceptanceType: ReactionAcceptanceType? = null,
     var draftNoteId: Long = 0L
 ) : Serializable {
     val filePreviewSources: List<FilePreviewSource> by lazy {
