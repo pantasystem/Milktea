@@ -11,10 +11,10 @@ import net.pantasystem.milktea.model.file.FilePreviewSource
 import net.pantasystem.milktea.model.notes.Note
 import net.pantasystem.milktea.model.notes.PollEditingState
 import net.pantasystem.milktea.model.notes.Visibility
-import java.util.*
+import java.util.Date
 
 enum class NoteEditorSavedStateKey() {
-    Text, Cw, PickedFiles, Visibility, ChannelId, ReplyId, RenoteId, ScheduleAt, DraftNoteId, HasCW, Poll, IsSensitive,
+    Text, Cw, PickedFiles, Visibility, ChannelId, ReplyId, RenoteId, ScheduleAt, DraftNoteId, HasCW, Poll, IsSensitive, ReactionAcceptance,
 }
 
 

@@ -117,6 +117,7 @@ class NoteEditorViewModel @Inject constructor(
                 is AppFile.Local -> {
                     FilePreviewSource.Local(appFile)
                 }
+
                 is AppFile.Remote -> {
                     runCancellableCatching {
                         driveFiles.firstOrNull {
@@ -141,6 +142,9 @@ class NoteEditorViewModel @Inject constructor(
     private val renoteId =
         savedStateHandle.getStateFlow<Note.Id?>(NoteEditorSavedStateKey.RenoteId.name, null)
 
+    private val replyIdAndRenoteId = combine(replyId, renoteId) { replyId, renoteId ->
+        replyId to renoteId
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), Pair(null, null))
 
     @OptIn(ExperimentalCoroutinesApi::class)
     val maxTextLength =
@@ -164,16 +168,11 @@ class NoteEditorViewModel @Inject constructor(
         instanceInfoService.find(it.normalizedInstanceUri).getOrNull()?.maxFileCount
     }.stateIn(viewModelScope + Dispatchers.IO, started = SharingStarted.Eagerly, initialValue = 4)
 
-//    @OptIn(ExperimentalCoroutinesApi::class)
-//    val instanceInfo = _currentAccount.filterNotNull().flatMapLatest {
-//        instanceInfoRepository.observeByHost(it.getHost())
-//    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
-
-
     private val _visibility = savedStateHandle.getStateFlow<Visibility?>(
         NoteEditorSavedStateKey.Visibility.name,
         null
     )
+
     val visibility = combine(_visibility, _currentAccount.filterNotNull().map {
         localConfigRepository.getRememberVisibility(it.accountId).getOrElse {
             RememberVisibility.None
@@ -191,6 +190,15 @@ class NoteEditorViewModel @Inject constructor(
     val isLocalOnly = visibility.map {
         it.isLocalOnly()
     }.stateIn(viewModelScope, SharingStarted.Eagerly, false)
+
+    private val reactionAcceptanceType = savedStateHandle.getStateFlow<String?>(
+        NoteEditorSavedStateKey.ReactionAcceptance.name,
+        null
+    ).map { strType ->
+        ReactionAcceptanceType.values().find {
+            it.name == strType
+        }
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
 
     val reservationPostingAt =
         savedStateHandle.getStateFlow<Date?>(NoteEditorSavedStateKey.ScheduleAt.name, null)
@@ -265,11 +273,11 @@ class NoteEditorViewModel @Inject constructor(
 
     private val noteEditorSendToState = combine(
         visibilityAndChannelId,
-        replyId,
-        renoteId,
+        replyIdAndRenoteId,
         reservationPostingAt,
         draftNoteId,
-    ) { vc, replyId, renoteId, scheduleDate, dfId ->
+        reactionAcceptanceType
+    ) { vc, (replyId, renoteId), scheduleDate, dfId, reactionAcceptance ->
         NoteEditorSendToState(
             visibility = vc.visibility,
             channelId = vc.channelId,
@@ -278,7 +286,8 @@ class NoteEditorViewModel @Inject constructor(
             schedulePostAt = scheduleDate?.let {
                 Instant.fromEpochMilliseconds(it.time)
             },
-            draftNoteId = dfId
+            draftNoteId = dfId,
+            reactionAcceptanceType = reactionAcceptance,
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), NoteEditorSendToState())
 
@@ -471,6 +480,7 @@ class NoteEditorViewModel @Inject constructor(
                 savedStateHandle[NoteEditorSavedStateKey.PickedFiles.name] =
                     files.value.toggleFileSensitiveStatus(appFile)
             }
+
             is AppFile.Remote -> {
                 viewModelScope.launch {
                     runCancellableCatching {
@@ -503,6 +513,7 @@ class NoteEditorViewModel @Inject constructor(
             is AppFile.Local -> {
                 savedStateHandle.setFiles(files.value.updateFileName(appFile, name))
             }
+
             is AppFile.Remote -> {
                 viewModelScope.launch {
                     runCancellableCatching {
@@ -527,6 +538,7 @@ class NoteEditorViewModel @Inject constructor(
             is AppFile.Local -> {
                 savedStateHandle.setFiles(files.value.updateFileComment(appFile, comment))
             }
+
             is AppFile.Remote -> {
                 viewModelScope.launch {
                     runCancellableCatching {
@@ -597,16 +609,14 @@ class NoteEditorViewModel @Inject constructor(
 
     fun enablePoll() {
         val poll =
-            if (savedStateHandle.getPoll() == null) PollEditingState(listOf(
-                PollChoiceState("", UUID.randomUUID()),
-                PollChoiceState("", UUID.randomUUID()),
-                PollChoiceState("", UUID.randomUUID())
-            ), false) else null
+            if (savedStateHandle.getPoll() == null) PollEditingState(
+                listOf(
+                    PollChoiceState("", UUID.randomUUID()),
+                    PollChoiceState("", UUID.randomUUID()),
+                    PollChoiceState("", UUID.randomUUID())
+                ), false
+            ) else null
         savedStateHandle.setPoll(poll)
-    }
-
-    fun disablePoll() {
-        savedStateHandle.setPoll(null)
     }
 
     fun setText(text: String) {
@@ -673,7 +683,7 @@ class NoteEditorViewModel @Inject constructor(
     }
 
     fun addEmoji(emoji: String, pos: Int): Int {
-        when(focusType) {
+        when (focusType) {
             NoteEditorFocusEditTextType.Cw -> {
                 val builder = StringBuilder(savedStateHandle.getCw() ?: "")
                 logger.debug("pos:$pos")
@@ -682,6 +692,7 @@ class NoteEditorViewModel @Inject constructor(
                 logger.debug("position:${pos + emoji.length - 1}")
                 return pos + emoji.length
             }
+
             NoteEditorFocusEditTextType.Text -> {
                 val builder = StringBuilder(savedStateHandle.getText() ?: "")
                 builder.insert(pos, emoji)
@@ -718,27 +729,29 @@ class NoteEditorViewModel @Inject constructor(
         }
     }
 
-    fun onPastePostUrl(text: String, start: Int, beforeText: String, count: Int) = viewModelScope.launch {
-        val urlText = text.substring(start, start + count)
-        val ca = _currentAccount.value ?: return@launch
-        val canQuote = canQuote()
+    fun onPastePostUrl(text: String, start: Int, beforeText: String, count: Int) =
+        viewModelScope.launch {
+            val urlText = text.substring(start, start + count)
+            val ca = _currentAccount.value ?: return@launch
+            val canQuote = canQuote()
 
-        if (!canQuote) {
-            return@launch
-        }
+            if (!canQuote) {
+                return@launch
+            }
 
-        if (UrlPatternChecker.isMatch(urlText)) {
-            apResolverRepository.resolve(ca.accountId, urlText).onSuccess {
-                when(it) {
-                    is ApResolver.TypeNote -> {
-                        setRenoteTo(it.note.id)
-                        setText(beforeText)
+            if (UrlPatternChecker.isMatch(urlText)) {
+                apResolverRepository.resolve(ca.accountId, urlText).onSuccess {
+                    when (it) {
+                        is ApResolver.TypeNote -> {
+                            setRenoteTo(it.note.id)
+                            setText(beforeText)
+                        }
+
+                        is ApResolver.TypeUser -> return@launch
                     }
-                    is ApResolver.TypeUser -> return@launch
                 }
             }
         }
-    }
 
     fun canSaveDraft(): Boolean {
         return uiState.value.shouldDiscardingConfirmation()
@@ -812,7 +825,7 @@ data class TextWithCursorPos(val text: String?, val cursorPos: Int)
 data class FileSizeInvalidEvent(
     val file: AppFile.Local,
     val instanceInfo: InstanceInfo,
-    val account: Account
+    val account: Account,
 )
 
 enum class NoteEditorFocusEditTextType {
