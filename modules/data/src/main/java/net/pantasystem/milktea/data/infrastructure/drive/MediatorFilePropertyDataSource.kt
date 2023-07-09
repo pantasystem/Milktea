@@ -1,7 +1,13 @@
 package net.pantasystem.milktea.data.infrastructure.drive
 
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.withContext
 import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.common.collection.LRUCache
@@ -144,6 +150,9 @@ class MediatorFilePropertyDataSource @Inject constructor(
     }
 
     override fun observeIn(ids: List<FileProperty.Id>): Flow<List<FileProperty>> {
+        if (ids.isEmpty()) {
+            return flowOf(emptyList())
+        }
         val accountIds = ids.map { it.accountId }.distinct()
         val flows = accountIds.map { accountId ->
             driveFileRecordDao.observeIn(
