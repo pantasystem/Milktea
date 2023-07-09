@@ -42,8 +42,12 @@ import net.pantasystem.milktea.note.R
 import net.pantasystem.milktea.note.databinding.FragmentSimpleEditorBinding
 import net.pantasystem.milktea.note.editor.file.EditFileCaptionDialog
 import net.pantasystem.milktea.note.editor.file.EditFileNameDialog
+import net.pantasystem.milktea.note.editor.poll.PollDatePickerDialog
+import net.pantasystem.milktea.note.editor.poll.PollEditorFragment
+import net.pantasystem.milktea.note.editor.poll.PollTimePickerDialog
 import net.pantasystem.milktea.note.editor.viewmodel.NoteEditorViewModel
 import net.pantasystem.milktea.note.editor.viewmodel.toCreateNote
+import net.pantasystem.milktea.note.editor.visibility.VisibilitySelectionDialogV2
 import net.pantasystem.milktea.note.emojis.CustomEmojiPickerDialog
 import net.pantasystem.milktea.note.emojis.viewmodel.EmojiSelectionViewModel
 import javax.inject.Inject

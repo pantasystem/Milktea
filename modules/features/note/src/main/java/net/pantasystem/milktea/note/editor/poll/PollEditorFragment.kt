@@ -1,4 +1,4 @@
-package net.pantasystem.milktea.note.editor
+package net.pantasystem.milktea.note.editor.poll
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -13,8 +13,6 @@ import com.google.android.material.composethemeadapter.MdcTheme
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.datetime.Clock
 import net.pantasystem.milktea.model.notes.PollExpiresAt
-import net.pantasystem.milktea.note.editor.poll.ExpireAtType
-import net.pantasystem.milktea.note.editor.poll.PollEditorLayout
 import net.pantasystem.milktea.note.editor.viewmodel.NoteEditorViewModel
 import kotlin.time.Duration.Companion.days
 

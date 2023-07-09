@@ -1,4 +1,4 @@
-package net.pantasystem.milktea.note.editor
+package net.pantasystem.milktea.note.editor.visibility
 
 import android.app.Dialog
 import android.os.Bundle
