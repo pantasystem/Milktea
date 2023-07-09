@@ -9,6 +9,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
@@ -198,7 +199,7 @@ class DriveViewModel @Inject constructor(
     )
 
     init {
-        combine(currentAccount, currentDirectory) { ac, dir ->
+        combine(currentAccount.filterNotNull(), currentDirectory) { ac, dir ->
             ac to dir
         }.onEach { (ac, dir) ->
             refreshPagingState(ac, dir)
@@ -227,7 +228,7 @@ class DriveViewModel @Inject constructor(
     }
 
     fun popUntil(directory: Directory?) {
-        savedStateHandle[STATE_CURRENT_DIRECTORY_ID] = directory?.parent?.parent?.id
+        savedStateHandle[STATE_CURRENT_DIRECTORY_ID] = directory?.id?.directoryId
     }
 
     fun setUsingGridView(value: Boolean) {
