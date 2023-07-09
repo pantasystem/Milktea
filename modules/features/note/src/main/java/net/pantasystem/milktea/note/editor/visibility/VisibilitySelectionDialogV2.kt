@@ -36,7 +36,6 @@ import net.pantasystem.milktea.model.notes.CanLocalOnly
 import net.pantasystem.milktea.model.notes.Visibility
 import net.pantasystem.milktea.model.notes.isLocalOnly
 import net.pantasystem.milktea.note.R
-import net.pantasystem.milktea.note.editor.viewmodel.NoteEditorUiState
 import net.pantasystem.milktea.note.editor.viewmodel.NoteEditorViewModel
 
 @AndroidEntryPoint
@@ -67,7 +66,9 @@ fun VisibilitySelectionDialogContent(viewModel: NoteEditorViewModel) {
     val uiState by viewModel.uiState.collectAsState()
     val channelsState by viewModel.channels.collectAsState()
     VisibilitySelectionDialogLayout(
-        uiState = uiState,
+        visibility = uiState.sendToState.visibility,
+        channelId = uiState.sendToState.channelId,
+        currentAccountInstanceType = uiState.currentAccount?.instanceType,
         channelsState = channelsState,
         onVisibilityChanged = viewModel::setVisibility,
         onChannelSelected = {
@@ -79,15 +80,15 @@ fun VisibilitySelectionDialogContent(viewModel: NoteEditorViewModel) {
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun VisibilitySelectionDialogLayout(
-    uiState: NoteEditorUiState,
+    visibility: Visibility,
     channelsState: ResultState<List<Channel>>,
     onVisibilityChanged: (visibility: Visibility) -> Unit,
     onChannelSelected: (channel: Channel) -> Unit,
+    channelId: Channel.Id? = null,
+    currentAccountInstanceType: Account.InstanceType? = null,
 ) {
-    val visibility = uiState.sendToState.visibility
     val channels =
         (channelsState.content as? StateContent.Exist)?.rawContent ?: emptyList()
-    val channelId = uiState.sendToState.channelId
     Surface(
         Modifier
             .fillMaxWidth()
@@ -138,7 +139,7 @@ fun VisibilitySelectionDialogLayout(
                         onClick = onVisibilityChanged
                     )
 
-                    if (uiState.currentAccount?.instanceType == Account.InstanceType.MISSKEY) {
+                    if (currentAccountInstanceType == Account.InstanceType.MISSKEY) {
                         VisibilityLocalOnlySwitch(
                             checked = visibility.isLocalOnly(),
                             enabled = visibility is CanLocalOnly && channelId == null,
@@ -155,7 +156,7 @@ fun VisibilitySelectionDialogLayout(
                     }
                 }
 
-                if (uiState.currentAccount?.instanceType == Account.InstanceType.MISSKEY) {
+                if (currentAccountInstanceType == Account.InstanceType.MISSKEY) {
                     items(channels) { channel ->
                         VisibilityChannelSelection(
                             item = channel,
