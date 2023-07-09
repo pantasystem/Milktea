@@ -4,4 +4,8 @@ import net.pantasystem.milktea.model.user.User
 
 interface UserListNavigation : ActivityNavigation<UserListArgs>
 
-data class UserListArgs(val userId: User.Id? = null)
+data class UserListArgs(
+    val userId: User.Id? = null,
+    val specifiedAccountId: Long? = null,
+    val addTabToAccountId: Long? = null,
+)

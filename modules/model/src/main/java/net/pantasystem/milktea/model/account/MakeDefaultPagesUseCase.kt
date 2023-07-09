@@ -64,7 +64,7 @@ class MakeDefaultPagesUseCase(
                 }
                 defaultPages
             }
-            Account.InstanceType.MASTODON -> {
+            Account.InstanceType.MASTODON, Account.InstanceType.PLEROMA -> {
                 listOf(
                     PageableTemplate(account).mastodonHomeTimeline(pageDefaultStrings.homeTimeline),
                     PageableTemplate(account).mastodonLocalTimeline(pageDefaultStrings.localTimeline),

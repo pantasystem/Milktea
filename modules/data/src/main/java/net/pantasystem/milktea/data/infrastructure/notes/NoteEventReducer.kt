@@ -3,6 +3,8 @@ package net.pantasystem.milktea.data.infrastructure.notes
 import net.pantasystem.milktea.api_streaming.NoteUpdated
 import net.pantasystem.milktea.api_streaming.mastodon.EmojiReaction
 import net.pantasystem.milktea.model.account.Account
+import net.pantasystem.milktea.model.emoji.CustomEmojiAspectRatio
+import net.pantasystem.milktea.model.image.ImageCache
 import net.pantasystem.milktea.model.notes.Note
 import net.pantasystem.milktea.model.notes.reaction.ReactionCount
 
@@ -27,7 +29,12 @@ fun Note.onUnReacted(account: Account, e: NoteUpdated.Body.Unreacted): Note {
     )
 }
 
-fun Note.onReacted(account: Account, e: NoteUpdated.Body.Reacted): Note {
+fun Note.onReacted(
+    account: Account,
+    e: NoteUpdated.Body.Reacted,
+    aspectRatio: CustomEmojiAspectRatio?,
+    imageCache: ImageCache?,
+): Note {
     val hasItem = this.reactionCounts.any { count ->
         count.reaction == e.body.reaction
     }
@@ -43,7 +50,10 @@ fun Note.onReacted(account: Account, e: NoteUpdated.Body.Reacted): Note {
         list = list + ReactionCount(reaction = e.body.reaction, count = 1, me = false)
     }
 
-    val emojis = when (val emoji = e.body.emoji) {
+    val emojis = when (val emoji = e.body.emoji?.copy(
+        aspectRatio = aspectRatio?.aspectRatio,
+        cachePath = imageCache?.cachePath
+    )) {
         null -> this.emojis
         else -> (this.emojis ?: emptyList()) + emoji
     }
@@ -60,7 +70,7 @@ fun Note.onReacted(account: Account, e: NoteUpdated.Body.Reacted): Note {
     )
 }
 
-fun Note.onEmojiReacted(account: Account, e: EmojiReaction): Note {
+fun Note.onEmojiReacted(account: Account, e: EmojiReaction, imageCache: ImageCache?): Note {
     val reactionCount = ReactionCount(e.reaction, e.count, me = false)
     val hasItem = reactionCounts.any {
         it.reaction == e.reaction
@@ -77,7 +87,7 @@ fun Note.onEmojiReacted(account: Account, e: EmojiReaction): Note {
         list = list + reactionCount
     }
 
-    val emojis = when (val emoji = e.toEmoji()) {
+    val emojis = when (val emoji = e.toEmoji(imageCache?.cachePath)) {
         null -> this.emojis
         else -> (this.emojis ?: emptyList()) + emoji
     }

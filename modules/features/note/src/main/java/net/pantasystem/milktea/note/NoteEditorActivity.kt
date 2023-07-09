@@ -16,6 +16,7 @@ import net.pantasystem.milktea.model.file.toAppFile
 import net.pantasystem.milktea.model.notes.Note
 import net.pantasystem.milktea.note.databinding.ActivityNoteEditorBinding
 import net.pantasystem.milktea.note.editor.NoteEditorFragment
+import net.pantasystem.milktea.note.editor.viewmodel.NoteEditorSavedStateKey
 import net.pantasystem.milktea.note.editor.viewmodel.NoteEditorViewModel
 import javax.inject.Inject
 
@@ -33,6 +34,7 @@ class NoteEditorActivity : AppCompatActivity() {
 
         private const val EXTRA_MENTIONS = "EXTRA_MENTIONS"
         private const val EXTRA_CHANNEL_ID = "EXTRA_CHANNEL_ID"
+        private const val EXTRA_SPECIFIED_ACCOUNT_ID = "EXTRA_SPECIFIED_ACCOUNT_ID"
 
         fun newBundle(
             context: Context,
@@ -41,6 +43,8 @@ class NoteEditorActivity : AppCompatActivity() {
             draftNoteId: Long? = null,
             mentions: List<String>? = null,
             channelId: Channel.Id? = null,
+            accountId: Long? = null,
+            text: String? = null,
         ): Intent {
             return Intent(context, NoteEditorActivity::class.java).apply {
                 replyTo?.let {
@@ -67,6 +71,13 @@ class NoteEditorActivity : AppCompatActivity() {
                     putExtra(EXTRA_ACCOUNT_ID, it.accountId)
                 }
 
+                accountId?.let {
+                    putExtra(EXTRA_SPECIFIED_ACCOUNT_ID, it)
+                }
+
+                text?.let {
+                    putExtra(NoteEditorSavedStateKey.Text.name, it)
+                }
             }
         }
     }
@@ -125,6 +136,9 @@ class NoteEditorActivity : AppCompatActivity() {
             if (it == -1L) null else it
         }
 
+        val specifiedAccountId = intent.getLongExtra(EXTRA_SPECIFIED_ACCOUNT_ID, -1).takeIf {
+            it > 0
+        }
         if (savedInstanceState == null) {
             val mentions = intent.getStringArrayExtra(EXTRA_MENTIONS)?.toList()
             val fragment = NoteEditorFragment.newInstance(
@@ -133,7 +147,8 @@ class NoteEditorActivity : AppCompatActivity() {
                 draftNoteId = draftNoteId,
                 mentions = mentions,
                 channelId = channelId,
-                text = text
+                text = text,
+                specifiedAccountId = specifiedAccountId,
             )
             val ft = supportFragmentManager.beginTransaction()
             ft.replace(R.id.fragmentBase, fragment)

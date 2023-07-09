@@ -256,6 +256,14 @@ sealed class ChannelBody : StreamingEvent(){
             override val id: String
         ) : Main()
 
+        @Serializable
+        @SerialName("reply")
+        data class Reply(
+            @SerialName("id")
+            override val id: String,
+            @SerialName("body")
+            val body: NoteDTO
+        ) : Main()
     }
 }
 

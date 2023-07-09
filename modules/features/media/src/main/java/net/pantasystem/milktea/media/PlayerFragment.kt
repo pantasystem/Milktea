@@ -73,6 +73,10 @@ class PlayerFragment : Fragment(R.layout.fragment_player){
         simpleExoPlayer.prepare()
         simpleExoPlayer.play()
 
+        view.findViewById<SwipeFinishLayout>(R.id.swipeFinishLayout).setOnFinishEventListener {
+            requireActivity().finish()
+        }
+
         mExoPlayer = simpleExoPlayer
 
     }

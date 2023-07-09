@@ -1,14 +1,21 @@
 package net.pantasystem.milktea.notification.viewmodel
 
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.stateIn
 import net.pantasystem.milktea.common_android.resource.StringSource
 import net.pantasystem.milktea.model.notification.*
+import net.pantasystem.milktea.model.setting.DefaultConfig
+import net.pantasystem.milktea.model.setting.LocalConfigRepository
 import net.pantasystem.milktea.model.user.User
 import net.pantasystem.milktea.note.viewmodel.PlaneNoteViewData
 import net.pantasystem.milktea.notification.R
 
 class NotificationViewData(
     val notification: NotificationRelation,
-    val noteViewData: PlaneNoteViewData?
+    val noteViewData: PlaneNoteViewData?,
+    configRepository: LocalConfigRepository,
+    coroutineScope: CoroutineScope,
 ) {
     enum class Type(val default: String) {
         FOLLOW("follow"),
@@ -62,6 +69,8 @@ class NotificationViewData(
     val followRequestMessageSource: StringSource? = (notification.notification as? ReceiveFollowRequestNotification?)?.let {
         StringSource(R.string.follow_requested_by, name ?: "")
     }
+
+    val config = configRepository.observe().stateIn(coroutineScope, SharingStarted.WhileSubscribed(5_000), DefaultConfig.config)
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

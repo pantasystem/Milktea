@@ -8,21 +8,21 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import net.pantasystem.milktea.antenna.databinding.ItemAntennaBinding
+import net.pantasystem.milktea.antenna.viewmodel.AntennaListItem
 import net.pantasystem.milktea.antenna.viewmodel.AntennaListViewModel
-import net.pantasystem.milktea.model.antenna.Antenna
 
 class AntennaListAdapter(
     private val antennaListViewModel: AntennaListViewModel,
     val lifecycleOwner: LifecycleOwner
-) : ListAdapter<Antenna, AntennaListAdapter.ViewHolder>(ItemCallback()){
+) : ListAdapter<AntennaListItem, AntennaListAdapter.ViewHolder>(ItemCallback()){
 
-    class ItemCallback : DiffUtil.ItemCallback<Antenna>(){
-        override fun areContentsTheSame(oldItem: Antenna, newItem: Antenna): Boolean {
-            return oldItem.id == newItem.id
+    class ItemCallback : DiffUtil.ItemCallback<AntennaListItem>(){
+        override fun areContentsTheSame(oldItem: AntennaListItem, newItem: AntennaListItem): Boolean {
+            return oldItem == newItem
         }
 
-        override fun areItemsTheSame(oldItem: Antenna, newItem: Antenna): Boolean {
-            return oldItem == newItem
+        override fun areItemsTheSame(oldItem: AntennaListItem, newItem: AntennaListItem): Boolean {
+            return oldItem.antenna.id == newItem.antenna.id
         }
     }
 

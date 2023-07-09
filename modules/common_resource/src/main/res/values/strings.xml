@@ -91,6 +91,7 @@
     <string name="theme_black">AMOLED</string>
     <string name="theme_dark">Dark</string>
     <string name="theme_bread">Pancake</string>
+    <string name="theme_mastodon_dark">Elephant Dark</string>
 
     <string name="title_activity_media">MediaActivity</string>
     <string name="dummy_button">Dummy Button</string>
@@ -237,7 +238,7 @@
 
     <string name="update_timeline_in_background">Update timeline in background</string>
 
-    <string name="edit_tab_name">Edit tab name</string>
+    <string name="edit_tab">Edit tab</string>
 
     <string name="follow_request_accepted_by">Follow request accepted by %s</string>
     <string name="poll_ended">Poll ended</string>
@@ -266,7 +267,7 @@
 
     <string name="success">Success</string>
     <string name="failure">Failure</string>
-    <string name="explore_fediverse">Explore the Fediverse</string>
+    <string name="explore_fediverse">Fediverse</string>
     <string name="explore">Explore</string>
     <string name="trending_users">Trending users</string>
     <string name="users_with_recent_activity">Users with recent activity</string>
@@ -447,6 +448,12 @@
     <string name="settings_renote_mute_title">Renote mutes</string>
     <string name="bookmark">Bookmark</string>
 
+    <string name="milktea_catchphrase">Would you like Milktea with Fediverse?</string>
+    <string name="donation">Donation</string>
+    <string name="privacy_policy">Privacy policy</string>
+    <string name="terms_of_service">Terms of service</string>
+
+
     <!-- Authorization Start -->
     <string name="auth_custom_app_name">App name</string>
     <string name="auth_app_name">Milktea</string>
@@ -559,6 +566,15 @@
     <string name="enable_automic_updates">Enable automatic updates</string>
     <string name="please_login">Please login</string>
     <string name="settings_edit_tab_only_media">Only Media</string>
+    <string name="settings_about_milktea">About Milktea</string>
+    <string name="settings_about_milktea_source_code">Source code(GitHub)</string>
+    <string name="settings_note_content_font_size">Note content font size(%fsp)</string>
+    <string name="settings_note_header_font_size">Note header font size(%fsp)</string>
+    <string name="settings_note_reaction_counter_font_size">Note reaction counter font size(%fsp, %fsp)</string>
+    <string name="settings_note_custom_emoji_scale_size_in_text">Magnification for custom emoji in text(%fX)</string>
+    <string name="settings_emoji_picker">Emoji picker</string>
+    <string name="settings_emoji_display_size">Emoji display size</string>
+
     <!-- Settings -->
 
     <!-- User -->
@@ -576,6 +592,18 @@
     <string name="user_mute_specify_time_indefinite_period">Indefinite perio</string>
     <string name="view_remotely">View remotely</string>
     <string name="follows_you">Follows you</string>
+    <string name="suggestion_users">Suggestions</string>
     <!-- User -->
 
+
+    <string name="trend_posted_person_count_msg">%d people posting</string>
+    <string name="notes_confirm_attach_quote_note_by_url">Attach as a quote post?</string>
+    <string name="select_draft_post">Select draft post</string>
+    <string name="remember_scroll_position">Remember scroll position</string>
+    <string name="post_only">Post only</string>
+    <string name="settings_display_timestamps_as_absolute_dates">Display timestamps as absolute dates</string>
+    <string name="settings_cache_config">Cache settings</string>
+    <string name="settings_note_cache">Note cache</string>
+    <string name="settings_custom_emoji_cache">Custom emoji cache</string>
+    <string name="move_files_here">Move files here</string>
 </resources>

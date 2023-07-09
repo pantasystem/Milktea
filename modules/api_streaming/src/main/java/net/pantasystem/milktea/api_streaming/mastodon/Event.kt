@@ -37,7 +37,9 @@ data class EmojiReaction(
     @SerialName("static_url") val staticUrl: String? = null,
     @SerialName("domain") val domain: String? = null,
     @SerialName("account_ids") val accountIds: List<String>,
-    @SerialName("status_id") val statusId: String
+    @SerialName("status_id") val statusId: String,
+    @SerialName("width") val width: Int? = null,
+    @SerialName("height") val height: Int? = null,
 ) {
     val isCustomEmoji: Boolean = url != null || staticUrl != null
     val reaction = if (isCustomEmoji) {
@@ -51,7 +53,7 @@ data class EmojiReaction(
     }
 
 
-    fun toEmoji(): Emoji? {
+    fun toEmoji(cachePath: String? = null): Emoji? {
         if (!isCustomEmoji) {
             return null
         }
@@ -64,6 +66,8 @@ data class EmojiReaction(
             },
             url = url,
             host = domain,
+            aspectRatio = if (width == null || height == null) null else (width.toFloat() / height),
+            cachePath = cachePath,
         )
     }
 

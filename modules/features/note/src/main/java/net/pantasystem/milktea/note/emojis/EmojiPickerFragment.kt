@@ -8,34 +8,46 @@ import android.widget.EditText
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.repeatOnLifecycle
-import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.lifecycle.*
 import androidx.recyclerview.widget.RecyclerView
-import com.ahmadhamwi.tabsync.TabbedListMediator
 import com.google.android.flexbox.AlignItems
 import com.google.android.flexbox.FlexboxLayoutManager
 import com.google.android.material.tabs.TabLayout
 import com.wada811.databinding.dataBinding
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.distinctUntilChangedBy
 import kotlinx.coroutines.flow.filterNot
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
+import net.pantasystem.milktea.common_android_ui.tab.TabbedFlexboxListMediator
 import net.pantasystem.milktea.model.notes.reaction.LegacyReaction
 import net.pantasystem.milktea.model.notes.reaction.Reaction
 import net.pantasystem.milktea.model.notes.reaction.ReactionSelection
+import net.pantasystem.milktea.model.setting.DefaultConfig
+import net.pantasystem.milktea.model.setting.LocalConfigRepository
+import net.pantasystem.milktea.note.EmojiListItemType
+import net.pantasystem.milktea.note.EmojiPickerUiStateService
 import net.pantasystem.milktea.note.R
 import net.pantasystem.milktea.note.databinding.FragmentEmojiPickerBinding
 import net.pantasystem.milktea.note.emojis.viewmodel.EmojiPickerViewModel
-import net.pantasystem.milktea.note.reaction.choices.EmojiChoicesAdapter
-import net.pantasystem.milktea.note.reaction.choices.EmojiChoicesListAdapter
+import net.pantasystem.milktea.note.reaction.choices.EmojiListItemsAdapter
 import net.pantasystem.milktea.note.toTextReaction
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class EmojiPickerFragment : Fragment(R.layout.fragment_emoji_picker), ReactionSelection {
 
+    companion object {
+        fun newInstance(accountId: Long?): EmojiPickerFragment {
+            return EmojiPickerFragment().also { fragment ->
+                fragment.arguments = Bundle().apply {
+                    putLong(EmojiPickerUiStateService.EXTRA_ACCOUNT_ID, accountId ?: -1L)
+                }
+            }
+        }
+    }
     interface OnEmojiSelectedListener {
         fun onSelect(emoji: String)
     }
@@ -43,6 +55,9 @@ class EmojiPickerFragment : Fragment(R.layout.fragment_emoji_picker), ReactionSe
     private val binding: FragmentEmojiPickerBinding by dataBinding()
 
     private val emojiPickerViewModel: EmojiPickerViewModel by viewModels()
+
+    @Inject
+    internal lateinit var configRepository: LocalConfigRepository
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -53,7 +68,6 @@ class EmojiPickerFragment : Fragment(R.layout.fragment_emoji_picker), ReactionSe
             scope = viewLifecycleOwner.lifecycleScope,
             fragmentManager = childFragmentManager,
             lifecycleOwner = viewLifecycleOwner,
-            searchSuggestionListView = binding.searchSuggestionsView,
             tabLayout = binding.reactionChoicesTab,
             recyclerView = binding.reactionChoicesViewPager,
             searchWordTextField = binding.searchReactionEditText,
@@ -69,6 +83,7 @@ class EmojiPickerFragment : Fragment(R.layout.fragment_emoji_picker), ReactionSe
                 onSelect(it)
             },
             emojiPickerViewModel = emojiPickerViewModel,
+            emojiPickerEmojiSize = configRepository.get().getOrElse { DefaultConfig.config }.emojiPickerEmojiDisplaySize
         )
         binder.bind()
 
@@ -95,43 +110,20 @@ class EmojiSelectionBinder(
     val scope: CoroutineScope,
     val fragmentManager: FragmentManager,
     val lifecycleOwner: LifecycleOwner,
-    val searchSuggestionListView: RecyclerView,
     val tabLayout: TabLayout,
     val recyclerView: RecyclerView,
     val searchWordTextField: EditText,
     val emojiPickerViewModel: EmojiPickerViewModel,
     val onReactionSelected: (String) -> Unit,
     val onSearchEmojiTextFieldEntered: (String) -> Unit,
+    val emojiPickerEmojiSize: Int,
 ) {
 
-    private val flexBoxLayoutManager: FlexboxLayoutManager by lazy {
-        val flexBoxLayoutManager = FlexboxLayoutManager(context)
-        flexBoxLayoutManager.alignItems = AlignItems.STRETCH
-        flexBoxLayoutManager
-    }
-
     fun bind() {
-        val searchedReactionAdapter = EmojiChoicesAdapter(
-            onEmojiSelected = {
-                onReactionSelected(it.toTextReaction())
-            },
-            onEmojiLongClicked = { emojiType ->
-                val exists = emojiPickerViewModel.uiState.value.isExistsConfig(emojiType)
-                if (!exists) {
-                    AddEmojiToUserConfigDialog.newInstance(emojiType)
-                        .show(fragmentManager, "AddEmojiToUserConfigDialog")
-                    true
-                } else {
-                    false
-                }
-            }
-        )
-        searchSuggestionListView.adapter = searchedReactionAdapter
-        searchSuggestionListView.layoutManager = flexBoxLayoutManager
 
-        val layoutManager = LinearLayoutManager(context)
 
-        val choicesAdapter = EmojiChoicesListAdapter(
+        val adapter = EmojiListItemsAdapter(
+            isApplyImageAspectRatio = true,
             onEmojiLongClicked = { emojiType ->
                 val exists = emojiPickerViewModel.uiState.value.isExistsConfig(emojiType)
                 if (!exists) {
@@ -144,42 +136,57 @@ class EmojiSelectionBinder(
             },
             onEmojiSelected = {
                 onReactionSelected(it.toTextReaction())
-            }
+            },
+            baseItemSizeDp = emojiPickerEmojiSize,
         )
-        recyclerView.adapter = choicesAdapter
+
+
+        val layoutManager by lazy {
+            val flexBoxLayoutManager = FlexboxLayoutManager(context)
+            flexBoxLayoutManager.alignItems = AlignItems.STRETCH
+            flexBoxLayoutManager
+        }
 
         recyclerView.layoutManager = layoutManager
+
+        recyclerView.adapter = adapter
 
 
         scope.launch {
             lifecycleOwner.repeatOnLifecycle(Lifecycle.State.RESUMED) {
                 emojiPickerViewModel.uiState.collect {
-                    choicesAdapter.submitList(it.segments)
-                    searchedReactionAdapter.submitList(it.searchFilteredEmojis)
+                    adapter.submitList(it.emojiListItems)
                 }
             }
         }
 
-        var tabbedListMediator: TabbedListMediator? = null
-        scope.launch {
-            lifecycleOwner.repeatOnLifecycle(Lifecycle.State.RESUMED) {
-                emojiPickerViewModel.tabLabels.filterNot {
-                    it.isEmpty()
-                }.collect {
-                    tabLayout.removeAllTabs()
-                    it.map {
-                        val tab = tabLayout.newTab().apply {
-                            text = it.getString(context)
-                        }
-                        tabLayout.addTab(tab)
-                    }
-                    tabbedListMediator?.detach()
-                    tabbedListMediator =
-                        TabbedListMediator(recyclerView, tabLayout, it.indices.toList())
-                    tabbedListMediator?.attach()
+        var tabbedListMediator: TabbedFlexboxListMediator? = null
+        emojiPickerViewModel.uiState.filterNot {
+            it.tabHeaderLabels.isEmpty()
+        }.distinctUntilChangedBy {
+            it.emojiListItems
+        }.onEach {
+            tabLayout.removeAllTabs()
+            val labels = it.tabHeaderLabels
+            labels.forEach {
+                val tab = tabLayout.newTab().apply {
+                    text = it.getString(context)
                 }
+                tabLayout.addTab(tab, false)
             }
-        }
+            tabbedListMediator?.detach()
+            tabbedListMediator = TabbedFlexboxListMediator(
+                recyclerView,
+                tabLayout,
+                it.emojiListItems.mapIndexedNotNull { index, emojiListItemType ->
+                    when(emojiListItemType) {
+                        is EmojiListItemType.EmojiItem -> null
+                        is EmojiListItemType.Header -> index
+                    }
+                }
+            )
+            tabbedListMediator?.attach()
+        }.flowWithLifecycle(lifecycleOwner.lifecycle, Lifecycle.State.RESUMED).launchIn(scope)
 
 
         searchWordTextField.setOnEditorActionListener { _, actionId, _ ->

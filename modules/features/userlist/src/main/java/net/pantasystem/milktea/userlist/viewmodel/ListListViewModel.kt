@@ -1,5 +1,6 @@
 package net.pantasystem.milktea.userlist.viewmodel
 
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -17,7 +18,6 @@ import net.pantasystem.milktea.model.user.User
 import net.pantasystem.milktea.model.user.UserRepository
 import javax.inject.Inject
 
-@ExperimentalCoroutinesApi
 @HiltViewModel
 class ListListViewModel @Inject constructor(
     val accountStore: AccountStore,
@@ -26,16 +26,49 @@ class ListListViewModel @Inject constructor(
     private val userListRepository: UserListRepository,
     private val userRepository: UserRepository,
     private val toggleAddToTabUseCase: UserListTabToggleAddToTabUseCase,
+    private val savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
 
+    companion object {
+        const val EXTRA_SPECIFIED_ACCOUNT_ID = "ListListViewModel.EXTRA_SPECIFIED_ACCOUNT_ID"
+        const val EXTRA_ADD_TAB_TO_ACCOUNT_ID = "ListListViewModel.EXTRA_ADD_TAB_TO_ACCOUNT_ID"
+    }
 
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    private val currentAccount = savedStateHandle.getStateFlow<Long?>(
+        EXTRA_SPECIFIED_ACCOUNT_ID,
+        null
+    ).flatMapLatest { accountId ->
+        accountStore.state.map { state ->
+            accountId?.let {
+                state.get(it)
+
+            } ?: state.currentAccount
+        }
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    private val addTabToAccount = savedStateHandle.getStateFlow<Long?>(
+        EXTRA_ADD_TAB_TO_ACCOUNT_ID,
+        null
+    ).flatMapLatest { accountId ->
+        accountStore.state.map { state ->
+            accountId?.let { accountId ->
+                state.get(accountId)
+            } ?: state.currentAccount
+        }
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
+
+    @OptIn(ExperimentalCoroutinesApi::class)
     private val userListsFlow =
-        accountStore.observeCurrentAccount.filterNotNull().flatMapLatest { account ->
+        currentAccount.filterNotNull().flatMapLatest { account ->
             userListRepository.observeByAccountId(account.accountId)
         }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     private val userListsSyncState =
-        accountStore.observeCurrentAccount.filterNotNull().flatMapLatest {
+        currentAccount.filterNotNull().flatMapLatest {
             suspend {
                 userListRepository.syncByAccountId(it.accountId).getOrThrow()
             }.asLoadingStateFlow()
@@ -48,17 +81,18 @@ class ListListViewModel @Inject constructor(
     private val addTargetUserId = MutableStateFlow<User.Id?>(null)
 
     val uiState = combine(
-        accountStore.observeCurrentAccount,
+        addTabToAccount,
         userListsFlow,
         userListsSyncState,
         addTargetUserId
-    ) { ac, userLists, syncState, addUser ->
+    ) { addTabToAccount, userLists, syncState, addUser ->
         UserListsUiState(
             userLists.map { userList ->
                 UserListBindingModel(
                     userList,
-                    ac?.pages?.any {
+                    addTabToAccount?.pages?.any {
                         it.pageParams.listId == userList.userList.id.userListId
+                                && userList.userList.id.accountId == (it.attachedAccountId ?: it.accountId)
                     } ?: false,
                     isTargetUserAdded = userList.userList.userIds.any { id ->
                         id == addUser
@@ -106,7 +140,7 @@ class ListListViewModel @Inject constructor(
     fun toggleTab(userList: UserList?) {
         userList?.let { ul ->
             viewModelScope.launch {
-                toggleAddToTabUseCase(ul.id).onFailure {
+                toggleAddToTabUseCase(ul.id, savedStateHandle[EXTRA_ADD_TAB_TO_ACCOUNT_ID]).onFailure {
                     logger.error("タブtoggle処理失敗", e = it)
                 }
             }
@@ -130,6 +164,10 @@ class ListListViewModel @Inject constructor(
 
     fun setAddTargetUserId(userId: User.Id?) {
         addTargetUserId.value = userId
+    }
+
+    fun getAddTabToAccountId(): Long? {
+        return savedStateHandle[EXTRA_ADD_TAB_TO_ACCOUNT_ID]
     }
 
     private suspend fun syncUsers(accountId: Long) {

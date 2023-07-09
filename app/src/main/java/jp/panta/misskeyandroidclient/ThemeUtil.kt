@@ -29,6 +29,7 @@ fun Activity.setTheme() {
         Theme.Black -> setTheme(R.style.AppThemeBlack)
         Theme.Bread -> setTheme(R.style.AppThemeBread)
         Theme.White -> setTheme(R.style.AppTheme)
+        Theme.ElephantDark -> setTheme(R.style.AppThemeMastodonDark)
     }
 
 }

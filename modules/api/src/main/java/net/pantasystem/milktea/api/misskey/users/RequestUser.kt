@@ -3,7 +3,7 @@ package net.pantasystem.milktea.api.misskey.users
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import net.pantasystem.milktea.model.user.query.FindUsersQuery
+import net.pantasystem.milktea.model.user.query.FindUsersQuery4Misskey
 
 @Serializable
 data class RequestUser(
@@ -52,7 +52,7 @@ data class RequestUser(
 
 }
 
-fun RequestUser.Companion.from(query: FindUsersQuery, i: String): RequestUser {
+fun RequestUser.Companion.from(query: FindUsersQuery4Misskey, i: String): RequestUser {
     return RequestUser(
         i = i,
         origin = query.origin?.origin,

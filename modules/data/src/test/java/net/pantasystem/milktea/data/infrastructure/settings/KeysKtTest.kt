@@ -100,6 +100,30 @@ class KeysKtTest {
                     "IsHideMediaWhenMobileNetwork",
                     key.str()
                 )
+                Keys.NoteContentFontSize -> Assertions.assertEquals(
+                    "NoteContentFontSize",
+                    key.str()
+                )
+                Keys.NoteHeaderFontSize -> Assertions.assertEquals(
+                    "NoteHeaderFontSize",
+                    key.str()
+                )
+                Keys.IsDisplayTimestampsAsAbsoluteDates -> Assertions.assertEquals(
+                    "IsDisplayTimestampsAsAbsoluteDates",
+                    key.str()
+                )
+                Keys.NoteReactionCounterFontSize -> Assertions.assertEquals(
+                    "NoteReactionCounterFontSize",
+                    key.str()
+                )
+                Keys.NoteCustomEmojiScaleSizeInText -> Assertions.assertEquals(
+                    "NoteCustomEmojiScaleSizeInText",
+                    key.str()
+                )
+                Keys.EmojiPickerEmojiDisplaySize -> Assertions.assertEquals(
+                    "EmojiPickerEmojiDisplaySize",
+                    key.str()
+                )
             }
         }
     }
@@ -107,8 +131,8 @@ class KeysKtTest {
 
     @Test
     fun checkAllKeysCount() {
-        Assertions.assertEquals(27, Keys.allKeys.size)
-        Assertions.assertEquals(27, Keys.allKeys.map { it.str() }.toSet().size)
+        Assertions.assertEquals(33, Keys.allKeys.size)
+        Assertions.assertEquals(33, Keys.allKeys.map { it.str() }.toSet().size)
     }
 
 

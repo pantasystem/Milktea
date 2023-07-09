@@ -31,11 +31,10 @@ import net.pantasystem.milktea.common_viewmodel.CurrentPageableTimelineViewModel
 import net.pantasystem.milktea.common_viewmodel.ScrollToTopViewModel
 import net.pantasystem.milktea.model.account.page.Page
 import net.pantasystem.milktea.model.account.page.Pageable
+import net.pantasystem.milktea.model.setting.LocalConfigRepository
 import net.pantasystem.milktea.note.R
 import net.pantasystem.milktea.note.databinding.FragmentSwipeRefreshRecyclerViewBinding
-import net.pantasystem.milktea.note.timeline.viewmodel.TimeMachineEventViewModel
-import net.pantasystem.milktea.note.timeline.viewmodel.TimelineViewModel
-import net.pantasystem.milktea.note.timeline.viewmodel.provideViewModel
+import net.pantasystem.milktea.note.timeline.viewmodel.*
 import net.pantasystem.milktea.note.view.NoteCardActionHandler
 import net.pantasystem.milktea.note.viewmodel.NotesViewModel
 import javax.inject.Inject
@@ -80,9 +79,14 @@ class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view)
     private val mViewModel: TimelineViewModel by viewModels<TimelineViewModel> {
         TimelineViewModel.provideViewModel(
             timelineViewModelFactory,
-            null,
-            mPage?.accountId ?: accountId,
-            mPageable
+            accountId = (mPage?.attachedAccountId?: mPage?.accountId ?: accountId)?.let {
+                AccountId(it)
+            },
+            pageId = mPage?.pageId?.let {
+                PageId(it)
+            },
+            pageable = mPageable,
+            isSaveScrollPosition = mPage?.isSavePagePosition
         )
     }
 
@@ -107,6 +111,9 @@ class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view)
 
     @Inject
     lateinit var channelDetailNavigation: ChannelDetailNavigation
+
+    @Inject
+    lateinit var configRepository: LocalConfigRepository
 
 
     private val mBinding: FragmentSwipeRefreshRecyclerViewBinding by dataBinding()
@@ -147,6 +154,7 @@ class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view)
         val lm = LinearLayoutManager(this.requireContext())
         _linearLayoutManager = lm
         val adapter = TimelineListAdapter(
+            configRepository = configRepository,
             viewLifecycleOwner,
             onRefreshAction = {
                 mViewModel.loadInit()
@@ -231,7 +239,7 @@ class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view)
             override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
                 when (menuItem.itemId) {
                     R.id.refresh_timeline -> {
-                        mViewModel.loadInit()
+                        mViewModel.loadInit(ignoreSavedScrollPosition = true)
                         return true
                     }
                     R.id.set_time_machine -> {
@@ -246,7 +254,7 @@ class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view)
         viewLifecycleOwner.lifecycleScope.launch {
             whenResumed {
                 timeMachineEventViewModel.loadEvents.collect {
-                    mViewModel.loadInit(it)
+                    mViewModel.loadInit(it, ignoreSavedScrollPosition = true)
                 }
             }
         }
@@ -270,11 +278,7 @@ class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view)
                         mViewModel.loadOld()
                     }
 
-                    if (lm.findFirstVisibleItemPosition() <= 3) {
-                        mViewModel.onVisibleFirst()
-                    }
-
-                    mViewModel.onPositionChanged(lm.findFirstVisibleItemPosition())
+                    mViewModel.onScrollPositionChanged(lm.findFirstVisibleItemPosition())
 
                 }
             }
@@ -288,7 +292,7 @@ class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view)
         isShowing = true
         mViewModel.onResume()
 
-        currentPageableTimelineViewModel.setCurrentPageable(mPageable)
+        currentPageableTimelineViewModel.setCurrentPageable(mViewModel.accountId?.value, mPageable)
         try {
             layoutManager.scrollToPosition(mViewModel.position)
         } catch (_: Exception) {

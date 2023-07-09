@@ -22,10 +22,10 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
 import net.pantasystem.milktea.common.PageableState
 import net.pantasystem.milktea.common.StateContent
-import net.pantasystem.milktea.model.notes.NoteRelation
 import net.pantasystem.milktea.model.user.User
 import net.pantasystem.milktea.note.renote.ItemRenoteAction
 import net.pantasystem.milktea.note.renote.ItemRenoteUser
+import net.pantasystem.milktea.note.renote.RenoteItemType
 import net.pantasystem.milktea.note.renote.RenotesViewModel
 
 
@@ -33,14 +33,15 @@ import net.pantasystem.milktea.note.renote.RenotesViewModel
 @Composable
 fun RenoteUsersScreen(
     renotesViewModel: RenotesViewModel,
-    onSelected: (NoteRelation) -> Unit,
+    onSelected: (RenoteItemType) -> Unit,
     onScrollState: (Boolean) -> Unit,
 ) {
 
     val myId by renotesViewModel.myId.collectAsState()
     val account by renotesViewModel.account.collectAsState()
+    val config by renotesViewModel.config.collectAsState()
 
-    val renotes: PageableState<List<NoteRelation>> by renotesViewModel.renotes.asLiveData()
+    val renotes: PageableState<List<RenoteItemType>> by renotesViewModel.renotes.asLiveData()
         .observeAsState(
             initial = PageableState.Fixed(
                 StateContent.NotExist()
@@ -61,7 +62,7 @@ fun RenoteUsersScreen(
                         onSelected(it.note)
                     }
                     is ItemRenoteAction.OnDeleteButtonClicked -> {
-                        renotesViewModel.delete(it.note.note.id)
+                        renotesViewModel.delete(it.note)
                     }
                 }
             },
@@ -72,6 +73,7 @@ fun RenoteUsersScreen(
             onScrollState = onScrollState,
             myId = myId,
             accountHost = account?.getHost(),
+            isDisplayTimestampsAsAbsoluteDates = config.isDisplayTimestampsAsAbsoluteDates,
         )
     } else {
         Column(
@@ -100,9 +102,10 @@ fun RenoteUsersScreen(
 @ExperimentalCoroutinesApi
 @Composable
 fun RenoteUserList(
-    notes: List<NoteRelation>,
+    notes: List<RenoteItemType>,
     myId: User.Id?,
     accountHost: String?,
+    isDisplayTimestampsAsAbsoluteDates: Boolean?,
     onAction: (ItemRenoteAction) -> Unit,
     onBottomReached: () -> Unit,
     onScrollState: (Boolean) -> Unit,
@@ -135,15 +138,13 @@ fun RenoteUserList(
         rememberNestedScrollInteropConnection())) {
         this.items(
             notes.size,
-            key = {
-                notes[it].note.id
-            }
         ) { pos ->
             ItemRenoteUser(
                 note = notes[pos],
                 onAction = onAction,
                 myId = myId,
                 accountHost = accountHost,
+                isDisplayTimestampsAsAbsoluteDates = isDisplayTimestampsAsAbsoluteDates ?: false,
             )
         }
     }

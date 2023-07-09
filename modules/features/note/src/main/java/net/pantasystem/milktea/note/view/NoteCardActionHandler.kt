@@ -52,7 +52,10 @@ class NoteCardActionHandler(
                 )
             }
             is NoteCardAction.OnReactionButtonClicked -> {
-                if (action.note.currentNote.value.isReacted) {
+                if (
+                    action.note.currentNote.value.isReacted
+                    && !action.note.currentNote.value.canReaction
+                ) {
                     notesViewModel.deleteReactions(action.note.toShowNote.note.id)
                     return
                 }
@@ -94,17 +97,10 @@ class NoteCardActionHandler(
                 ).show(activity.supportFragmentManager, "")
             }
             is NoteCardAction.OnRenoteButtonClicked -> {
-                when(action.note.note.note.type) {
-                    is Note.Type.Mastodon -> {
-                        notesViewModel.toggleReblog(action.note.toShowNote.note.id)
-                    }
-                    is Note.Type.Misskey -> {
-                        RenoteBottomSheetDialog.newInstance(
-                            action.note.note.note.id,
-                            action.note.isRenotedByMe
-                        ).show(activity.supportFragmentManager, "")
-                    }
-                }
+                RenoteBottomSheetDialog.newInstance(
+                    action.note.note.note.id,
+                    action.note.isRenotedByMe
+                ).show(activity.supportFragmentManager, "")
             }
             is NoteCardAction.OnRenoteButtonLongClicked -> {
                 RenotesBottomSheetDialog.newInstance(action.note.toShowNote.note.id)

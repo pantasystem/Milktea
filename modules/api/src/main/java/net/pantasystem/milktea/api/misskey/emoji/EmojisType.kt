@@ -12,13 +12,12 @@ import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonContentPolymorphicSerializer
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonObject
-import net.pantasystem.milktea.model.emoji.Emoji
 
 
 @kotlinx.serialization.Serializable(with = CustomEmojisTypeSerializer::class)
 sealed interface EmojisType {
     @kotlinx.serialization.Serializable(with = TypeArraySerializer::class)
-    data class TypeArray(val emojis: List<Emoji>) : EmojisType
+    data class TypeArray(val emojis: List<CustomEmojiNetworkDTO>) : EmojisType
 
     @kotlinx.serialization.Serializable(with = TypeObjectSerializer::class)
     data class TypeObject(val emojis: Map<String, String>) : EmojisType
@@ -61,7 +60,7 @@ object TypeObjectSerializer : KSerializer<EmojisType.TypeObject> {
 }
 
 class TypeArraySerializer : KSerializer<EmojisType.TypeArray> {
-    private val listSerializer = ListSerializer(Emoji.serializer())
+    private val listSerializer = ListSerializer(CustomEmojiNetworkDTO.serializer())
     override val descriptor: SerialDescriptor = listSerializer.descriptor
 
     override fun deserialize(decoder: Decoder): EmojisType.TypeArray {

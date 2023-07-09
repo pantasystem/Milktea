@@ -189,7 +189,7 @@ class FollowFollowerPagingModelImpl(
                         else -> throw IllegalStateException("not support follow follower list")
                     }
                 }
-                Account.InstanceType.MASTODON -> {
+                Account.InstanceType.MASTODON, Account.InstanceType.PLEROMA -> {
                     MastodonLoader(
                         requestType,
                         account,

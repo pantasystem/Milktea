@@ -86,10 +86,13 @@ data class NoteRecord(
     var misskeyChannelId: String? = null,
     var misskeyChannelName: String? = null,
     var misskeyIsAcceptingOnlyLikeReaction: Boolean = false,
+    var misskeyIsNotAcceptingSensitiveReaction: Boolean = false,
 
     var myReactions: MutableList<String>? = null,
     var maxReactionsPerAccount: Int = 0,
 
+    var customEmojiAspectRatioMap: MutableMap<String, String>? = null,
+    var customEmojiUrlAndCachePathMap: MutableMap<String, String?>? = null,
 ) {
 
     companion object {
@@ -168,8 +171,26 @@ data class NoteRecord(
                 misskeyChannelId = t.channel?.id?.channelId
                 misskeyChannelName = t.channel?.name
                 misskeyIsAcceptingOnlyLikeReaction = t.isAcceptingOnlyLikeReaction
+                misskeyIsNotAcceptingSensitiveReaction = t.isNotAcceptingSensitiveReaction
             }
         }
+        customEmojiAspectRatioMap = model.emojis?.mapNotNull {  emoji ->
+            val aspectRatio = emoji.aspectRatio
+            val uri = emoji.url ?: emoji.uri
+            if (aspectRatio == null || uri == null) {
+                null
+            } else {
+                uri to aspectRatio.toString()
+            }
+        }?.toMap()?.toMutableMap()
+        customEmojiUrlAndCachePathMap = model.emojis?.mapNotNull { emoji ->
+            val url = (emoji.url ?: emoji.uri)
+            if (emoji.cachePath == null || url == null) {
+                null
+            } else {
+                url to emoji.cachePath
+            }
+        }?.toMap()?.toMutableMap()
     }
 
     fun toModel(): Note {
@@ -197,7 +218,12 @@ data class NoteRecord(
                         it == entry.key
                     } ?: false
                 ) },
-            emojis = emojis?.map { Emoji(name = it.key, url = it.value) },
+            emojis = emojis?.map { Emoji(
+                name = it.key,
+                url = it.value,
+                aspectRatio = customEmojiAspectRatioMap?.get(it.value)?.toFloatOrNull(),
+                cachePath = customEmojiUrlAndCachePathMap?.get(it.value)
+            ) },
             repliesCount = repliesCount,
             fileIds = fileIds?.map { FileProperty.Id(accountId, it) },
             poll = getPoll(),
@@ -213,7 +239,8 @@ data class NoteRecord(
                                 name = misskeyChannelName ?: ""
                             )
                         },
-                        isAcceptingOnlyLikeReaction = misskeyIsAcceptingOnlyLikeReaction
+                        isAcceptingOnlyLikeReaction = misskeyIsAcceptingOnlyLikeReaction,
+                        isNotAcceptingSensitiveReaction = misskeyIsNotAcceptingSensitiveReaction,
                     )
                 }
                 "mastodon" -> {

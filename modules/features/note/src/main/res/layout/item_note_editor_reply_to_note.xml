@@ -92,6 +92,7 @@
                 android:ellipsize="end"
                 elapsedTime="@{note.toShowNote.note.createdAt}"
                 visibility="@{note.toShowNote.note.visibility}"
+                isDisplayTimestampsAsAbsoluteDates="@{note.config.displayTimestampsAsAbsoluteDates}"
                 android:layout_alignParentEnd="true"
                 android:gravity="end"
                 tools:text="16分前"
@@ -189,6 +190,7 @@
                             android:layout_height="wrap_content"
                             android:textSize="@dimen/note_content_text_size"
                             textTypeSource="@{note.textNode}"
+                            customEmojiScale="@{note.config.noteCustomEmojiScaleSizeInText}"
                             tools:text="aoiwefjowiaejiowajefihawoefoiawehfioawheoifawoiefioawejfowaoeifjawoiejfoaw"
                             android:visibility='@{note.text == null ? View.GONE : View.VISIBLE}'
                             />
@@ -346,6 +348,7 @@
                                 android:id="@+id/subNoteText"
                                 tools:text="aowjfoiwajehofijawioefjioawejfiowajeiofhawoifahwoiefwaioe"
                                 textTypeSource="@{note.subNoteTextNode}"
+                                customEmojiScale="@{note.config.noteCustomEmojiScaleSizeInText}"
                                 app:layout_constraintTop_toBottomOf="@id/subContentFoldingButton"
                                 app:layout_constraintStart_toStartOf="parent"
                                 android:visibility="@{ note.subContentFolding || note.subNote.note.text == null ? View.GONE : View.VISIBLE }"/>

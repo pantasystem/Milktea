@@ -9,7 +9,6 @@ import dagger.assisted.AssistedInject
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import net.pantasystem.milktea.common.Logger
-import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.common_android.emoji.V13EmojiUrlResolver
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.AccountRepository
@@ -17,10 +16,7 @@ import net.pantasystem.milktea.model.emoji.Emoji
 import net.pantasystem.milktea.model.instance.MetaRepository
 import net.pantasystem.milktea.model.notes.Note
 import net.pantasystem.milktea.model.notes.NoteRepository
-import net.pantasystem.milktea.model.notes.reaction.ReactionHistory
-import net.pantasystem.milktea.model.notes.reaction.ReactionHistoryDataSource
-import net.pantasystem.milktea.model.notes.reaction.ReactionHistoryPaginator
-import net.pantasystem.milktea.model.notes.reaction.ReactionHistoryRequest
+import net.pantasystem.milktea.model.notes.reaction.*
 import net.pantasystem.milktea.model.user.User
 import net.pantasystem.milktea.model.user.UserRepository
 import net.pantasystem.milktea.note.EmojiType
@@ -28,13 +24,12 @@ import net.pantasystem.milktea.note.from
 
 
 class ReactionHistoryViewModel @AssistedInject constructor(
-    reactionHistoryDataSource: ReactionHistoryDataSource,
-    paginatorFactory: ReactionHistoryPaginator.Factory,
-    val loggerFactory: Logger.Factory,
-    val metaRepository: MetaRepository,
-    val accountRepository: AccountRepository,
-    val noteRepository: NoteRepository,
-    val userRepository: UserRepository,
+    loggerFactory: Logger.Factory,
+    private val metaRepository: MetaRepository,
+    private val accountRepository: AccountRepository,
+    noteRepository: NoteRepository,
+    private val userRepository: UserRepository,
+    private val reactionUserRepository: ReactionUserRepository,
     @Assisted val noteId: Note.Id,
     @Assisted val type: String?
 ) : ViewModel() {
@@ -49,7 +44,9 @@ class ReactionHistoryViewModel @AssistedInject constructor(
     val logger = loggerFactory.create("ReactionHistoryVM")
 
     private val isLoading = MutableStateFlow(false)
-    private val histories = MutableStateFlow<List<ReactionHistory>>(emptyList())
+
+    private val users = reactionUserRepository.observeBy(noteId, type)
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
 
     @OptIn(ExperimentalCoroutinesApi::class)
     private val emojis = flowOf(noteId).mapNotNull {
@@ -62,7 +59,6 @@ class ReactionHistoryViewModel @AssistedInject constructor(
 
     private val note = noteRepository.observeOne(noteId)
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
-    private val paginator = paginatorFactory.create(ReactionHistoryRequest(noteId, type))
 
     @OptIn(FlowPreview::class)
     private val account = suspend {
@@ -85,9 +81,9 @@ class ReactionHistoryViewModel @AssistedInject constructor(
         noteInfo,
         emojis,
         isLoading,
-        histories,
+        users,
         account,
-    ) { noteInfo, emojis, loading, histories, a ->
+    ) { noteInfo, emojis, loading, users, a ->
         ReactionHistoryUiState(
             items = listOfNotNull(
                 type?.let { type ->
@@ -111,8 +107,8 @@ class ReactionHistoryViewModel @AssistedInject constructor(
                         ReactionHistoryListType.Header(it)
                     }
                 }
-            ) + histories.map {
-                ReactionHistoryListType.ItemUser(it.user, account = a)
+            ) + users.map {
+                ReactionHistoryListType.ItemUser(it, account = a)
             } + listOfNotNull(
                 if (loading) {
                     ReactionHistoryListType.Loading
@@ -128,27 +124,17 @@ class ReactionHistoryViewModel @AssistedInject constructor(
     )
 
     init {
-        reactionHistoryDataSource.filter(noteId, type).onEach {
-            histories.value = it
-        }.catch {
-
-        }.launchIn(viewModelScope + Dispatchers.IO)
-    }
-
-    fun next() {
-        if (isLoading.value) {
-            return
-        }
-        isLoading.value = true
         viewModelScope.launch {
-
-            runCancellableCatching {
-                paginator.next()
-            }.onFailure {
-                logger.error("リアクションの履歴の取得に失敗しました", e = it)
+            isLoading.value = true
+            reactionUserRepository.syncBy(noteId, type).onFailure {
+                logger.error("リアクション履歴の同期に失敗", it)
             }
             isLoading.value = false
         }
+    }
+
+    fun next() {
+
     }
 
 }

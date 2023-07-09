@@ -5,8 +5,11 @@ import net.pantasystem.milktea.api_streaming.Socket
 import net.pantasystem.milktea.api_streaming.network.SocketImpl
 import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.model.account.Account
-import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.account.UnauthorizedException
+import net.pantasystem.milktea.model.instance.Version
+import net.pantasystem.milktea.model.nodeinfo.NodeInfo
+import net.pantasystem.milktea.model.nodeinfo.NodeInfoRepository
+import net.pantasystem.milktea.model.nodeinfo.getVersion
 import javax.inject.Inject
 import net.pantasystem.milktea.data.streaming.SocketWithAccountProvider as ISocketWithAccountProvider
 
@@ -14,14 +17,14 @@ import net.pantasystem.milktea.data.streaming.SocketWithAccountProvider as ISock
  * SocketをAccountに基づきいい感じにリソースを取得できるようにする
  */
 class SocketWithAccountProviderImpl @Inject constructor(
-    val accountRepository: AccountRepository,
     val loggerFactory: Logger.Factory,
-    val okHttpClientProvider: OkHttpClientProvider
+    val okHttpClientProvider: OkHttpClientProvider,
+    val nodeInfoRepository: NodeInfoRepository,
 ) : ISocketWithAccountProvider{
 
     private val logger = loggerFactory.create("SocketProvider")
 
-    private val accountIdWithSocket = mutableMapOf<Long, Socket>()
+    private val accountIdWithSocket = mutableMapOf<Long, SocketImpl>()
 
     /**
      * accountIdとそのTokenを管理している。
@@ -47,10 +50,7 @@ class SocketWithAccountProviderImpl @Inject constructor(
                     logger.debug { "すでにインスタンス化済み" }
                     return socket
                 } else {
-                    if (socket is SocketImpl) {
-                        socket.destroy()
-
-                    }
+                    socket.destroy()
                 }
             }
 
@@ -66,6 +66,11 @@ class SocketWithAccountProviderImpl @Inject constructor(
 
             socket = SocketImpl(
                 url = uri,
+                isRequirePingPong = {
+                    nodeInfoRepository.get(account.getHost())?.let {
+                        !(it.type is NodeInfo.SoftwareType.Misskey.Normal && it.type.getVersion() >= Version("13.13.2"))
+                    } ?: true
+                },
                 okHttpClientProvider = okHttpClientProvider,
                 loggerFactory = loggerFactory,
             )

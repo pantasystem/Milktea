@@ -66,8 +66,8 @@ class PageSettingActivity : AppCompatActivity() {
         }
 //
         mPageSettingViewModel.pageAddedEvent.observe(this) { pt ->
-            when (pt) {
-                PageType.SEARCH, PageType.SEARCH_HASH, PageType.MASTODON_HASHTAG_TIMELINE -> startActivity(
+            when (pt.type) {
+                PageType.SEARCH, PageType.SEARCH_HASH, PageType.MASTODON_TAG_TIMELINE -> startActivity(
                     searchNavigation.newIntent(SearchNavType.SearchScreen())
                 )
                 PageType.USER -> {
@@ -80,26 +80,42 @@ class PageSettingActivity : AppCompatActivity() {
                     launchSearchAndSelectUserForAddUserTimelineTab.launch(intent)
                 }
                 PageType.USER_LIST, PageType.MASTODON_LIST_TIMELINE -> startActivity(
-                    userListNavigation.newIntent(UserListArgs())
+                    userListNavigation.newIntent(UserListArgs(
+                        specifiedAccountId = pt.relatedAccount.accountId,
+                        addTabToAccountId = mPageSettingViewModel.account.value?.accountId
+                    ))
                 )
                 PageType.DETAIL -> startActivity(searchNavigation.newIntent(SearchNavType.SearchScreen()))
-                PageType.ANTENNA -> startActivity(antennaNavigation.newIntent(Unit))
+                PageType.ANTENNA -> startActivity(antennaNavigation.newIntent(AntennaNavigationArgs(
+                    specifiedAccountId = pt.relatedAccount.accountId,
+                    addTabToAccountId = mPageSettingViewModel.account.value?.accountId
+                )))
                 PageType.CLIP_NOTES -> startActivity(
                     clipListNavigation.newIntent(
-                        ClipListNavigationArgs(mode = ClipListNavigationArgs.Mode.AddToTab)
+                        ClipListNavigationArgs(
+                            mode = ClipListNavigationArgs.Mode.AddToTab,
+                            accountId = pt.relatedAccount.accountId,
+                            addTabToAccountId = mPageSettingViewModel.account.value?.accountId
+                        )
                     )
                 )
                 PageType.USERS_GALLERY_POSTS -> {
                     val intent =
                         searchAndSelectUserNavigation.newIntent(
                             SearchAndSelectUserNavigationArgs(
-                                selectableMaximumSize = 1
+                                selectableMaximumSize = 1,
+                                accountId = pt.relatedAccount.accountId,
                             )
                         )
                     launchSearchAndSelectUserForAddGalleryTab.launch(intent)
                 }
                 PageType.CHANNEL_TIMELINE -> {
-                    val intent = channelNavigation.newIntent(Unit)
+                    val intent = channelNavigation.newIntent(
+                        ChannelNavigationArgs(
+                            specifiedAccountId = pt.relatedAccount.accountId,
+                            addTabToAccountId = mPageSettingViewModel.account.value?.accountId
+                        )
+                    )
                     startActivity(intent)
                 }
                 else -> {
@@ -111,7 +127,7 @@ class PageSettingActivity : AppCompatActivity() {
 
         setContent {
             MdcTheme {
-                val pageTypes by mPageSettingViewModel.pageTypes.collectAsState()
+                val pageTypes by mPageSettingViewModel.pageTypesGroupedByAccount.collectAsState()
                 val list by mPageSettingViewModel.selectedPages.collectAsState()
                 val scope = rememberCoroutineScope()
                 val dragAndDropState =

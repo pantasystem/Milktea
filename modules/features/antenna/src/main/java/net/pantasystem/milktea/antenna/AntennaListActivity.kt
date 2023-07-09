@@ -16,6 +16,7 @@ import net.pantasystem.milktea.antenna.databinding.ActivityAntennaListBinding
 import net.pantasystem.milktea.antenna.viewmodel.AntennaListViewModel
 import net.pantasystem.milktea.common.ui.ApplyTheme
 import net.pantasystem.milktea.common_navigation.AntennaNavigation
+import net.pantasystem.milktea.common_navigation.AntennaNavigationArgs
 import net.pantasystem.milktea.model.antenna.Antenna
 import javax.inject.Inject
 
@@ -85,7 +86,10 @@ class AntennaListActivity : AppCompatActivity() {
 class AntennaNavigationImpl @Inject constructor(
     val activity: Activity
 ): AntennaNavigation {
-    override fun newIntent(args: Unit): Intent {
-        return Intent(activity, AntennaListActivity::class.java)
+    override fun newIntent(args: AntennaNavigationArgs): Intent {
+        return Intent(activity, AntennaListActivity::class.java).apply {
+            putExtra(AntennaListViewModel.EXTRA_SPECIFIED_ACCOUNT_ID, args.specifiedAccountId)
+            putExtra(AntennaListViewModel.EXTRA_ADD_TAB_TO_ACCOUNT_ID, args.addTabToAccountId)
+        }
     }
 }

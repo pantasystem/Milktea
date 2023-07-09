@@ -102,4 +102,21 @@
     </style>
 
 
+    <style name="AppThemeMastodonDark" parent="AppThemeDark">
+        <item name="colorPrimary">#FF8C8DFE</item>
+        <item name="colorPrimaryDark">#FF282c37</item>
+        <item name="colorSurface">#FF282C37</item>
+        <item name="colorSecondary">#FF595aff</item>
+        <item name="appBarLayoutStyle">@style/Widget.MaterialComponents.Toolbar.PrimarySurface</item>
+        <item name="toolbarStyle">@style/Widget.MaterialComponents.Toolbar.PrimarySurface</item>
+        <item name="tabStyle">@style/Widget.MaterialComponents.TabLayout.PrimarySurface</item>
+        <item name="bottomNavigationStyle">@style/BottomNavigationView4Dark</item>
+        <item name="colorSelectedReactionCounterBackground">#FF8C8DFE</item>
+        <item name="colorNormalReactionCounterBackground">#FF424859</item>
+        <item name="android:windowBackground">#FF191B22</item>
+
+<!--        <item name="android:navigationBarColor">@color/colorBreadPrimary</item>-->
+
+    </style>
+
 </resources>

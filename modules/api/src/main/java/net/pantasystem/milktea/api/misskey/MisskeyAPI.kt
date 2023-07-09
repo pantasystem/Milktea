@@ -1,5 +1,6 @@
 package net.pantasystem.milktea.api.misskey
 
+import kotlinx.serialization.json.JsonObject
 import net.pantasystem.milktea.api.misskey.ap.ApResolveRequest
 import net.pantasystem.milktea.api.misskey.ap.ApResolveResult
 import net.pantasystem.milktea.api.misskey.app.CreateApp
@@ -7,7 +8,6 @@ import net.pantasystem.milktea.api.misskey.auth.App
 import net.pantasystem.milktea.api.misskey.clip.*
 import net.pantasystem.milktea.api.misskey.drive.*
 import net.pantasystem.milktea.api.misskey.favorite.Favorite
-import net.pantasystem.milktea.api.misskey.hashtag.RequestHashTagList
 import net.pantasystem.milktea.api.misskey.hashtag.SearchHashtagRequest
 import net.pantasystem.milktea.api.misskey.list.*
 import net.pantasystem.milktea.api.misskey.messaging.MessageAction
@@ -23,10 +23,12 @@ import net.pantasystem.milktea.api.misskey.notes.translation.Translate
 import net.pantasystem.milktea.api.misskey.notes.translation.TranslationResult
 import net.pantasystem.milktea.api.misskey.notification.NotificationDTO
 import net.pantasystem.milktea.api.misskey.notification.NotificationRequest
+import net.pantasystem.milktea.api.misskey.online.user.OnlineUserCount
 import net.pantasystem.milktea.api.misskey.register.Subscription
 import net.pantasystem.milktea.api.misskey.register.UnSubscription
 import net.pantasystem.milktea.api.misskey.register.WebClientBaseRequest
 import net.pantasystem.milktea.api.misskey.register.WebClientRegistries
+import net.pantasystem.milktea.api.misskey.trend.HashtagTrend
 import net.pantasystem.milktea.api.misskey.users.*
 import net.pantasystem.milktea.api.misskey.users.renote.mute.CreateRenoteMuteRequest
 import net.pantasystem.milktea.api.misskey.users.renote.mute.DeleteRenoteMuteRequest
@@ -34,8 +36,6 @@ import net.pantasystem.milktea.api.misskey.users.renote.mute.RenoteMuteDTO
 import net.pantasystem.milktea.api.misskey.users.renote.mute.RenoteMutesRequest
 import net.pantasystem.milktea.api.misskey.users.report.ReportDTO
 import net.pantasystem.milktea.api.misskey.v13.EmojisResponse
-import net.pantasystem.milktea.model.drive.Directory
-import net.pantasystem.milktea.model.hashtag.HashTag
 import net.pantasystem.milktea.model.instance.Meta
 import net.pantasystem.milktea.model.instance.RequestMeta
 import net.pantasystem.milktea.model.messaging.RequestMessageHistory
@@ -153,7 +153,7 @@ interface MisskeyAPI {
     suspend fun showNote(@Body requestNote: NoteRequest): Response<NoteDTO>
 
     @POST("api/notes/children")
-    suspend fun children(@Body noteRequest: NoteRequest): Response<List<NoteDTO>>
+    suspend fun children(@Body req: GetNoteChildrenRequest): Response<List<NoteDTO>>
 
     @POST("api/notes/conversation")
     suspend fun conversation(@Body noteRequest: NoteRequest): Response<List<NoteDTO>>
@@ -198,7 +198,7 @@ interface MisskeyAPI {
     suspend fun getFiles(@Body fileRequest: RequestFile): Response<List<FilePropertyDTO>>
 
     @POST("api/drive/files/update")
-    suspend fun updateFile(@Body updateFileRequest: UpdateFileDTO): Response<FilePropertyDTO>
+    suspend fun updateFile(@Body updateFileRequest: JsonObject): Response<FilePropertyDTO>
 
     @POST("api/drive/files/delete")
     suspend fun deleteFile(@Body req: DeleteFileDTO): Response<Unit>
@@ -207,10 +207,13 @@ interface MisskeyAPI {
     suspend fun showFile(@Body req: ShowFile) : Response<FilePropertyDTO>
 
     @POST("api/drive/folders")
-    suspend fun getFolders(@Body folderRequest: RequestFolder): Response<List<Directory>>
+    suspend fun getFolders(@Body folderRequest: RequestFolder): Response<List<DirectoryNetworkDTO>>
 
     @POST("api/drive/folders/create")
-    suspend fun createFolder(@Body createFolder: CreateFolder): Response<Directory>
+    suspend fun createFolder(@Body createFolder: CreateFolder): Response<DirectoryNetworkDTO>
+
+    @POST("api/drive/folders/show")
+    suspend fun showFolder(@Body req: ShowFolderRequest): Response<DirectoryNetworkDTO>
 
 
     //meta
@@ -240,8 +243,6 @@ interface MisskeyAPI {
     @POST("api/mute/delete")
     suspend fun unmuteUser(@Body requestUser: RequestUser): Response<Unit>
 
-    @POST("api/hashtags/list")
-    suspend fun getHashTagList(@Body requestHashTagList: RequestHashTagList): Response<List<HashTag>>
 
     @POST("api/sw/register")
     suspend fun swRegister(@Body subscription: Subscription) : Response<SubscriptionState>
@@ -318,4 +319,10 @@ interface MisskeyAPI {
 
     @POST("api/renote-mute/delete")
     suspend fun deleteRenoteMute(@Body req: DeleteRenoteMuteRequest): Response<Unit>
+
+    @POST("api/hashtags/trend")
+    suspend fun getTrendingHashtags(@Body body: EmptyRequest): Response<List<HashtagTrend>>
+
+    @POST("api/get-online-users-count")
+    suspend fun getOnlineUsersCount(@Body body: EmptyRequest): Response<OnlineUserCount>
 }

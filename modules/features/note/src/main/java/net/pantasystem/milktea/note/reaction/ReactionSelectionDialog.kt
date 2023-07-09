@@ -62,7 +62,7 @@ class ReactionSelectionDialog : BottomSheetDialogFragment(),
         binding.lifecycleOwner = this
 
         if (savedInstanceState == null) {
-            val fragment = EmojiPickerFragment()
+            val fragment = EmojiPickerFragment.newInstance(noteId.accountId)
             childFragmentManager.beginTransaction().also { ft ->
                 ft.add(R.id.fragmentBaseContainer, fragment)
             }.commit()

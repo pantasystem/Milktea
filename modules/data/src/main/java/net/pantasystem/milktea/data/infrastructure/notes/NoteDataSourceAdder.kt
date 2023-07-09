@@ -165,7 +165,7 @@ suspend fun NoteDTO.toEntities(
         files,
         userDTOEntityConverter,
         noteDTOEntityConverter,
-        filePropertyDTOEntityConverter
+        filePropertyDTOEntityConverter,
     )
     return NoteRelationEntities(
         note = note,
@@ -183,7 +183,7 @@ private suspend fun NoteDTO.pickEntities(
     userDTOEntityConverter: UserDTOEntityConverter,
     noteDTOEntityConverter: NoteDTOEntityConverter,
     filePropertyDTOEntityConverter: FilePropertyDTOEntityConverter,
-) {
+    ) {
     val (note, user) = this.toNoteAndUser(
         account,
         userDTOEntityConverter,
@@ -204,7 +204,7 @@ private suspend fun NoteDTO.pickEntities(
             files,
             userDTOEntityConverter,
             noteDTOEntityConverter,
-            filePropertyDTOEntityConverter
+            filePropertyDTOEntityConverter,
         )
     }
 
@@ -216,7 +216,7 @@ private suspend fun NoteDTO.pickEntities(
             files,
             userDTOEntityConverter,
             noteDTOEntityConverter,
-            filePropertyDTOEntityConverter
+            filePropertyDTOEntityConverter,
         )
     }
 }

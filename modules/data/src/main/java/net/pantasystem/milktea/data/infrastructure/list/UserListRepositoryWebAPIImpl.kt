@@ -48,7 +48,7 @@ class UserListRepositoryWebAPIImpl @Inject constructor(
                         it.toEntity(account)
                     }
                 }
-                Account.InstanceType.MASTODON -> {
+                Account.InstanceType.MASTODON, Account.InstanceType.PLEROMA -> {
                     val body = mastodonAPIProvider.get(account).getMyLists()
                         .throwIfHasError()
                         .body()
@@ -142,7 +142,7 @@ class UserListRepositoryWebAPIImpl @Inject constructor(
                         .throwIfHasError()
                     res.body()!!.toEntity(account)
                 }
-                Account.InstanceType.MASTODON -> {
+                Account.InstanceType.MASTODON, Account.InstanceType.PLEROMA -> {
                     val res = mastodonAPIProvider.get(account).getList(userListId.userListId)
                         .throwIfHasError()
                     requireNotNull(res.body()).toModel(account)

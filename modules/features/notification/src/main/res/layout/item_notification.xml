@@ -105,6 +105,7 @@
                         tools:text="16min"
                         android:singleLine="true"
                         elapsedTime="@{notification.notification.notification.createdAt}"
+                        isDisplayTimestampsAsAbsoluteDates="@{notification.config.displayTimestampsAsAbsoluteDates}"
                         android:layout_gravity="center"/>
             </LinearLayout>
             <LinearLayout

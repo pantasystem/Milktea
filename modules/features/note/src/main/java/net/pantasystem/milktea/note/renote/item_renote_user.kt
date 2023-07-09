@@ -13,6 +13,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -23,21 +24,34 @@ import coil.compose.rememberAsyncImagePainter
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import net.pantasystem.milktea.common_compose.CustomEmojiText
 import net.pantasystem.milktea.common_compose.getSimpleElapsedTime
-import net.pantasystem.milktea.model.notes.NoteRelation
 import net.pantasystem.milktea.model.user.User
+import java.text.SimpleDateFormat
+import java.util.*
 
 @ExperimentalCoroutinesApi
 @Composable
 @Stable
 fun ItemRenoteUser(
-    note: NoteRelation,
+    note: RenoteItemType,
     myId: User.Id?,
     accountHost: String?,
+    isDisplayTimestampsAsAbsoluteDates: Boolean,
     onAction: (ItemRenoteAction) -> Unit,
     isUserNameDefault: Boolean = false
 ) {
 
-    val createdAt = getSimpleElapsedTime(time = note.note.createdAt)
+    val createdAt = (note as? RenoteItemType.Renote)?.let { renote ->
+        if (isDisplayTimestampsAsAbsoluteDates) {
+            remember(renote.note.note.createdAt) {
+                SimpleDateFormat.getDateTimeInstance().format(renote.note.note.createdAt.let {
+                    Date(it.toEpochMilliseconds())
+                })
+            }
+        } else {
+            getSimpleElapsedTime(time = renote.note.note.createdAt)
+        }
+
+    }
 
     Card(
         shape = RoundedCornerShape(0.dp),
@@ -96,7 +110,9 @@ fun ItemRenoteUser(
                 }
             }
             Column {
-                Text(createdAt)
+                if (createdAt != null) {
+                    Text(createdAt)
+                }
                 if (note.user.id == myId) {
                     IconButton(onClick = {
                         onAction(ItemRenoteAction.OnDeleteButtonClicked(note))
@@ -113,7 +129,7 @@ fun ItemRenoteUser(
 
 
 sealed interface ItemRenoteAction {
-    data class OnClick(val note: NoteRelation) : ItemRenoteAction
-    data class OnDeleteButtonClicked(val note: NoteRelation): ItemRenoteAction
+    data class OnClick(val note: RenoteItemType) : ItemRenoteAction
+    data class OnDeleteButtonClicked(val note: RenoteItemType): ItemRenoteAction
 }
 

@@ -15,4 +15,6 @@
     <string name="second_ago">秒前</string>
     <string name="edit_file_name">ファイル名を変更</string>
     <string name="edit_file_caption">キャプションを編集</string>
+    <string name="instance">インスタンス</string>
+    <string name="online_user_count_message">%d人がオンライン</string>
 </resources>

@@ -17,16 +17,14 @@ import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.android.material.composethemeadapter.MdcTheme
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import net.pantasystem.milktea.app_store.account.AccountStore
-import net.pantasystem.milktea.app_store.drive.DriveState
-import net.pantasystem.milktea.app_store.drive.DriveStore
 import net.pantasystem.milktea.common.ui.ApplyTheme
 import net.pantasystem.milktea.common_android.platform.PermissionUtil
-import net.pantasystem.milktea.common_navigation.*
-import net.pantasystem.milktea.drive.viewmodel.*
-import net.pantasystem.milktea.model.drive.DirectoryPath
-import net.pantasystem.milktea.model.drive.FileProperty
-import net.pantasystem.milktea.model.drive.SelectedFilePropertyIds
+import net.pantasystem.milktea.common_navigation.DriveNavigation
+import net.pantasystem.milktea.common_navigation.DriveNavigationArgs
+import net.pantasystem.milktea.common_navigation.EXTRA_ACCOUNT_ID
+import net.pantasystem.milktea.common_navigation.EXTRA_INT_SELECTABLE_FILE_MAX_SIZE
+import net.pantasystem.milktea.common_navigation.EXTRA_SELECTED_FILE_PROPERTY_IDS
+import net.pantasystem.milktea.drive.viewmodel.DriveViewModel
 import javax.inject.Inject
 
 class DriveNavigationImpl @Inject constructor(
@@ -47,80 +45,7 @@ class DriveNavigationImpl @Inject constructor(
 class DriveActivity : AppCompatActivity() {
 
 
-
-    @Inject
-    lateinit var accountStore: AccountStore
-
-    private val accountId: Long? by lazy {
-        intent.getLongExtra(EXTRA_ACCOUNT_ID, -1).let {
-            if (it == -1L) null else it
-        }
-    }
-
-
-    private val selectedFileIds: List<FileProperty.Id>? by lazy {
-        (intent.getSerializableExtra(EXTRA_SELECTED_FILE_PROPERTY_IDS) as? ArrayList<*>)?.map {
-            it as FileProperty.Id
-        }
-    }
-
-    private val accountIds: List<Long> by lazy {
-        val accountIds = selectedFileIds?.map { it.accountId }?.distinct() ?: emptyList()
-        require(selectedFileIds == null || accountIds.size <= 1) {
-            "選択したFilePropertyの所有者は全て同一のアカウントである必要があります。ids:${accountIds}"
-        }
-        accountIds
-    }
-
-
-    private val driveSelectableMode: DriveSelectableMode? by lazy {
-
-        val maxSize = intent.getIntExtra(EXTRA_INT_SELECTABLE_FILE_MAX_SIZE, -1)
-        if (intent.action == Intent.ACTION_OPEN_DOCUMENT) {
-            val aId = accountId ?: accountIds.lastOrNull() ?: accountStore.currentAccountId
-            requireNotNull(aId)
-            DriveSelectableMode(
-                maxSize,
-                selectedFileIds ?: emptyList(),
-                aId
-            )
-        } else {
-            null
-        }
-    }
-
-    private val driveStore: DriveStore by lazy {
-        val selectable = driveSelectableMode
-        DriveStore(DriveState(
-            accountId = selectable?.accountId,
-            path = DirectoryPath(emptyList()),
-            selectedFilePropertyIds = selectable?.let {
-                SelectedFilePropertyIds(
-                    selectableMaxCount = it.selectableMaxSize,
-                    selectedIds = it.selectedFilePropertyIds.toSet()
-                )
-            }
-        ))
-    }
-
-    @Inject
-    lateinit var directoryViewModelFactory: DirectoryViewModel.ViewModelAssistedFactory
-    private val _directoryViewModel: DirectoryViewModel by viewModels {
-        DirectoryViewModel.provideViewModel(directoryViewModelFactory, driveStore)
-    }
-
-    @Inject
-    lateinit var fileViewModelFactory: FileViewModel.AssistedViewModelFactory
-
-    private val _fileViewModel: FileViewModel by viewModels {
-        FileViewModel.provideFactory(fileViewModelFactory, driveStore)
-    }
-
-    @Inject
-    lateinit var driveViewModelFactory: DriveViewModel.AssistedViewModelFactory
-    private val _driveViewModel: DriveViewModel by viewModels {
-        DriveViewModel.provideViewModel(driveViewModelFactory, driveStore, driveSelectableMode)
-    }
+    private val _driveViewModel: DriveViewModel by viewModels()
 
     @Inject
     lateinit var setTheme: ApplyTheme
@@ -137,14 +62,10 @@ class DriveActivity : AppCompatActivity() {
         ViewTreeLifecycleOwner.set(window.decorView, this)
 
 
-
-
         setContent {
             MdcTheme {
                 DriveScreen(
                     driveViewModel = _driveViewModel,
-                    fileViewModel = _fileViewModel,
-                    directoryViewModel = _directoryViewModel,
                     onNavigateUp = { finish() },
                     onFixSelected = {
                         val ids = _driveViewModel.getSelectedFileIds()
@@ -211,7 +132,7 @@ class DriveActivity : AppCompatActivity() {
         }
     }
 
-    val registerForOpenFileActivityResult =
+    private val registerForOpenFileActivityResult =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             val uri = result.data?.data
             if (uri != null) {
@@ -219,7 +140,7 @@ class DriveActivity : AppCompatActivity() {
             }
         }
 
-    val registerForReadExternalStoragePermissionResult =
+    private val registerForReadExternalStoragePermissionResult =
         registerForActivityResult(ActivityResultContracts.RequestPermission()) {
             if (it) {
                 showFileManager()
@@ -234,7 +155,7 @@ class DriveActivity : AppCompatActivity() {
         }
 
     private fun uploadFile(uri: Uri) {
-        _fileViewModel.uploadFile(uri.toAppFile(this))
+        _driveViewModel.uploadFile(uri.toAppFile(this))
     }
 
 

@@ -1,5 +1,7 @@
 package net.pantasystem.milktea.note.draft
 
+import android.app.Activity.RESULT_OK
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -15,6 +17,7 @@ import net.pantasystem.milktea.model.file.AppFile
 import net.pantasystem.milktea.model.file.FilePreviewSource
 import net.pantasystem.milktea.model.file.from
 import net.pantasystem.milktea.model.notes.draft.DraftNoteFile
+import net.pantasystem.milktea.note.DraftNotesActivity
 import net.pantasystem.milktea.note.NoteEditorActivity
 import net.pantasystem.milktea.note.draft.viewmodel.DraftNotesViewModel
 import javax.inject.Inject
@@ -34,33 +37,54 @@ class DraftNotesFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View {
+        val action = activity?.intent?.action
+        val isSelectMode = action == Intent.ACTION_PICK
         return ComposeView(requireContext()).apply {
             setContent {
                 MdcTheme {
                     DraftNotesScreen(
+                        isPickMode = isSelectMode,
                         viewModel = viewModel,
                         onNavigateUp = {
-                                       requireActivity().finish()
+                            requireActivity().finish()
                         },
                         onEdit = {
                             val intent = NoteEditorActivity.newBundle(
                                 requireContext(),
                                 draftNoteId = it.draftNoteId
                             )
-                            requireActivity().startActivityFromFragment(this@DraftNotesFragment, intent, 300)
+                            requireActivity().startActivityFromFragment(
+                                this@DraftNotesFragment,
+                                intent,
+                                300
+                            )
                         },
                         onShowFile = {
                             val intent = mediaNavigation.newIntent(
                                 MediaNavigationArgs.AFile(
-                                    when(it) {
-                                        is DraftNoteFile.Local -> FilePreviewSource.Local(AppFile.from(it) as AppFile.Local)
-                                        is DraftNoteFile.Remote -> FilePreviewSource.Remote(AppFile.Remote(it.fileProperty.id), it.fileProperty)
+                                    when (it) {
+                                        is DraftNoteFile.Local -> FilePreviewSource.Local(
+                                            AppFile.from(
+                                                it
+                                            ) as AppFile.Local
+                                        )
+                                        is DraftNoteFile.Remote -> FilePreviewSource.Remote(
+                                            AppFile.Remote(
+                                                it.fileProperty.id
+                                            ), it.fileProperty
+                                        )
                                     }
                                 )
                             )
                             startActivity(intent)
+                        },
+                        onSelect = {
+                            val intent = Intent()
+                            intent.putExtra(DraftNotesActivity.EXTRA_DRAFT_NOTE_ID, it.draftNoteId)
+                            requireActivity().setResult(RESULT_OK, intent)
+                            requireActivity().finish()
                         }
                     )
                 }

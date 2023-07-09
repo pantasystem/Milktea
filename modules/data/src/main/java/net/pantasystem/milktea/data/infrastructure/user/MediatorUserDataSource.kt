@@ -97,18 +97,7 @@ class MediatorUserDataSource @Inject constructor(
 
             memCache.put(user.id, user)
 
-            val newRecord = UserRecord(
-                accountId = user.id.accountId,
-                serverId = user.id.id,
-                avatarUrl = user.avatarUrl,
-                host = user.host,
-                isBot = user.isBot,
-                isCat = user.isCat,
-                isSameHost = user.isSameHost,
-                name = user.name,
-                userName = user.userName,
-                avatarBlurhash = user.avatarBlurhash,
-            )
+            val newRecord = UserRecord.from(user)
             val record = userDao.get(user.id.accountId, user.id.id)
             val result = if (record == null) AddResult.Created else AddResult.Updated
             val dbId = if (record == null) {
@@ -120,7 +109,7 @@ class MediatorUserDataSource @Inject constructor(
 
             // NOTE: 新たに追加される予定のオブジェクトと既にキャッシュしているオブジェクトの絵文字リストを比較している
             // NOTE: 比較した上で同一でなければキャッシュの更新処理を行う
-            if (record?.toModel()?.emojis?.toSet() != user.emojis.toSet()) {
+            if (!record?.emojis.isEqualToModels(user.emojis)) {
                 // NOTE: 既にキャッシュに存在していた場合一度全て剥がす
                 if (record != null) {
                     userDao.detachAllUserEmojis(dbId)
@@ -132,6 +121,8 @@ class MediatorUserDataSource @Inject constructor(
                             name = it.name,
                             uri = it.uri,
                             url = it.url,
+                            aspectRatio = it.aspectRatio,
+                            cachePath = it.cachePath
                         )
                     }
                 )
@@ -242,6 +233,9 @@ class MediatorUserDataSource @Inject constructor(
 
 
     override fun observeIn(accountId: Long, serverIds: List<String>): Flow<List<User>> {
+        if (serverIds.isEmpty()) {
+            return flowOf(emptyList())
+        }
         return serverIds.distinct().chunked(50).map {
             userDao.observeInServerIds(accountId, serverIds).distinctUntilChanged().map { list ->
                 list.map {

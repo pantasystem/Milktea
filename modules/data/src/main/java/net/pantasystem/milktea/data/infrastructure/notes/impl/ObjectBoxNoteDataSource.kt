@@ -7,18 +7,16 @@ import io.objectbox.kotlin.boxFor
 import io.objectbox.kotlin.inValues
 import io.objectbox.kotlin.toFlow
 import io.objectbox.query.QueryBuilder
-import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
-import kotlinx.coroutines.withContext
 import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.common_android.hilt.IODispatcher
 import net.pantasystem.milktea.data.infrastructure.notes.impl.db.NoteRecord
 import net.pantasystem.milktea.data.infrastructure.notes.impl.db.NoteRecord_
+import net.pantasystem.milktea.data.infrastructure.notes.impl.db.NoteThreadRecordDAO
 import net.pantasystem.milktea.model.AddResult
 import net.pantasystem.milktea.model.notes.*
 import net.pantasystem.milktea.model.user.User
@@ -27,6 +25,7 @@ import javax.inject.Inject
 
 class ObjectBoxNoteDataSource @Inject constructor(
     private val boxStore: BoxStore,
+    private val noteThreadRecordDAO: NoteThreadRecordDAO,
     @IODispatcher val coroutineDispatcher: CoroutineDispatcher,
     loggerFactory: Logger.Factory
 ) : NoteDataSource {
@@ -103,12 +102,6 @@ class ObjectBoxNoteDataSource @Inject constructor(
             ).build().find().mapNotNull {
                 it?.toModel()
             }
-        }
-    }
-
-    override fun observeRecursiveReplies(noteId: Note.Id): Flow<List<Note>> {
-        return changedIdFlow.map {
-            recursiveFindReplies(noteId).getOrThrow()
         }
     }
 
@@ -214,7 +207,7 @@ class ObjectBoxNoteDataSource @Inject constructor(
 
     override suspend fun clear(): Result<Unit> = runCancellableCatching {
         withContext(coroutineDispatcher) {
-            boxStore.removeAllObjects()
+            noteBox.removeAll()
         }
     }
 
@@ -250,6 +243,65 @@ class ObjectBoxNoteDataSource @Inject constructor(
         }
     }
 
+    @OptIn(FlowPreview::class)
+    override fun observeNoteThreadContext(noteId: Note.Id): Flow<NoteThreadContext?> {
+        return suspend {
+            noteThreadRecordDAO.appendBlank(noteId)
+        }.asFlow().map { record ->
+            NoteThreadContext(
+                descendants = record.descendants.map {
+                    it.toModel()
+                },
+                ancestors = record.ancestors.map {
+                    it.toModel()
+                }
+            )
+        }
+    }
+
+    override suspend fun addNoteThreadContext(
+        noteId: Note.Id,
+        context: NoteThreadContext
+    ): Result<Unit> = runCancellableCatching {
+        withContext(coroutineDispatcher) {
+            noteThreadRecordDAO.clearRelation(noteId)
+            val record = noteThreadRecordDAO.appendBlank(noteId)
+
+            record.ancestors.clear()
+            record.ancestors.addAll(findByNotes(context.ancestors.map { it.id }))
+            record.descendants.clear()
+            record.descendants.addAll(findByNotes(context.descendants.map { it.id }))
+            noteThreadRecordDAO.update(record)
+        }
+    }
+
+    override suspend fun clearNoteThreadContext(noteId: Note.Id): Result<Unit> = runCancellableCatching{
+        withContext(coroutineDispatcher) {
+            noteThreadRecordDAO.clearRelation(noteId)
+        }
+    }
+
+    override suspend fun findNoteThreadContext(noteId: Note.Id): Result<NoteThreadContext> = runCancellableCatching {
+        withContext(coroutineDispatcher) {
+            noteThreadRecordDAO.findBy(noteId)?.let { record ->
+                NoteThreadContext(
+                    ancestors = record.ancestors.mapNotNull {
+                        it?.toModel()
+                    },
+                    descendants = record.descendants.mapNotNull {
+                        it?.toModel()
+                    }
+                )
+            } ?: NoteThreadContext(emptyList(), emptyList())
+        }
+    }
+
+    override suspend fun findLocalCount(): Result<Long> = runCancellableCatching {
+        withContext(coroutineDispatcher) {
+            noteBox.count()
+        }
+    }
+
     private fun publish(ev: NoteDataSource.Event) = runBlocking {
         listenersLock.withLock {
             listeners.forEach {
@@ -259,16 +311,19 @@ class ObjectBoxNoteDataSource @Inject constructor(
         changedIdFlow.value = UUID.randomUUID().toString()
     }
 
-    private suspend fun recursiveFindReplies(noteId: Note.Id): Result<List<Note>> = runCancellableCatching {
-        val children = findByReplyId(noteId).getOrThrow()
-        children + children.map {
-            recursiveFindReplies(it.id).getOrThrow()
-        }.flatten()
-    }
 
     private suspend fun onAdded(note: Note) {
         lock.withLock {
             deleteNoteIds.remove(note.id)
         }
+    }
+
+    private fun findByNotes(noteIds: List<Note.Id>): List<NoteRecord> {
+        return noteBox.query().inValues(
+            NoteRecord_.accountIdAndNoteId, noteIds.map {
+                NoteRecord.generateAccountAndNoteId(it)
+            }.toTypedArray(),
+            QueryBuilder.StringOrder.CASE_SENSITIVE
+        ).build().find()
     }
 }

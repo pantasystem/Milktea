@@ -9,7 +9,12 @@ import net.pantasystem.milktea.api.misskey.drive.RequestFile
 import net.pantasystem.milktea.app_store.drive.FilePropertyPagingStore
 import net.pantasystem.milktea.common.PageableState
 import net.pantasystem.milktea.common.StateContent
-import net.pantasystem.milktea.common.paginator.*
+import net.pantasystem.milktea.common.paginator.EntityConverter
+import net.pantasystem.milktea.common.paginator.IdGetter
+import net.pantasystem.milktea.common.paginator.PaginationState
+import net.pantasystem.milktea.common.paginator.PreviousLoader
+import net.pantasystem.milktea.common.paginator.PreviousPagingController
+import net.pantasystem.milktea.common.paginator.StateLocker
 import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.common.throwIfHasError
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
@@ -57,8 +62,8 @@ class FilePropertyPagingStoreImpl @Inject constructor(
 
     override val isLoading: Boolean get() = this.filePropertyPagingImpl.mutex.isLocked
 
-    override suspend fun loadPrevious() {
-        previousPagingController.loadPrevious()
+    override suspend fun loadPrevious(): Result<Int> {
+        return previousPagingController.loadPrevious()
     }
 
     override suspend fun clear() {
@@ -69,7 +74,7 @@ class FilePropertyPagingStoreImpl @Inject constructor(
 
     override suspend fun setCurrentDirectory(directory: Directory?) {
         this.clear()
-        this.currentDirectoryId = directory?.id
+        this.currentDirectoryId = directory?.id?.directoryId
     }
 
     override suspend fun setCurrentAccount(account: Account?) {

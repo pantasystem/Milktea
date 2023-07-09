@@ -23,10 +23,12 @@ import net.pantasystem.milktea.note.draft.viewmodel.DraftNotesViewModel
 
 @Composable
 fun DraftNotesScreen(
+    isPickMode: Boolean,
     viewModel: DraftNotesViewModel,
     onShowFile: (DraftNoteFile) -> Unit,
     onNavigateUp: () -> Unit,
-    onEdit: (DraftNote) -> Unit
+    onEdit: (DraftNote) -> Unit,
+    onSelect: (DraftNote) -> Unit,
 ) {
     val state by viewModel.uiState.collectAsState()
 
@@ -39,7 +41,11 @@ fun DraftNotesScreen(
                     }
                 },
                 title = {
-                    Text(text = stringResource(id = net.pantasystem.milktea.common_resource.R.string.draft_notes))
+                    if (isPickMode) {
+                        Text(text = stringResource(id = net.pantasystem.milktea.common_resource.R.string.select_draft_post))
+                    } else {
+                        Text(text = stringResource(id = net.pantasystem.milktea.common_resource.R.string.draft_notes))
+                    }
                 },
                 backgroundColor = MaterialTheme.colors.surface,
                 elevation = 0.dp
@@ -64,6 +70,7 @@ fun DraftNotesScreen(
                                 DraftNoteCard(
                                     draftNote = item.draftNote,
                                     isVisibleContent = item.isVisibleContent,
+                                    isPickMode = isPickMode,
                                     onAction = { action ->
                                         when (action) {
                                             is DraftNoteCardAction.DeleteDraftNote -> {
@@ -81,7 +88,8 @@ fun DraftNotesScreen(
                                     },
                                     onToggleSensitive = { e ->
                                         viewModel.toggleSensitive(e)
-                                    }
+                                    },
+                                    onSelect = onSelect
                                 )
                             }
                         }

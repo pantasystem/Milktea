@@ -23,6 +23,13 @@ sealed interface TemporarilyAuthState {
         val scope: String,
 
     ) : TemporarilyAuthState
+
+    data class Pleroma(
+        override val instanceDomain: String,
+        override val enabledDateEnd: Date,
+        val app: AppType.Pleroma,
+        val scope: String,
+    ) : TemporarilyAuthState
 }
 
 fun AppType.Misskey.createAuth(instanceDomain: String, session: Session, timeLimit: Date = Date(System.currentTimeMillis() + 3600 * 1000)): TemporarilyAuthState.Misskey {
@@ -38,6 +45,15 @@ fun AppType.Misskey.createAuth(instanceDomain: String, session: Session, timeLim
 
 fun AppType.Mastodon.createAuth(instanceDomain: String, scope: String, timeLimit: Date = Date(System.currentTimeMillis() + 3600 * 1000)): TemporarilyAuthState.Mastodon {
     return TemporarilyAuthState.Mastodon(
+        scope = scope,
+        instanceDomain = instanceDomain,
+        enabledDateEnd = timeLimit,
+        app = this
+    )
+}
+
+fun AppType.Pleroma.createAuth(instanceDomain: String, scope: String, timeLimit: Date = Date(System.currentTimeMillis() + 3600 * 1000)): TemporarilyAuthState.Pleroma {
+    return TemporarilyAuthState.Pleroma(
         scope = scope,
         instanceDomain = instanceDomain,
         enabledDateEnd = timeLimit,

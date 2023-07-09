@@ -28,6 +28,12 @@ data class Instance(
 
     @SerialName("fedibird_capabilities")
     val fedibirdCapabilities: List<String>? = null,
+
+    @SerialName("pleroma")
+    val pleroma: Pleroma? = null,
+
+    @SerialName("feature_quote")
+    val featureQuote: Boolean? = null,
 ) {
     @Serializable
     data class Configuration(
@@ -68,4 +74,15 @@ data class Instance(
     data class Urls(
         @SerialName("streaming_api") val streamingApi: String
     )
+
+    @Serializable
+    data class Pleroma(
+        @SerialName("metadata") val metadata: Metadata,
+
+    ) {
+        @Serializable
+        data class Metadata(
+            @SerialName("features") val features: List<String>,
+        )
+    }
 }

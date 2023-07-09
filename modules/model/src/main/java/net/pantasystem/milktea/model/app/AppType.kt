@@ -12,7 +12,7 @@ sealed interface AppType {
         override val callbackUrl: String?,
         val isAuthorized: Boolean? = null,
         val permission: List<String> = emptyList(),
-        override val secret: String? = null
+        override val secret: String? = null,
     ) : AppType
 
     companion object;
@@ -28,6 +28,24 @@ sealed interface AppType {
         val clientSecret: String,
 
         ) : AppType {
+        override val callbackUrl: String
+            get() = redirectUri
+        override val secret: String
+            get() = clientSecret
+
+        companion object
+    }
+
+    data class Pleroma(
+        val id: String,
+        override val name: String,
+
+        val clientId: String,
+
+        val redirectUri: String,
+
+        val clientSecret: String,
+    ) : AppType {
         override val callbackUrl: String
             get() = redirectUri
         override val secret: String

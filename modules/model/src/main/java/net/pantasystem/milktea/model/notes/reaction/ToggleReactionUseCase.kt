@@ -12,6 +12,7 @@ import net.pantasystem.milktea.model.notes.Note
 import net.pantasystem.milktea.model.notes.NoteRepository
 import net.pantasystem.milktea.model.notes.reaction.history.ReactionHistory
 import net.pantasystem.milktea.model.notes.reaction.history.ReactionHistoryRepository
+import net.pantasystem.milktea.model.user.UserRepository
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -29,6 +30,7 @@ class ToggleReactionUseCase @Inject constructor(
     private val instanceInfoService: InstanceInfoService,
     private val customEmojiRepository: CustomEmojiRepository,
     private val checkEmoji: CheckEmoji,
+    private val userRepository: UserRepository,
 ) : UseCase {
 
     suspend operator fun invoke(noteId: Note.Id, reaction: String): Result<Unit> {
@@ -72,11 +74,17 @@ class ToggleReactionUseCase @Inject constructor(
             if (reactionRepository.create(CreateReaction(noteId, sendReaction)).getOrThrow()) {
                 reactionHistoryRepository.create(
                     ReactionHistory(
-                        sendReaction,
-                        account.normalizedInstanceUri
+                        reaction = sendReaction,
+                        instanceDomain = account.normalizedInstanceUri,
+                        accountId = account.accountId,
+                        targetPostId = noteId.noteId,
+                        targetUserId = note.userId.id,
                     )
                 )
             }
+
+            // NOTE: Suggestionを表示するためにユーザのデータが必要になるので、キャッシュを更新しておく
+            userRepository.sync(note.userId).getOrThrow()
         }.mapCancellableCatching {
             noteRepository.sync(noteId).getOrThrow()
         }
@@ -102,6 +110,15 @@ class ToggleReactionUseCase @Inject constructor(
                     }
 
                     reactionObj.getNameAndHost()
+                }
+                is InstanceInfoType.Pleroma -> {
+                    val maxCount = instanceType.maxReactionsPerAccount
+                    if (maxCount < 1) {
+                        return null
+                    }
+
+                    // TODO: ユニコード絵文字の場合コロンは不要かもしれない
+                    ":${reactionObj.getNameAndHost()}:"
                 }
                 is InstanceInfoType.Misskey -> {
                     val name = reactionObj.getName()

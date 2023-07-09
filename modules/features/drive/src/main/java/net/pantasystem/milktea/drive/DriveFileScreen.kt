@@ -9,11 +9,16 @@ import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.runtime.*
-import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.asLiveData
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -25,24 +30,22 @@ import net.pantasystem.milktea.common.StateContent
 import net.pantasystem.milktea.common.ui.isScrolledToTheEnd
 import net.pantasystem.milktea.drive.viewmodel.DriveViewModel
 import net.pantasystem.milktea.drive.viewmodel.FileViewData
-import net.pantasystem.milktea.drive.viewmodel.FileViewModel
 import net.pantasystem.milktea.model.drive.FileProperty
 
 @ExperimentalCoroutinesApi
 @ExperimentalMaterialApi
 @Composable
 fun FilePropertyListScreen(
-    fileViewModel: FileViewModel,
     driveViewModel: DriveViewModel,
     isGridMode: Boolean,
 ) {
-    val filesState: PageableState<List<FileViewData>> by fileViewModel.state.collectAsState()
+    val uiState by driveViewModel.uiState.collectAsState()
+    val filesState = uiState.driveFilesState
 
     val swipeRefreshState = rememberSwipeRefreshState(
         isRefreshing = filesState is PageableState.Loading.Init || filesState is PageableState.Loading.Future
     )
-    val isSelectMode: Boolean by driveViewModel.isSelectMode.asLiveData()
-        .observeAsState(initial = false)
+    val isSelectMode: Boolean = uiState.isSelectMode
     val files = (filesState.content as? StateContent.Exist)?.rawContent ?: emptyList()
 
     var confirmDeleteTarget: FileProperty? by remember {
@@ -65,7 +68,7 @@ fun FilePropertyListScreen(
             confirmDeleteTarget = null
         },
         onConfirmed = {
-            fileViewModel.deleteFile(confirmDeleteTarget!!.id)
+            driveViewModel.deleteFile(confirmDeleteTarget!!.id)
             confirmDeleteTarget = null
         }
     )
@@ -77,7 +80,7 @@ fun FilePropertyListScreen(
         },
         onSave = { id, newCaption ->
             editCaptionTargetFile = null
-            fileViewModel.updateCaption(id, newCaption)
+            driveViewModel.updateCaption(id, newCaption)
         }
     )
 
@@ -86,23 +89,23 @@ fun FilePropertyListScreen(
         onDismiss = { editNameTargetFile = null },
         onSave = { id, newName ->
             editNameTargetFile = null
-            fileViewModel.updateFileName(id, newName)
+            driveViewModel.updateFileName(id, newName)
         },
     )
 
     val actionHandler: (FilePropertyCardAction) -> Unit = { cardAction ->
         when (cardAction) {
             is FilePropertyCardAction.OnCloseDropdownMenu -> {
-                fileViewModel.closeFileCardDropDownMenu()
+                driveViewModel.closeFileCardDropDownMenu()
             }
             is FilePropertyCardAction.OnOpenDropdownMenu -> {
-                fileViewModel.openFileCardDropDownMenu(cardAction.fileId)
+                driveViewModel.openFileCardDropDownMenu(cardAction.fileId)
             }
             is FilePropertyCardAction.OnToggleSelectItem -> {
-                driveViewModel.driveStore.toggleSelect(cardAction.fileId)
+                driveViewModel.toggleSelect(cardAction.fileId)
             }
             is FilePropertyCardAction.OnToggleNsfw -> {
-                fileViewModel.toggleNsfw(cardAction.fileId)
+                driveViewModel.toggleNsfw(cardAction.fileId)
             }
             is FilePropertyCardAction.OnSelectDeletionMenuItem -> {
                 confirmDeleteTarget = cardAction.file
@@ -113,20 +116,24 @@ fun FilePropertyListScreen(
             is FilePropertyCardAction.OnSelectEditFileNameMenuItem -> {
                 editNameTargetFile = cardAction.file
             }
+
+            is FilePropertyCardAction.OnLongClicked -> {
+                driveViewModel.selectAndSelectMode(cardAction.file)
+            }
         }
     }
 
     SwipeRefresh(
         state = swipeRefreshState,
         onRefresh = {
-            fileViewModel.loadInit()
+            driveViewModel.onFileListRefreshed()
         }
     ) {
         if (isGridMode) {
             DriveFilesGridView(
                 files = files,
                 onLoadNext = {
-                    fileViewModel.loadNext()
+                    driveViewModel.onFileListViewBottomReached()
                 },
                 isSelectMode = isSelectMode,
                 onAction = actionHandler
@@ -137,7 +144,7 @@ fun FilePropertyListScreen(
                 isSelectMode,
                 onAction = actionHandler,
                 onLoadNext = {
-                    fileViewModel.loadNext()
+                    driveViewModel.onFileListViewBottomReached()
                 }
             )
         }

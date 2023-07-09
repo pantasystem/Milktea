@@ -5,7 +5,7 @@
   "entities": [
     {
       "id": "1:4355718382021751829",
-      "lastPropertyId": "50:4252978610725343033",
+      "lastPropertyId": "54:1696546822899785376",
       "name": "NoteRecord",
       "properties": [
         {
@@ -266,14 +266,232 @@
           "id": "50:4252978610725343033",
           "name": "myReactions",
           "type": 30
+        },
+        {
+          "id": "51:1047146758580551890",
+          "name": "maxReactionsPerAccount",
+          "type": 5
+        },
+        {
+          "id": "52:3207491205296200689",
+          "name": "customEmojiAspectRatioMap",
+          "type": 13
+        },
+        {
+          "id": "53:5101199550893785799",
+          "name": "misskeyIsNotAcceptingSensitiveReaction",
+          "type": 1
+        },
+        {
+          "id": "54:1696546822899785376",
+          "name": "customEmojiUrlAndCachePathMap",
+          "type": 13
+        }
+      ],
+      "relations": []
+    },
+    {
+      "id": "2:2221534449032746185",
+      "lastPropertyId": "4:3861751215772392457",
+      "name": "ThreadRecord",
+      "properties": [
+        {
+          "id": "1:6898596592219565017",
+          "name": "id",
+          "type": 6,
+          "flags": 1
+        },
+        {
+          "id": "2:2473069054411856439",
+          "name": "targetNoteId",
+          "type": 9
+        },
+        {
+          "id": "3:2251620119095233921",
+          "name": "accountId",
+          "type": 6
+        },
+        {
+          "id": "4:3861751215772392457",
+          "name": "targetNoteIdAndAccountId",
+          "indexId": "5:7310482946990627063",
+          "type": 9,
+          "flags": 2080
+        }
+      ],
+      "relations": [
+        {
+          "id": "1:5368363319508289421",
+          "name": "ancestors",
+          "targetId": "1:4355718382021751829"
+        },
+        {
+          "id": "2:5971800600708341253",
+          "name": "descendants",
+          "targetId": "1:4355718382021751829"
+        }
+      ]
+    },
+    {
+      "id": "3:1672123969377209864",
+      "lastPropertyId": "6:7634221281760726222",
+      "name": "ReactionUsersRecord",
+      "properties": [
+        {
+          "id": "1:676934433640553584",
+          "name": "id",
+          "type": 6,
+          "flags": 1
+        },
+        {
+          "id": "2:8038701529227730420",
+          "name": "accountId",
+          "indexId": "6:6489830746707304657",
+          "type": 6,
+          "flags": 8
+        },
+        {
+          "id": "3:2163943456333549192",
+          "name": "noteId",
+          "indexId": "7:7445768282858324655",
+          "type": 9,
+          "flags": 2048
+        },
+        {
+          "id": "4:2143810341282238420",
+          "name": "accountIdAndNoteIdAndReaction",
+          "indexId": "8:2235427975397612884",
+          "type": 9,
+          "flags": 2080
+        },
+        {
+          "id": "5:1292188942965914799",
+          "name": "reaction",
+          "type": 9
+        },
+        {
+          "id": "6:7634221281760726222",
+          "name": "accountIds",
+          "type": 30
+        }
+      ],
+      "relations": []
+    },
+    {
+      "id": "4:5892387857597582401",
+      "lastPropertyId": "3:5250934048025398662",
+      "name": "CustomEmojiAspectRatioRecord",
+      "properties": [
+        {
+          "id": "1:27795029384995044",
+          "name": "id",
+          "type": 6,
+          "flags": 1
+        },
+        {
+          "id": "2:6142530143329153194",
+          "name": "uri",
+          "indexId": "9:4038966684149214552",
+          "type": 9,
+          "flags": 2080
+        },
+        {
+          "id": "3:5250934048025398662",
+          "name": "aspectRatio",
+          "type": 7
+        }
+      ],
+      "relations": []
+    },
+    {
+      "id": "5:192241672526547352",
+      "lastPropertyId": "4:2544401018528846153",
+      "name": "ImageCacheRecord",
+      "properties": [
+        {
+          "id": "1:6002315150189198372",
+          "name": "id",
+          "type": 6,
+          "flags": 1
+        },
+        {
+          "id": "2:7274049216628202631",
+          "name": "sourceUrl",
+          "indexId": "10:5291013203713667470",
+          "type": 9,
+          "flags": 2080
+        },
+        {
+          "id": "3:3858052356230995928",
+          "name": "cachePath",
+          "type": 9
+        },
+        {
+          "id": "4:2544401018528846153",
+          "name": "cachedAt",
+          "type": 6
+        }
+      ],
+      "relations": []
+    },
+    {
+      "id": "6:5418605338436881136",
+      "lastPropertyId": "9:4598656151033408118",
+      "name": "CustomEmojiRecord",
+      "properties": [
+        {
+          "id": "1:271785103207869909",
+          "name": "id",
+          "type": 6,
+          "flags": 1
+        },
+        {
+          "id": "2:6655539627519293459",
+          "name": "serverId",
+          "type": 9
+        },
+        {
+          "id": "3:211101382978291231",
+          "name": "name",
+          "type": 9
+        },
+        {
+          "id": "4:7927231724161011575",
+          "name": "emojiHost",
+          "type": 9
+        },
+        {
+          "id": "5:2060901050158269776",
+          "name": "url",
+          "type": 9
+        },
+        {
+          "id": "6:1468865394375722898",
+          "name": "uri",
+          "type": 9
+        },
+        {
+          "id": "7:3770123434781396120",
+          "name": "type",
+          "type": 9
+        },
+        {
+          "id": "8:8187355251103755613",
+          "name": "category",
+          "type": 9
+        },
+        {
+          "id": "9:4598656151033408118",
+          "name": "aliases",
+          "type": 30
         }
       ],
       "relations": []
     }
   ],
-  "lastEntityId": "1:4355718382021751829",
-  "lastIndexId": "4:873220635513493863",
-  "lastRelationId": "0:0",
+  "lastEntityId": "6:5418605338436881136",
+  "lastIndexId": "10:5291013203713667470",
+  "lastRelationId": "2:5971800600708341253",
   "lastSequenceId": "0:0",
   "modelVersion": 5,
   "modelVersionParserMinimum": 5,

@@ -10,19 +10,23 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import net.pantasystem.milktea.app_store.account.AccountStore
 import net.pantasystem.milktea.common.Logger
-import net.pantasystem.milktea.common.PageableState
 import net.pantasystem.milktea.common.StateContent
 import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.model.notes.*
-import net.pantasystem.milktea.model.notes.renote.Renote
-import net.pantasystem.milktea.model.notes.renote.RenotesPagingService
+import net.pantasystem.milktea.model.notes.repost.RenoteType
+import net.pantasystem.milktea.model.notes.repost.RenotesPagingService
+import net.pantasystem.milktea.model.setting.DefaultConfig
+import net.pantasystem.milktea.model.setting.LocalConfigRepository
 import net.pantasystem.milktea.model.user.User
+import net.pantasystem.milktea.model.user.UserRepository
 
 class RenotesViewModel @AssistedInject constructor(
     private val renotesPagingServiceFactory: RenotesPagingService.Factory,
     private val noteGetter: NoteRelationGetter,
     private val noteRepository: NoteRepository,
     private val noteCaptureAPIAdapter: NoteCaptureAPIAdapter,
+    private val userRepository: UserRepository,
+    configRepository: LocalConfigRepository,
     accountStore: AccountStore,
     loggerFactory: Logger.Factory,
     @Assisted val noteId: Note.Id,
@@ -42,11 +46,28 @@ class RenotesViewModel @AssistedInject constructor(
 
     private val logger = loggerFactory.create("RenotesVM")
 
-    val renotes = renotesPagingService.state.map {
-        it.convert { list ->
-            list.filterIsInstance<Renote.Normal>()
+    val config = configRepository.observe().stateIn(
+        viewModelScope,
+        SharingStarted.WhileSubscribed(5_000),
+        DefaultConfig.config,
+    )
+
+    val renotes = renotesPagingService.state.map { state ->
+        state.suspendConvert { renotes ->
+            renotes.mapNotNull {renote ->
+                when(renote) {
+                    is RenoteType.Renote -> if (renote.isQuote) {
+                        null
+                    } else {
+                        noteGetter.get(renote.noteId).getOrNull()?.let {
+                            RenoteItemType.Renote(it)
+                        }
+                    }
+                    is RenoteType.Reblog -> RenoteItemType.Reblog(userRepository.find(renote.userId))
+                }
+            }
         }
-    }.asNoteRelation()
+    }
 
     val myId = accountStore.observeCurrentAccount.map {
         it?.let {
@@ -63,8 +84,10 @@ class RenotesViewModel @AssistedInject constructor(
             renotesPagingService.state.mapNotNull {
                 (it.content as? StateContent.Exist)?.rawContent
             }.map { renotes ->
-                renotes.map {
-                    noteCaptureAPIAdapter.capture(it.noteId)
+                renotes.mapNotNull { renote ->
+                    (renote as? RenoteType.Renote)?.let {
+                        noteCaptureAPIAdapter.capture(it.noteId)
+                    }
                 }
             }.map { flows ->
                 combine(flows) {
@@ -96,25 +119,28 @@ class RenotesViewModel @AssistedInject constructor(
         }
     }
 
-    fun delete(noteId: Note.Id) {
+    fun delete(item: RenoteItemType) {
         viewModelScope.launch {
-            noteRepository.delete(noteId).onFailure {
-                _errors.value = it
-            }.onSuccess {
-                refresh()
+            when(item) {
+                is RenoteItemType.Reblog -> {
+                    noteRepository.unrenote(noteId).onFailure {
+                        _errors.value = it
+                    }.onSuccess {
+                        refresh()
+                    }
+                }
+                is RenoteItemType.Renote -> {
+                    noteRepository.delete(item.note.note.id).onFailure {
+                        _errors.value = it
+                    }.onSuccess {
+                        refresh()
+                    }
+                }
             }
+
         }
     }
 
-    private fun <T : Renote> Flow<PageableState<List<T>>>.asNoteRelation(): Flow<PageableState<List<NoteRelation>>> {
-        return this.map { pageable ->
-            pageable.suspendConvert { list ->
-                list.mapNotNull {
-                    noteGetter.get(it.noteId).getOrNull()
-                }
-            }
-        }
-    }
 }
 
 fun RenotesViewModel.Companion.provideViewModel(
@@ -125,4 +151,15 @@ fun RenotesViewModel.Companion.provideViewModel(
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         return factory.create(noteId) as T
     }
+}
+
+sealed interface RenoteItemType {
+
+    val user: User
+    data class Renote(val note: NoteRelation) : RenoteItemType {
+        override val user: User
+            get() = note.user
+    }
+
+    data class Reblog(override val user: User) : RenoteItemType
 }

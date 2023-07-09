@@ -13,4 +13,8 @@ sealed interface PrefType {
         val value: Int
     ) : PrefType
 
+    data class FloatPref(
+        val value: Float
+    ) : PrefType
+
 }

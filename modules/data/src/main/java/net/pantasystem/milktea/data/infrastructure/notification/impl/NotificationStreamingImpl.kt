@@ -57,7 +57,7 @@ class NotificationStreamingImpl @Inject constructor(
                         notificationCacheAdder.addAndConvert(account, it.body)
                     }
                 }
-                Account.InstanceType.MASTODON -> requireNotNull(streamingAPIProvider.get(account)).connectUser()
+                Account.InstanceType.MASTODON, Account.InstanceType.PLEROMA -> requireNotNull(streamingAPIProvider.get(account)).connectUser()
                     .mapNotNull {
                         (it as? Event.Notification)?.notification
                     }.mapNotNull {

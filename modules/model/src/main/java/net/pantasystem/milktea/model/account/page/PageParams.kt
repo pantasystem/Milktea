@@ -162,12 +162,6 @@ data class PageParams(
                 MASTODON_HOME_TIMELINE -> {
                     Pageable.Mastodon.HomeTimeline
                 }
-                MASTODON_HASHTAG_TIMELINE -> {
-                    Pageable.Mastodon.HashTagTimeline(
-                        requireNotNull(tag),
-                        isOnlyMedia = withFiles,
-                    )
-                }
                 MASTODON_LIST_TIMELINE -> {
                     Pageable.Mastodon.ListTimeline(
                         listId = requireNotNull(listId),
@@ -191,6 +185,20 @@ data class PageParams(
                 }
                 MASTODON_BOOKMARK_TIMELINE -> {
                     Pageable.Mastodon.BookmarkTimeline
+                }
+                MASTODON_SEARCH_TIMELINE -> {
+                    Pageable.Mastodon.SearchTimeline(
+                        query = requireNotNull(query),
+                        userId = userId,
+                    )
+                }
+                MASTODON_TAG_TIMELINE -> {
+                    Pageable.Mastodon.HashTagTimeline(
+                        requireNotNull(tag)
+                    )
+                }
+                MASTODON_TREND_TIMELINE -> {
+                    Pageable.Mastodon.TrendTimeline
                 }
             }
         } catch (e: NullPointerException) {

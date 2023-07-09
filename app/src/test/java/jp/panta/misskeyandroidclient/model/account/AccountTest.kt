@@ -282,4 +282,17 @@ class AccountTest {
         )
         Assertions.assertEquals("mk.iaia.moe", account.getHost())
     }
+
+    @Test
+    fun getAcct() {
+        val account = Account(
+            remoteId = "",
+            instanceDomain = "https://calc.panta.systems",
+            userName = "Panta",
+            instanceType = Account.InstanceType.MISSKEY,
+            token = ""
+        )
+        val actual = account.getAcct()
+        Assertions.assertEquals("@Panta@calc.panta.systems", actual)
+    }
 }

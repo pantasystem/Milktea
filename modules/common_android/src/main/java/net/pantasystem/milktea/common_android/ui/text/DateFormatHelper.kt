@@ -34,20 +34,28 @@ object DateFormatHelper {
 
 
 
-    @BindingAdapter("elapsedTime")
+    @BindingAdapter("elapsedTime", "isDisplayTimestampsAsAbsoluteDates")
     @JvmStatic
-    fun TextView.setElapsedTime(elapsedTime: Instant?) {
+    fun TextView.setElapsedTime(elapsedTime: Instant?, isDisplayTimestampsAsAbsoluteDates: Boolean?) {
 
-        this.text = GetElapsedTimeStringSource(
-            SimpleElapsedTime(
-                elapsedTime ?: Clock.System.now()
+        this.text = if (isDisplayTimestampsAsAbsoluteDates == true) {
+            SimpleDateFormat.getDateTimeInstance().format(
+                elapsedTime?.let {
+                    Date(it.toEpochMilliseconds())
+                } ?: Date()
             )
-        ).getString(context)
+        } else {
+            GetElapsedTimeStringSource(
+                SimpleElapsedTime(
+                    elapsedTime ?: Clock.System.now()
+                )
+            ).getString(context)
+        }
     }
 
-    @BindingAdapter("elapsedTime", "visibility")
+    @BindingAdapter("elapsedTime", "visibility", "isDisplayTimestampsAsAbsoluteDates")
     @JvmStatic
-    fun TextView.setElapsedTimeAndVisibility(elapsedTime: Instant?, visibility: Visibility?) {
+    fun TextView.setElapsedTimeAndVisibility(elapsedTime: Instant?, visibility: Visibility?, isDisplayTimestampsAsAbsoluteDates: Boolean?) {
         val visibilityIcon = when(visibility ?: Visibility.Public(false)) {
             is Visibility.Followers -> R.drawable.ic_lock_black_24dp
             is Visibility.Home -> R.drawable.ic_home_black_24dp
@@ -57,11 +65,19 @@ object DateFormatHelper {
             Visibility.Mutual -> R.drawable.ic_sync_alt_24px
             Visibility.Personal -> R.drawable.ic_person_black_24dp
         }
-        val text = GetElapsedTimeStringSource(
-            SimpleElapsedTime(
-                elapsedTime ?: Clock.System.now()
+        val text = if (isDisplayTimestampsAsAbsoluteDates == true) {
+            SimpleDateFormat.getDateTimeInstance().format(
+                elapsedTime?.let {
+                    Date(it.toEpochMilliseconds())
+                } ?: Date()
             )
-        ).getString(context)
+        } else {
+            GetElapsedTimeStringSource(
+                SimpleElapsedTime(
+                    elapsedTime ?: Clock.System.now()
+                )
+            ).getString(context)
+        }
 
         this.text = if (visibilityIcon == null) {
             text
@@ -86,5 +102,38 @@ object DateFormatHelper {
         val date = createdAt ?: Clock.System.now()
         val javaDate = Date(date.toEpochMilliseconds())
         this.text = SimpleDateFormat.getDateTimeInstance().format(javaDate)
+    }
+
+    @BindingAdapter("createdAt", "visibility")
+    @JvmStatic
+    fun TextView.setCreatedAtWithVisibility(createdAt: Instant?, visibility: Visibility?) {
+        val date = createdAt ?: Clock.System.now()
+        val javaDate = Date(date.toEpochMilliseconds())
+        val visibilityIcon = when(visibility ?: Visibility.Public(false)) {
+            is Visibility.Followers -> R.drawable.ic_lock_black_24dp
+            is Visibility.Home -> R.drawable.ic_home_black_24dp
+            is Visibility.Public -> null
+            is Visibility.Specified -> R.drawable.ic_email_black_24dp
+            is Visibility.Limited -> R.drawable.ic_groups
+            Visibility.Mutual -> R.drawable.ic_sync_alt_24px
+            Visibility.Personal -> R.drawable.ic_person_black_24dp
+        }
+        val text = SimpleDateFormat.getDateTimeInstance().format(javaDate)
+
+        this.text = if (visibilityIcon == null) {
+            text
+        } else {
+            val target = "visibility $text"
+            SpannableStringBuilder(target).apply {
+                val drawable = ContextCompat.getDrawable(context, visibilityIcon)
+                drawable?.setTint(currentTextColor)
+                val span = DrawableEmojiSpan(EmojiAdapter(this@setCreatedAtWithVisibility), visibilityIcon)
+                setSpan(span, 0, "visibility".length,0)
+                GlideApp.with(this@setCreatedAtWithVisibility)
+                    .load(drawable)
+                    .override(min(textSize.toInt(), 640))
+                    .into(span.target)
+            }
+        }
     }
 }

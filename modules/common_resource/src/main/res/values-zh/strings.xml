@@ -8,7 +8,7 @@
     <string name="action_settings">设置</string>
 
     <string name="menu_home">主页</string>
-    <string name="menu_gallery">相册</string>
+    <string name="menu_gallery">图库</string>
     <string name="menu_slideshow">幻灯片放映</string>
     <string name="menu_tools">工具</string>
     <string name="share">分享</string>
@@ -16,8 +16,8 @@
     <string name="search">搜索</string>
     <string name="notification">通知</string>
     <string name="message">消息</string>
-    <string name="start_auth">用户身份验证</string>
-    <string name="selecting_instance">选中的实例</string>
+    <string name="start_auth">登陆</string>
+    <string name="selecting_instance">选择的实例</string>
 <!--    <string name="welcome">欢迎</string>-->
 <!--    <string name="san">先生 / 女士</string>-->
     <string name="following">关注中</string>
@@ -28,7 +28,6 @@
     <string name="renote_was">转发</string>
     <string name="input_custom_emoji">自定义表情</string>
     <string name="title_activity_settings">设置</string>
-
 
     <string name="reply_title">默认回复行为</string>
 
@@ -44,8 +43,8 @@
     <string name="nav_setting_tab">选项卡设置</string>
     <string name="add_search">添加搜索</string>
     <string name="save_setting">保存设置</string>
-    <string name="tab_selected">已添加</string>
-    <string name="tab_selectable">从下方添加</string>
+    <string name="tab_selected">已选中</string>
+    <string name="tab_selectable">可选</string>
     <string name="title_featured">热门</string>
 
 <!--    <string name="create_folder">创建文件夹</string>-->
@@ -69,9 +68,9 @@
     <string name="media">媒体</string>
     <string name="follow">关注</string>
 
-    <string name="include_local_renotes">在时间线上显示本地转帖</string>
-    <string name="include_renoted_my_notes">在时间线上显示被转帖的帖子</string>
-    <string name="include_my_renotes">在时间线上显示你的转帖</string>
+    <string name="include_local_renotes">显示本地转发</string>
+    <string name="include_renoted_my_notes">显示被转发的帖子</string>
+    <string name="include_my_renotes">显示你的转发</string>
     <string name="auto_load_timeline">自动加载时间线</string>
     <string name="timeline">时间线</string>
 
@@ -79,7 +78,7 @@
     <string name="auto_load_when_stopped">即使实例停止也自动加载时间轴</string>
     <string name="sync">同步</string>
 
-    <string name="movement">同步中</string>
+    <string name="movement">同步</string>
     <string name="remove_note">删除帖子</string>
 
     <string name="hide_removed_note">隐藏已删除的帖子</string>
@@ -90,6 +89,7 @@
     <string name="theme_black">黑色</string>
     <string name="theme_dark">暗色</string>
     <string name="theme_bread">薄饼</string>
+    <string name="theme_mastodon_dark">大象暗色</string>
 
     <string name="title_activity_media">媒体活动</string>
     <string name="dummy_button">虚拟按钮</string>
@@ -108,7 +108,7 @@
     <string name="mention_by">被 %s 提及</string>
     <string name="reacted_by">被 %s 回应</string>
     <string name="renoted_by">被 %s 转帖</string>
-    <string name="follow_requested_by">收到来自 %s 的关注请求</string>
+    <string name="follow_requested_by">来自 %s 的关注请求</string>
     <string name="poll_ended">投票结束</string>
 
     <string name="input_message">有什么新鲜事?</string>
@@ -235,7 +235,7 @@
 
     <string name="update_timeline_in_background">在后台更新时间线</string>
 
-    <string name="edit_tab_name">编辑选项卡名称</string>
+    <string name="edit_tab">编辑选项卡名称</string>
 
     <string name="follow_request_accepted_by">关注请求已被 %s 接受</string>
     <string name="confirm_deletion">确认删除</string>
@@ -316,9 +316,9 @@
     <string name="local">本地</string>
     <string name="add_user_list">添加用户列表</string>
     <string name="edit_note">编辑帖文</string>
-    <string name="gallery_favorite_button">相册收藏按钮</string>
+    <string name="gallery_favorite_button">图库收藏按钮</string>
     <string name="popular_posts">流行趋势</string>
-    <string name="gallery">相册</string>
+    <string name="gallery">图库</string>
     <string name="my_posts">我的帖文</string>
     <string name="my_liking">我喜欢的</string>
     <string name="websocket_error">WebSocket 错误</string>
@@ -326,7 +326,7 @@
     <string name="connected">已连接</string>
     <string name="closing">关闭中…</string>
     <string name="closed">已关闭</string>
-    <string name="create_gallery">创建相册</string>
+    <string name="create_gallery">创建图库</string>
     <string name="title">标题</string>
     <string name="description">描述</string>
     <string name="pick_image">选择图片</string>
@@ -394,8 +394,8 @@
     <string name="successfully_created_schedule_note">已成功创建计划帖子</string>
     <string name="account">帐户</string>
     <string name="switch_account">切换帐号</string>
-    <string name="mute_thread">静音线程</string>
-    <string name="unmute_thread">取消静音线程</string>
+    <string name="mute_thread">屏蔽帖子列表</string>
+    <string name="unmute_thread">取消屏蔽帖子列表</string>
 
     <!--    <string name="n_people">%d位用户</string>-->
 <!--    <string name="n_posts">%d篇帖文</string>-->
@@ -403,21 +403,21 @@
 
     <string name="edit_caption">编辑标题</string>
     <string name="input_caption">输入标题</string>
-    <string name="notes_and_replies">帖子和回复</string>
+    <string name="notes_and_replies">帖子与回复</string>
     <string name="other">其他</string>
     <string name="recently_used">最近使用</string>
-    <string name="char_count">%1$d个字符</string>
+    <string name="char_count">%1$d 个字符</string>
     <string name="file_count">%1$d 个文件</string>
     <string name="poll">投票</string>
     <string name="remove_bookmark">删除书签</string>
-    <string name="add_to_bookmark">添加到书签</string>
-    <string name="visibility_personal">自我限制</string>
-    <string name="visibility_limited">圆圈</string>
+    <string name="add_to_bookmark">添加书签</string>
+    <string name="visibility_personal">仅自己</string>
+    <string name="visibility_limited">限制</string>
     <string name="visibility_mutual">相互关注</string>
     <string name="calckey_recomended_timeline">推荐的</string>
     <string name="notification_favorited_by">被 %s 收藏</string>
-    <string name="notification_posted_by">发布者 %s</string>
-    <string name="clip">夹子</string>
+    <string name="notification_posted_by">由 %s 发布</string>
+    <string name="clip">便签</string>
 
     <string name="server_error">服务器错误</string>
     <string name="bot_error">你是人类吗？</string>
@@ -429,11 +429,11 @@
     <string name="show_more_reactions">显示更多反应</string>
     <string name="pick_file_from_device">从设备中选择文件</string>
     <string name="note_editor_file_max_size_validation_error_message">不能附加超过 %d 个文件</string>
-    <string name="auth_sign_up">报名</string>
+    <string name="auth_sign_up">注册</string>
     <string name="auth_join_milktea_title">让我们从Milktea开始Misskey</string>
-    <string name="auth_sign_up_button">报名</string>
+    <string name="auth_sign_up_button">注册</string>
     <string name="auth_sign_in">登入</string>
-    <string name="auth_find_instance">找服务器</string>
+    <string name="auth_find_instance">寻找服务器</string>
     <string name="auth_find_instance_next_button_text">下一个</string>
     <string name="auth_find_instance_show_in_web_browser_message">注册屏幕将出现在您的浏览器中</string>
     <string name="settings_note_divider">在笔记中显示水平分隔线</string>
@@ -449,10 +449,16 @@
     <string name="notes_media_click_to_load_image">点击加载图片</string>
     <string name="notifications_follow_requests">按照要求</string>
     <string name="content_not_exists_message">无内容</string>
-    <string name="user_detail_mute_renotes">Mute Renotes</string>
-    <string name="user_detail_unmute_renotes">Unmute renotes</string>
-    <string name="settings_renote_mute_title">远程静音</string>
+    <string name="user_detail_mute_renotes">屏蔽转发</string>
+    <string name="user_detail_unmute_renotes">取消屏蔽转发</string>
+    <string name="settings_renote_mute_title">转发屏蔽</string>
     <string name="bookmark">书签</string>
+
+    <string name="milktea_catchphrase">你想要带有联邦宇宙的Milktea吗？</string>
+    <string name="donation">捐款</string>
+    <string name="privacy_policy">隐私政策</string>
+    <string name="terms_of_service">服务条款</string>
+
 
     <string name="auth_custom_app_name">应用名称</string>
     <string name="auth_app_name">Milktea</string>
@@ -464,7 +470,7 @@
     <string name="auth_instance_domain">实例 URL</string>
     <string name="auth_https">https://</string>
     <string name="auth_waiting_4_u_to_approve">正在等待您的同意</string>
-    <string name="auth_i_have_approved">已同意的</string>
+    <string name="auth_i_have_approved">已同意</string>
     <string name="auth_waiting_4_approval">正在等待同意</string>
     <string name="auth_authentication_url">验证 URL</string>
     <string name="auth_copy_the_url_of_the_authentication_destination_to_the_clipboard">将身份验证 URL 复制到剪贴板。</string>
@@ -473,7 +479,7 @@
     <string name="auth_open_in_webview">使用 WebView 打开</string>
     <string name="auth_terms_of_service_agreeation">我同意服务条款</string>
     <string name="auth_privacy_policy_agreeation">我同意隐私政策</string>
-    <string name="auth_accpet_mastodon_alpha_test">我明白Mastodon相关的功能仍处于alpha阶段，可能存在尚未实现或无法工作的功能，我同意不对开发人员负责</string>
+    <string name="auth_accpet_mastodon_alpha_test">我明白Mastodon相关的功能仍处于alpha阶段，可能存在尚未实现或无法工作的功能，我同意不让开发人员负责。</string>
 
     <!-- Channel -->
     <string name="channel_n_people">%d 人</string>
@@ -496,8 +502,8 @@
     <!-- Gallery -->
     <string name="gallery_sensitive_content">敏感内容</string>
     <string name="gallery_pick_image">选择图片</string>
-    <string name="gallery_pick_image_from_device">从设备中选取图片</string>
-    <string name="gallery_pick_image_from_drive">从网盘中选取图片</string>
+    <string name="gallery_pick_image_from_device">从设备中选取</string>
+    <string name="gallery_pick_image_from_drive">从网盘中选取</string>
     <!-- Gallery -->
 
     <!-- Group -->
@@ -524,7 +530,7 @@
 
     <string name="timeout_error">超时</string>
     <string name="reauthenticate">重新认证</string>
-    <string name="expand">展開</string>
+    <string name="expand">展开</string>
     <string name="file_size_warning_dialog_message">%1$s 不允许大于 %2$s 的附件。要继续吗？</string>
     <string name="file_size_warning_dialog_negative_button">取消附件</string>
     <string name="file_size_warning_dialo_positive_button">继续</string>
@@ -541,40 +547,60 @@
 
     <!-- Notification -->
     <string name="no_notifications">没有通知</string>
-    <string name="notification_menu_mark_as_all_read_notifications_label">Mark as all read notifications</string>
+    <string name="notification_menu_mark_as_all_read_notifications_label">标记所有通知为已读</string>
     <!-- Notification -->
 
     <!-- Settings -->
-    <string name="client_word_mute">客户端关键字静音</string>
+    <string name="client_word_mute">客户端关键字屏蔽</string>
     <string name="client_word_mute_format_description">用空格分隔会产生 AND 规范，用换行符分隔会产生 OR 规范。\n关键字周围的斜线使其成为正则表达式。</string>
     <string name="import_reactions_from_the_web">从网络导入反应</string>
     <string name="import_reactions">导入反应</string>
     <string name="overwrite_save">覆盖保存</string>
     <string name="notification_sound">通知音</string>
     <string name="inapp_notification_sound">启用应用内通知音</string>
-    <string name="streaming">自動更新</string>
-    <string name="is_stop_timeline_streaming_when_background">在后台不更新时间线</string>
-    <string name="is_stop_note_capture_when_background">不要在后台捕捉笔记</string>
+    <string name="streaming">自动更新</string>
+    <string name="is_stop_timeline_streaming_when_background">不在后台更新时间线</string>
+    <string name="is_stop_note_capture_when_background">不在后台获取帖子</string>
     <string name="enable_automic_updates">启用自动更新</string>
     <string name="please_login">请登录</string>
-    <string name="settings_edit_tab_only_media">Only Media</string>
+    <string name="settings_edit_tab_only_media">仅媒体</string>
+    <string name="settings_about_milktea">关于Milktea</string>
+    <string name="settings_about_milktea_source_code">源代码（GitHub）</string>
+    <string name="settings_emoji_picker">表情选择器</string>
+    <string name="settings_emoji_display_size">表情显示大小</string>
+
     <!-- Settings -->
 
     <!-- User -->
     <string name="user_birthday">生日: %s</string>
     <string name="user_registration_date">注册于 %s</string>
     <string name="confirm_user_block_title">确认</string>
-    <string name="confirm_user_block_description">您确定要拉黑 %s 吗？</string>
+    <string name="confirm_user_block_description">您确定要屏蔽 %s 吗？</string>
 
-    <string name="user_mute_specify_time_15_minutes_later">15 分钟后</string>
-    <string name="user_mute_specify_time_30_minutes_later">30 分钟后</string>
-    <string name="user_mute_specify_time_1_hours_later">1 小时后</string>
-    <string name="user_mute_specify_time_1_day_later">1 天后</string>
-    <string name="user_mute_specify_time_1_week_later">1 周后</string>
-    <string name="user_mute_specify_time_1_month_later">1 个月后</string>
-    <string name="user_mute_specify_time_indefinite_period">无限期</string>
+    <string name="user_mute_specify_time_15_minutes_later">15 分钟</string>
+    <string name="user_mute_specify_time_30_minutes_later">30 分钟</string>
+    <string name="user_mute_specify_time_1_hours_later">1 小时</string>
+    <string name="user_mute_specify_time_1_day_later">1 天</string>
+    <string name="user_mute_specify_time_1_week_later">1 周</string>
+    <string name="user_mute_specify_time_1_month_later">1 个月</string>
+    <string name="user_mute_specify_time_indefinite_period">永久</string>
     <string name="view_remotely">远程查看</string>
     <string name="follows_you">正在关注你</string>
+    <string name="settings_note_content_font_size">帖子内容字体大小（%fsp）</string>
+    <string name="settings_note_header_font_size">帖子标题字体大小（%fsp）</string>
+    <string name="settings_note_reaction_counter_font_size">帖子反应计数字体大小（%fsp，%fps）</string>
+    <string name="settings_note_custom_emoji_scale_size_in_text">自定义表情符号放大倍率（%fX）</string>
+    <string name="suggestion_users">建议</string>
+    <string name="trend_posted_person_count_msg">%d 人发帖</string>
+    <string name="notes_confirm_attach_quote_note_by_url">作为引用帖子附加？</string>
+    <string name="select_draft_post">选择草稿帖子</string>
+    <string name="remember_scroll_position">记住滚动位置</string>
+    <string name="post_only">仅发帖</string>
+    <string name="settings_display_timestamps_as_absolute_dates">以绝对日期显示时间戳</string>
+    <string name="settings_cache_config">缓存设置</string>
+    <string name="settings_note_cache">帖子缓存</string>
+    <string name="settings_custom_emoji_cache">自定义表情缓存</string>
+    <string name="move_files_here">将文件移至此处</string>
     <!-- User -->
 
 </resources>

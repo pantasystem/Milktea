@@ -52,7 +52,7 @@ internal class UserApiAdapterImpl @Inject constructor(
                     detail
                 )
             }
-            Account.InstanceType.MASTODON -> {
+            Account.InstanceType.MASTODON, Account.InstanceType.PLEROMA -> {
                 val res = mastodonAPIProvider.get(account).getAccount(userId.id)
                     .throwIfHasError()
                     .body()
@@ -93,10 +93,11 @@ internal class UserApiAdapterImpl @Inject constructor(
                 )
                 SearchResult.Misskey(body)
             }
-            Account.InstanceType.MASTODON -> {
+            Account.InstanceType.MASTODON, Account.InstanceType.PLEROMA -> {
                 val body = requireNotNull(
                     mastodonAPIProvider.get(account).search(
-                        if (host == null) userName else "$userName@$host"
+                        if (host == null) userName else "$userName@$host",
+                        type = "accounts"
                     ).throwIfHasError().body()
                 ).accounts
                 SearchResult.Mastodon(body)

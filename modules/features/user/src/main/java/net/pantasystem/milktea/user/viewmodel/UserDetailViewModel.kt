@@ -23,7 +23,6 @@ import net.pantasystem.milktea.common_android.eventbus.EventBus
 import net.pantasystem.milktea.common_android.resource.StringSource
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.AccountRepository
-import net.pantasystem.milktea.model.account.CurrentAccountWatcher
 import net.pantasystem.milktea.model.account.page.Pageable
 import net.pantasystem.milktea.model.account.page.PageableTemplate
 import net.pantasystem.milktea.model.instance.FeatureEnables
@@ -63,7 +62,16 @@ class UserDetailViewModel @AssistedInject constructor(
     companion object;
 
     private val logger = loggerFactory.create("UserDetailViewModel")
-    private val accountWatcher = CurrentAccountWatcher(userId?.accountId, accountRepository)
+    private val currentAccountId = MutableStateFlow(userId?.accountId)
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val currentAccount = currentAccountId.flatMapLatest { accountId ->
+        accountStore.state.map { state ->
+            accountId?.let {
+                state.get(it)
+            } ?: state.currentAccount
+        }
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
 
     private val _errors = MutableSharedFlow<Throwable>(extraBufferCapacity = 100)
     val errors = _errors.asSharedFlow()
@@ -75,7 +83,7 @@ class UserDetailViewModel @AssistedInject constructor(
             userDataSource.observe(userId)
         }
         fqdnUserName != null -> {
-            accountStore.observeCurrentAccount.filterNotNull().flatMapLatest {
+            currentAccount.filterNotNull().flatMapLatest {
                 userDataSource.observe(it.accountId, fqdnUserName)
             }
         }
@@ -90,14 +98,9 @@ class UserDetailViewModel @AssistedInject constructor(
     }.stateIn(viewModelScope, SharingStarted.Lazily, null)
 
     val user = userState.asLiveData()
-    @OptIn(ExperimentalCoroutinesApi::class)
-    val account = accountWatcher.account.catch {
-        logger.error("Accountの取得に失敗", it)
-    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
 
-
-    val isMine = combine(userState, accountStore.state) { userState, accountState ->
-        userState?.id?.id == accountState.currentAccount?.remoteId
+    val isMine = combine(userState, currentAccount) { userState, account ->
+        userState?.id?.id == account?.remoteId
     }.stateIn(viewModelScope, SharingStarted.Lazily, false)
 
     val birthday = userState.map {
@@ -113,7 +116,7 @@ class UserDetailViewModel @AssistedInject constructor(
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
 
     val tabTypes = combine(
-        accountStore.observeCurrentAccount.filterNotNull(), userState.filterNotNull()
+        currentAccount.filterNotNull(), userState.filterNotNull()
     ) { account, user ->
         val isEnableGallery =
             featureEnables.isEnable(account.normalizedInstanceUri, FeatureType.Gallery)
@@ -127,6 +130,7 @@ class UserDetailViewModel @AssistedInject constructor(
             Account.InstanceType.MISSKEY -> {
                 listOfNotNull(
                     UserDetailTabType.UserTimeline(user.id),
+                    UserDetailTabType.UserTimelineOnlyPosts(user.id),
                     UserDetailTabType.UserTimelineWithReplies(user.id),
                     UserDetailTabType.PinNote(user.id),
                     UserDetailTabType.Media(user.id),
@@ -136,9 +140,10 @@ class UserDetailViewModel @AssistedInject constructor(
                     if (isPublicReaction) UserDetailTabType.Reactions(user.id) else null,
                 )
             }
-            Account.InstanceType.MASTODON -> {
+            Account.InstanceType.MASTODON, Account.InstanceType.PLEROMA -> {
                 listOf(
                     UserDetailTabType.MastodonUserTimeline(user.id),
+                    UserDetailTabType.MastodonUserTimelineOnlyPosts(user.id),
                     UserDetailTabType.MastodonUserTimelineWithReplies(user.id),
                     UserDetailTabType.MastodonMedia(user.id)
                 )
@@ -162,6 +167,11 @@ class UserDetailViewModel @AssistedInject constructor(
             "userIdかfqdnUserNameのいずれかが指定されている必要があります。"
         }
         sync()
+        accountStore.observeCurrentAccount.onEach {
+            if (userId == null) {
+                currentAccountId.value = it?.accountId
+            }
+        }.launchIn(viewModelScope)
     }
 
 
@@ -231,7 +241,7 @@ class UserDetailViewModel @AssistedInject constructor(
         viewModelScope.launch {
             userState.value?.let { user ->
                 blockRepository.create(user.id).mapCancellableCatching {
-                    userRepository.sync(user.id)
+                    userRepository.sync(user.id).getOrThrow()
                 }.onFailure {
                     logger.error("block failed", it)
                     _errors.tryEmit(it)
@@ -309,7 +319,7 @@ class UserDetailViewModel @AssistedInject constructor(
             runCancellableCatching {
                 getUserId()
             }.mapCancellableCatching {
-                renoteMuteRepository.create(it)
+                renoteMuteRepository.create(it).getOrThrow()
             }.onFailure {
                 _errors.tryEmit(it)
             }
@@ -321,7 +331,7 @@ class UserDetailViewModel @AssistedInject constructor(
             runCancellableCatching {
                 getUserId()
             }.mapCancellableCatching {
-                renoteMuteRepository.delete(it)
+                renoteMuteRepository.delete(it).getOrThrow()
             }.onFailure {
                 _errors.tryEmit(it)
             }
@@ -338,7 +348,7 @@ class UserDetailViewModel @AssistedInject constructor(
             return userId
         }
 
-        val account = accountWatcher.getAccount()
+        val account = currentAccount.value ?: accountRepository.getCurrentAccount().getOrThrow()
         if (fqdnUserName != null) {
             val (userName, host) = Acct(fqdnUserName).let {
                 it.userName to it.host
@@ -374,6 +384,9 @@ sealed class UserDetailTabType(
 
     data class UserTimeline(val userId: User.Id) : UserDetailTabType(R.string.post)
     data class UserTimelineWithReplies(val userId: User.Id) : UserDetailTabType(R.string.notes_and_replies)
+
+    data class UserTimelineOnlyPosts(val userId: User.Id) : UserDetailTabType(R.string.post_only)
+
     data class PinNote(val userId: User.Id) : UserDetailTabType(R.string.pin)
     data class Gallery(val userId: User.Id, val accountId: Long) :
         UserDetailTabType(R.string.gallery)
@@ -383,5 +396,8 @@ sealed class UserDetailTabType(
 
     data class MastodonUserTimeline(val userId: User.Id) : UserDetailTabType(R.string.post)
     data class MastodonUserTimelineWithReplies(val userId: User.Id) : UserDetailTabType(R.string.notes_and_replies)
+
+    data class MastodonUserTimelineOnlyPosts(val userId: User.Id) : UserDetailTabType(R.string.post_only)
+
     data class MastodonMedia(val userId: User.Id) : UserDetailTabType(R.string.media)
 }

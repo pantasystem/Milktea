@@ -50,6 +50,10 @@ data class IsAnalyticsCollectionEnabled(
  * @Param isEnableNoteDivider ノートの区切り線の有無 trueで有り falseで無し
  * @param isVisibleInstanceUrlInToolbar toolbar内にインスタンス情報を表示するか？
  * @param isHideMediaWhenMobileNetwork モバイルネットワークの時はメディアを表示しない
+ * @param noteHeaderFontSize ノートのヘッダー部分のテキストサイズ
+ * @param noteContentFontSize ノートのコンテンツ部分のテキストサイズ
+ * @param noteReactionCounterFontSize ノートのリアクションカウンターのカスタム絵文字、絵文字と件数表示のフォントサイズ
+ * @param emojiPickerEmojiDisplaySize 絵文字ピッカーの絵文字の表示サイズ
  */
 data class Config(
     val isSimpleEditorEnabled: Boolean,
@@ -77,6 +81,12 @@ data class Config(
     val isEnableNoteDivider: Boolean,
     val isVisibleInstanceUrlInToolbar: Boolean,
     val isHideMediaWhenMobileNetwork: Boolean,
+    val noteHeaderFontSize: Float,
+    val noteContentFontSize: Float,
+    val isDisplayTimestampsAsAbsoluteDates: Boolean,
+    val noteReactionCounterFontSize: Float,
+    val noteCustomEmojiScaleSizeInText: Float,
+    val emojiPickerEmojiDisplaySize: Int,
 ) {
     companion object
 
@@ -131,7 +141,13 @@ object DefaultConfig {
         isEnableStreamingAPIAndNoteCapture = true,
         isEnableNoteDivider = true,
         isVisibleInstanceUrlInToolbar = true,
-        isHideMediaWhenMobileNetwork = false
+        isHideMediaWhenMobileNetwork = false,
+        noteContentFontSize = 15f,
+        noteHeaderFontSize = 15f,
+        isDisplayTimestampsAsAbsoluteDates = false,
+        noteReactionCounterFontSize = 15f,
+        noteCustomEmojiScaleSizeInText = 1.2f,
+        emojiPickerEmojiDisplaySize = 28,
     )
 
     fun getRememberVisibilityConfig(accountId: Long): RememberVisibility.Remember {

@@ -10,7 +10,7 @@ interface FilePropertyPagingStore {
     val state: Flow<PageableState<List<FileProperty.Id>>>
     val isLoading: Boolean
 
-    suspend fun loadPrevious()
+    suspend fun loadPrevious(): Result<Int>
     suspend fun clear()
     suspend fun setCurrentDirectory(directory: Directory?)
     suspend fun setCurrentAccount(account: Account?)

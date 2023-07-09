@@ -1,5 +1,6 @@
 package net.pantasystem.milktea.note
 
+import androidx.lifecycle.SavedStateHandle
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -25,28 +26,50 @@ class EmojiPickerUiStateService(
     private val reactionHistoryRepository: ReactionHistoryRepository,
     private val userEmojiConfigRepository: UserEmojiConfigRepository,
     private val logger: Logger,
+    savedStateHandle: SavedStateHandle,
     coroutineScope: CoroutineScope,
 ) {
-
-
-    @OptIn(ExperimentalCoroutinesApi::class)
-    private val emojis = accountStore.observeCurrentAccount.filterNotNull().flatMapLatest { ac ->
-        customEmojiRepository.observeBy(ac.getHost())
-    }.catch {
-        logger.error("絵文字の取得に失敗", it)
-    }.flowOn(Dispatchers.IO)
+    companion object {
+        const val EXTRA_ACCOUNT_ID = "EmojiPickerViewModel.EXTRA_ACCOUNT_ID"
+    }
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    private val reactionCount =
-        accountStore.observeCurrentAccount.filterNotNull().flatMapLatest { ac ->
+    val account = savedStateHandle.getStateFlow<Long>(EXTRA_ACCOUNT_ID, -1L).map {
+        it.takeIf {
+            it > 0
+        }
+    }.flatMapLatest { specifiedId ->
+        accountStore.state.map { state ->
+            specifiedId?.let {
+                state.get(it)
+            } ?: state.currentAccount
+        }
+    }.stateIn(coroutineScope, SharingStarted.WhileSubscribed(5_000), null)
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    private val emojis = account
+        .filterNotNull()
+        .flatMapLatest { ac ->
+            customEmojiRepository.observeBy(ac.getHost())
+        }.catch {
+            logger.error("絵文字の取得に失敗", it)
+        }.flowOn(Dispatchers.IO)
+        .stateIn(coroutineScope, SharingStarted.WhileSubscribed(5_000), emptyList())
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    private val reactionCount = account
+        .filterNotNull()
+        .flatMapLatest { ac ->
             reactionHistoryRepository.observeSumReactions(ac.normalizedInstanceUri)
         }.catch {
             logger.error("リアクション履歴の取得に失敗", it)
         }.flowOn(Dispatchers.IO)
+        .stateIn(coroutineScope, SharingStarted.WhileSubscribed(5_000), emptyList())
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    private val userSetting =
-        accountStore.observeCurrentAccount.filterNotNull().flatMapLatest { ac ->
+    private val userSetting = account
+        .filterNotNull()
+        .flatMapLatest { ac ->
             userEmojiConfigRepository.observeByInstanceDomain(ac.normalizedInstanceUri)
         }.catch {
             logger.error("ユーザーリアクション設定情報の取得に失敗", it)
@@ -63,7 +86,7 @@ class EmojiPickerUiStateService(
         Reactions(emptyList(), emptyList())
     )
 
-    private val baseInfo = combine(accountStore.observeCurrentAccount, emojis) { account, emojis ->
+    private val baseInfo = combine(account, emojis) { account, emojis ->
         BaseInfo(account, emojis)
     }.stateIn(
         coroutineScope,
@@ -73,7 +96,7 @@ class EmojiPickerUiStateService(
 
     @OptIn(ExperimentalCoroutinesApi::class)
     private val recentlyUsedReactions =
-        accountStore.observeCurrentAccount.filterNotNull().flatMapLatest {
+        account.filterNotNull().flatMapLatest {
             reactionHistoryRepository.observeRecentlyUsedBy(it.normalizedInstanceUri, limit = 20)
         }.catch {
             logger.error("絵文字の直近使用履歴の取得に失敗", it)
@@ -109,12 +132,6 @@ class EmojiPickerUiStateService(
         )
     )
 
-    val tabLabels = uiState.map { uiState ->
-        uiState.segments.map {
-            it.label
-        }
-    }.distinctUntilChanged()
-        .stateIn(coroutineScope, SharingStarted.WhileSubscribed(5_000), emptyList())
 }
 
 data class EmojiPickerUiState(
@@ -136,9 +153,7 @@ data class EmojiPickerUiState(
         }.distinct()
     }
 
-
-
-    val userSettingEmojis: List<EmojiType> by lazy {
+    private val userSettingEmojis: List<EmojiType> by lazy {
         userSettingReactions.mapNotNull { setting ->
             EmojiType.from(customEmojis, setting.reaction)
         }.ifEmpty {
@@ -149,7 +164,7 @@ data class EmojiPickerUiState(
     }
 
     private val otherEmojis = customEmojis.filter {
-        it.category == null
+        it.category.isNullOrBlank()
     }.map {
         EmojiType.CustomEmoji(it)
     }
@@ -173,24 +188,12 @@ data class EmojiPickerUiState(
         EmojiType.from(customEmojis, it.reaction)
     }
 
-    val segments = listOfNotNull(
-        SegmentType.UserCustom(userSettingEmojis),
-        SegmentType.OftenUse(frequencyUsedReactionsV2),
-        SegmentType.RecentlyUsed(recentlyUsed),
-        otherEmojis.let {
-            SegmentType.OtherCategory(it)
-        },
-    ) + categories.map {
-        SegmentType.Category(
-            it,
-            getCategoryBy(it)
-        )
-    }
 
-    val searchFilteredEmojis = customEmojis.filterEmojiBy(keyword).map {
-        EmojiType.CustomEmoji(it)
-    }.sortedBy {
-        LevenshteinDistance(it.emoji.name, keyword)
+    val emojiListItems: List<EmojiListItemType> = generateEmojiListItems()
+
+
+    val tabHeaderLabels = emojiListItems.mapNotNull {
+        (it as? EmojiListItemType.Header)?.label
     }
 
     fun isExistsConfig(emojiType: EmojiType): Boolean {
@@ -198,35 +201,41 @@ data class EmojiPickerUiState(
             emojiType.areItemsTheSame(it)
         }
     }
+
+    private fun generateEmojiListItems(): List<EmojiListItemType> {
+        return if (keyword.isBlank()) {
+            listOf(
+                EmojiListItemType.Header(StringSource.invoke(R.string.user)),
+            ) + userSettingEmojis.map {
+                EmojiListItemType.EmojiItem(it)
+            } + EmojiListItemType.Header(StringSource.invoke(R.string.often_use)) + frequencyUsedReactionsV2.map {
+                EmojiListItemType.EmojiItem(it)
+            } + EmojiListItemType.Header(StringSource(R.string.recently_used)) + recentlyUsed.map {
+                EmojiListItemType.EmojiItem(it)
+            } + EmojiListItemType.Header(StringSource.invoke(R.string.other)) + otherEmojis.map {
+                EmojiListItemType.EmojiItem(it)
+            } + categories.map { category ->
+                listOf(EmojiListItemType.Header(StringSource.invoke(category))) + getCategoryBy(category).map {
+                    EmojiListItemType.EmojiItem(it)
+                }
+            }.flatten()
+        } else {
+            customEmojis.filterEmojiBy(keyword).map {
+                EmojiType.CustomEmoji(it)
+            }.sortedBy {
+                LevenshteinDistance(it.emoji.name, keyword)
+            }.map {
+                EmojiListItemType.EmojiItem(it)
+            }
+        }
+    }
 }
 
-sealed interface SegmentType {
-    val label: StringSource
-    val emojis: List<EmojiType>
 
-    data class Category(val name: String, override val emojis: List<EmojiType>) : SegmentType {
-        override val label: StringSource
-            get() = StringSource.invoke(name)
-    }
+sealed interface EmojiListItemType {
+    data class EmojiItem(val emoji: EmojiType) : EmojiListItemType
 
-    data class UserCustom(override val emojis: List<EmojiType>) : SegmentType {
-        override val label: StringSource
-            get() = StringSource.invoke(R.string.user)
-    }
-
-    data class OftenUse(override val emojis: List<EmojiType>) : SegmentType {
-        override val label: StringSource
-            get() = StringSource.invoke(R.string.often_use)
-    }
-
-    data class OtherCategory(override val emojis: List<EmojiType>) : SegmentType {
-        override val label: StringSource
-            get() = StringSource.invoke(R.string.other)
-    }
-    data class RecentlyUsed(override val emojis: List<EmojiType>) : SegmentType {
-        override val label: StringSource
-            get() = StringSource.invoke(R.string.recently_used)
-    }
+    data class Header(val label: StringSource) : EmojiListItemType
 }
 
 sealed interface EmojiType {
@@ -242,7 +251,7 @@ sealed interface EmojiType {
         if (this.javaClass != other.javaClass) {
             return false
         }
-        return when(this) {
+        return when (this) {
             is CustomEmoji -> {
                 emoji == (other as? CustomEmoji)?.emoji
             }

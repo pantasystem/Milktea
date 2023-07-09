@@ -33,7 +33,7 @@ class UpdateAppFileSensitiveUseCase @Inject constructor(
                         )
                         AppFile.Remote(fileProperty.id)
                     }
-                    Account.InstanceType.MASTODON -> {
+                    Account.InstanceType.MASTODON, Account.InstanceType.PLEROMA -> {
                         val fileProperty = filePropertyDataSource.find(appFile.id).getOrThrow()
                         filePropertyDataSource.add(
                             fileProperty.copy(

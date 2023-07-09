@@ -139,6 +139,30 @@ class ConfigKtTest {
                     config.isHideMediaWhenMobileNetwork,
                     (u as PrefType.BoolPref).value
                 )
+                Keys.NoteContentFontSize -> Assertions.assertEquals(
+                    config.noteContentFontSize,
+                    (u as PrefType.FloatPref).value
+                )
+                Keys.NoteHeaderFontSize -> Assertions.assertEquals(
+                    config.noteHeaderFontSize,
+                    (u as PrefType.FloatPref).value
+                )
+                Keys.IsDisplayTimestampsAsAbsoluteDates -> Assertions.assertEquals(
+                    config.isDisplayTimestampsAsAbsoluteDates,
+                    (u as PrefType.BoolPref).value
+                )
+                Keys.NoteReactionCounterFontSize -> Assertions.assertEquals(
+                    config.noteReactionCounterFontSize,
+                    (u as PrefType.FloatPref).value
+                )
+                Keys.NoteCustomEmojiScaleSizeInText -> Assertions.assertEquals(
+                    config.noteCustomEmojiScaleSizeInText,
+                    (u as PrefType.FloatPref).value
+                )
+                Keys.EmojiPickerEmojiDisplaySize -> Assertions.assertEquals(
+                    config.emojiPickerEmojiDisplaySize,
+                    (u as PrefType.IntPref).value
+                )
             }
         }
     }
