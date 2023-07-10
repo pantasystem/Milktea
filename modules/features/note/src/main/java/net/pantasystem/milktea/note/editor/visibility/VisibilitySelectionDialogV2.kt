@@ -70,6 +70,7 @@ fun VisibilitySelectionDialogContent(viewModel: NoteEditorViewModel) {
     val uiState by viewModel.uiState.collectAsState()
     val channelsState by viewModel.channels.collectAsState()
     val enableFeatures by viewModel.enableFeatures.collectAsState()
+    val reactionAcceptanceType = uiState.sendToState.reactionAcceptanceType
     VisibilitySelectionDialogLayout(
         visibility = uiState.sendToState.visibility,
         channelId = uiState.sendToState.channelId,
@@ -77,8 +78,12 @@ fun VisibilitySelectionDialogContent(viewModel: NoteEditorViewModel) {
         channelsState = channelsState,
         onVisibilityChanged = viewModel::setVisibility,
         enableFeatures = enableFeatures,
+        reactionAcceptanceType = reactionAcceptanceType,
         onChannelSelected = {
             viewModel.setChannelId(it.id)
+        },
+        onReactionAcceptanceSelected = {
+            viewModel.onReactionAcceptanceSelected(it)
         }
     )
 }
@@ -91,8 +96,10 @@ fun VisibilitySelectionDialogLayout(
     enableFeatures: Set<FeatureType>,
     onVisibilityChanged: (visibility: Visibility) -> Unit,
     onChannelSelected: (channel: Channel) -> Unit,
+    onReactionAcceptanceSelected: (ReactionAcceptanceType?) -> Unit,
     channelId: Channel.Id? = null,
     currentAccountInstanceType: Account.InstanceType? = null,
+    reactionAcceptanceType: ReactionAcceptanceType? = null,
 ) {
     val channels =
         (channelsState.content as? StateContent.Exist)?.rawContent ?: emptyList()
@@ -169,8 +176,8 @@ fun VisibilitySelectionDialogLayout(
                     items(listOf<ReactionAcceptanceType?>(null) + ReactionAcceptanceType.values()) { type ->
                         ReactionAcceptanceSelection(
                             type = type,
-                            isSelected = type == null,
-                            onSelected = {}
+                            isSelected = type == reactionAcceptanceType,
+                            onSelected = onReactionAcceptanceSelected
                         )
                     }
                 }
