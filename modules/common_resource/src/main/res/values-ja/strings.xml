@@ -609,6 +609,11 @@
     <string name="settings_note_cache">ノートのキャッシュ</string>
     <string name="settings_custom_emoji_cache">カスタム絵文字のキャッシュ</string>
     <string name="move_files_here">ここにファイルを移動</string>
+    <string name="reaction_acceptance_all">全て</string>
+    <string name="reaction_acceptance_like_only_for_remote">全て (リモートはいいねのみ)</string>
+    <string name="reaction_acceptance_non_sensitive_only">非センシティブのみ (リモートはいいねのみ)</string>
+    <string name="reaction_acceptance_non_sensitive_only_likes_from_remote">いいねのみ (リモートはいいねのみ)</string>
+    <string name="reaction_acceptance_only_likes">いいねのみ</string>
     <!-- User -->
 
 
