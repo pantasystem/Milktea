@@ -5,19 +5,6 @@ import net.pantasystem.milktea.model.AddResult
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.user.User
 
-data class NoteDataSourceState(
-    val map: Map<Note.Id, Note>,
-) {
-    fun findIn(ids: List<Note.Id>): List<Note> {
-        return ids.mapNotNull {
-            map[it]
-        }
-    }
-
-    fun getOrNull(id: Note.Id): Note? {
-        return map[id]
-    }
-}
 
 /**
  * キャッシュやデータベースの実装の差をなくすためのRepository

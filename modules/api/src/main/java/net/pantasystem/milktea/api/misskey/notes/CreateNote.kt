@@ -50,6 +50,9 @@ data class CreateNote(
 
     @SerialName("channelId")
     val channelId: String? = null,
+
+    @SerialName("reactionAcceptance")
+    val reactionAcceptance: ReactionAcceptanceType? = null,
 ) {
 
     @Serializable

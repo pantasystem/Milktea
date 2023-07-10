@@ -14,7 +14,6 @@ import net.pantasystem.milktea.data.infrastructure.MemoryCacheCleaner
 import net.pantasystem.milktea.model.AddResult
 import net.pantasystem.milktea.model.notes.Note
 import net.pantasystem.milktea.model.notes.NoteDataSource
-import net.pantasystem.milktea.model.notes.NoteDataSourceState
 import net.pantasystem.milktea.model.notes.NoteDeletedException
 import net.pantasystem.milktea.model.notes.NoteNotFoundException
 import net.pantasystem.milktea.model.notes.NoteRemovedException
@@ -42,7 +41,7 @@ class InMemoryNoteDataSource @Inject constructor(
     init {
         addEventListener {
             _state.update {
-                it.copy(notes)
+                it.copy(map = notes)
             }
         }
         memoryCacheCleaner.register(this)
@@ -221,4 +220,18 @@ class InMemoryNoteDataSource @Inject constructor(
         return Result.success(notes.size.toLong())
     }
 
+}
+
+data class NoteDataSourceState(
+    val map: Map<Note.Id, Note>,
+) {
+    fun findIn(ids: List<Note.Id>): List<Note> {
+        return ids.mapNotNull {
+            map[it]
+        }
+    }
+
+    fun getOrNull(id: Note.Id): Note? {
+        return map[id]
+    }
 }

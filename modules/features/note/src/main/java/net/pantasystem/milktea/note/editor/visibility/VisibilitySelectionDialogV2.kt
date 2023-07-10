@@ -3,6 +3,7 @@ package net.pantasystem.milktea.note.editor.visibility
 import android.app.Dialog
 import android.os.Bundle
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -11,6 +12,7 @@ import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
@@ -32,7 +34,9 @@ import net.pantasystem.milktea.common.ResultState
 import net.pantasystem.milktea.common.StateContent
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.channel.Channel
+import net.pantasystem.milktea.model.instance.FeatureType
 import net.pantasystem.milktea.model.notes.CanLocalOnly
+import net.pantasystem.milktea.model.notes.ReactionAcceptanceType
 import net.pantasystem.milktea.model.notes.Visibility
 import net.pantasystem.milktea.model.notes.isLocalOnly
 import net.pantasystem.milktea.note.R
@@ -65,14 +69,21 @@ class VisibilitySelectionDialogV2 : BottomSheetDialogFragment() {
 fun VisibilitySelectionDialogContent(viewModel: NoteEditorViewModel) {
     val uiState by viewModel.uiState.collectAsState()
     val channelsState by viewModel.channels.collectAsState()
+    val enableFeatures by viewModel.enableFeatures.collectAsState()
+    val reactionAcceptanceType = uiState.sendToState.reactionAcceptanceType
     VisibilitySelectionDialogLayout(
         visibility = uiState.sendToState.visibility,
         channelId = uiState.sendToState.channelId,
         currentAccountInstanceType = uiState.currentAccount?.instanceType,
         channelsState = channelsState,
         onVisibilityChanged = viewModel::setVisibility,
+        enableFeatures = enableFeatures,
+        reactionAcceptanceType = reactionAcceptanceType,
         onChannelSelected = {
             viewModel.setChannelId(it.id)
+        },
+        onReactionAcceptanceSelected = {
+            viewModel.onReactionAcceptanceSelected(it)
         }
     )
 }
@@ -82,10 +93,13 @@ fun VisibilitySelectionDialogContent(viewModel: NoteEditorViewModel) {
 fun VisibilitySelectionDialogLayout(
     visibility: Visibility,
     channelsState: ResultState<List<Channel>>,
+    enableFeatures: Set<FeatureType>,
     onVisibilityChanged: (visibility: Visibility) -> Unit,
     onChannelSelected: (channel: Channel) -> Unit,
+    onReactionAcceptanceSelected: (ReactionAcceptanceType?) -> Unit,
     channelId: Channel.Id? = null,
     currentAccountInstanceType: Account.InstanceType? = null,
+    reactionAcceptanceType: ReactionAcceptanceType? = null,
 ) {
     val channels =
         (channelsState.content as? StateContent.Exist)?.rawContent ?: emptyList()
@@ -139,6 +153,7 @@ fun VisibilitySelectionDialogLayout(
                         onClick = onVisibilityChanged
                     )
 
+
                     if (currentAccountInstanceType == Account.InstanceType.MISSKEY) {
                         VisibilityLocalOnlySwitch(
                             checked = visibility.isLocalOnly(),
@@ -151,12 +166,26 @@ fun VisibilitySelectionDialogLayout(
                                 }
                             },
                         )
+                    }
+                }
 
-                        VisibilityChannelTitle()
+                if (enableFeatures.contains(FeatureType.ReactionAcceptance)) {
+                    item {
+                        ReactionAcceptanceTitle()
+                    }
+                    items(listOf<ReactionAcceptanceType?>(null) + ReactionAcceptanceType.values()) { type ->
+                        ReactionAcceptanceSelection(
+                            type = type,
+                            isSelected = type == reactionAcceptanceType,
+                            onSelected = onReactionAcceptanceSelected
+                        )
                     }
                 }
 
                 if (currentAccountInstanceType == Account.InstanceType.MISSKEY) {
+                    item {
+                        VisibilityChannelTitle()
+                    }
                     items(channels) { channel ->
                         VisibilityChannelSelection(
                             item = channel,
@@ -184,3 +213,44 @@ fun VisibilityChannelTitle() {
     )
 }
 
+@Composable
+fun ReactionAcceptanceTitle() {
+    Text(
+        stringResource(R.string.reaction_acceptance),
+        fontSize = 20.sp,
+        modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 8.dp),
+        fontWeight = FontWeight.ExtraBold
+    )
+}
+
+@Composable
+fun ReactionAcceptanceSelection(
+    type: ReactionAcceptanceType?,
+    isSelected: Boolean,
+    onSelected: (ReactionAcceptanceType?) -> Unit,
+) {
+    val title = remember(type) {
+        when(type) {
+            ReactionAcceptanceType.LikeOnly -> R.string.reaction_acceptance_only_likes
+            ReactionAcceptanceType.LikeOnly4Remote -> R.string.reaction_acceptance_like_only_for_remote
+            ReactionAcceptanceType.NonSensitiveOnly -> R.string.reaction_acceptance_non_sensitive_only
+            ReactionAcceptanceType.NonSensitiveOnly4LocalOnly4Remote -> R.string.reaction_acceptance_non_sensitive_only_likes_from_remote
+            null -> R.string.reaction_acceptance_all
+        }
+    }
+    Surface(
+        Modifier.clickable {
+            onSelected(type)
+        },
+        color = if (isSelected) MaterialTheme.colors.primary else MaterialTheme.colors.surface,
+    ) {
+        Row(
+            Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp, vertical = 16.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(stringResource(id = title))
+        }
+    }
+}

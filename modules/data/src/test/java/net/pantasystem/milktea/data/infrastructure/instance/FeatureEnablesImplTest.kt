@@ -246,7 +246,8 @@ class FeatureEnablesImplTest {
                 FeatureType.Drive,
                 FeatureType.Messaging,
                 FeatureType.Gallery,
-                FeatureType.Antenna
+                FeatureType.Antenna,
+                FeatureType.ReactionAcceptance
             ),
             result,
         )
@@ -287,7 +288,8 @@ class FeatureEnablesImplTest {
                 FeatureType.Clip,
                 FeatureType.Drive,
                 FeatureType.Gallery,
-                FeatureType.Antenna
+                FeatureType.Antenna,
+                FeatureType.ReactionAcceptance,
             ),
             result,
         )

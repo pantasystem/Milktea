@@ -45,6 +45,7 @@ class FeatureEnablesImpl @Inject constructor(
                 if (isMisskey && version <= Version("13.6.1") || isCalckey) FeatureType.Messaging else null,
                 if (isMisskey) FeatureType.Drive else null,
                 if (isMastodon) FeatureType.Bookmark else null,
+                if (nodeInfo.type is NodeInfo.SoftwareType.Misskey.Normal && version >= Version("13")) FeatureType.ReactionAcceptance else null,
             )
         }
     }
