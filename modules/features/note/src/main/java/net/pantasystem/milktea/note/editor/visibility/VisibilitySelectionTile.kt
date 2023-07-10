@@ -24,7 +24,7 @@ import net.pantasystem.milktea.note.R
 
 
 @Composable
-fun VisibilitySelectionTile(
+internal fun VisibilitySelectionTile(
     item: Visibility,
     isSelected: Boolean,
     onClick: (item: Visibility) -> Unit,
@@ -71,7 +71,7 @@ fun VisibilitySelectionTile(
 
 
 @Composable
-fun VisibilityLocalOnlySwitch(
+internal fun VisibilityLocalOnlySwitch(
     modifier: Modifier = Modifier,
     checked: Boolean,
     onChanged: (Boolean) -> Unit,

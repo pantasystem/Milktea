@@ -28,7 +28,7 @@ import net.pantasystem.milktea.model.channel.Channel
 
 
 @Composable
-fun VisibilityChannelSelection(
+internal fun VisibilityChannelSelection(
     item: Channel,
     isSelected: Boolean,
     onClick: (Channel) -> Unit,

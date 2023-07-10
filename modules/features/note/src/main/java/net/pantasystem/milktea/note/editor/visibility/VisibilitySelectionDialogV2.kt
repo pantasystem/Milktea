@@ -3,7 +3,6 @@ package net.pantasystem.milktea.note.editor.visibility
 import android.app.Dialog
 import android.os.Bundle
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -12,7 +11,6 @@ import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
@@ -21,10 +19,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.rememberNestedScrollInteropConnection
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.fragment.app.activityViewModels
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
@@ -39,7 +34,6 @@ import net.pantasystem.milktea.model.notes.CanLocalOnly
 import net.pantasystem.milktea.model.notes.ReactionAcceptanceType
 import net.pantasystem.milktea.model.notes.Visibility
 import net.pantasystem.milktea.model.notes.isLocalOnly
-import net.pantasystem.milktea.note.R
 import net.pantasystem.milktea.note.editor.viewmodel.NoteEditorViewModel
 
 @AndroidEntryPoint
@@ -203,54 +197,3 @@ fun VisibilitySelectionDialogLayout(
 }
 
 
-@Composable
-fun VisibilityChannelTitle() {
-    Text(
-        stringResource(R.string.channel),
-        fontSize = 20.sp,
-        modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 8.dp),
-        fontWeight = FontWeight.ExtraBold
-    )
-}
-
-@Composable
-fun ReactionAcceptanceTitle() {
-    Text(
-        stringResource(R.string.reaction_acceptance),
-        fontSize = 20.sp,
-        modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 8.dp),
-        fontWeight = FontWeight.ExtraBold
-    )
-}
-
-@Composable
-fun ReactionAcceptanceSelection(
-    type: ReactionAcceptanceType?,
-    isSelected: Boolean,
-    onSelected: (ReactionAcceptanceType?) -> Unit,
-) {
-    val title = remember(type) {
-        when(type) {
-            ReactionAcceptanceType.LikeOnly -> R.string.reaction_acceptance_only_likes
-            ReactionAcceptanceType.LikeOnly4Remote -> R.string.reaction_acceptance_like_only_for_remote
-            ReactionAcceptanceType.NonSensitiveOnly -> R.string.reaction_acceptance_non_sensitive_only
-            ReactionAcceptanceType.NonSensitiveOnly4LocalOnly4Remote -> R.string.reaction_acceptance_non_sensitive_only_likes_from_remote
-            null -> R.string.reaction_acceptance_all
-        }
-    }
-    Surface(
-        Modifier.clickable {
-            onSelected(type)
-        },
-        color = if (isSelected) MaterialTheme.colors.primary else MaterialTheme.colors.surface,
-    ) {
-        Row(
-            Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 16.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(stringResource(id = title))
-        }
-    }
-}
