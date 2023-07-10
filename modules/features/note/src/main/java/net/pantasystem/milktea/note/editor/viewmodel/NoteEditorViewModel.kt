@@ -795,7 +795,7 @@ class NoteEditorViewModel @Inject constructor(
     }
 
     fun onReactionAcceptanceSelected(type: ReactionAcceptanceType?) {
-        savedStateHandle[NoteEditorSavedStateKey.ReactionAcceptance.name] = type?.name
+        savedStateHandle.setReactionAcceptanceType(type)
     }
 
     private fun setUpUserViewData(userId: User.Id): UserViewData {
