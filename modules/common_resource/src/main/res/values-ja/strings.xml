@@ -614,6 +614,7 @@
     <string name="reaction_acceptance_non_sensitive_only">非センシティブのみ (リモートはいいねのみ)</string>
     <string name="reaction_acceptance_non_sensitive_only_likes_from_remote">いいねのみ (リモートはいいねのみ)</string>
     <string name="reaction_acceptance_only_likes">いいねのみ</string>
+    <string name="reaction_acceptance">リアクションの受け入れ</string>
     <!-- User -->
 
 

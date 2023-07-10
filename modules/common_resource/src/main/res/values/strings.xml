@@ -608,6 +608,7 @@
     <string name="move_files_here">Move files here</string>
 
     <!-- reaction-acceptance -->
+    <string name="reaction_acceptance">Reaction acceptance</string>
     <string name="reaction_acceptance_all">All</string>
     <string name="reaction_acceptance_like_only_for_remote">All (Only likes for remote instances)</string>
     <string name="reaction_acceptance_non_sensitive_only">Non-sensitive only</string>
