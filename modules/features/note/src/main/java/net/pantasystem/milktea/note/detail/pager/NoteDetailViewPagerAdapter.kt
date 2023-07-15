@@ -41,4 +41,14 @@ class NoteDetailViewPagerAdapter(activity: Fragment, val factory: PageableFragme
         val result = DiffUtil.calculateDiff(callback)
         result.dispatchUpdatesTo(this)
     }
+
+    override fun containsItem(itemId: Long): Boolean {
+        return _list.map {
+            it.hashCode().toLong()
+        }.contains(itemId)
+    }
+
+    override fun getItemId(position: Int): Long {
+        return _list[position].hashCode().toLong()
+    }
 }
