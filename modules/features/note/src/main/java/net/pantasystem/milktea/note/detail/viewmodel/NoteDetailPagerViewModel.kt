@@ -83,7 +83,10 @@ class NoteDetailPagerViewModel @Inject constructor(
 
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    private val timelineState = currentAccount.flatMapLatest {
+    private val timelineState = savedStateHandle.getStateFlow<Pageable?>(EXTRA_FROM_PAGEABLE, null).flatMapLatest {
+        if (it != null) {
+            timelineStoreHolder.setPageable(it)
+        }
         timelineStoreHolder.timelineStore.timelineState
     }.stateIn(
         viewModelScope,
