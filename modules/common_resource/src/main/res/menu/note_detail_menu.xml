@@ -3,6 +3,12 @@
         xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
+        android:id="@+id/nav_switch_account"
+        android:title="@string/switch_account"
+        android:icon="@drawable/ic_account_circle_24px"
+        app:showAsAction="ifRoom"
+        />
+    <item
             android:id="@+id/nav_add_to_tab"
             android:title="@string/add_to_tab"
             android:icon="@drawable/ic_add_black_24dp"
