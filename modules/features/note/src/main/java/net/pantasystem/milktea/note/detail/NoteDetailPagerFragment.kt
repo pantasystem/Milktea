@@ -3,7 +3,7 @@ package net.pantasystem.milktea.note.detail
 import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
@@ -43,7 +43,7 @@ class NoteDetailPagerFragment : Fragment(R.layout.fragment_note_detail_pager) {
 
     private val binding by dataBinding<FragmentNoteDetailPagerBinding>()
 
-    val viewModel: NoteDetailPagerViewModel by viewModels()
+    val viewModel: NoteDetailPagerViewModel by activityViewModels()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)

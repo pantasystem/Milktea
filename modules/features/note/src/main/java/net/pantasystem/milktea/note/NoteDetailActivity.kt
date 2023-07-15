@@ -25,6 +25,7 @@ import net.pantasystem.milktea.model.account.page.Page
 import net.pantasystem.milktea.model.account.page.Pageable
 import net.pantasystem.milktea.model.notes.Note
 import net.pantasystem.milktea.note.databinding.ActivityNoteDetailBinding
+import net.pantasystem.milktea.note.detail.NoteDetailAccountSwitchDialog
 import net.pantasystem.milktea.note.detail.NoteDetailPagerFragment
 import net.pantasystem.milktea.note.detail.viewmodel.NoteDetailPagerViewModel
 import net.pantasystem.milktea.note.view.ActionNoteHandler
@@ -34,8 +35,6 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class NoteDetailActivity : AppCompatActivity() {
     companion object {
-        private const val EXTRA_NOTE_ID = "jp.panta.misskeyandroidclient.EXTRA_NOTE_ID"
-        private const val EXTRA_ACCOUNT_ID = "jp.panta.misskeyandroidclient.EXTRA_ACCOUNT_ID"
 
         private const val TAG = "NoteDetailActivity"
 
@@ -43,8 +42,8 @@ class NoteDetailActivity : AppCompatActivity() {
 
         fun newIntent(context: Context, noteId: Note.Id, fromPageable: Pageable? = null): Intent {
             return Intent(context, NoteDetailActivity::class.java).apply {
-                putExtra(EXTRA_NOTE_ID, noteId.noteId)
-                putExtra(EXTRA_ACCOUNT_ID, noteId.accountId)
+                putExtra(NoteDetailPagerViewModel.EXTRA_NOTE_ID, noteId.noteId)
+                putExtra(NoteDetailPagerViewModel.EXTRA_ACCOUNT_ID, noteId.accountId)
                 putExtra(NoteDetailPagerViewModel.EXTRA_FROM_PAGEABLE, fromPageable)
             }
         }
@@ -90,11 +89,11 @@ class NoteDetailActivity : AppCompatActivity() {
 
         mParentActivity = intent.getParentActivity()
 
-        val noteId = intent.getStringExtra(EXTRA_NOTE_ID)
+        val noteId = intent.getStringExtra(NoteDetailPagerViewModel.EXTRA_NOTE_ID)
             ?: intent.data?.path?.split("/notes/")?.lastOrNull()
         Log.d(TAG, "受け取ったnoteId: $noteId")
         mNoteId = noteId
-        mAccountId = intent.getLongExtra(EXTRA_ACCOUNT_ID, -1).let {
+        mAccountId = intent.getLongExtra(NoteDetailPagerViewModel.EXTRA_ACCOUNT_ID, -1).let {
             if (it == -1L) null else it
         }
 
@@ -133,6 +132,9 @@ class NoteDetailActivity : AppCompatActivity() {
             }
             R.id.nav_add_to_tab -> {
                 addToTab()
+            }
+            R.id.nav_switch_account -> {
+                NoteDetailAccountSwitchDialog().show(supportFragmentManager, "switch_account")
             }
         }
         return super.onOptionsItemSelected(item)
