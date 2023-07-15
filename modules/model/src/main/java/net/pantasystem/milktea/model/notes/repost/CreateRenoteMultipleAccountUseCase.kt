@@ -4,21 +4,18 @@ import kotlinx.coroutines.coroutineScope
 import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.model.UseCase
 import net.pantasystem.milktea.model.account.AccountRepository
-import net.pantasystem.milktea.model.ap.ApResolver
-import net.pantasystem.milktea.model.ap.ApResolverRepository
+import net.pantasystem.milktea.model.ap.ApResolverService
 import net.pantasystem.milktea.model.notes.Note
 import net.pantasystem.milktea.model.notes.NoteRepository
-import net.pantasystem.milktea.model.user.UserRepository
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
 class CreateRenoteMultipleAccountUseCase @Inject constructor(
     private val accountRepository: AccountRepository,
-    private val apResolverRepository: ApResolverRepository,
-    private val userRepository: UserRepository,
     private val noteRepository: NoteRepository,
     private val checkCanRepostService: CheckCanRepostService,
+    private val apResolverService: ApResolverService,
 ) : UseCase {
 
     suspend operator fun invoke(
@@ -41,12 +38,8 @@ class CreateRenoteMultipleAccountUseCase @Inject constructor(
             val account = accountRepository.get(accountId).getOrThrow()
             val relatedSourceNoteAccount =
                 accountRepository.get(sourceNote.id.accountId).getOrThrow()
-            val user = userRepository.find(sourceNote.userId)
-            val noteUri = sourceNote.uri ?: "https://${user.host}/notes/${sourceNote.id.noteId}"
             val relatedNote = if (account.getHost() != relatedSourceNoteAccount.getHost()) {
-                (apResolverRepository.resolve(accountId, noteUri)
-                    .getOrThrow() as ApResolver.TypeNote)
-                    .note
+                apResolverService.resolve(sourceNote.id, accountId).getOrThrow()
             } else {
                 noteRepository.find(Note.Id(account.accountId, sourceNote.id.noteId)).getOrThrow()
             }
