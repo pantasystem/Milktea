@@ -19,11 +19,14 @@ import net.pantasystem.milktea.app_store.notes.TimelineStore
 import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.common.PageableState
 import net.pantasystem.milktea.common.StateContent
+import net.pantasystem.milktea.common_android_ui.account.viewmodel.AccountViewModelUiStateHelper
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.account.page.Pageable
 import net.pantasystem.milktea.model.ap.ApResolverService
+import net.pantasystem.milktea.model.instance.InstanceInfoService
 import net.pantasystem.milktea.model.notes.Note
+import net.pantasystem.milktea.model.user.UserDataSource
 import javax.inject.Inject
 
 @HiltViewModel
@@ -33,7 +36,9 @@ class NoteDetailPagerViewModel @Inject constructor(
     private val apResolverService: ApResolverService,
     private val accountStore: AccountStore,
     private val accountRepository: AccountRepository,
-    private val loggerFactory: Logger.Factory,
+    instanceInfoService: InstanceInfoService,
+    userDataSource: UserDataSource,
+    loggerFactory: Logger.Factory,
 ) : ViewModel() {
 
     companion object {
@@ -97,6 +102,14 @@ class NoteDetailPagerViewModel @Inject constructor(
             it.noteId
         }.reversed()
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
+
+    val accountUiState = AccountViewModelUiStateHelper(
+        currentAccount,
+        accountStore,
+        userDataSource,
+        instanceInfoService,
+        viewModelScope,
+    ).uiState
 
     init {
         load()
