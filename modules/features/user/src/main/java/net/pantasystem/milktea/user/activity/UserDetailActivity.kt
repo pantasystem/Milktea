@@ -56,7 +56,6 @@ import net.pantasystem.milktea.user.profile.mute.SpecifyMuteExpiredAtDialog
 import net.pantasystem.milktea.user.reaction.UserReactionsFragment
 import net.pantasystem.milktea.user.viewmodel.UserDetailTabType
 import net.pantasystem.milktea.user.viewmodel.UserDetailViewModel
-import net.pantasystem.milktea.user.viewmodel.provideFactory
 import javax.inject.Inject
 
 class UserDetailNavigationImpl @Inject constructor(
@@ -80,11 +79,11 @@ class UserDetailNavigationImpl @Inject constructor(
 @AndroidEntryPoint
 class UserDetailActivity : AppCompatActivity() {
     companion object {
-        private const val EXTRA_USER_ID =
+        internal const val EXTRA_USER_ID =
             "net.pantasystem.milktea.user.activity.UserDetailActivity.EXTRA_USER_ID"
-        private const val EXTRA_USER_NAME =
+        internal const val EXTRA_USER_NAME =
             "net.pantasystem.milktea.user.activity.UserDetailActivity.EXTRA_USER_NAME"
-        private const val EXTRA_ACCOUNT_ID =
+        internal const val EXTRA_ACCOUNT_ID =
             "jp.panta.misskeyandroiclient.UserDetailActivity.EXTRA_ACCOUNT_ID"
         const val EXTRA_IS_MAIN_ACTIVE = "jp.panta.misskeyandroidclient.EXTRA_IS_MAIN_ACTIVE"
 
@@ -104,8 +103,6 @@ class UserDetailActivity : AppCompatActivity() {
         }
     }
 
-    @Inject
-    lateinit var assistedFactory: UserDetailViewModel.ViewModelAssistedFactory
 
     @Inject
     lateinit var accountStore: AccountStore
@@ -117,25 +114,27 @@ class UserDetailActivity : AppCompatActivity() {
     lateinit var searchNavigation: SearchNavigation
 
 
-    @ExperimentalCoroutinesApi
-    val mViewModel: UserDetailViewModel by viewModels {
-        val remoteUserId: String? = intent.getStringExtra(EXTRA_USER_ID)
-        val accountId: Long = intent.getLongExtra(EXTRA_ACCOUNT_ID, -1)
-        if (!(remoteUserId == null || accountId == -1L)) {
-            val userId = User.Id(accountId, remoteUserId)
-            return@viewModels UserDetailViewModel.provideFactory(assistedFactory, userId)
-        }
-        val userName = intent.data?.getQueryParameter("userName")
-            ?: intent.getStringExtra(EXTRA_USER_NAME)
-            ?: intent.data?.path?.let { path ->
-                if (path.startsWith("/")) {
-                    path.substring(1, path.length)
-                } else {
-                    path
-                }
-            }
-        return@viewModels UserDetailViewModel.provideFactory(assistedFactory, userName!!)
-    }
+//    @ExperimentalCoroutinesApi
+//    val mViewModel: UserDetailViewModel by viewModels {
+//        val remoteUserId: String? = intent.getStringExtra(EXTRA_USER_ID)
+//        val accountId: Long = intent.getLongExtra(EXTRA_ACCOUNT_ID, -1)
+//        if (!(remoteUserId == null || accountId == -1L)) {
+//            val userId = User.Id(accountId, remoteUserId)
+//            return@viewModels UserDetailViewModel.provideFactory(assistedFactory, userId)
+//        }
+//        val userName = intent.data?.getQueryParameter("userName")
+//            ?: intent.getStringExtra(EXTRA_USER_NAME)
+//            ?: intent.data?.path?.let { path ->
+//                if (path.startsWith("/")) {
+//                    path.substring(1, path.length)
+//                } else {
+//                    path
+//                }
+//            }
+//        return@viewModels UserDetailViewModel.provideFactory(assistedFactory, userName!!)
+//    }
+
+    private val mViewModel: UserDetailViewModel by viewModels()
 
 
     private var mUserId: User.Id? = null
