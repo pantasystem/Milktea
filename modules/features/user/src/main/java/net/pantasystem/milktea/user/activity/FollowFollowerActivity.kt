@@ -16,7 +16,6 @@ import net.pantasystem.milktea.user.UserCardActionHandler
 import net.pantasystem.milktea.user.compose.screen.FollowFollowerRoute
 import net.pantasystem.milktea.user.viewmodel.FollowFollowerViewModel
 import net.pantasystem.milktea.user.viewmodel.ToggleFollowViewModel
-import net.pantasystem.milktea.user.viewmodel.UserDetailViewModel
 import net.pantasystem.milktea.user.viewmodel.provideFactory
 import javax.inject.Inject
 
@@ -42,8 +41,6 @@ class FollowFollowerActivity : AppCompatActivity() {
         }
     }
 
-    @Inject
-    lateinit var assistedFactory: UserDetailViewModel.ViewModelAssistedFactory
 
     @Inject
     lateinit var applyTheme: ApplyTheme

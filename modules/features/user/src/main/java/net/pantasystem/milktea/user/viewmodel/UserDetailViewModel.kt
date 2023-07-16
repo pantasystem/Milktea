@@ -1,13 +1,11 @@
 package net.pantasystem.milktea.user.viewmodel
 
 import androidx.annotation.StringRes
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
-import dagger.assisted.Assisted
-import dagger.assisted.AssistedFactory
-import dagger.assisted.AssistedInject
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -21,12 +19,15 @@ import net.pantasystem.milktea.common.mapCancellableCatching
 import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.common_android.eventbus.EventBus
 import net.pantasystem.milktea.common_android.resource.StringSource
+import net.pantasystem.milktea.common_android_ui.account.viewmodel.AccountViewModelUiStateHelper
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.account.page.Pageable
 import net.pantasystem.milktea.model.account.page.PageableTemplate
+import net.pantasystem.milktea.model.ap.ApResolverService
 import net.pantasystem.milktea.model.instance.FeatureEnables
 import net.pantasystem.milktea.model.instance.FeatureType
+import net.pantasystem.milktea.model.instance.InstanceInfoService
 import net.pantasystem.milktea.model.user.*
 import net.pantasystem.milktea.model.user.block.BlockRepository
 import net.pantasystem.milktea.model.user.mute.CreateMute
@@ -35,8 +36,11 @@ import net.pantasystem.milktea.model.user.nickname.DeleteNicknameUseCase
 import net.pantasystem.milktea.model.user.nickname.UpdateNicknameUseCase
 import net.pantasystem.milktea.model.user.renote.mute.RenoteMuteRepository
 import net.pantasystem.milktea.user.R
+import net.pantasystem.milktea.user.activity.UserDetailActivity
+import javax.inject.Inject
 
-class UserDetailViewModel @AssistedInject constructor(
+@HiltViewModel
+class UserDetailViewModel @Inject constructor(
     private val deleteNicknameUseCase: DeleteNicknameUseCase,
     private val updateNicknameUseCase: UpdateNicknameUseCase,
     private val accountStore: AccountStore,
@@ -47,48 +51,76 @@ class UserDetailViewModel @AssistedInject constructor(
     private val muteRepository: MuteRepository,
     userDataSource: UserDataSource,
     loggerFactory: Logger.Factory,
+    instanceInfoService: InstanceInfoService,
     private val userRepository: UserRepository,
     private val featureEnables: FeatureEnables,
     private val toggleFollowUseCase: ToggleFollowUseCase,
-    @Assisted val userId: User.Id?,
-    @Assisted private val fqdnUserName: String?,
+    private val apResolverService: ApResolverService,
+    private val savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
-
-    @AssistedFactory
-    interface ViewModelAssistedFactory {
-        fun create(userId: User.Id?, fqdnUserName: String?): UserDetailViewModel
-    }
 
     companion object;
 
     private val logger = loggerFactory.create("UserDetailViewModel")
-    private val currentAccountId = MutableStateFlow(userId?.accountId)
+
+    //    private val currentAccountId = MutableStateFlow(userId?.accountId)
+    private val userId =
+        savedStateHandle.getStateFlow<String?>(UserDetailActivity.EXTRA_USER_ID, null)
+    private val specifiedAccountId =
+        savedStateHandle.getStateFlow<Long?>(UserDetailActivity.EXTRA_ACCOUNT_ID, null)
+
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    val currentAccount = currentAccountId.flatMapLatest { accountId ->
+    val currentAccount = specifiedAccountId.flatMapLatest { accountId ->
         accountStore.state.map { state ->
             accountId?.let {
                 state.get(it)
             } ?: state.currentAccount
         }
-    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
+    }.stateIn(
+        viewModelScope,
+        SharingStarted.WhileSubscribed(5_000),
+        null,
+    )
+
+    private val fqdnUserName =
+        savedStateHandle.getStateFlow<String?>(UserDetailActivity.EXTRA_USER_NAME, null)
 
     private val _errors = MutableSharedFlow<Throwable>(extraBufferCapacity = 100)
     val errors = _errors.asSharedFlow()
 
+    private val userProfileArgType = combine(
+        userId,
+        fqdnUserName,
+        currentAccount,
+    ) { userId, fqdnUserName, currentAccount ->
+        when {
+            userId != null && currentAccount != null -> {
+                UserProfileArgType.UserId(User.Id(currentAccount.accountId, userId))
+            }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
-    val userState = when {
-        userId != null -> {
-            userDataSource.observe(userId)
-        }
-        fqdnUserName != null -> {
-            currentAccount.filterNotNull().flatMapLatest {
-                userDataSource.observe(it.accountId, fqdnUserName)
+            fqdnUserName != null && currentAccount != null -> {
+                UserProfileArgType.FqdnUserName(fqdnUserName, currentAccount)
+            }
+
+            else -> {
+                UserProfileArgType.None
             }
         }
-        else -> {
-            throw IllegalArgumentException()
+    }.stateIn(viewModelScope, SharingStarted.Lazily, UserProfileArgType.None)
+
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val userState = userProfileArgType.flatMapLatest {
+        when (val type = it) {
+            is UserProfileArgType.FqdnUserName -> {
+                userDataSource.observe(type.currentAccount.accountId, type.fqdnUserName)
+            }
+
+            UserProfileArgType.None -> flowOf(null)
+            is UserProfileArgType.UserId -> {
+                userDataSource.observe(type.userId)
+            }
         }
     }.mapNotNull {
         it as? User.Detail
@@ -96,6 +128,7 @@ class UserDetailViewModel @AssistedInject constructor(
         logger.error("observe user error", it)
         _errors.tryEmit(it)
     }.stateIn(viewModelScope, SharingStarted.Lazily, null)
+
 
     val user = userState.asLiveData()
 
@@ -112,7 +145,10 @@ class UserDetailViewModel @AssistedInject constructor(
     val registrationDate = userState.map {
         it?.info?.createdAt?.toLocalDateTime(TimeZone.currentSystemDefault())?.date
     }.filterNotNull().map {
-        StringSource(R.string.user_registration_date, "${it.year}/${it.monthNumber}/${it.dayOfMonth}")
+        StringSource(
+            R.string.user_registration_date,
+            "${it.year}/${it.monthNumber}/${it.dayOfMonth}"
+        )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
 
     val tabTypes = combine(
@@ -121,12 +157,12 @@ class UserDetailViewModel @AssistedInject constructor(
         val isEnableGallery =
             featureEnables.isEnable(account.normalizedInstanceUri, FeatureType.Gallery)
         val isPublicReaction = featureEnables.isEnable(
-                account.normalizedInstanceUri,
-                FeatureType.UserReactionHistory
-            ) && (user.info.isPublicReactions || user.id == User.Id(
-                account.accountId, account.remoteId
-            ))
-        when(account.instanceType) {
+            account.normalizedInstanceUri,
+            FeatureType.UserReactionHistory
+        ) && (user.info.isPublicReactions || user.id == User.Id(
+            account.accountId, account.remoteId
+        ))
+        when (account.instanceType) {
             Account.InstanceType.MISSKEY -> {
                 listOfNotNull(
                     UserDetailTabType.UserTimeline(user.id),
@@ -140,6 +176,7 @@ class UserDetailViewModel @AssistedInject constructor(
                     if (isPublicReaction) UserDetailTabType.Reactions(user.id) else null,
                 )
             }
+
             Account.InstanceType.MASTODON, Account.InstanceType.PLEROMA -> {
                 listOf(
                     UserDetailTabType.MastodonUserTimeline(user.id),
@@ -154,6 +191,14 @@ class UserDetailViewModel @AssistedInject constructor(
         logger.error("ユーザープロフィールのタブの取得に失敗", it)
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
 
+    val accountUiState = AccountViewModelUiStateHelper(
+        currentAccount,
+        accountStore,
+        userDataSource,
+        instanceInfoService,
+        viewModelScope,
+    ).uiState
+
     @OptIn(ExperimentalCoroutinesApi::class)
     val renoteMuteState = userState.filterNotNull().flatMapLatest {
         renoteMuteRepository.observeOne(it.id)
@@ -163,15 +208,7 @@ class UserDetailViewModel @AssistedInject constructor(
     val showFollows = EventBus<User?>()
 
     init {
-        require(userId != null || fqdnUserName != null) {
-            "userIdかfqdnUserNameのいずれかが指定されている必要があります。"
-        }
         sync()
-        accountStore.observeCurrentAccount.onEach {
-            if (userId == null) {
-                currentAccountId.value = it?.accountId
-            }
-        }.launchIn(viewModelScope)
     }
 
 
@@ -227,7 +264,7 @@ class UserDetailViewModel @AssistedInject constructor(
     fun unmute() {
         viewModelScope.launch {
             userState.value?.let { user ->
-                muteRepository.delete(user.id).mapCancellableCatching{
+                muteRepository.delete(user.id).mapCancellableCatching {
                     userRepository.sync(user.id).getOrThrow()
                 }.onFailure {
                     logger.error("unmute", e = it)
@@ -338,52 +375,72 @@ class UserDetailViewModel @AssistedInject constructor(
         }
     }
 
+    fun setCurrentAccount(accountId: Long) {
+        viewModelScope.launch {
+            accountRepository.get(accountId).mapCancellableCatching {
+                it to apResolverService.resolve(getUserId(), accountId).getOrThrow()
+            }.onSuccess { (account, resolved) ->
+                savedStateHandle[UserDetailActivity.EXTRA_USER_ID] = resolved.id.id
+                savedStateHandle[UserDetailActivity.EXTRA_ACCOUNT_ID] = resolved.id.accountId
+                accountStore.setCurrent(account)
+            }.onFailure {
+                logger.error("setCurrentAccount failed", it)
+                _errors.tryEmit(it)
+            }
+        }
+    }
+
     private suspend fun findUser(): User {
         return userRepository.find(getUserId())
     }
 
 
     private suspend fun getUserId(): User.Id {
-        if (userId != null) {
-            return userId
-        }
-
-        val account = currentAccount.value ?: accountRepository.getCurrentAccount().getOrThrow()
-        if (fqdnUserName != null) {
-            val (userName, host) = Acct(fqdnUserName).let {
-                it.userName to it.host
+        val strUserId = savedStateHandle.get<String?>(UserDetailActivity.EXTRA_USER_ID)
+        val specifiedAccountId = savedStateHandle.get<Long?>(UserDetailActivity.EXTRA_ACCOUNT_ID)
+        val fqdnUserName = savedStateHandle.get<String?>(UserDetailActivity.EXTRA_USER_NAME)
+        val currentAccount = specifiedAccountId?.let {
+            accountRepository.get(it).getOrThrow()
+        } ?: accountRepository.getCurrentAccount().getOrThrow()
+        val argType = when {
+            strUserId != null -> {
+                UserProfileArgType.UserId(User.Id(currentAccount.accountId, strUserId))
             }
-            return userRepository.findByUserName(account.accountId, userName, host).id
+
+            fqdnUserName != null -> {
+                UserProfileArgType.FqdnUserName(fqdnUserName, currentAccount)
+            }
+
+            else -> {
+                UserProfileArgType.None
+            }
         }
-        throw IllegalStateException()
-    }
-}
 
-@Suppress("UNCHECKED_CAST")
-fun UserDetailViewModel.Companion.provideFactory(
-    assistedFactory: UserDetailViewModel.ViewModelAssistedFactory, userId: User.Id
-): ViewModelProvider.Factory = object : ViewModelProvider.Factory {
-    override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        return assistedFactory.create(userId, null) as T
-    }
-}
+        return when (argType) {
+            is UserProfileArgType.FqdnUserName -> {
+                val (userName, host) = Acct(argType.fqdnUserName).let {
+                    it.userName to it.host
+                }
+                userRepository.findByUserName(currentAccount.accountId, userName, host).id
+            }
 
-@Suppress("UNCHECKED_CAST")
-fun UserDetailViewModel.Companion.provideFactory(
-    assistedFactory: UserDetailViewModel.ViewModelAssistedFactory,
-    fqdnUserName: String,
-): ViewModelProvider.Factory = object : ViewModelProvider.Factory {
-    override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        return assistedFactory.create(null, fqdnUserName) as T
+            is UserProfileArgType.UserId -> {
+                argType.userId
+            }
+
+            UserProfileArgType.None -> throw IllegalStateException()
+        }
+
     }
 }
 
 sealed class UserDetailTabType(
-    @StringRes val title: Int
+    @StringRes val title: Int,
 ) {
 
     data class UserTimeline(val userId: User.Id) : UserDetailTabType(R.string.post)
-    data class UserTimelineWithReplies(val userId: User.Id) : UserDetailTabType(R.string.notes_and_replies)
+    data class UserTimelineWithReplies(val userId: User.Id) :
+        UserDetailTabType(R.string.notes_and_replies)
 
     data class UserTimelineOnlyPosts(val userId: User.Id) : UserDetailTabType(R.string.post_only)
 
@@ -395,9 +452,21 @@ sealed class UserDetailTabType(
     data class Media(val userId: User.Id) : UserDetailTabType(R.string.media)
 
     data class MastodonUserTimeline(val userId: User.Id) : UserDetailTabType(R.string.post)
-    data class MastodonUserTimelineWithReplies(val userId: User.Id) : UserDetailTabType(R.string.notes_and_replies)
+    data class MastodonUserTimelineWithReplies(val userId: User.Id) :
+        UserDetailTabType(R.string.notes_and_replies)
 
-    data class MastodonUserTimelineOnlyPosts(val userId: User.Id) : UserDetailTabType(R.string.post_only)
+    data class MastodonUserTimelineOnlyPosts(val userId: User.Id) :
+        UserDetailTabType(R.string.post_only)
 
     data class MastodonMedia(val userId: User.Id) : UserDetailTabType(R.string.media)
+}
+
+sealed interface UserProfileArgType {
+    data class UserId(val userId: User.Id) : UserProfileArgType
+
+    data class FqdnUserName(val fqdnUserName: String, val currentAccount: Account) :
+        UserProfileArgType
+
+    object None : UserProfileArgType
+
 }
