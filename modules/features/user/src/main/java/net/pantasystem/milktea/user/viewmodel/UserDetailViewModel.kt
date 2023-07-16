@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -86,25 +87,11 @@ class UserDetailViewModel @Inject constructor(
     private val _errors = MutableSharedFlow<Throwable>(extraBufferCapacity = 100)
     val errors = _errors.asSharedFlow()
 
-    private val userProfileArgType = combine(
+    private val userProfileArgType = UserProfileArgTypeCombiner(viewModelScope).create(
         userId,
         fqdnUserName,
         currentAccount,
-    ) { userId, fqdnUserName, currentAccount ->
-        when {
-            userId != null && currentAccount != null -> {
-                UserProfileArgType.UserId(User.Id(currentAccount.accountId, userId))
-            }
-
-            fqdnUserName != null && currentAccount != null -> {
-                UserProfileArgType.FqdnUserName(fqdnUserName, currentAccount)
-            }
-
-            else -> {
-                UserProfileArgType.None
-            }
-        }
-    }.stateIn(viewModelScope, SharingStarted.Lazily, UserProfileArgType.None)
+    ).stateIn(viewModelScope, SharingStarted.Lazily, UserProfileArgType.None)
 
 
     @OptIn(ExperimentalCoroutinesApi::class)
@@ -410,4 +397,38 @@ sealed interface UserProfileArgType {
 
     object None : UserProfileArgType
 
+}
+
+class UserProfileArgTypeCombiner(
+    private val scope: CoroutineScope,
+) {
+    fun create(
+        userIdFlow: StateFlow<String?>,
+        fqdnUserNameFlow: StateFlow<String?>,
+        currentAccountFlow: StateFlow<Account?>
+    ): StateFlow<UserProfileArgType> {
+        return combine(
+            userIdFlow,
+            fqdnUserNameFlow,
+            currentAccountFlow,
+        ) { userId, fqdnUserName, currentAccount ->
+            when {
+                userId != null && currentAccount != null -> {
+                    UserProfileArgType.UserId(User.Id(currentAccount.accountId, userId))
+                }
+
+                fqdnUserName != null && currentAccount != null -> {
+                    UserProfileArgType.FqdnUserName(fqdnUserName, currentAccount)
+                }
+
+                else -> {
+                    UserProfileArgType.None
+                }
+            }
+        }.stateIn(
+            scope,
+            SharingStarted.WhileSubscribed(5_000),
+            UserProfileArgType.None
+        )
+    }
 }
