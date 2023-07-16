@@ -19,12 +19,15 @@ import net.pantasystem.milktea.common.mapCancellableCatching
 import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.common_android.eventbus.EventBus
 import net.pantasystem.milktea.common_android.resource.StringSource
+import net.pantasystem.milktea.common_android_ui.account.viewmodel.AccountViewModelUiStateHelper
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.account.page.Pageable
 import net.pantasystem.milktea.model.account.page.PageableTemplate
+import net.pantasystem.milktea.model.ap.ApResolverService
 import net.pantasystem.milktea.model.instance.FeatureEnables
 import net.pantasystem.milktea.model.instance.FeatureType
+import net.pantasystem.milktea.model.instance.InstanceInfoService
 import net.pantasystem.milktea.model.user.*
 import net.pantasystem.milktea.model.user.block.BlockRepository
 import net.pantasystem.milktea.model.user.mute.CreateMute
@@ -48,9 +51,11 @@ class UserDetailViewModel @Inject constructor(
     private val muteRepository: MuteRepository,
     userDataSource: UserDataSource,
     loggerFactory: Logger.Factory,
+    instanceInfoService: InstanceInfoService,
     private val userRepository: UserRepository,
     private val featureEnables: FeatureEnables,
     private val toggleFollowUseCase: ToggleFollowUseCase,
+    private val apResolverService: ApResolverService,
     private val savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
 
@@ -185,6 +190,14 @@ class UserDetailViewModel @Inject constructor(
     }.catch {
         logger.error("ユーザープロフィールのタブの取得に失敗", it)
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
+
+    val accountUiState = AccountViewModelUiStateHelper(
+        currentAccount,
+        accountStore,
+        userDataSource,
+        instanceInfoService,
+        viewModelScope,
+    ).uiState
 
     @OptIn(ExperimentalCoroutinesApi::class)
     val renoteMuteState = userState.filterNotNull().flatMapLatest {
@@ -357,6 +370,21 @@ class UserDetailViewModel @Inject constructor(
             }.mapCancellableCatching {
                 renoteMuteRepository.delete(it).getOrThrow()
             }.onFailure {
+                _errors.tryEmit(it)
+            }
+        }
+    }
+
+    fun setCurrentAccount(accountId: Long) {
+        viewModelScope.launch {
+            accountRepository.get(accountId).mapCancellableCatching {
+                it to apResolverService.resolve(getUserId(), accountId).getOrThrow()
+            }.onSuccess { (account, resolved) ->
+                savedStateHandle[UserDetailActivity.EXTRA_USER_ID] = resolved.id.id
+                savedStateHandle[UserDetailActivity.EXTRA_ACCOUNT_ID] = resolved.id.accountId
+                accountStore.setCurrent(account)
+            }.onFailure {
+                logger.error("setCurrentAccount failed", it)
                 _errors.tryEmit(it)
             }
         }

@@ -51,6 +51,7 @@ import net.pantasystem.milktea.user.activity.binder.UserDetailActivityMenuBinder
 import net.pantasystem.milktea.user.databinding.ActivityUserDetailBinding
 import net.pantasystem.milktea.user.nickname.EditNicknameDialog
 import net.pantasystem.milktea.user.profile.ConfirmUserBlockDialog
+import net.pantasystem.milktea.user.profile.ProfileAccountSwitchDialog
 import net.pantasystem.milktea.user.profile.UserProfileFieldListAdapter
 import net.pantasystem.milktea.user.profile.mute.SpecifyMuteExpiredAtDialog
 import net.pantasystem.milktea.user.reaction.UserReactionsFragment
@@ -337,7 +338,6 @@ class UserDetailActivity : AppCompatActivity() {
     }
 
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.activity_user_menu, menu)
 
@@ -411,6 +411,9 @@ class UserDetailActivity : AppCompatActivity() {
                         )
                     )
                 )
+            }
+            R.id.nav_switch_account -> {
+                ProfileAccountSwitchDialog().show(supportFragmentManager, "switchAccountDialog")
             }
             else -> return false
 

@@ -45,4 +45,9 @@
     <item
             android:id="@+id/share"
             android:title="@string/share"/>
+
+    <item
+            android:id="@+id/nav_switch_account"
+            android:title="@string/switch_account"
+        />
 </menu>
