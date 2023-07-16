@@ -1,6 +1,5 @@
 package net.pantasystem.milktea.user.viewmodel
 
-import androidx.annotation.StringRes
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
@@ -25,8 +24,6 @@ import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.account.page.Pageable
 import net.pantasystem.milktea.model.account.page.PageableTemplate
 import net.pantasystem.milktea.model.ap.ApResolverService
-import net.pantasystem.milktea.model.instance.FeatureEnables
-import net.pantasystem.milktea.model.instance.FeatureType
 import net.pantasystem.milktea.model.instance.InstanceInfoService
 import net.pantasystem.milktea.model.user.*
 import net.pantasystem.milktea.model.user.block.BlockRepository
@@ -53,10 +50,10 @@ class UserDetailViewModel @Inject constructor(
     loggerFactory: Logger.Factory,
     instanceInfoService: InstanceInfoService,
     private val userRepository: UserRepository,
-    private val featureEnables: FeatureEnables,
     private val toggleFollowUseCase: ToggleFollowUseCase,
     private val apResolverService: ApResolverService,
     private val savedStateHandle: SavedStateHandle,
+    private val userDetailTabTypeFactory: UserDetailTabTypeFactory,
 ) : ViewModel() {
 
     companion object;
@@ -154,39 +151,10 @@ class UserDetailViewModel @Inject constructor(
     val tabTypes = combine(
         currentAccount.filterNotNull(), userState.filterNotNull()
     ) { account, user ->
-        val isEnableGallery =
-            featureEnables.isEnable(account.normalizedInstanceUri, FeatureType.Gallery)
-        val isPublicReaction = featureEnables.isEnable(
-            account.normalizedInstanceUri,
-            FeatureType.UserReactionHistory
-        ) && (user.info.isPublicReactions || user.id == User.Id(
-            account.accountId, account.remoteId
-        ))
-        when (account.instanceType) {
-            Account.InstanceType.MISSKEY -> {
-                listOfNotNull(
-                    UserDetailTabType.UserTimeline(user.id),
-                    UserDetailTabType.UserTimelineOnlyPosts(user.id),
-                    UserDetailTabType.UserTimelineWithReplies(user.id),
-                    UserDetailTabType.PinNote(user.id),
-                    UserDetailTabType.Media(user.id),
-                    if (isEnableGallery) UserDetailTabType.Gallery(
-                        user.id, accountId = account.accountId
-                    ) else null,
-                    if (isPublicReaction) UserDetailTabType.Reactions(user.id) else null,
-                )
-            }
-
-            Account.InstanceType.MASTODON, Account.InstanceType.PLEROMA -> {
-                listOf(
-                    UserDetailTabType.MastodonUserTimeline(user.id),
-                    UserDetailTabType.MastodonUserTimelineOnlyPosts(user.id),
-                    UserDetailTabType.MastodonUserTimelineWithReplies(user.id),
-                    UserDetailTabType.MastodonMedia(user.id)
-                )
-            }
-        }
-
+        userDetailTabTypeFactory.createTabsForInstanceType(
+            account,
+            user,
+        )
     }.catch {
         logger.error("ユーザープロフィールのタブの取得に失敗", it)
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
@@ -432,33 +400,6 @@ class UserDetailViewModel @Inject constructor(
         }
 
     }
-}
-
-sealed class UserDetailTabType(
-    @StringRes val title: Int,
-) {
-
-    data class UserTimeline(val userId: User.Id) : UserDetailTabType(R.string.post)
-    data class UserTimelineWithReplies(val userId: User.Id) :
-        UserDetailTabType(R.string.notes_and_replies)
-
-    data class UserTimelineOnlyPosts(val userId: User.Id) : UserDetailTabType(R.string.post_only)
-
-    data class PinNote(val userId: User.Id) : UserDetailTabType(R.string.pin)
-    data class Gallery(val userId: User.Id, val accountId: Long) :
-        UserDetailTabType(R.string.gallery)
-
-    data class Reactions(val userId: User.Id) : UserDetailTabType(R.string.reaction)
-    data class Media(val userId: User.Id) : UserDetailTabType(R.string.media)
-
-    data class MastodonUserTimeline(val userId: User.Id) : UserDetailTabType(R.string.post)
-    data class MastodonUserTimelineWithReplies(val userId: User.Id) :
-        UserDetailTabType(R.string.notes_and_replies)
-
-    data class MastodonUserTimelineOnlyPosts(val userId: User.Id) :
-        UserDetailTabType(R.string.post_only)
-
-    data class MastodonMedia(val userId: User.Id) : UserDetailTabType(R.string.media)
 }
 
 sealed interface UserProfileArgType {
