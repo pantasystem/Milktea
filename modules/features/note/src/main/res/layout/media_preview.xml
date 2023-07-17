@@ -17,7 +17,7 @@
             android:layout_height="match_parent"
             android:baselineAligned="false"
             rect="@{30F}"
-            memoVisibility="@{ media.isEmpty() ? View.GONE : View.VISIBLE }"
+            memoVisibility="@{ media.isHideFourMediaPreviewLayout() ? View.GONE : View.VISIBLE }"
         >
 
         <LinearLayout
