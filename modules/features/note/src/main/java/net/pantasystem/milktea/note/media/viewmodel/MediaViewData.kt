@@ -31,7 +31,7 @@ class MediaViewData(
     })
     val files: StateFlow<List<PreviewAbleFile>> = _files
 
-    val isEmpty = _files.map { it.isEmpty() }.stateIn(coroutineScope, SharingStarted.WhileSubscribed(5_000), true)
+    val isHideFourMediaPreviewLayout = _files.map { it.isEmpty() || it.size > 4 }.stateIn(coroutineScope, SharingStarted.WhileSubscribed(5_000), true)
 
     val fileOne = _files.map {
         it.getOrNull(0)
