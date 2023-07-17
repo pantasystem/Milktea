@@ -123,4 +123,9 @@ dependencies {
     testRuntimeOnly libs.junit.jupiter.engine
 
     implementation 'io.github.ahmad-hamwi:tabsync:1.0.1'
+
+    implementation ("com.github.bumptech.glide:recyclerview-integration:4.14.2") {
+        // Excludes the support library because it's already included by Glide.
+        transitive = false
+    }
 }

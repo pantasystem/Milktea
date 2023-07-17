@@ -179,6 +179,8 @@ class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view)
             ).onAction(it)
         }
 
+        adapter.AvatarIconPreloadProvider(requireContext()).setup(mBinding.listView)
+
         mBinding.listView.layoutManager = lm
 
         mBinding.refresh.setOnRefreshListener {
