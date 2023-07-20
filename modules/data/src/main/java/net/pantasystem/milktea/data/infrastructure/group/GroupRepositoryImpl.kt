@@ -4,8 +4,15 @@ package net.pantasystem.milktea.data.infrastructure.group
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import net.pantasystem.milktea.api.misskey.I
-import net.pantasystem.milktea.api.misskey.groups.*
-import net.pantasystem.milktea.api.misskey.v11.MisskeyAPIV11
+import net.pantasystem.milktea.api.misskey.MisskeyAPI
+import net.pantasystem.milktea.api.misskey.groups.AcceptInvitationDTO
+import net.pantasystem.milktea.api.misskey.groups.CreateGroupDTO
+import net.pantasystem.milktea.api.misskey.groups.InviteUserDTO
+import net.pantasystem.milktea.api.misskey.groups.RejectInvitationDTO
+import net.pantasystem.milktea.api.misskey.groups.RemoveUserDTO
+import net.pantasystem.milktea.api.misskey.groups.ShowGroupDTO
+import net.pantasystem.milktea.api.misskey.groups.TransferGroupDTO
+import net.pantasystem.milktea.api.misskey.groups.UpdateGroupDTO
 import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.common.throwIfHasError
@@ -14,8 +21,16 @@ import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
 import net.pantasystem.milktea.data.infrastructure.toGroup
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.AccountRepository
-import net.pantasystem.milktea.model.group.*
-import net.pantasystem.milktea.model.instance.IllegalVersionException
+import net.pantasystem.milktea.model.group.CreateGroup
+import net.pantasystem.milktea.model.group.Group
+import net.pantasystem.milktea.model.group.GroupDataSource
+import net.pantasystem.milktea.model.group.GroupNotFoundException
+import net.pantasystem.milktea.model.group.GroupRepository
+import net.pantasystem.milktea.model.group.InvitationId
+import net.pantasystem.milktea.model.group.Invite
+import net.pantasystem.milktea.model.group.Pull
+import net.pantasystem.milktea.model.group.Transfer
+import net.pantasystem.milktea.model.group.UpdateGroup
 import net.pantasystem.milktea.model.user.UserRepository
 import javax.inject.Inject
 
@@ -32,7 +47,6 @@ class GroupRepositoryImpl @Inject constructor(
         loggerFactory.create("GroupRepositoryImpl")
     }
 
-    @Suppress("BlockingMethodInNonBlockingContext")
     override suspend fun create(createGroup: CreateGroup): Group {
         return withContext(ioDispatcher) {
             val account = accountRepository.get(createGroup.author).getOrThrow()
@@ -94,7 +108,6 @@ class GroupRepositoryImpl @Inject constructor(
         }
     }
 
-    @Suppress("BlockingMethodInNonBlockingContext")
     override suspend fun syncByOwned(accountId: Long): List<Group> {
         return withContext(ioDispatcher) {
             val account = accountRepository.get(accountId).getOrThrow()
@@ -112,7 +125,6 @@ class GroupRepositoryImpl @Inject constructor(
         }
     }
 
-    @Suppress("BlockingMethodInNonBlockingContext")
     override suspend fun pull(pull: Pull): Group {
         return withContext(ioDispatcher) {
             var group = syncOne(pull.groupId)
@@ -134,7 +146,6 @@ class GroupRepositoryImpl @Inject constructor(
         }
     }
 
-    @Suppress("BlockingMethodInNonBlockingContext")
     override suspend fun transfer(transfer: Transfer): Group {
         return withContext(ioDispatcher) {
             val account = accountRepository.get(transfer.groupId.accountId).getOrThrow()
@@ -153,7 +164,6 @@ class GroupRepositoryImpl @Inject constructor(
         }
     }
 
-    @Suppress("BlockingMethodInNonBlockingContext")
     override suspend fun update(updateGroup: UpdateGroup): Group {
         return withContext(ioDispatcher) {
             val account = accountRepository.get(updateGroup.groupId.accountId).getOrThrow()
@@ -210,8 +220,7 @@ class GroupRepositoryImpl @Inject constructor(
         }
     }
 
-    private fun getMisskeyAPI(account: Account): MisskeyAPIV11 {
-        return misskeyAPIProvider.get(account.normalizedInstanceUri) as? MisskeyAPIV11
-            ?: throw IllegalVersionException()
+    private fun getMisskeyAPI(account: Account): MisskeyAPI {
+        return misskeyAPIProvider.get(account.normalizedInstanceUri)
     }
 }
