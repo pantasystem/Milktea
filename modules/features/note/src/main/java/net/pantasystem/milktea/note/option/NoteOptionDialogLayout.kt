@@ -5,7 +5,18 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.Divider
 import androidx.compose.material.Surface
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.filled.Attachment
+import androidx.compose.material.icons.filled.BookmarkRemove
+import androidx.compose.material.icons.filled.ContentCopy
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.Mood
+import androidx.compose.material.icons.filled.Report
+import androidx.compose.material.icons.filled.Share
+import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.filled.Translate
+import androidx.compose.material.icons.filled.VolumeMute
 import androidx.compose.material.icons.outlined.BookmarkAdd
 import androidx.compose.material.icons.outlined.Star
 import androidx.compose.runtime.Composable
@@ -48,7 +59,8 @@ fun NoteOptionDialogLayout(
                 )
             }
 
-            if (uiState.currentAccount?.instanceType == Account.InstanceType.MISSKEY
+            if ((uiState.currentAccount?.instanceType == Account.InstanceType.MISSKEY
+                        || uiState.currentAccount?.instanceType == Account.InstanceType.FIREFISH)
                 && uiState.note?.id != null
             ) {
                 NormalBottomSheetDialogSelectionLayout(
@@ -123,6 +135,7 @@ fun NoteOptionDialogLayout(
                             )
                         )
                     }
+
                     false -> {
                         NormalBottomSheetDialogSelectionLayout(
                             onClick = {
@@ -132,6 +145,7 @@ fun NoteOptionDialogLayout(
                             text = stringResource(id = R.string.add_to_bookmark)
                         )
                     }
+
                     else -> {}
                 }
             }

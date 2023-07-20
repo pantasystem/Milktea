@@ -66,7 +66,11 @@ data class NoteEditorUiState(
             return false
         }
 
-        if (this.sendToState.renoteId != null && currentAccount?.instanceType == Account.InstanceType.MISSKEY) {
+        if (this.sendToState.renoteId != null && (
+                    currentAccount?.instanceType == Account.InstanceType.MISSKEY
+                            || currentAccount?.instanceType == Account.InstanceType.FIREFISH
+                    )
+        ) {
             return true
         }
         if (this.poll != null && this.poll.checkValidate()) {
@@ -153,10 +157,11 @@ fun DraftNote.toNoteEditingState(): NoteEditorUiState {
             )
         },
         files = draftFiles?.map {
-            when(it) {
+            when (it) {
                 is DraftNoteFile.Local -> {
                     FilePreviewSource.Local(AppFile.from(it) as AppFile.Local)
                 }
+
                 is DraftNoteFile.Remote -> {
                     FilePreviewSource.Remote(AppFile.from(it) as AppFile.Remote, it.fileProperty)
                 }

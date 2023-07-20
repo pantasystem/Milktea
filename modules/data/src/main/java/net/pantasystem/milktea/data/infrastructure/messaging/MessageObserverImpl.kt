@@ -43,7 +43,7 @@ class MessageObserverImpl @Inject constructor(
             }
             emit(accountRepository.get(accountId).getOrNull())
         }.filterNotNull().filter {
-            it.instanceType == Account.InstanceType.MISSKEY
+            it.instanceType == Account.InstanceType.MISSKEY || it.instanceType == Account.InstanceType.FIREFISH
         }.flatMapLatest { ac ->
             requireNotNull(channelAPIProvider.get(ac)).connect(ChannelAPI.Type.Main).map{
                 (it as? ChannelBody.Main.MessagingMessage)?.body

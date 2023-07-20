@@ -148,7 +148,9 @@ fun VisibilitySelectionDialogLayout(
                     )
 
 
-                    if (currentAccountInstanceType == Account.InstanceType.MISSKEY) {
+                    if (currentAccountInstanceType == Account.InstanceType.MISSKEY
+                        || currentAccountInstanceType == Account.InstanceType.FIREFISH
+                    ) {
                         VisibilityLocalOnlySwitch(
                             checked = visibility.isLocalOnly(),
                             enabled = visibility is CanLocalOnly && channelId == null,
@@ -176,7 +178,9 @@ fun VisibilitySelectionDialogLayout(
                     }
                 }
 
-                if (currentAccountInstanceType == Account.InstanceType.MISSKEY) {
+                if (currentAccountInstanceType == Account.InstanceType.MISSKEY
+                    || currentAccountInstanceType == Account.InstanceType.FIREFISH
+                ) {
                     item {
                         VisibilityChannelTitle()
                     }
