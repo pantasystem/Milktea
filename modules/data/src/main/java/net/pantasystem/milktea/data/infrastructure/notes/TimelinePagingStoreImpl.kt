@@ -5,7 +5,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.sync.Mutex
 import net.pantasystem.milktea.api.misskey.notes.NoteDTO
 import net.pantasystem.milktea.api.misskey.notes.NoteRequest
-import net.pantasystem.milktea.api.misskey.v12.MisskeyAPIV12
 import net.pantasystem.milktea.app_store.notes.InitialLoadQuery
 import net.pantasystem.milktea.common.PageableState
 import net.pantasystem.milktea.common.StateContent
@@ -142,18 +141,10 @@ internal class TimelinePagingStoreImpl(
                 is Pageable.CalckeyRecommendedTimeline -> api::getCalckeyRecommendedTimeline
                 is Pageable.ClipNotes -> api::getClipNotes
                 is Pageable.Antenna -> {
-                    if (api is MisskeyAPIV12) {
-                        (api)::antennasNotes
-                    } else {
-                        throw IllegalArgumentException("antennaはV12以上でなければ使用できません")
-                    }
+                    (api)::antennasNotes
                 }
                 is Pageable.ChannelTimeline -> {
-                    if (api is MisskeyAPIV12) {
-                        (api)::channelTimeline
-                    } else {
-                        throw IllegalArgumentException("channelはV12以上でなければ使用できません")
-                    }
+                    (api)::channelTimeline
                 }
                 else -> throw IllegalArgumentException("unknown class:${pageableTimeline.javaClass}")
             }

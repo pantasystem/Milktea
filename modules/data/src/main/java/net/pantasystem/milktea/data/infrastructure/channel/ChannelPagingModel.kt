@@ -5,7 +5,6 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import net.pantasystem.milktea.api.misskey.I
-import net.pantasystem.milktea.api.misskey.v12.MisskeyAPIV12
 import net.pantasystem.milktea.api.misskey.v12.channel.ChannelDTO
 import net.pantasystem.milktea.api.misskey.v12.channel.FindPageable
 import net.pantasystem.milktea.common.*
@@ -114,7 +113,7 @@ class ChannelPagingModel(
 
     override suspend fun loadPrevious(): Result<List<ChannelDTO>> {
         val account = accountRepository.get(getAccount().accountId).getOrThrow()
-        val api = (misskeyAPIProvider.get(account) as MisskeyAPIV12)
+        val api = (misskeyAPIProvider.get(account))
         val i = account.token
         val res = when (type) {
             ChannelListType.FOLLOWED -> {

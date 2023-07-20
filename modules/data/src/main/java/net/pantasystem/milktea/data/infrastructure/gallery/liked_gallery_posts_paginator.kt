@@ -5,10 +5,13 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.map
 import net.pantasystem.milktea.api.misskey.v12_75_0.GetPosts
 import net.pantasystem.milktea.api.misskey.v12_75_0.LikedGalleryPost
-import net.pantasystem.milktea.api.misskey.v12_75_0.MisskeyAPIV1275
 import net.pantasystem.milktea.common.PageableState
 import net.pantasystem.milktea.common.StateContent
-import net.pantasystem.milktea.common.paginator.*
+import net.pantasystem.milktea.common.paginator.EntityConverter
+import net.pantasystem.milktea.common.paginator.FutureLoader
+import net.pantasystem.milktea.common.paginator.IdGetter
+import net.pantasystem.milktea.common.paginator.PaginationState
+import net.pantasystem.milktea.common.paginator.PreviousLoader
 import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.common.throwIfHasError
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
@@ -16,7 +19,6 @@ import net.pantasystem.milktea.data.converters.GalleryPostDTOEntityConverter
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.gallery.GalleryDataSource
 import net.pantasystem.milktea.model.gallery.GalleryPost
-import net.pantasystem.milktea.model.instance.IllegalVersionException
 
 data class LikedGalleryPostId(
     val id: String,
@@ -95,9 +97,7 @@ class LikedGalleryPostsLoader(
 
     override suspend fun loadFuture(): Result<List<LikedGalleryPost>> {
         return runCancellableCatching {
-            val api =
-                misskeyAPIProvider.get(getAccount.invoke().normalizedInstanceUri) as? MisskeyAPIV1275
-                    ?: throw IllegalVersionException()
+            val api = misskeyAPIProvider.get(getAccount.invoke().normalizedInstanceUri)
             api.likedGalleryPosts(
                 GetPosts(
                     sinceId = idGetter.getSinceId(),
@@ -111,8 +111,7 @@ class LikedGalleryPostsLoader(
     override suspend fun loadPrevious(): Result<List<LikedGalleryPost>> {
         return runCancellableCatching {
             val api =
-                misskeyAPIProvider.get(getAccount.invoke().normalizedInstanceUri) as? MisskeyAPIV1275
-                    ?: throw IllegalVersionException()
+                misskeyAPIProvider.get(getAccount.invoke().normalizedInstanceUri)
             api.likedGalleryPosts(
                 GetPosts(
                     untilId = idGetter.getUntilId(),
