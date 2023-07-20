@@ -22,7 +22,6 @@ import androidx.compose.material.icons.outlined.Star
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.notes.Note
 import net.pantasystem.milktea.model.notes.NoteRelation
 import net.pantasystem.milktea.note.R
@@ -59,13 +58,10 @@ fun NoteOptionDialogLayout(
                 )
             }
 
-            if ((uiState.currentAccount?.instanceType == Account.InstanceType.MISSKEY
-                        || uiState.currentAccount?.instanceType == Account.InstanceType.FIREFISH)
-                && uiState.note?.id != null
-            ) {
+            if (uiState.isVisibleReactionUsersSelection) {
                 NormalBottomSheetDialogSelectionLayout(
                     onClick = {
-                        onShowReactionHistoryButtonClicked(uiState.note.id)
+                        uiState.note?.id?.let(onShowReactionHistoryButtonClicked)
                     },
                     icon = Icons.Default.Mood, text = stringResource(
                         id = R.string.reaction
