@@ -48,6 +48,7 @@ class FeatureEnablesImpl @Inject constructor(
                 if (isMastodon) FeatureType.Bookmark else null,
                 if (nodeInfo.type is NodeInfo.SoftwareType.Misskey.Normal && version >= Version("13")) FeatureType.ReactionAcceptance else null,
                 if (isMisskey || isFirefish) FeatureType.PostReactionUsers else null,
+                if (isMisskey || isFirefish) FeatureType.PostLocalOnlyVisibility else null,
             )
         }
     }

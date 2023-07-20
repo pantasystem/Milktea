@@ -82,7 +82,8 @@ class FeatureEnablesImplTest {
                 FeatureType.Messaging,
                 FeatureType.Drive,
                 FeatureType.Group,
-                FeatureType.PostReactionUsers
+                FeatureType.PostReactionUsers,
+                FeatureType.PostLocalOnlyVisibility,
             ),
             result,
         )
@@ -126,6 +127,7 @@ class FeatureEnablesImplTest {
                 FeatureType.Drive,
                 FeatureType.Messaging,
                 FeatureType.PostReactionUsers,
+                FeatureType.PostLocalOnlyVisibility,
             ),
             result,
         )
@@ -168,6 +170,7 @@ class FeatureEnablesImplTest {
                 FeatureType.Drive,
                 FeatureType.Messaging,
                 FeatureType.PostReactionUsers,
+                FeatureType.PostLocalOnlyVisibility,
             ),
             result,
         )
@@ -212,6 +215,7 @@ class FeatureEnablesImplTest {
                 FeatureType.Gallery,
                 FeatureType.Antenna,
                 FeatureType.PostReactionUsers,
+                FeatureType.PostLocalOnlyVisibility,
             ),
             result,
         )
@@ -257,6 +261,7 @@ class FeatureEnablesImplTest {
                 FeatureType.Antenna,
                 FeatureType.ReactionAcceptance,
                 FeatureType.PostReactionUsers,
+                FeatureType.PostLocalOnlyVisibility,
             ),
             result,
         )
@@ -300,6 +305,7 @@ class FeatureEnablesImplTest {
                 FeatureType.Antenna,
                 FeatureType.ReactionAcceptance,
                 FeatureType.PostReactionUsers,
+                FeatureType.PostLocalOnlyVisibility,
             ),
             result,
         )
@@ -344,6 +350,7 @@ class FeatureEnablesImplTest {
                 FeatureType.Group,
                 FeatureType.Messaging,
                 FeatureType.PostReactionUsers,
+                FeatureType.PostLocalOnlyVisibility,
             ),
             result,
         )
@@ -420,6 +427,7 @@ class FeatureEnablesImplTest {
                 FeatureType.Group,
                 FeatureType.Messaging,
                 FeatureType.PostReactionUsers,
+                FeatureType.PostLocalOnlyVisibility,
             ),
             result,
         )

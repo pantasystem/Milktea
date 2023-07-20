@@ -27,7 +27,6 @@ import com.google.android.material.composethemeadapter.MdcTheme
 import dagger.hilt.android.AndroidEntryPoint
 import net.pantasystem.milktea.common.ResultState
 import net.pantasystem.milktea.common.StateContent
-import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.channel.Channel
 import net.pantasystem.milktea.model.instance.FeatureType
 import net.pantasystem.milktea.model.notes.CanLocalOnly
@@ -67,18 +66,17 @@ fun VisibilitySelectionDialogContent(viewModel: NoteEditorViewModel) {
     val reactionAcceptanceType = uiState.sendToState.reactionAcceptanceType
     VisibilitySelectionDialogLayout(
         visibility = uiState.sendToState.visibility,
-        channelId = uiState.sendToState.channelId,
-        currentAccountInstanceType = uiState.currentAccount?.instanceType,
         channelsState = channelsState,
-        onVisibilityChanged = viewModel::setVisibility,
         enableFeatures = enableFeatures,
-        reactionAcceptanceType = reactionAcceptanceType,
+        onVisibilityChanged = viewModel::setVisibility,
         onChannelSelected = {
             viewModel.setChannelId(it.id)
         },
         onReactionAcceptanceSelected = {
             viewModel.onReactionAcceptanceSelected(it)
-        }
+        },
+        channelId = uiState.sendToState.channelId,
+        reactionAcceptanceType = reactionAcceptanceType
     )
 }
 
@@ -92,7 +90,6 @@ fun VisibilitySelectionDialogLayout(
     onChannelSelected: (channel: Channel) -> Unit,
     onReactionAcceptanceSelected: (ReactionAcceptanceType?) -> Unit,
     channelId: Channel.Id? = null,
-    currentAccountInstanceType: Account.InstanceType? = null,
     reactionAcceptanceType: ReactionAcceptanceType? = null,
 ) {
     val channels =
@@ -148,9 +145,7 @@ fun VisibilitySelectionDialogLayout(
                     )
 
 
-                    if (currentAccountInstanceType == Account.InstanceType.MISSKEY
-                        || currentAccountInstanceType == Account.InstanceType.FIREFISH
-                    ) {
+                    if (enableFeatures.contains(FeatureType.PostLocalOnlyVisibility)) {
                         VisibilityLocalOnlySwitch(
                             checked = visibility.isLocalOnly(),
                             enabled = visibility is CanLocalOnly && channelId == null,
