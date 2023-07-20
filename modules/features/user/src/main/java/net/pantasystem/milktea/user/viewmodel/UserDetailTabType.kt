@@ -44,7 +44,7 @@ class UserDetailTabTypeFactory @Inject constructor(
 
     suspend fun createTabsForInstanceType(account: Account, user: User.Detail): List<UserDetailTabType> {
         return when (account.instanceType) {
-            Account.InstanceType.MISSKEY -> createMisskeyTabs(account, user)
+            Account.InstanceType.MISSKEY, Account.InstanceType.FIREFISH -> createMisskeyTabs(account, user)
             Account.InstanceType.MASTODON, Account.InstanceType.PLEROMA -> createMastodonPleromaTabs(user)
         }
     }

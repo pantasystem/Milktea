@@ -4,7 +4,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
-import net.pantasystem.milktea.api.misskey.v12.MisskeyAPIV12
 import net.pantasystem.milktea.api.misskey.v12.user.reaction.UserReactionRequest
 import net.pantasystem.milktea.app_store.user.UserReactionPagingStore
 import net.pantasystem.milktea.common.PageableState
@@ -103,7 +102,7 @@ class UserReactionPagingImpl(
 
     override suspend fun loadPrevious(): Result<List<UserReactionDTO>> = runCancellableCatching {
         val account = accountRepository.get(userId.accountId).getOrThrow()
-        (misskeyAPIProvider.get(account) as MisskeyAPIV12).getUserReactions(
+        (misskeyAPIProvider.get(account)).getUserReactions(
             UserReactionRequest(
                 i = account.token,
                 untilId = getUntilId(),

@@ -35,7 +35,7 @@ class SyncMastodonFilterWorker @AssistedInject constructor(
     override suspend fun doWork(): Result {
         return accountRepository.findAll().mapCancellableCatching { accounts ->
             accounts.filter {
-                it.instanceType == Account.InstanceType.MASTODON
+                it.instanceType == Account.InstanceType.MASTODON || it.instanceType == Account.InstanceType.PLEROMA
             }
         }.mapCancellableCatching { accounts ->
             coroutineScope {

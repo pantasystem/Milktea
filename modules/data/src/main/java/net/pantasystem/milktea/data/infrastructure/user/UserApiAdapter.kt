@@ -11,6 +11,7 @@ import net.pantasystem.milktea.data.converters.UserDTOEntityConverter
 import net.pantasystem.milktea.data.infrastructure.toUserRelated
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.AccountRepository
+import net.pantasystem.milktea.model.nodeinfo.NodeInfoRepository
 import net.pantasystem.milktea.model.user.User
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -33,12 +34,13 @@ internal class UserApiAdapterImpl @Inject constructor(
     private val misskeyAPIProvider: MisskeyAPIProvider,
     private val mastodonAPIProvider: MastodonAPIProvider,
     private val userDTOEntityConverter: UserDTOEntityConverter,
+    private val nodeInfoRepository: NodeInfoRepository,
 ) : UserApiAdapter {
 
     override suspend fun show(userId: User.Id, detail: Boolean): User {
         val account = accountRepository.get(userId.accountId).getOrThrow()
         return when (account.instanceType) {
-            Account.InstanceType.MISSKEY -> {
+            Account.InstanceType.MISSKEY, Account.InstanceType.FIREFISH -> {
                 val res = misskeyAPIProvider.get(account).showUser(
                     RequestUser(
                         i = account.token,
@@ -79,10 +81,10 @@ internal class UserApiAdapterImpl @Inject constructor(
     ): SearchResult {
         val account = accountRepository.get(accountId).getOrThrow()
         return when (account.instanceType) {
-            Account.InstanceType.MISSKEY -> {
+            Account.InstanceType.MISSKEY, Account.InstanceType.FIREFISH -> {
                 val api = misskeyAPIProvider.get(account)
                 val body = requireNotNull(
-                    SearchByUserAndHost(api)
+                    SearchByUserAndHost(api, nodeInfoRepository, account)
                         .search(
                             RequestUser(
                                 userName = userName,

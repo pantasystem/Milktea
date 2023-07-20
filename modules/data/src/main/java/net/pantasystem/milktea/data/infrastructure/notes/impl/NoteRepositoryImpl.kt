@@ -1,12 +1,20 @@
 package net.pantasystem.milktea.data.infrastructure.notes.impl
 
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.withContext
 import net.pantasystem.milktea.api.misskey.notes.GetNoteChildrenRequest
 import net.pantasystem.milktea.api.misskey.notes.NoteDTO
 import net.pantasystem.milktea.api.misskey.notes.NoteRequest
-import net.pantasystem.milktea.common.*
+import net.pantasystem.milktea.common.APIError
+import net.pantasystem.milktea.common.Logger
+import net.pantasystem.milktea.common.mapCancellableCatching
+import net.pantasystem.milktea.common.runCancellableCatching
+import net.pantasystem.milktea.common.throwIfHasError
 import net.pantasystem.milktea.common_android.hilt.IODispatcher
 import net.pantasystem.milktea.data.api.mastodon.MastodonAPIProvider
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
@@ -14,13 +22,20 @@ import net.pantasystem.milktea.data.infrastructure.notes.NoteDataSourceAdder
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.GetAccount
 import net.pantasystem.milktea.model.drive.FilePropertyDataSource
-import net.pantasystem.milktea.model.notes.*
+import net.pantasystem.milktea.model.notes.CreateNote
+import net.pantasystem.milktea.model.notes.Note
+import net.pantasystem.milktea.model.notes.NoteDataSource
+import net.pantasystem.milktea.model.notes.NoteDeletedException
+import net.pantasystem.milktea.model.notes.NoteNotFoundException
+import net.pantasystem.milktea.model.notes.NoteRemovedException
+import net.pantasystem.milktea.model.notes.NoteRepository
+import net.pantasystem.milktea.model.notes.NoteState
+import net.pantasystem.milktea.model.notes.NoteThreadContext
 import net.pantasystem.milktea.model.notes.poll.Poll
 import net.pantasystem.milktea.model.notes.poll.Vote
 import net.pantasystem.milktea.model.user.UserDataSource
 import javax.inject.Inject
 
-@Suppress("UNREACHABLE_CODE", "IMPLICIT_NOTHING_TYPE_ARGUMENT_IN_RETURN_POSITION")
 class NoteRepositoryImpl @Inject constructor(
     val loggerFactory: Logger.Factory,
     val userDataSource: UserDataSource,
@@ -47,7 +62,7 @@ class NoteRepositoryImpl @Inject constructor(
         withContext(ioDispatcher) {
             val account = getAccount.get(noteId.accountId)
             when (account.instanceType) {
-                Account.InstanceType.MISSKEY -> {
+                Account.InstanceType.MISSKEY, Account.InstanceType.FIREFISH -> {
                     val n = find(noteId).getOrThrow()
                     create(
                         CreateNote(
@@ -74,7 +89,7 @@ class NoteRepositoryImpl @Inject constructor(
         withContext(ioDispatcher) {
             val account = getAccount.get(noteId.accountId)
             when (account.instanceType) {
-                Account.InstanceType.MISSKEY -> delete(noteId).getOrThrow()
+                Account.InstanceType.MISSKEY, Account.InstanceType.FIREFISH -> delete(noteId).getOrThrow()
                 Account.InstanceType.MASTODON, Account.InstanceType.PLEROMA -> {
                     val res = mastodonAPIProvider.get(account).unreblog(noteId.noteId)
                         .throwIfHasError()
@@ -214,7 +229,7 @@ class NoteRepositoryImpl @Inject constructor(
         withContext(ioDispatcher) {
             val account = getAccount.get(noteId.accountId)
             when (account.instanceType) {
-                Account.InstanceType.MISSKEY -> {
+                Account.InstanceType.MISSKEY, Account.InstanceType.FIREFISH -> {
                     val ancestors = requireNotNull(
                         misskeyAPIProvider.get(account).conversation(
                             NoteRequest(
@@ -295,7 +310,7 @@ class NoteRepositoryImpl @Inject constructor(
             withContext(ioDispatcher) {
                 val account = getAccount.get(noteId.accountId)
                 when (account.instanceType) {
-                    Account.InstanceType.MISSKEY -> {
+                    Account.InstanceType.MISSKEY, Account.InstanceType.FIREFISH -> {
                         misskeyAPIProvider.get(account.normalizedInstanceUri).noteState(
                             NoteRequest(
                                 i = account.token,

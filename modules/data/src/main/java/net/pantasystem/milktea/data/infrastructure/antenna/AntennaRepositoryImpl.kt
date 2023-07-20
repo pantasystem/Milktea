@@ -2,7 +2,6 @@ package net.pantasystem.milktea.data.infrastructure.antenna
 
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
-import net.pantasystem.milktea.api.misskey.v12.MisskeyAPIV12
 import net.pantasystem.milktea.api.misskey.v12.antenna.AntennaQuery
 import net.pantasystem.milktea.api.misskey.v12.antenna.AntennaToAdd
 import net.pantasystem.milktea.api.misskey.v12.antenna.from
@@ -25,7 +24,7 @@ class AntennaRepositoryImpl @Inject constructor(
     override suspend fun findByAccountId(accountId: Long): Result<List<Antenna>> = runCancellableCatching {
         withContext(ioDispatcher) {
             val account = getAccount.get(accountId)
-            val body = (misskeyAPIProvider.get(account) as MisskeyAPIV12).getAntennas(
+            val body = (misskeyAPIProvider.get(account)).getAntennas(
                 AntennaQuery(
                     i = account.token,
                     limit = null,
@@ -42,7 +41,7 @@ class AntennaRepositoryImpl @Inject constructor(
     override suspend fun delete(antennaId: Antenna.Id): Result<Unit> = runCancellableCatching {
         withContext(ioDispatcher) {
             val account = getAccount.get(antennaId.accountId)
-            (misskeyAPIProvider.get(account) as MisskeyAPIV12).deleteAntenna(
+            (misskeyAPIProvider.get(account)).deleteAntenna(
                 AntennaQuery(
                     antennaId = antennaId.antennaId,
                     i = account.token,
@@ -56,7 +55,7 @@ class AntennaRepositoryImpl @Inject constructor(
         withContext(ioDispatcher) {
             val account = getAccount.get(accountId)
             val request = AntennaToAdd.from(account.token, params,)
-            (misskeyAPIProvider.get(account) as MisskeyAPIV12).createAntenna(request)
+            (misskeyAPIProvider.get(account)).createAntenna(request)
                 .throwIfHasError()
                 .body()
                 ?.toEntity(account)!!
@@ -67,7 +66,7 @@ class AntennaRepositoryImpl @Inject constructor(
         withContext(ioDispatcher) {
             val account = getAccount.get(antennaId.accountId)
             val request = AntennaToAdd.from(account.token, params, antennaId.antennaId)
-            (misskeyAPIProvider.get(account) as MisskeyAPIV12).updateAntenna(request)
+            (misskeyAPIProvider.get(account)).updateAntenna(request)
                 .throwIfHasError()
                 .body()
                 ?.toEntity(account)!!
@@ -77,7 +76,7 @@ class AntennaRepositoryImpl @Inject constructor(
     override suspend fun find(antennaId: Antenna.Id): Result<Antenna> = runCancellableCatching {
         withContext(ioDispatcher) {
             val account = getAccount.get(antennaId.accountId)
-            val api = misskeyAPIProvider.get(account) as MisskeyAPIV12
+            val api = misskeyAPIProvider.get(account)
 
             val res = api.showAntenna(
                 AntennaQuery(

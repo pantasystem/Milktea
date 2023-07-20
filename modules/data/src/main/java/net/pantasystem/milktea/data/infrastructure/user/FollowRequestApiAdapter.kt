@@ -27,7 +27,7 @@ class FollowRequestApiAdapter @Inject constructor(
     suspend fun accept(userId: User.Id): FollowRequestResult {
         val account = accountRepository.get(userId.accountId).getOrThrow()
         return when(account.instanceType) {
-            Account.InstanceType.MISSKEY -> {
+            Account.InstanceType.MISSKEY, Account.InstanceType.FIREFISH -> {
                 misskeyAPIProvider.get(account)
                     .acceptFollowRequest(
                         AcceptFollowRequest(
@@ -49,7 +49,7 @@ class FollowRequestApiAdapter @Inject constructor(
     suspend fun reject(userId: User.Id): FollowRequestResult {
         val account = accountRepository.get(userId.accountId).getOrThrow()
         return when(account.instanceType) {
-            Account.InstanceType.MISSKEY -> {
+            Account.InstanceType.MISSKEY, Account.InstanceType.FIREFISH -> {
                 misskeyAPIProvider.get(account).rejectFollowRequest(
                     RejectFollowRequest(
                         i = account.token,
@@ -70,7 +70,7 @@ class FollowRequestApiAdapter @Inject constructor(
     suspend fun findFollowRequests(accountId: Long, sinceId: String? = null, untilId: String? = null): FindFollowRequestsResult {
         val account = accountRepository.get(accountId).getOrThrow()
         return when(account.instanceType) {
-            Account.InstanceType.MISSKEY -> {
+            Account.InstanceType.MISSKEY, Account.InstanceType.FIREFISH -> {
                 val body = misskeyAPIProvider.get(account).getFollowRequestsList(
                     GetFollowRequest(
                         i = account.token,

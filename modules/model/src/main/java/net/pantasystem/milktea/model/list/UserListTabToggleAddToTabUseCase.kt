@@ -36,7 +36,7 @@ class UserListTabToggleAddToTabUseCase @Inject constructor(
                     weight = -1,
                     attachedAccountId = if (addTabToAccountId == null) null else relatedAccount.accountId,
                     pageable = when(account.instanceType) {
-                        Account.InstanceType.MISSKEY -> Pageable.UserListTimeline(
+                        Account.InstanceType.MISSKEY, Account.InstanceType.FIREFISH -> Pageable.UserListTimeline(
                             listId.userListId
                         )
                         Account.InstanceType.MASTODON, Account.InstanceType.PLEROMA -> Pageable.Mastodon.ListTimeline(

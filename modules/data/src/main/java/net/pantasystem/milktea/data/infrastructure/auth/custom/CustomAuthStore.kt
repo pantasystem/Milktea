@@ -5,7 +5,7 @@ import android.content.SharedPreferences
 import net.pantasystem.milktea.api.misskey.auth.Session
 import net.pantasystem.milktea.common.getPreferenceName
 import net.pantasystem.milktea.model.app.AppType
-import java.util.*
+import java.util.Date
 
 class CustomAuthStore(private val sharedPreferences: SharedPreferences){
 
@@ -77,6 +77,18 @@ class CustomAuthStore(private val sharedPreferences: SharedPreferences){
                     putString(TYPE, "pleroma")
                 }.apply()
             }
+            is TemporarilyAuthState.Firefish -> {
+                sharedPreferences.edit().apply {
+                    putString(MISSKEY_SECRET, customAuthBridge.secret)
+                    putString(MISSKEY_SESSION_TOKEN, customAuthBridge.session.token)
+                    putString(MISSKEY_SESSION_URL, customAuthBridge.session.url)
+                    putString(INSTANCE_DOMAIN, customAuthBridge.instanceDomain)
+                    putLong(ENABLED_DATE_END, customAuthBridge.enabledDateEnd.time)
+                    putString(MISSKEY_VIA_NAME, customAuthBridge.viaName)
+                    putString(TYPE, "firefish")
+                    apply()
+                }
+            }
         }
 
 
@@ -133,6 +145,21 @@ class CustomAuthStore(private val sharedPreferences: SharedPreferences){
                         instanceDomain = instanceDomain,
                         enabledDateEnd = enabledDate,
                         scope = it.getString(MASTODON_SCOPE, null)?: return null
+                    )
+                }
+                "firefish" -> {
+                    val secret = it.getString(MISSKEY_SECRET, null)?: return null
+                    val sessionToken = it.getString(MISSKEY_SESSION_TOKEN, null)?: return null
+                    val sessionUrl = it.getString(MISSKEY_SESSION_URL, null)?: return null
+                    TemporarilyAuthState.Firefish(
+                        secret = secret,
+                        session = Session(
+                            url = sessionUrl,
+                            token = sessionToken
+                        ),
+                        instanceDomain = instanceDomain,
+                        enabledDateEnd = enabledDate,
+                        viaName = viaName
                     )
                 }
                 else -> null

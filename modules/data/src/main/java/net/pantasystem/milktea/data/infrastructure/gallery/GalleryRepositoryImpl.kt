@@ -1,7 +1,16 @@
 package net.pantasystem.milktea.data.infrastructure.gallery
 
-import kotlinx.coroutines.*
-import net.pantasystem.milktea.api.misskey.v12_75_0.*
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.withContext
+import net.pantasystem.milktea.api.misskey.MisskeyAPI
+import net.pantasystem.milktea.api.misskey.v12_75_0.Delete
+import net.pantasystem.milktea.api.misskey.v12_75_0.Like
+import net.pantasystem.milktea.api.misskey.v12_75_0.Show
+import net.pantasystem.milktea.api.misskey.v12_75_0.UnLike
+import net.pantasystem.milktea.api.misskey.v12_75_0.Update
 import net.pantasystem.milktea.common.throwIfHasError
 import net.pantasystem.milktea.common_android.hilt.IODispatcher
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
@@ -12,9 +21,12 @@ import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.account.UnauthorizedException
 import net.pantasystem.milktea.model.file.AppFile
-import net.pantasystem.milktea.model.gallery.*
+import net.pantasystem.milktea.model.gallery.CreateGalleryPost
+import net.pantasystem.milktea.model.gallery.GalleryDataSource
+import net.pantasystem.milktea.model.gallery.GalleryNotFoundException
 import net.pantasystem.milktea.model.gallery.GalleryPost
-import net.pantasystem.milktea.model.instance.IllegalVersionException
+import net.pantasystem.milktea.model.gallery.GalleryRepository
+import net.pantasystem.milktea.model.gallery.UpdateGalleryPost
 import javax.inject.Inject
 import net.pantasystem.milktea.api.misskey.v12_75_0.CreateGallery as CreateGalleryDTO
 
@@ -162,8 +174,7 @@ class GalleryRepositoryImpl @Inject constructor(
         }
     }
 
-    private fun getMisskeyAPI(account: Account): MisskeyAPIV1275 {
-        return misskeyAPIProvider.get(account.normalizedInstanceUri) as? MisskeyAPIV1275
-            ?: throw IllegalVersionException()
+    private fun getMisskeyAPI(account: Account): MisskeyAPI {
+        return misskeyAPIProvider.get(account.normalizedInstanceUri)
     }
 }

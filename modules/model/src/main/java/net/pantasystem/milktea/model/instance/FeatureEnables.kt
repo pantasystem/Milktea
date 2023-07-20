@@ -4,12 +4,12 @@ interface FeatureEnables {
     suspend fun isEnable(
         instanceDomain: String,
         type: FeatureType,
-        default: Boolean = true
+        default: Boolean = true,
     ): Boolean
 
     suspend fun enableFeatures(instanceDomain: String): Set<FeatureType>
 }
 
 enum class FeatureType {
-    Gallery, Channel, Group, Antenna, UserReactionHistory, Drive, Bookmark, Clip, Messaging, ReactionAcceptance,
+    Gallery, Channel, Group, Antenna, UserReactionHistory, Drive, Bookmark, Clip, Messaging, ReactionAcceptance, PostReactionUsers, PostLocalOnlyVisibility
 }

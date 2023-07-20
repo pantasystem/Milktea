@@ -111,6 +111,14 @@ class ToggleReactionUseCase @Inject constructor(
 
                     reactionObj.getNameAndHost()
                 }
+                is InstanceInfoType.Firefish -> {
+                    val maxCount = instanceType.maxReactionsPerAccount
+                    if (maxCount < 1) {
+                        return null
+                    }
+
+                    reactionObj.getNameAndHost()
+                }
                 is InstanceInfoType.Pleroma -> {
                     val maxCount = instanceType.maxReactionsPerAccount
                     if (maxCount < 1) {

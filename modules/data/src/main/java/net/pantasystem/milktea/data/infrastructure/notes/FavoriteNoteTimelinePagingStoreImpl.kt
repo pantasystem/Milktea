@@ -6,8 +6,16 @@ import kotlinx.coroutines.sync.Mutex
 import net.pantasystem.milktea.api.mastodon.status.TootStatusDTO
 import net.pantasystem.milktea.api.misskey.favorite.Favorite
 import net.pantasystem.milktea.api.misskey.notes.NoteRequest
-import net.pantasystem.milktea.common.*
-import net.pantasystem.milktea.common.paginator.*
+import net.pantasystem.milktea.common.MastodonLinkHeaderDecoder
+import net.pantasystem.milktea.common.PageableState
+import net.pantasystem.milktea.common.StateContent
+import net.pantasystem.milktea.common.paginator.EntityConverter
+import net.pantasystem.milktea.common.paginator.FutureLoader
+import net.pantasystem.milktea.common.paginator.IdGetter
+import net.pantasystem.milktea.common.paginator.PreviousLoader
+import net.pantasystem.milktea.common.paginator.StateLocker
+import net.pantasystem.milktea.common.runCancellableCatching
+import net.pantasystem.milktea.common.throwIfHasError
 import net.pantasystem.milktea.data.api.mastodon.MastodonAPIProvider
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
 import net.pantasystem.milktea.model.account.Account
@@ -86,7 +94,7 @@ internal class FavoriteNoteTimelinePagingStoreImpl(
         val ac = getAccount.invoke()
         return runCancellableCatching {
             when(ac.instanceType) {
-                Account.InstanceType.MISSKEY -> {
+                Account.InstanceType.MISSKEY, Account.InstanceType.FIREFISH -> {
                     misskeyAPIProvider.get(getAccount.invoke()).favorites(
                         NoteRequest.Builder(pageableTimeline, ac.token, limit = LIMIT)
                             .build(NoteRequest.Conditions(sinceId = getSinceId()))
@@ -117,7 +125,7 @@ internal class FavoriteNoteTimelinePagingStoreImpl(
         return runCancellableCatching {
             val ac = getAccount.invoke()
             when(ac.instanceType) {
-                Account.InstanceType.MISSKEY -> {
+                Account.InstanceType.MISSKEY, Account.InstanceType.FIREFISH -> {
                     misskeyAPIProvider.get(getAccount.invoke()).favorites(
                         NoteRequest.Builder(pageableTimeline, ac.token, limit = LIMIT)
                             .build(NoteRequest.Conditions(untilId = getUntilId()))

@@ -25,7 +25,7 @@ class SearchTopViewModel @Inject constructor(
         SearchTopUiState(
             currentAccount = it,
             tabItems = when(it?.instanceType) {
-                Account.InstanceType.MISSKEY -> {
+                Account.InstanceType.MISSKEY, Account.InstanceType.FIREFISH -> {
                     listOf(
                         SearchTopTabItem(
                             StringSource(R.string.title_featured),

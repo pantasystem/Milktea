@@ -23,7 +23,7 @@ class ReplyStreamingImpl @Inject constructor(
             emit(getAccount())
         }.flatMapLatest { ac ->
             when(ac.instanceType) {
-                Account.InstanceType.MISSKEY -> {
+                Account.InstanceType.MISSKEY, Account.InstanceType.FIREFISH -> {
                     requireNotNull(channelAPIProvider.get(ac)).connect(ChannelAPI.Type.Main).map {
                         it as ChannelBody.Main.Reply
                     }.map {

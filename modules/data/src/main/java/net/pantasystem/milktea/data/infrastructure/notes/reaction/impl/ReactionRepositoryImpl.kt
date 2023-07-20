@@ -48,7 +48,7 @@ class ReactionRepositoryImpl @Inject constructor(
 
                 runCancellableCatching {
                     when (account.instanceType) {
-                        Account.InstanceType.MISSKEY -> {
+                        Account.InstanceType.MISSKEY, Account.InstanceType.FIREFISH -> {
                             if (postReaction(createReaction) && noteCaptureAPIProvider.get(account)
                                     ?.isCaptured(createReaction.noteId.noteId) == false
                             ) {
@@ -90,7 +90,7 @@ class ReactionRepositoryImpl @Inject constructor(
                 val note = noteRepository.find(deleteReaction.noteId).getOrThrow()
                 val account = getAccount.get(deleteReaction.noteId.accountId)
                 when (account.instanceType) {
-                    Account.InstanceType.MISSKEY -> {
+                    Account.InstanceType.MISSKEY, Account.InstanceType.FIREFISH -> {
                         postUnReaction(deleteReaction.noteId)
                                 && (noteCaptureAPIProvider.get(account)
                             ?.isCaptured(deleteReaction.noteId.noteId) == true

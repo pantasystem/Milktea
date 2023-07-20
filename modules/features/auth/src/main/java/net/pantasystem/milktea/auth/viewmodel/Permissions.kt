@@ -63,6 +63,7 @@ object Permissions{
         }
     }
 
+
     fun getPermission(softwareType: NodeInfo.SoftwareType.Misskey?): List<String>? {
         return when {
             softwareType == null -> {
@@ -81,5 +82,9 @@ object Permissions{
                 defaultPermission
             }
         }
+    }
+
+    fun getPermission(softwareType: NodeInfo.SoftwareType.Firefish?): List<String> {
+        return defaultPermission
     }
 }

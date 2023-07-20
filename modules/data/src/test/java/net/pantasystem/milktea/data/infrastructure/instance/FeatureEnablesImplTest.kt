@@ -78,7 +78,13 @@ class FeatureEnablesImplTest {
         )
         val result = impl.enableFeatures("https://misskey.dev")
         Assertions.assertEquals(
-            setOf(FeatureType.Messaging, FeatureType.Drive, FeatureType.Group),
+            setOf(
+                FeatureType.Messaging,
+                FeatureType.Drive,
+                FeatureType.Group,
+                FeatureType.PostReactionUsers,
+                FeatureType.PostLocalOnlyVisibility,
+            ),
             result,
         )
     }
@@ -119,7 +125,9 @@ class FeatureEnablesImplTest {
                 FeatureType.Clip,
                 FeatureType.Group,
                 FeatureType.Drive,
-                FeatureType.Messaging
+                FeatureType.Messaging,
+                FeatureType.PostReactionUsers,
+                FeatureType.PostLocalOnlyVisibility,
             ),
             result,
         )
@@ -160,7 +168,9 @@ class FeatureEnablesImplTest {
                 FeatureType.Clip,
                 FeatureType.Group,
                 FeatureType.Drive,
-                FeatureType.Messaging
+                FeatureType.Messaging,
+                FeatureType.PostReactionUsers,
+                FeatureType.PostLocalOnlyVisibility,
             ),
             result,
         )
@@ -203,7 +213,9 @@ class FeatureEnablesImplTest {
                 FeatureType.Drive,
                 FeatureType.Messaging,
                 FeatureType.Gallery,
-                FeatureType.Antenna
+                FeatureType.Antenna,
+                FeatureType.PostReactionUsers,
+                FeatureType.PostLocalOnlyVisibility,
             ),
             result,
         )
@@ -247,7 +259,9 @@ class FeatureEnablesImplTest {
                 FeatureType.Messaging,
                 FeatureType.Gallery,
                 FeatureType.Antenna,
-                FeatureType.ReactionAcceptance
+                FeatureType.ReactionAcceptance,
+                FeatureType.PostReactionUsers,
+                FeatureType.PostLocalOnlyVisibility,
             ),
             result,
         )
@@ -290,6 +304,8 @@ class FeatureEnablesImplTest {
                 FeatureType.Gallery,
                 FeatureType.Antenna,
                 FeatureType.ReactionAcceptance,
+                FeatureType.PostReactionUsers,
+                FeatureType.PostLocalOnlyVisibility,
             ),
             result,
         )
@@ -332,7 +348,9 @@ class FeatureEnablesImplTest {
                 FeatureType.Gallery,
                 FeatureType.Antenna,
                 FeatureType.Group,
-                FeatureType.Messaging
+                FeatureType.Messaging,
+                FeatureType.PostReactionUsers,
+                FeatureType.PostLocalOnlyVisibility,
             ),
             result,
         )
@@ -367,6 +385,49 @@ class FeatureEnablesImplTest {
         Assertions.assertEquals(
             setOf(
                 FeatureType.Bookmark
+            ),
+            result,
+        )
+    }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    @Test
+    fun enableFeatures_GiveFirefish() = runTest {
+        val impl = FeatureEnablesImpl(
+            metaRepository = mock() {
+                onBlocking {
+                    find(any())
+                } doReturn Result.failure(IllegalArgumentException())
+            },
+            nodeInfoRepository = mock() {
+                onBlocking {
+                    find(any())
+                } doReturn Result.success(
+                    NodeInfo(
+                        host = "example.com",
+                        version = "2.0",
+                        software = NodeInfo.Software(
+                            name = "firefish",
+                            version = "1.0.0"
+                        )
+                    )
+                )
+            },
+            ioDispatcher = Dispatchers.Default
+        )
+        val result = impl.enableFeatures("https://example.com")
+        Assertions.assertEquals(
+            setOf(
+                FeatureType.Channel,
+                FeatureType.UserReactionHistory,
+                FeatureType.Clip,
+                FeatureType.Drive,
+                FeatureType.Gallery,
+                FeatureType.Antenna,
+                FeatureType.Group,
+                FeatureType.Messaging,
+                FeatureType.PostReactionUsers,
+                FeatureType.PostLocalOnlyVisibility,
             ),
             result,
         )

@@ -39,7 +39,7 @@ class UserListRepositoryWebAPIImpl @Inject constructor(
         return withContext(ioDispatcher) {
             val account = accountRepository.get(accountId).getOrThrow()
             when(account.instanceType) {
-                Account.InstanceType.MISSKEY -> {
+                Account.InstanceType.MISSKEY, Account.InstanceType.FIREFISH -> {
                     val api = misskeyAPIProvider.get(account)
                     val body = api.userList(I(account.token))
                         .throwIfHasError()
@@ -136,7 +136,7 @@ class UserListRepositoryWebAPIImpl @Inject constructor(
         return withContext(ioDispatcher) {
             val account = accountRepository.get(userListId.accountId).getOrThrow()
             when(account.instanceType) {
-                Account.InstanceType.MISSKEY -> {
+                Account.InstanceType.MISSKEY, Account.InstanceType.FIREFISH -> {
                     val misskeyAPI = misskeyAPIProvider.get(account)
                     val res = misskeyAPI.showList(ListId(account.token, userListId.userListId))
                         .throwIfHasError()

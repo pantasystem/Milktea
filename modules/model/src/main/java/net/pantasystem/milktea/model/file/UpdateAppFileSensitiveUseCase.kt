@@ -24,7 +24,7 @@ class UpdateAppFileSensitiveUseCase @Inject constructor(
             is AppFile.Remote -> {
                 val account = accountRepository.get(appFile.id.accountId).getOrThrow()
                 when (account.instanceType) {
-                    Account.InstanceType.MISSKEY -> {
+                    Account.InstanceType.MISSKEY, Account.InstanceType.FIREFISH -> {
                         val fileProperty = driveFileRepository.find(appFile.id)
                         driveFileRepository.update(
                             fileProperty.update(

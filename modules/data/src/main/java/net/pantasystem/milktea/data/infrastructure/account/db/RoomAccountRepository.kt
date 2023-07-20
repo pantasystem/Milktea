@@ -71,7 +71,8 @@ class RoomAccountRepository(
                     remoteId = account.remoteId,
                     instanceDomain = account.instanceDomain,
                     token = account.token,
-                    userName = account.userName
+                    userName = account.userName,
+                    instanceType = account.instanceType,
                 ).also {
                     accountDao.update(AccountRecord.from(it, encryption))
                 }

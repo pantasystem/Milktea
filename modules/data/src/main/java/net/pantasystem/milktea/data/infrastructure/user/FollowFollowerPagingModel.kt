@@ -8,9 +8,7 @@ import net.pantasystem.milktea.api.mastodon.accounts.MastodonAccountDTO
 import net.pantasystem.milktea.api.mastodon.accounts.MastodonAccountRelationshipDTO
 import net.pantasystem.milktea.api.misskey.users.RequestUser
 import net.pantasystem.milktea.api.misskey.users.UserDTO
-import net.pantasystem.milktea.api.misskey.v10.MisskeyAPIV10
 import net.pantasystem.milktea.api.misskey.v10.RequestFollowFollower
-import net.pantasystem.milktea.api.misskey.v11.MisskeyAPIV11
 import net.pantasystem.milktea.app_store.user.FollowFollowerPagingStore
 import net.pantasystem.milktea.app_store.user.RequestType
 import net.pantasystem.milktea.common.*
@@ -22,6 +20,8 @@ import net.pantasystem.milktea.data.infrastructure.notes.NoteDataSourceAdder
 import net.pantasystem.milktea.data.infrastructure.toUserRelated
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.GetAccount
+import net.pantasystem.milktea.model.nodeinfo.NodeInfo
+import net.pantasystem.milktea.model.nodeinfo.NodeInfoRepository
 import net.pantasystem.milktea.model.user.User
 import net.pantasystem.milktea.model.user.UserDataSource
 import javax.inject.Inject
@@ -36,6 +36,7 @@ class FollowFollowerPagingStoreImpl(
     val loggerFactory: Logger.Factory,
     val noteDataSourceAdder: NoteDataSourceAdder,
     val userDTOEntityConverter: UserDTOEntityConverter,
+    val nodeInfoRepository: NodeInfoRepository,
 ) : FollowFollowerPagingStore {
 
     class Factory @Inject constructor(
@@ -46,6 +47,7 @@ class FollowFollowerPagingStoreImpl(
         val getAccount: GetAccount,
         val noteDataSourceAdder: NoteDataSourceAdder,
         val userDTOEntityConverter: UserDTOEntityConverter,
+        val nodeInfoRepository: NodeInfoRepository,
     ) : FollowFollowerPagingStore.Factory {
         override fun create(type: RequestType): FollowFollowerPagingStore {
             return FollowFollowerPagingStoreImpl(
@@ -56,7 +58,8 @@ class FollowFollowerPagingStoreImpl(
                 userDataSource = userDataSource,
                 noteDataSourceAdder = noteDataSourceAdder,
                 mastodonAPIProvider = mastodonAPIProvider,
-                userDTOEntityConverter = userDTOEntityConverter
+                userDTOEntityConverter = userDTOEntityConverter,
+                nodeInfoRepository = nodeInfoRepository,
             )
         }
     }
@@ -68,6 +71,7 @@ class FollowFollowerPagingStoreImpl(
         misskeyAPIProvider = misskeyAPIProvider,
         mastodonAPIProvider = mastodonAPIProvider,
         userDTOEntityConverter = userDTOEntityConverter,
+        nodeInfoRepository = nodeInfoRepository,
     )
 
     private val previousPagingController = PreviousPagingController(
@@ -132,6 +136,7 @@ class FollowFollowerPagingModelImpl(
     val misskeyAPIProvider: MisskeyAPIProvider,
     val mastodonAPIProvider: MastodonAPIProvider,
     val userDTOEntityConverter: UserDTOEntityConverter,
+    val nodeInfoRepository: NodeInfoRepository,
 ) : StateLocker,
     PreviousLoader<FollowFollowerResponseItemType>,
     EntityConverter<FollowFollowerResponseItemType, UserIdAndNextId>,
@@ -167,17 +172,10 @@ class FollowFollowerPagingModelImpl(
         runCancellableCatching {
             val account = getAccount.get(requestType.userId.accountId)
             when (account.instanceType) {
-                Account.InstanceType.MISSKEY -> {
-                    when (misskeyAPIProvider.get(account)) {
-                        is MisskeyAPIV11 -> {
-                            DefaultLoader(
-                                requestType,
-                                account,
-                                misskeyAPIProvider,
-                                this@FollowFollowerPagingModelImpl
-                            )
-                        }
-                        is MisskeyAPIV10 -> {
+                Account.InstanceType.MISSKEY, Account.InstanceType.FIREFISH -> {
+                    val nodeInfo = nodeInfoRepository.find(account.getHost()).getOrThrow()
+                    when (nodeInfo.type) {
+                        is NodeInfo.SoftwareType.Misskey.Meisskey -> {
                             V10Loader(
                                 requestType,
                                 account,
@@ -186,7 +184,14 @@ class FollowFollowerPagingModelImpl(
                                 this@FollowFollowerPagingModelImpl
                             )
                         }
-                        else -> throw IllegalStateException("not support follow follower list")
+                         else -> {
+                             DefaultLoader(
+                                 requestType,
+                                 account,
+                                 misskeyAPIProvider,
+                                 this@FollowFollowerPagingModelImpl
+                             )
+                         }
                     }
                 }
                 Account.InstanceType.MASTODON, Account.InstanceType.PLEROMA -> {
@@ -231,10 +236,10 @@ class V10Loader(
         if (!isEmpty && idGetter.getUntilId() == null) {
             return@runCancellableCatching emptyList()
         }
-        val api = misskeyAPIProvider.get(account) as MisskeyAPIV10
+        val api = misskeyAPIProvider.get(account)
         val func = when(type) {
-            is RequestType.Follower -> api::followers
-            is RequestType.Following -> api::following
+            is RequestType.Follower -> api::followers4V10
+            is RequestType.Following -> api::following4V10
         }
         val body = func(
             RequestFollowFollower(
@@ -260,7 +265,7 @@ class DefaultLoader(
     val idGetter: IdGetter<String>,
 ) : PreviousLoader<FollowFollowerResponseItemType> {
     override suspend fun loadPrevious(): Result<List<FollowFollowerResponseItemType>> = runCancellableCatching{
-        val api = misskeyAPIProvider.get(account) as MisskeyAPIV11
+        val api = misskeyAPIProvider.get(account)
         val func = when(type) {
             is RequestType.Follower -> api::followers
             is RequestType.Following -> api::following

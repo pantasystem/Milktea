@@ -63,6 +63,12 @@ data class NodeInfo(
                 override val version: String
             ) : Pleroma
         }
+
+        data class Firefish(
+            override val version: String,
+            override val name: String
+        ) : SoftwareType
+
         data class Other(
             override val version: String,
             override val name: String
@@ -78,6 +84,7 @@ data class NodeInfo(
         "foundkey" -> SoftwareType.Misskey.Foundkey(version = software.version, name = software.name)
         "pleroma" -> SoftwareType.Pleroma.Normal(version = software.version, name = software.name)
         "akkoma" -> SoftwareType.Pleroma.Akkoma(version = software.version, name = software.name)
+        "firefish" -> SoftwareType.Firefish(version = software.version, name = software.name)
         else -> SoftwareType.Other(version = software.version, name = software.name)
     }
 }

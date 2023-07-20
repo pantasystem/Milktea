@@ -20,7 +20,7 @@ sealed interface TextType {
 
 fun getTextType(account: Account, note: NoteRelation, instanceEmojis: Map<String, Emoji>?): TextType? {
     return when (account.instanceType) {
-        Account.InstanceType.MISSKEY -> {
+        Account.InstanceType.MISSKEY, Account.InstanceType.FIREFISH -> {
             val root = MFMParser.parse(
                 note.note.text,
                 (note.note.emojis?.associateBy { it.name }?.toMap()),
