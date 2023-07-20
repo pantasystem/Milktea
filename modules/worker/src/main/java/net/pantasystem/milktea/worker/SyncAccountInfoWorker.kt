@@ -9,12 +9,8 @@ import androidx.work.WorkerParameters
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import net.pantasystem.milktea.common.Logger
-import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.AccountRepository
-import net.pantasystem.milktea.model.nodeinfo.NodeInfo
-import net.pantasystem.milktea.model.nodeinfo.NodeInfoRepository
-import net.pantasystem.milktea.model.user.User
-import net.pantasystem.milktea.model.user.UserRepository
+import net.pantasystem.milktea.model.account.SyncAccountInfoUseCase
 import java.util.concurrent.TimeUnit
 
 @HiltWorker
@@ -22,9 +18,8 @@ class SyncAccountInfoWorker @AssistedInject constructor(
     @Assisted val context: Context,
     @Assisted val params: WorkerParameters,
     private val accountRepository: AccountRepository,
-    private val nodeInfoRepository: NodeInfoRepository,
-    private val userRepository: UserRepository,
     private val loggerFactory: Logger.Factory,
+    private val syncAccountInfoUseCase: SyncAccountInfoUseCase,
 ) : CoroutineWorker(context, params) {
 
     private val logger by lazy {
@@ -46,29 +41,16 @@ class SyncAccountInfoWorker @AssistedInject constructor(
             }
 
             val successfulCounts = accounts.map { account ->
-                try {
-                    val nodeInfo = nodeInfoRepository.find(account.getHost()).getOrThrow()
-                    val user = userRepository.find(User.Id(account.accountId, account.remoteId))
-                    val remoteSoftwareType = when (nodeInfo.type) {
-                        is NodeInfo.SoftwareType.Firefish -> Account.InstanceType.FIREFISH
-                        is NodeInfo.SoftwareType.Mastodon -> Account.InstanceType.MASTODON
-                        is NodeInfo.SoftwareType.Misskey -> Account.InstanceType.MISSKEY
-                        is NodeInfo.SoftwareType.Pleroma -> Account.InstanceType.PLEROMA
-                        is NodeInfo.SoftwareType.Other -> throw IllegalStateException("unknown type of software:${nodeInfo.type}")
+                syncAccountInfoUseCase(account).onFailure {
+                    logger.error("failed to sync account info", it)
+                }.fold(
+                    onSuccess = {
+                        true
+                    },
+                    onFailure = {
+                        false
                     }
-                    if (account.instanceType != remoteSoftwareType || user.userName != account.userName) {
-                        accountRepository.add(
-                            account.copy(
-                                instanceType = remoteSoftwareType,
-                                userName = account.userName
-                            ), false
-                        )
-                    }
-                    true
-                } catch (e: Exception) {
-                    logger.error("failed to sync account info", e)
-                    false
-                }
+                )
             }.count {
                 it
             }
