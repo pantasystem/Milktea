@@ -78,7 +78,12 @@ class FeatureEnablesImplTest {
         )
         val result = impl.enableFeatures("https://misskey.dev")
         Assertions.assertEquals(
-            setOf(FeatureType.Messaging, FeatureType.Drive, FeatureType.Group),
+            setOf(
+                FeatureType.Messaging,
+                FeatureType.Drive,
+                FeatureType.Group,
+                FeatureType.PostReactionUsers
+            ),
             result,
         )
     }
@@ -119,7 +124,8 @@ class FeatureEnablesImplTest {
                 FeatureType.Clip,
                 FeatureType.Group,
                 FeatureType.Drive,
-                FeatureType.Messaging
+                FeatureType.Messaging,
+                FeatureType.PostReactionUsers,
             ),
             result,
         )
@@ -160,7 +166,8 @@ class FeatureEnablesImplTest {
                 FeatureType.Clip,
                 FeatureType.Group,
                 FeatureType.Drive,
-                FeatureType.Messaging
+                FeatureType.Messaging,
+                FeatureType.PostReactionUsers,
             ),
             result,
         )
@@ -203,7 +210,8 @@ class FeatureEnablesImplTest {
                 FeatureType.Drive,
                 FeatureType.Messaging,
                 FeatureType.Gallery,
-                FeatureType.Antenna
+                FeatureType.Antenna,
+                FeatureType.PostReactionUsers,
             ),
             result,
         )
@@ -247,7 +255,8 @@ class FeatureEnablesImplTest {
                 FeatureType.Messaging,
                 FeatureType.Gallery,
                 FeatureType.Antenna,
-                FeatureType.ReactionAcceptance
+                FeatureType.ReactionAcceptance,
+                FeatureType.PostReactionUsers,
             ),
             result,
         )
@@ -290,6 +299,7 @@ class FeatureEnablesImplTest {
                 FeatureType.Gallery,
                 FeatureType.Antenna,
                 FeatureType.ReactionAcceptance,
+                FeatureType.PostReactionUsers,
             ),
             result,
         )
@@ -332,7 +342,8 @@ class FeatureEnablesImplTest {
                 FeatureType.Gallery,
                 FeatureType.Antenna,
                 FeatureType.Group,
-                FeatureType.Messaging
+                FeatureType.Messaging,
+                FeatureType.PostReactionUsers,
             ),
             result,
         )
@@ -407,7 +418,8 @@ class FeatureEnablesImplTest {
                 FeatureType.Gallery,
                 FeatureType.Antenna,
                 FeatureType.Group,
-                FeatureType.Messaging
+                FeatureType.Messaging,
+                FeatureType.PostReactionUsers,
             ),
             result,
         )
