@@ -372,4 +372,45 @@ class FeatureEnablesImplTest {
         )
     }
 
+    @OptIn(ExperimentalCoroutinesApi::class)
+    @Test
+    fun enableFeatures_GiveFirefish() = runTest {
+        val impl = FeatureEnablesImpl(
+            metaRepository = mock() {
+                onBlocking {
+                    find(any())
+                } doReturn Result.failure(IllegalArgumentException())
+            },
+            nodeInfoRepository = mock() {
+                onBlocking {
+                    find(any())
+                } doReturn Result.success(
+                    NodeInfo(
+                        host = "example.com",
+                        version = "2.0",
+                        software = NodeInfo.Software(
+                            name = "firefish",
+                            version = "1.0.0"
+                        )
+                    )
+                )
+            },
+            ioDispatcher = Dispatchers.Default
+        )
+        val result = impl.enableFeatures("https://example.com")
+        Assertions.assertEquals(
+            setOf(
+                FeatureType.Channel,
+                FeatureType.UserReactionHistory,
+                FeatureType.Clip,
+                FeatureType.Drive,
+                FeatureType.Gallery,
+                FeatureType.Antenna,
+                FeatureType.Group,
+                FeatureType.Messaging
+            ),
+            result,
+        )
+    }
+
 }
