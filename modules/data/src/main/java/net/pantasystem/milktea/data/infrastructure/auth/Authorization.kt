@@ -103,7 +103,7 @@ fun Authorization.Waiting4UserAuthorization.Companion.from(state: TemporarilyAut
             )
         }
         is TemporarilyAuthState.Firefish-> {
-            Authorization.Waiting4UserAuthorization.Misskey(
+            Authorization.Waiting4UserAuthorization.Firefish(
                 appSecret = state.secret,
                 session = state.session,
                 instanceBaseURL = state.instanceDomain,

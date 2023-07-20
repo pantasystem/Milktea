@@ -275,21 +275,21 @@ class AuthStateHelper @Inject constructor(
             a.accessToken.newAccount(a.instanceBaseURL),
             false
         ).getOrThrow()
-        val user = when (a.accessToken) {
+        val user = when (val token = a.accessToken) {
             is AccessToken.Mastodon -> {
-                (a.accessToken as AccessToken.Mastodon).account.toModel(account)
+                token.account.toModel(account)
             }
             is AccessToken.Misskey -> {
                 userDTOEntityConverter.convert(
                     account,
-                    (a.accessToken as AccessToken.Misskey).user,
+                    token.user,
                     true
                 ) as User.Detail
             }
             is AccessToken.MisskeyIdAndPassword -> {
                 userDTOEntityConverter.convert(
                     account,
-                    (a.accessToken as AccessToken.MisskeyIdAndPassword).user,
+                    token.user,
                     true
                 ) as User.Detail
             }
@@ -299,7 +299,7 @@ class AuthStateHelper @Inject constructor(
             is AccessToken.Firefish -> {
                 userDTOEntityConverter.convert(
                     account,
-                    (a.accessToken as AccessToken.Firefish).user,
+                    token.user,
                     true
                 ) as User.Detail
             }

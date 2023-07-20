@@ -14,7 +14,7 @@ fun AccessToken.Misskey.newAccount(instanceDomain: String): Account {
 }
 
 fun AccessToken.Firefish.newAccount(instanceDomain: String): Account {
-    return this.user.newAccount(
+    return this.user.newAccount4Firefish(
         instanceDomain,
         Hash.sha256(accessToken + appSecret)
     )
@@ -93,5 +93,26 @@ fun UserDTO.newAccount(instanceDomain: String, token: String): Account {
         //emojis = this.emojis?: emptyList(),
         pages = emptyList(),
         instanceType = Account.InstanceType.MISSKEY
+    )
+}
+
+fun UserDTO.newAccount4Firefish(instanceDomain: String, token: String): Account {
+    return Account(
+        remoteId = this.id,
+        instanceDomain = instanceDomain,
+        userName = this.userName,
+        /*name = this.name,
+        description = this.description,
+        followersCount = this.followersCount?: 0,
+        followingCount = this.followingCount?: 0,
+        notesCount = this.notesCount?: 0,
+        isBot = this.isBot,
+        isCat = this.isCat,
+        avatarUrl = this.avatarUrl,
+        bannerUrl = this.bannerUrl,*/
+        token = token,
+        //emojis = this.emojis?: emptyList(),
+        pages = emptyList(),
+        instanceType = Account.InstanceType.FIREFISH
     )
 }
