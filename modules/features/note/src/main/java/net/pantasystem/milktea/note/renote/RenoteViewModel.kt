@@ -143,6 +143,7 @@ class RenoteViewModel @Inject constructor(
             noteState = syncState,
             accounts = accounts,
             canQuote = instanceInfo is InstanceInfoType.Misskey
+                    || instanceInfo is InstanceInfoType.Firefish
                     || (instanceInfo as? InstanceInfoType.Mastodon)?.info?.featureQuote == true
         )
     }.stateIn(
