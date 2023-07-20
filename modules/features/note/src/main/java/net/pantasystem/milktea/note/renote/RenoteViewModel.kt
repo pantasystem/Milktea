@@ -15,7 +15,6 @@ import net.pantasystem.milktea.common.asLoadingStateFlow
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.instance.InstanceInfoService
-import net.pantasystem.milktea.model.instance.InstanceInfoType
 import net.pantasystem.milktea.model.notes.*
 import net.pantasystem.milktea.model.notes.repost.CreateRenoteMultipleAccountUseCase
 import net.pantasystem.milktea.model.user.User
@@ -126,11 +125,14 @@ class RenoteViewModel @Inject constructor(
     )
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    private val currentAccountInstanceInfo = accountStore.observeCurrentAccount.filterNotNull().flatMapLatest {
+    private val currentAccountInstanceInfo = _targetNoteId.filterNotNull().map {
+        accountRepository.get(it.accountId).getOrThrow()
+    }.flatMapLatest {
         instanceInfoService.observe(it.normalizedInstanceUri)
     }.catch {
         logger.error("observe current account error", it)
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
+
 
     val uiState = combine(
         _targetNoteId,
@@ -138,13 +140,14 @@ class RenoteViewModel @Inject constructor(
         accountWithUsers,
         currentAccountInstanceInfo,
     ) { noteId, syncState, accounts, instanceInfo ->
+        logger.debug {
+            "canQuote: ${instanceInfo?.canQuote}"
+        }
         RenoteViewModelUiState(
             targetNoteId = noteId,
             noteState = syncState,
             accounts = accounts,
-            canQuote = instanceInfo is InstanceInfoType.Misskey
-                    || instanceInfo is InstanceInfoType.Firefish
-                    || (instanceInfo as? InstanceInfoType.Mastodon)?.info?.featureQuote == true
+            canQuote = instanceInfo?.canQuote ?: false
         )
     }.stateIn(
         viewModelScope,

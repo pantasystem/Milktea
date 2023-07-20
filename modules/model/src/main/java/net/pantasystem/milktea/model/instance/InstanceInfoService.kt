@@ -95,7 +95,22 @@ open class InstanceInfoService @Inject constructor(
                         }
                     }
                 }
-                else -> flowOf(null)
+                is NodeInfo.SoftwareType.Firefish -> {
+                    metaRepository.observe(instanceDomain).map {
+                        it?.let {
+                            InstanceInfoType.Firefish(it)
+                        }
+                    }
+                }
+                is NodeInfo.SoftwareType.Pleroma -> {
+                    mastodonInstanceInfoRepository.observe(instanceDomain).map {
+                        it?.let {
+                            InstanceInfoType.Pleroma(it)
+                        }
+                    }
+                }
+                is NodeInfo.SoftwareType.Other -> flowOf(null)
+                null -> flowOf(null)
             }
         }
     }
