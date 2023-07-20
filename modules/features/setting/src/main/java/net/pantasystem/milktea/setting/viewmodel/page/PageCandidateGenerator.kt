@@ -21,6 +21,7 @@ class PageCandidateGenerator @Inject constructor(
         val nodeInfo = nodeInfoRepository.find(related.getHost()).getOrNull()
         val version = nodeInfo?.type?.getVersion() ?: Version("0")
         val isCalckey = nodeInfo?.type is NodeInfo.SoftwareType.Misskey.Calckey
+        val isFirefish = nodeInfo?.type is NodeInfo.SoftwareType.Firefish
 
         val isSameAccount = related.accountId == currentAccount?.accountId || currentAccount == null
         val restrictionTypes = setOf(
@@ -30,7 +31,7 @@ class PageCandidateGenerator @Inject constructor(
             PageType.DETAIL,
         )
         return when (related.instanceType) {
-            Account.InstanceType.MISSKEY, Account.InstanceType.FIREFISH -> {
+            Account.InstanceType.MISSKEY -> {
                 listOfNotNull(
                     PageCandidate(
                         related,
@@ -52,7 +53,7 @@ class PageCandidateGenerator @Inject constructor(
                         PageType.GLOBAL,
                         StringSource(R.string.global_timeline)
                     ),
-                    if (isCalckey) PageCandidate(
+                    if (isCalckey || isFirefish) PageCandidate(
                         related,
                         PageType.CALCKEY_RECOMMENDED_TIMELINE,
                         StringSource(R.string.calckey_recomended_timeline)
@@ -162,6 +163,133 @@ class PageCandidateGenerator @Inject constructor(
                 } else {
                     emptyList()
                 }
+            }
+            Account.InstanceType.FIREFISH -> {
+                listOfNotNull(
+                    PageCandidate(
+                        related,
+                        PageType.HOME,
+                        StringSource(R.string.home_timeline)
+                    ),
+                    PageCandidate(
+                        related,
+                        PageType.LOCAL,
+                        StringSource(R.string.local_timeline)
+                    ),
+                    PageCandidate(
+                        related,
+                        PageType.SOCIAL,
+                        StringSource(R.string.hybrid_timeline)
+                    ),
+                    PageCandidate(
+                        related,
+                        PageType.GLOBAL,
+                        StringSource(R.string.global_timeline)
+                    ),
+                    PageCandidate(
+                        related,
+                        PageType.CALCKEY_RECOMMENDED_TIMELINE,
+                        StringSource(R.string.calckey_recomended_timeline)
+                    ),
+                    PageCandidate(
+                        related,
+                        PageType.ANTENNA,
+                        StringSource(R.string.antenna)
+                    ),
+                    PageCandidate(
+                        related,
+                        PageType.NOTIFICATION,
+                        StringSource(R.string.notification)
+                    ),
+                    PageCandidate(
+                        related,
+                        PageType.USER_LIST,
+                        StringSource(R.string.user_list)
+                    ),
+                    PageCandidate(
+                        related,
+                        PageType.MENTION,
+                        StringSource(R.string.mention)
+                    ),
+                    PageCandidate(
+                        related,
+                        PageType.FAVORITE,
+                        StringSource(R.string.favorite)
+                    ),
+                    PageCandidate(
+                        related,
+                        PageType.CHANNEL_TIMELINE,
+                        StringSource(R.string.channel)
+                    ),
+                    PageCandidate(
+                        related,
+                        PageType.CLIP_NOTES,
+                        StringSource(R.string.clip)
+                    ),
+                    PageCandidate(
+                        related,
+                        PageType.SEARCH,
+                        StringSource(R.string.search)
+                    ),
+                    PageCandidate(
+                        related,
+                        PageType.SEARCH_HASH,
+                        StringSource(R.string.tag)
+                    ),
+                    PageCandidate(
+                        related,
+                        PageType.FEATURED,
+                        StringSource(R.string.featured)
+                    ),
+                    PageCandidate(
+                        related,
+                        PageType.USER,
+                        StringSource(R.string.user)
+                    ),
+                    PageCandidate(
+                        related,
+                        PageType.DETAIL,
+                        StringSource(R.string.detail)
+                    ),
+                    PageCandidate(
+                        related,
+                        PageType.GALLERY_FEATURED,
+                        StringSource(R.string.featured) + StringSource("(") + StringSource(R.string.gallery) + StringSource(
+                            ")"
+                        )
+                    ),
+                    PageCandidate(
+                        related,
+                        PageType.GALLERY_POPULAR,
+                        StringSource(R.string.popular_posts) + StringSource("(") + StringSource(
+                            R.string.gallery
+                        ) + StringSource(")")
+                    ),
+                    PageCandidate(
+                        related,
+                        PageType.GALLERY_POSTS,
+                        StringSource(R.string.gallery),
+                    ),
+                    PageCandidate(
+                        related,
+                        PageType.MY_GALLERY_POSTS,
+                        StringSource(R.string.my_posts) + StringSource("(") + StringSource(R.string.gallery) + StringSource(
+                            ")"
+                        ),
+                    ),
+                    PageCandidate(
+                        related,
+                        PageType.USERS_GALLERY_POSTS,
+                        StringSource(R.string.gallery) + StringSource("(User)")
+                    ),
+                    PageCandidate(
+                        related,
+                        PageType.I_LIKED_GALLERY_POSTS,
+                        StringSource(R.string.my_liking) + StringSource("(") + StringSource(R.string.gallery) + StringSource(
+                            ")"
+                        ),
+                    ),
+                )
             }
             Account.InstanceType.MASTODON, Account.InstanceType.PLEROMA -> {
                 listOf(

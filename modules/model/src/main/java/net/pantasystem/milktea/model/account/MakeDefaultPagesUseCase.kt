@@ -42,6 +42,7 @@ class MakeDefaultPagesUseCase(
     operator fun invoke(account: Account, meta: Meta?) : List<Page> {
         val nodeInfo = nodeInfoRepository.get(account.getHost())
         val isCalckey = nodeInfo?.type is NodeInfo.SoftwareType.Misskey.Calckey
+        val isFirefish = nodeInfo?.type is NodeInfo.SoftwareType.Firefish
         return when(account.instanceType) {
             Account.InstanceType.MISSKEY, Account.InstanceType.FIREFISH -> {
                 val isGlobalEnabled = !(meta?.disableGlobalTimeline ?: false)
@@ -59,7 +60,7 @@ class MakeDefaultPagesUseCase(
                 if (isGlobalEnabled) {
                     defaultPages.add(PageableTemplate(account).globalTimeline(pageDefaultStrings.globalTimeline))
                 }
-                if (isCalckey) {
+                if (isCalckey || isFirefish) {
                     defaultPages.add(PageableTemplate(account).calckeyRecommendedTimeline(pageDefaultStrings.recommendedTimeline))
                 }
                 defaultPages
