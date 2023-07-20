@@ -1,5 +1,3 @@
-@file:Suppress("DEPRECATION")
-
 package net.pantasystem.milktea.data.infrastructure.account
 
 import net.pantasystem.milktea.api.misskey.users.UserDTO
@@ -14,6 +12,14 @@ fun AccessToken.Misskey.newAccount(instanceDomain: String): Account {
         Hash.sha256(accessToken + appSecret)
     )
 }
+
+fun AccessToken.Firefish.newAccount(instanceDomain: String): Account {
+    return this.user.newAccount(
+        instanceDomain,
+        Hash.sha256(accessToken + appSecret)
+    )
+}
+
 fun AccessToken.Mastodon.newAccount(
     instanceDomain: String,
 ): Account {
@@ -59,6 +65,9 @@ fun AccessToken.newAccount(instanceDomain: String): Account {
             this.newAccount(instanceDomain)
         }
         is AccessToken.Pleroma -> {
+            this.newAccount(instanceDomain)
+        }
+        is AccessToken.Firefish -> {
             this.newAccount(instanceDomain)
         }
     }

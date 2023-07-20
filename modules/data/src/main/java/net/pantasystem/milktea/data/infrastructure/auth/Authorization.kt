@@ -53,6 +53,17 @@ sealed interface Authorization {
             }
         }
 
+        data class Firefish(
+            override val instanceBaseURL: String,
+            val viaName: String?,
+            val appSecret: String,
+            val session: Session
+        ) : Waiting4UserAuthorization {
+            override fun generateAuthUrl(): String {
+                return session.url
+            }
+        }
+
     }
 
 
@@ -89,6 +100,14 @@ fun Authorization.Waiting4UserAuthorization.Companion.from(state: TemporarilyAut
                 client = state.app,
                 instanceBaseURL = state.instanceDomain,
                 scope = state.scope
+            )
+        }
+        is TemporarilyAuthState.Firefish-> {
+            Authorization.Waiting4UserAuthorization.Misskey(
+                appSecret = state.secret,
+                session = state.session,
+                instanceBaseURL = state.instanceDomain,
+                viaName = state.viaName
             )
         }
     }

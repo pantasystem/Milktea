@@ -14,6 +14,7 @@ import net.pantasystem.milktea.data.api.mastodon.MastodonAPIProvider
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
 import net.pantasystem.milktea.data.infrastructure.auth.Authorization
 import net.pantasystem.milktea.data.infrastructure.auth.custom.AccessToken
+import net.pantasystem.milktea.data.infrastructure.auth.custom.toFirefishModel
 import net.pantasystem.milktea.data.infrastructure.auth.custom.toModel
 import net.pantasystem.milktea.data.infrastructure.auth.custom.toPleromaModel
 import javax.inject.Inject
@@ -43,6 +44,10 @@ class GetAccessToken @Inject constructor(
                     }
                     is Authorization.Waiting4UserAuthorization.Pleroma -> {
                         getAccessToken4Pleroma(a, code!!)
+                    }
+                    is Authorization.Waiting4UserAuthorization.Firefish -> {
+                        val accessToken = getFirefishAccessToken(a)
+                        accessToken.toFirefishModel(a.appSecret)
                     }
                 }
             }
@@ -108,6 +113,23 @@ class GetAccessToken @Inject constructor(
             }
             delay(100)
             getMisskeyAccessToken(a, retryCount + 1)
+        }
+    }
+
+    private suspend fun getFirefishAccessToken(a: Authorization.Waiting4UserAuthorization.Firefish, retryCount: Int = 0): net.pantasystem.milktea.api.misskey.auth.AccessToken {
+        return try {
+            misskeyAPIServiceBuilder.buildAuthAPI(a.instanceBaseURL).getAccessToken(
+                UserKey(
+                    appSecret = a.appSecret,
+                    a.session.token
+                )
+            ).throwIfHasError().body()!!
+        } catch (e: APIError) {
+            if (retryCount > 25) {
+                throw e
+            }
+            delay(100)
+            getFirefishAccessToken(a, retryCount + 1)
         }
     }
 }
