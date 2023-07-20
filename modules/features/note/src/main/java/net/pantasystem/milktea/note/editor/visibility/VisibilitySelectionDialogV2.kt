@@ -178,9 +178,7 @@ fun VisibilitySelectionDialogLayout(
                     }
                 }
 
-                if (currentAccountInstanceType == Account.InstanceType.MISSKEY
-                    || currentAccountInstanceType == Account.InstanceType.FIREFISH
-                ) {
+                if (enableFeatures.contains(FeatureType.Channel)) {
                     item {
                         VisibilityChannelTitle()
                     }
