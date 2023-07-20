@@ -23,6 +23,7 @@ import net.pantasystem.milktea.data.streaming.SocketWithAccountProvider
 import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.account.ClientIdRepository
 import net.pantasystem.milktea.model.notes.NoteDataSource
+import net.pantasystem.milktea.worker.SyncAccountInfoWorker
 import net.pantasystem.milktea.worker.SyncNodeInfoCacheWorker
 import net.pantasystem.milktea.worker.drive.CleanupUnusedDriveCacheWorker
 import net.pantasystem.milktea.worker.emoji.cache.CacheCustomEmojiImageWorker
@@ -190,6 +191,11 @@ class MiApplication : Application(), Configuration.Provider {
                 "syncLoggedInUsers",
                 ExistingPeriodicWorkPolicy.REPLACE,
                 SyncLoggedInUserInfoWorker.createPeriodicWorkRequest(),
+            )
+            enqueueUniquePeriodicWork(
+                "syncAccountInfo",
+                ExistingPeriodicWorkPolicy.REPLACE,
+                SyncAccountInfoWorker.createPeriodicWorkRequest(),
             )
 //            enqueueUniquePeriodicWork(
 //                "scheduleAuthInstancePostWorker",
