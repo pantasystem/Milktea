@@ -28,6 +28,7 @@ import net.pantasystem.milktea.model.file.AppFile
 import net.pantasystem.milktea.model.file.FilePreviewSource
 import net.pantasystem.milktea.model.file.UpdateAppFileSensitiveUseCase
 import net.pantasystem.milktea.model.instance.FeatureEnables
+import net.pantasystem.milktea.model.instance.FeatureType
 import net.pantasystem.milktea.model.instance.InstanceInfo
 //import net.pantasystem.milktea.model.instance.InstanceInfoRepository
 import net.pantasystem.milktea.model.instance.InstanceInfoService
@@ -471,7 +472,7 @@ class NoteEditorViewModel @Inject constructor(
     }
 
     fun toggleNsfw(appFile: AppFile) {
-        if (_currentAccount.value?.instanceType == Account.InstanceType.MASTODON) {
+        if (!enableFeatures.value.contains(FeatureType.Drive)) {
             return
         }
         when (appFile) {
