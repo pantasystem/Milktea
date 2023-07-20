@@ -65,6 +65,13 @@ internal class CustomEmojiApiAdapterImpl @Inject constructor(
                         ?.emojis
                 }
             }
+            is NodeInfo.SoftwareType.Firefish -> {
+                misskeyAPIProvider.get("https://${nodeInfo.host}")
+                    .getMeta(RequestMeta(detail = true))
+                    .throwIfHasError()
+                    .body()
+                    ?.emojis
+            }
             is NodeInfo.SoftwareType.Other -> throw IllegalStateException()
         } ?: throw IllegalArgumentException()
     }
