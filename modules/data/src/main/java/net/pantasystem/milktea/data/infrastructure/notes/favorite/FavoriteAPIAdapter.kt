@@ -22,7 +22,7 @@ class FavoriteAPIAdapter @Inject constructor(
     suspend fun create(noteId: Note.Id): SuccessfulResponseData {
         val account = getAccount.get(noteId.accountId)
         return when(account.instanceType) {
-            Account.InstanceType.MISSKEY -> {
+            Account.InstanceType.MISSKEY, Account.InstanceType.FIREFISH -> {
                 misskeyAPIProvider.get(account).createFavorite(CreateFavorite(i = account.token, noteId = noteId.noteId))
                     .throwIfHasError()
                 SuccessfulResponseData.Misskey
@@ -39,7 +39,7 @@ class FavoriteAPIAdapter @Inject constructor(
     suspend fun delete(noteId: Note.Id): SuccessfulResponseData {
         val account = getAccount.get(noteId.accountId)
         return when(account.instanceType) {
-            Account.InstanceType.MISSKEY -> {
+            Account.InstanceType.MISSKEY, Account.InstanceType.FIREFISH -> {
                 misskeyAPIProvider.get(account).deleteFavorite(DeleteFavorite(i = account.token, noteId = noteId.noteId))
                     .throwIfHasError()
                 SuccessfulResponseData.Misskey

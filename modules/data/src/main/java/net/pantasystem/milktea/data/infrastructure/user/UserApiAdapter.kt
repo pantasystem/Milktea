@@ -38,7 +38,7 @@ internal class UserApiAdapterImpl @Inject constructor(
     override suspend fun show(userId: User.Id, detail: Boolean): User {
         val account = accountRepository.get(userId.accountId).getOrThrow()
         return when (account.instanceType) {
-            Account.InstanceType.MISSKEY -> {
+            Account.InstanceType.MISSKEY, Account.InstanceType.FIREFISH -> {
                 val res = misskeyAPIProvider.get(account).showUser(
                     RequestUser(
                         i = account.token,
@@ -79,7 +79,7 @@ internal class UserApiAdapterImpl @Inject constructor(
     ): SearchResult {
         val account = accountRepository.get(accountId).getOrThrow()
         return when (account.instanceType) {
-            Account.InstanceType.MISSKEY -> {
+            Account.InstanceType.MISSKEY, Account.InstanceType.FIREFISH -> {
                 val api = misskeyAPIProvider.get(account)
                 val body = requireNotNull(
                     SearchByUserAndHost(api)

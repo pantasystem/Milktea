@@ -40,7 +40,7 @@ class NoteApiAdapter @Inject constructor(
 
     suspend fun create(createNote: CreateNote): NoteCreatedResultType {
         return when (createNote.author.instanceType) {
-            Account.InstanceType.MISSKEY -> {
+            Account.InstanceType.MISSKEY, Account.InstanceType.FIREFISH -> {
                 val task = PostNoteTask(
                     createNote,
                     createNote.author,
@@ -105,7 +105,7 @@ class NoteApiAdapter @Inject constructor(
     suspend fun showNote(noteId: Note.Id): ShowNoteResultType {
         val account = accountRepository.get(noteId.accountId).getOrThrow()
         return when (account.instanceType) {
-            Account.InstanceType.MISSKEY -> {
+            Account.InstanceType.MISSKEY, Account.InstanceType.FIREFISH -> {
                 val body = misskeyAPIProvider.get(account).showNote(
                     NoteRequest(
                         i = account.token,
@@ -126,7 +126,7 @@ class NoteApiAdapter @Inject constructor(
     suspend fun delete(noteId: Note.Id): DeleteNoteResultType {
         val account = accountRepository.get(noteId.accountId).getOrThrow()
         return when (account.instanceType) {
-            Account.InstanceType.MISSKEY -> {
+            Account.InstanceType.MISSKEY, Account.InstanceType.FIREFISH -> {
                 misskeyAPIProvider.get(account).delete(
                     DeleteNote(
                         i = account.token,
@@ -147,7 +147,7 @@ class NoteApiAdapter @Inject constructor(
     suspend fun createThreadMute(noteId: Note.Id): ToggleThreadMuteResultType {
         val account = accountRepository.get(noteId.accountId).getOrThrow()
         return when (account.instanceType) {
-            Account.InstanceType.MISSKEY -> {
+            Account.InstanceType.MISSKEY, Account.InstanceType.FIREFISH -> {
                 misskeyAPIProvider.get(account).createThreadMute(
                     ToggleThreadMuteRequest(
                         i = account.token,
@@ -169,7 +169,7 @@ class NoteApiAdapter @Inject constructor(
     suspend fun deleteThreadMute(noteId: Note.Id): ToggleThreadMuteResultType {
         val account = accountRepository.get(noteId.accountId).getOrThrow()
         return when (account.instanceType) {
-            Account.InstanceType.MISSKEY -> {
+            Account.InstanceType.MISSKEY, Account.InstanceType.FIREFISH -> {
                 misskeyAPIProvider.get(account).deleteThreadMute(
                     ToggleThreadMuteRequest(
                         i = account.token,

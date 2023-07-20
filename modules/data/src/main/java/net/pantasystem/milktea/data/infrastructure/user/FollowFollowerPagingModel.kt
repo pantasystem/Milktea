@@ -167,7 +167,7 @@ class FollowFollowerPagingModelImpl(
         runCancellableCatching {
             val account = getAccount.get(requestType.userId.accountId)
             when (account.instanceType) {
-                Account.InstanceType.MISSKEY -> {
+                Account.InstanceType.MISSKEY, Account.InstanceType.FIREFISH -> {
                     when (misskeyAPIProvider.get(account)) {
                         is MisskeyAPIV11 -> {
                             DefaultLoader(

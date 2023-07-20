@@ -1,9 +1,18 @@
 package net.pantasystem.milktea.data.infrastructure.notes
 
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.awaitClose
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.channelFlow
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
 import net.pantasystem.milktea.api_streaming.NoteUpdated
 import net.pantasystem.milktea.api_streaming.mastodon.Event
 import net.pantasystem.milktea.common.Logger
@@ -127,7 +136,7 @@ class NoteCaptureAPIAdapterImpl(
             if (addRepositoryEventListener(id, repositoryEventListener)) {
                 logger.debug("未登録だったのでRemoteに対して購読を開始する")
                 when (account.instanceType) {
-                    Account.InstanceType.MISSKEY -> {
+                    Account.InstanceType.MISSKEY, Account.InstanceType.FIREFISH -> {
                         val job = requireNotNull(noteCaptureAPIWithAccountProvider.get(account))
                             .capture(id.noteId)
                             .catch { e ->

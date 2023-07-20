@@ -22,7 +22,7 @@ class SignOutUseCaseImpl @Inject constructor(
     override suspend fun invoke(account: Account): Result<Unit> {
         return runCancellableCatching {
             when(account.instanceType) {
-                Account.InstanceType.MISSKEY -> {
+                Account.InstanceType.MISSKEY, Account.InstanceType.FIREFISH -> {
                     subscriptionUnRegistration
                         .unregister(account.accountId)
                 }
@@ -32,7 +32,7 @@ class SignOutUseCaseImpl @Inject constructor(
             accountRepository.delete(account)
         }.mapCancellableCatching {
             when(account.instanceType) {
-                Account.InstanceType.MISSKEY -> {
+                Account.InstanceType.MISSKEY, Account.InstanceType.FIREFISH -> {
                     val socket = socketWithAccountProvider.get(account.accountId)
                     if (socket is SocketImpl) {
                         socket.destroy()

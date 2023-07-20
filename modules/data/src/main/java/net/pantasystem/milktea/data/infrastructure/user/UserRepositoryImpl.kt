@@ -25,7 +25,6 @@ import net.pantasystem.milktea.model.user.query.FindUsersQuery4Mastodon
 import net.pantasystem.milktea.model.user.query.FindUsersQuery4Misskey
 import javax.inject.Inject
 
-@Suppress("BlockingMethodInNonBlockingContext")
 internal class UserRepositoryImpl @Inject constructor(
     val userDataSource: UserDataSource,
     val filePropertyDataSource: FilePropertyDataSource,
@@ -223,7 +222,7 @@ internal class UserRepositoryImpl @Inject constructor(
                         async {
                             val account = accountRepository.get(accountId).getOrThrow()
                             when(account.instanceType) {
-                                Account.InstanceType.MISSKEY -> {
+                                Account.InstanceType.MISSKEY, Account.InstanceType.FIREFISH -> {
                                     val users = misskeyAPIProvider.get(account)
                                         .showUsers(
                                             RequestUser(

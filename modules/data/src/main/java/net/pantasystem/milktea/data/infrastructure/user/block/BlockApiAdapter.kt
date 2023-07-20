@@ -24,7 +24,7 @@ class BlockApiAdapterImpl @Inject constructor(
     override suspend fun blockUser(userId: User.Id): BlockUserResult {
         val account = accountRepository.get(userId.accountId).getOrThrow()
         return when (account.instanceType) {
-            Account.InstanceType.MISSKEY -> {
+            Account.InstanceType.MISSKEY, Account.InstanceType.FIREFISH -> {
                 misskeyAPIProvider.get(account).blockUser(
                     RequestUser(
                         i = account.token,
@@ -46,7 +46,7 @@ class BlockApiAdapterImpl @Inject constructor(
     override suspend fun unblockUser(userId: User.Id): UnBlockUserResult {
         val account = accountRepository.get(userId.accountId).getOrThrow()
         return when (account.instanceType) {
-            Account.InstanceType.MISSKEY -> {
+            Account.InstanceType.MISSKEY, Account.InstanceType.FIREFISH -> {
                 misskeyAPIProvider.get(account).unblockUser(
                     RequestUser(
                         i = account.token,

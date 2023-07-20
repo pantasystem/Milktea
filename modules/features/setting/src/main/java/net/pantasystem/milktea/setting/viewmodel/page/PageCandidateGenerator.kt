@@ -30,7 +30,7 @@ class PageCandidateGenerator @Inject constructor(
             PageType.DETAIL,
         )
         return when (related.instanceType) {
-            Account.InstanceType.MISSKEY -> {
+            Account.InstanceType.MISSKEY, Account.InstanceType.FIREFISH -> {
                 listOfNotNull(
                     PageCandidate(
                         related,

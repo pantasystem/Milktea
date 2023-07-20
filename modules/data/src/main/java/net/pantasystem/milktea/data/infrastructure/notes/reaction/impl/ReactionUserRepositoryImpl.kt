@@ -34,7 +34,7 @@ class ReactionUserRepositoryImpl @Inject constructor(
             dao.remove(noteId, reaction)
             dao.createEmptyIfNotExists(noteId, reaction)
             when (account.instanceType) {
-                Account.InstanceType.MISSKEY -> {
+                Account.InstanceType.MISSKEY, Account.InstanceType.FIREFISH -> {
                     var reactions: List<ReactionHistoryDTO>
                     var offset = 0
                     do {

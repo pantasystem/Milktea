@@ -19,7 +19,7 @@ class OnlineUserCountRepositoryImpl @Inject constructor(
     override suspend fun find(accountId: Long): Result<OnlineUserCountResult> = runCancellableCatching {
         val account = accountRepository.get(accountId).getOrThrow()
         when(account.instanceType) {
-            Account.InstanceType.MISSKEY -> {
+            Account.InstanceType.MISSKEY, Account.InstanceType.FIREFISH -> {
                 val res = misskeyAPIProvider.get(account).getOnlineUsersCount(EmptyRequest)
                     .throwIfHasError().body()
                 OnlineUserCountResult.Success(requireNotNull(res?.count))

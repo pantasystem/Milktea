@@ -28,7 +28,7 @@ internal class MuteApiAdapterImpl @Inject constructor(
     override suspend fun muteUser(createMute: CreateMute): UserActionResult {
         val account = accountRepository.get(createMute.userId.accountId).getOrThrow()
         return when (account.instanceType) {
-            Account.InstanceType.MISSKEY -> {
+            Account.InstanceType.MISSKEY, Account.InstanceType.FIREFISH -> {
                 require(createMute.notifications == null) {
                     "Misskey does not support notifications mute account parameter"
                 }
@@ -59,7 +59,7 @@ internal class MuteApiAdapterImpl @Inject constructor(
     override suspend fun unmuteUser(userId: User.Id): UnMuteResult {
         val account = accountRepository.get(userId.accountId).getOrThrow()
         return when (account.instanceType) {
-            Account.InstanceType.MISSKEY -> {
+            Account.InstanceType.MISSKEY, Account.InstanceType.FIREFISH -> {
                 misskeyAPIProvider.get(account).unmuteUser(
                     RequestUser(
                         i = account.token,

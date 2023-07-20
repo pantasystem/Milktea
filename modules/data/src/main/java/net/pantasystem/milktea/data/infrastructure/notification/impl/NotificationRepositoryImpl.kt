@@ -31,7 +31,7 @@ class NotificationRepositoryImpl @Inject constructor(
     override suspend fun markAsRead(accountId: Long): Result<Unit> = runCancellableCatching {
         val account = accountRepository.get(accountId).getOrThrow()
         when(account.instanceType) {
-            Account.InstanceType.MISSKEY -> {
+            Account.InstanceType.MISSKEY, Account.InstanceType.FIREFISH -> {
                 misskeyAPIProvider.get(account).markAllAsReadNotifications(
                     I(
                         account.token

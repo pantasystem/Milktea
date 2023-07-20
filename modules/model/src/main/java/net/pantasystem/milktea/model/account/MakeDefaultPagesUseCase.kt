@@ -43,7 +43,7 @@ class MakeDefaultPagesUseCase(
         val nodeInfo = nodeInfoRepository.get(account.getHost())
         val isCalckey = nodeInfo?.type is NodeInfo.SoftwareType.Misskey.Calckey
         return when(account.instanceType) {
-            Account.InstanceType.MISSKEY -> {
+            Account.InstanceType.MISSKEY, Account.InstanceType.FIREFISH -> {
                 val isGlobalEnabled = !(meta?.disableGlobalTimeline ?: false)
                 val isLocalEnabled = !(meta?.disableLocalTimeline ?: false)
                 val defaultPages = ArrayList<Page>()

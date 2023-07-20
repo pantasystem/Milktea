@@ -121,7 +121,7 @@ data class SearchResultUiState(
     val isTag: Boolean = keyword.startsWith("#") && acct == null
 
     val tabItems: List<SearchResultTabItem> = when (currentAccount?.instanceType) {
-        Account.InstanceType.MISSKEY -> listOfNotNull(
+        Account.InstanceType.MISSKEY, Account.InstanceType.FIREFISH -> listOfNotNull(
             if (isTag) {
                 SearchResultTabItem(
                     title = StringSource(R.string.timeline),

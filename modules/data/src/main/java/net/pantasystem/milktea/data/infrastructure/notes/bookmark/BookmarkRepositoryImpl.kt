@@ -28,7 +28,7 @@ class BookmarkRepositoryImpl @Inject constructor(
         withContext(ioDispatcher) {
             val account = accountRepository.get(noteId.accountId).getOrThrow()
             when(account.instanceType) {
-                Account.InstanceType.MISSKEY -> favoriteRepository.create(noteId).getOrThrow()
+                Account.InstanceType.MISSKEY, Account.InstanceType.FIREFISH -> favoriteRepository.create(noteId).getOrThrow()
                 Account.InstanceType.MASTODON, Account.InstanceType.PLEROMA -> {
                     val body = mastodonAPIProvider.get(account).bookmarkStatus(noteId.noteId)
                         .throwIfHasError()
@@ -43,7 +43,7 @@ class BookmarkRepositoryImpl @Inject constructor(
         withContext(ioDispatcher) {
             val account = accountRepository.get(noteId.accountId).getOrThrow()
             when(account.instanceType) {
-                Account.InstanceType.MISSKEY -> favoriteRepository.delete(noteId).getOrThrow()
+                Account.InstanceType.MISSKEY, Account.InstanceType.FIREFISH -> favoriteRepository.delete(noteId).getOrThrow()
                 Account.InstanceType.MASTODON, Account.InstanceType.PLEROMA -> {
                     val body = mastodonAPIProvider.get(account).unbookmarkStatus(noteId.noteId)
                         .throwIfHasError()
