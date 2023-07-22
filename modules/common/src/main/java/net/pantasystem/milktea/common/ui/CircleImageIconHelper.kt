@@ -1,6 +1,7 @@
 package net.pantasystem.milktea.common.ui
 
 import android.graphics.Outline
+import android.util.TypedValue
 import android.view.View
 import android.view.ViewOutlineProvider
 import android.widget.ImageView
@@ -33,5 +34,21 @@ object CircleOutlineProvider : ViewOutlineProvider() {
         view ?: return
         outline ?: return
         outline.setOval(0, 0, view.width, view.height)
+    }
+}
+
+object RoundedCornerShapeProvider : ViewOutlineProvider() {
+    override fun getOutline(view: View?, outline: Outline?) {
+        view ?: return
+        outline ?: return
+        val left = 0
+        val top = 0
+        val right = view.width
+        val bottom = view.height
+        val cornerRadiusDP = 16f
+        val cornerRadius = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, cornerRadiusDP, view.context.resources.displayMetrics).toInt()
+
+        // all corners
+        outline.setRoundRect(left, top, right, bottom, cornerRadius.toFloat())
     }
 }
