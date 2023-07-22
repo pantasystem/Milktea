@@ -45,7 +45,7 @@ object RoundedCornerShapeProvider : ViewOutlineProvider() {
         val top = 0
         val right = view.width
         val bottom = view.height
-        val cornerRadiusDP = 16f
+        val cornerRadiusDP = 8f
         val cornerRadius = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, cornerRadiusDP, view.context.resources.displayMetrics).toInt()
 
         // all corners
