@@ -10,11 +10,12 @@ MilkteaはMastodonと[Misskey](https://github.com/misskey-dev/misskey)のため�
 
 ## 目標
 Milkteaでは以下のことを達成することを目標とし開発をしました。
+- ソフトウェアの差をできる限り意識させることなくFediverseライフをおくれるようにすること
 - AndroidらしいUIで提供すること
 - 競合サービスから移住してきても違和感なく触れるUIであること
 - 独自機能を追加してより使いやすくすること
 - 継続的な開発ができること
-- Fedivierseの存在を意識せずにFediverse lifeを送れるようにすること
+- Fedivierseの存在を意識せずにFediverse lifeをおくれるようにすること
 
 ## 機能
 ### タイムライン
