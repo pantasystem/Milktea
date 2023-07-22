@@ -1,6 +1,11 @@
 package net.pantasystem.milktea.data.infrastructure.settings
 
-import net.pantasystem.milktea.model.setting.*
+import net.pantasystem.milktea.model.setting.Config
+import net.pantasystem.milktea.model.setting.DefaultConfig
+import net.pantasystem.milktea.model.setting.Keys
+import net.pantasystem.milktea.model.setting.PrefType
+import net.pantasystem.milktea.model.setting.Theme
+import net.pantasystem.milktea.model.setting.allKeys
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 
@@ -161,6 +166,10 @@ class ConfigKtTest {
                 )
                 Keys.EmojiPickerEmojiDisplaySize -> Assertions.assertEquals(
                     config.emojiPickerEmojiDisplaySize,
+                    (u as PrefType.IntPref).value
+                )
+                Keys.AvatarIconShapeType -> Assertions.assertEquals(
+                    config.avatarIconShapeType.value,
                     (u as PrefType.IntPref).value
                 )
             }
