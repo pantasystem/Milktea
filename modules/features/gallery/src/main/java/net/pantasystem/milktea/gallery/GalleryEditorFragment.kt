@@ -14,9 +14,9 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
-import com.google.android.material.composethemeadapter.MdcTheme
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.*
+import net.pantasystem.milktea.common_compose.MilkteaStyleConfigApplyAndTheme
 import net.pantasystem.milktea.common_navigation.*
 import net.pantasystem.milktea.gallery.viewmodel.EditType
 import net.pantasystem.milktea.gallery.viewmodel.GalleryEditorViewModel
@@ -24,6 +24,7 @@ import net.pantasystem.milktea.model.drive.DriveFileRepository
 import net.pantasystem.milktea.model.drive.FileProperty
 import net.pantasystem.milktea.model.drive.FilePropertyDataSource
 import net.pantasystem.milktea.model.file.toAppFile
+import net.pantasystem.milktea.model.setting.LocalConfigRepository
 import javax.inject.Inject
 
 @FlowPreview
@@ -53,6 +54,8 @@ class GalleryEditorFragment : Fragment() {
     @Inject
     lateinit var mediaNavigation: MediaNavigation
 
+    @Inject
+    internal lateinit var configRepository: LocalConfigRepository
 
     val viewModel: GalleryEditorViewModel by viewModels()
 
@@ -71,7 +74,7 @@ class GalleryEditorFragment : Fragment() {
     ): View? {
         return ComposeView(requireContext()).apply {
             setContent {
-                MdcTheme {
+                MilkteaStyleConfigApplyAndTheme(configRepository = configRepository) {
                     GalleryEditorPage(
                         galleryEditorViewModel = viewModel,
                         onAction = this@GalleryEditorFragment::onAction

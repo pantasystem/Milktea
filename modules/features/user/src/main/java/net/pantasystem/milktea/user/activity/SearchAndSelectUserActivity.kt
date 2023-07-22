@@ -10,11 +10,12 @@ import androidx.activity.addCallback
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import com.google.android.material.composethemeadapter.MdcTheme
 import dagger.hilt.android.AndroidEntryPoint
 import net.pantasystem.milktea.common.ui.ApplyTheme
+import net.pantasystem.milktea.common_compose.MilkteaStyleConfigApplyAndTheme
 import net.pantasystem.milktea.common_navigation.SearchAndSelectUserNavigation
 import net.pantasystem.milktea.common_navigation.SearchAndSelectUserNavigationArgs
+import net.pantasystem.milktea.model.setting.LocalConfigRepository
 import net.pantasystem.milktea.model.user.User
 import net.pantasystem.milktea.user.search.SearchAndSelectUserScreen
 import net.pantasystem.milktea.user.search.SearchUserViewModel
@@ -68,6 +69,9 @@ class SearchAndSelectUserActivity : AppCompatActivity() {
     @Inject
     lateinit var applyTheme: ApplyTheme
 
+    @Inject
+    internal lateinit var configRepository: LocalConfigRepository
+
     private val selectedUserViewModel: SelectedUserViewModel by viewModels {
         val selectedUserIdList =
             (intent.getSerializableExtra(EXTRA_SELECTED_USER_IDS) as? ArrayList<*>)?.mapNotNull {
@@ -84,7 +88,7 @@ class SearchAndSelectUserActivity : AppCompatActivity() {
         applyTheme()
 
         setContent {
-            MdcTheme {
+            MilkteaStyleConfigApplyAndTheme(configRepository = configRepository) {
                 SearchAndSelectUserScreen(
                     searchUserViewModel = searchUserViewModel,
                     selectedUserViewModel = selectedUserViewModel,

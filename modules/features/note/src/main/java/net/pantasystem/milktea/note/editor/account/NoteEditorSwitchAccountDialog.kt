@@ -7,10 +7,15 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.ComposeView
 import androidx.fragment.app.activityViewModels
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
-import com.google.android.material.composethemeadapter.MdcTheme
 import dagger.hilt.android.AndroidEntryPoint
 import net.pantasystem.milktea.common_android_ui.account.AccountSwitchingDialogLayout
-import net.pantasystem.milktea.common_navigation.*
+import net.pantasystem.milktea.common_compose.MilkteaStyleConfigApplyAndTheme
+import net.pantasystem.milktea.common_navigation.AccountSettingNavigation
+import net.pantasystem.milktea.common_navigation.AuthorizationArgs
+import net.pantasystem.milktea.common_navigation.AuthorizationNavigation
+import net.pantasystem.milktea.common_navigation.UserDetailNavigation
+import net.pantasystem.milktea.common_navigation.UserDetailNavigationArgs
+import net.pantasystem.milktea.model.setting.LocalConfigRepository
 import net.pantasystem.milktea.note.editor.viewmodel.NoteEditorViewModel
 import javax.inject.Inject
 
@@ -25,6 +30,9 @@ class NoteEditorSwitchAccountDialog : BottomSheetDialogFragment() {
     @Inject
     lateinit var accountSettingNavigation: AccountSettingNavigation
 
+    @Inject
+    internal lateinit var configRepository: LocalConfigRepository
+
     val viewModel: NoteEditorViewModel by activityViewModels()
 
 
@@ -32,7 +40,7 @@ class NoteEditorSwitchAccountDialog : BottomSheetDialogFragment() {
         return super.onCreateDialog(savedInstanceState).apply {
             val view = ComposeView(requireContext()).apply {
                 setContent {
-                    MdcTheme {
+                    MilkteaStyleConfigApplyAndTheme(configRepository = configRepository) {
                         val uiState by viewModel.accountUiState.collectAsState()
                         AccountSwitchingDialogLayout(
                             uiState = uiState,

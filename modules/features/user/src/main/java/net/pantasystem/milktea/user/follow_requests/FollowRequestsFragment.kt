@@ -17,13 +17,14 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
-import com.google.android.material.composethemeadapter.MdcTheme
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import net.pantasystem.milktea.common_android_ui.user.FollowRequestsFragmentFactory
+import net.pantasystem.milktea.common_compose.MilkteaStyleConfigApplyAndTheme
 import net.pantasystem.milktea.common_navigation.UserDetailNavigation
 import net.pantasystem.milktea.common_navigation.UserDetailNavigationArgs
+import net.pantasystem.milktea.model.setting.LocalConfigRepository
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -31,6 +32,9 @@ class FollowRequestsFragment : Fragment() {
 
     @Inject
     lateinit var userDetailNavigation: UserDetailNavigation
+
+    @Inject
+    internal lateinit var configRepository: LocalConfigRepository
 
     val viewModel by viewModels<FollowRequestsViewModel>()
 
@@ -49,7 +53,7 @@ class FollowRequestsFragment : Fragment() {
 
         return ComposeView(requireContext()).apply {
             setContent {
-                MdcTheme {
+                MilkteaStyleConfigApplyAndTheme(configRepository = configRepository) {
                     val uiState by viewModel.uiState.collectAsState()
                     FollowRequestsScreen(
                         modifier = Modifier

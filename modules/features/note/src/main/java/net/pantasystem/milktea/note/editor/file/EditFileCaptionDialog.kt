@@ -9,11 +9,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.ComposeView
 import androidx.fragment.app.activityViewModels
-import com.google.android.material.composethemeadapter.MdcTheme
 import dagger.hilt.android.AndroidEntryPoint
+import net.pantasystem.milktea.common_compose.MilkteaStyleConfigApplyAndTheme
 import net.pantasystem.milktea.common_compose.drive.EditCaptionDialogLayout
 import net.pantasystem.milktea.model.file.AppFile
+import net.pantasystem.milktea.model.setting.LocalConfigRepository
 import net.pantasystem.milktea.note.editor.viewmodel.NoteEditorViewModel
+import javax.inject.Inject
 
 @Suppress("DEPRECATION")
 @AndroidEntryPoint
@@ -30,6 +32,9 @@ class EditFileCaptionDialog : AppCompatDialogFragment() {
         }
     }
 
+    @Inject
+    internal lateinit var configRepository: LocalConfigRepository
+
     val noteEditorViewModel by activityViewModels<NoteEditorViewModel>()
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
@@ -43,7 +48,7 @@ class EditFileCaptionDialog : AppCompatDialogFragment() {
                 var text: String by remember(comment) {
                     mutableStateOf(comment)
                 }
-                MdcTheme {
+                MilkteaStyleConfigApplyAndTheme(configRepository = configRepository) {
                     EditCaptionDialogLayout(
                         value = text,
                         onCancelButtonClicked = {

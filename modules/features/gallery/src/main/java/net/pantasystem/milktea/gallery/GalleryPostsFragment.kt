@@ -13,11 +13,11 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import com.google.android.material.composethemeadapter.MdcTheme
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import net.pantasystem.milktea.common.APIError
 import net.pantasystem.milktea.common.ErrorType
+import net.pantasystem.milktea.common_compose.MilkteaStyleConfigApplyAndTheme
 import net.pantasystem.milktea.common_navigation.*
 import net.pantasystem.milktea.common_viewmodel.CurrentPageableTimelineViewModel
 import net.pantasystem.milktea.gallery.viewmodel.GalleryPostsViewModel
@@ -25,6 +25,7 @@ import net.pantasystem.milktea.gallery.viewmodel.provideFactory
 import net.pantasystem.milktea.model.account.page.Pageable
 import net.pantasystem.milktea.model.file.AppFile
 import net.pantasystem.milktea.model.file.FilePreviewSource
+import net.pantasystem.milktea.model.setting.LocalConfigRepository
 import javax.inject.Inject
 
 @Suppress("DEPRECATION")
@@ -68,6 +69,10 @@ class GalleryPostsFragment : Fragment() {
     @Inject
     lateinit var authorizationNavigation: AuthorizationNavigation
 
+    @Inject
+    internal lateinit var configRepository: LocalConfigRepository
+
+
     private val accountId: Long? by lazy {
         arguments?.getLong(EXTRA_ACCOUNT_ID, -1)?.takeIf {
             it > 0
@@ -88,7 +93,7 @@ class GalleryPostsFragment : Fragment() {
         return ComposeView(requireContext()).apply {
             setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
             setContent {
-                MdcTheme {
+                MilkteaStyleConfigApplyAndTheme(configRepository = configRepository) {
                     GalleryPostCardList(
                         viewModel = viewModel,
                         onAction = {

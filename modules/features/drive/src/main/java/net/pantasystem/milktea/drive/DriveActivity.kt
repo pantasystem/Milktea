@@ -14,17 +14,18 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.lifecycle.ViewTreeLifecycleOwner
 import com.google.accompanist.pager.ExperimentalPagerApi
-import com.google.android.material.composethemeadapter.MdcTheme
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import net.pantasystem.milktea.common.ui.ApplyTheme
 import net.pantasystem.milktea.common_android.platform.PermissionUtil
+import net.pantasystem.milktea.common_compose.MilkteaStyleConfigApplyAndTheme
 import net.pantasystem.milktea.common_navigation.DriveNavigation
 import net.pantasystem.milktea.common_navigation.DriveNavigationArgs
 import net.pantasystem.milktea.common_navigation.EXTRA_ACCOUNT_ID
 import net.pantasystem.milktea.common_navigation.EXTRA_INT_SELECTABLE_FILE_MAX_SIZE
 import net.pantasystem.milktea.common_navigation.EXTRA_SELECTED_FILE_PROPERTY_IDS
 import net.pantasystem.milktea.drive.viewmodel.DriveViewModel
+import net.pantasystem.milktea.model.setting.LocalConfigRepository
 import javax.inject.Inject
 
 class DriveNavigationImpl @Inject constructor(
@@ -50,6 +51,9 @@ class DriveActivity : AppCompatActivity() {
     @Inject
     lateinit var setTheme: ApplyTheme
 
+    @Inject
+    internal lateinit var configRepository: LocalConfigRepository
+
     @OptIn(
         ExperimentalPagerApi::class,
         ExperimentalMaterialApi::class,
@@ -63,7 +67,7 @@ class DriveActivity : AppCompatActivity() {
 
 
         setContent {
-            MdcTheme {
+            MilkteaStyleConfigApplyAndTheme(configRepository = configRepository) {
                 DriveScreen(
                     driveViewModel = _driveViewModel,
                     onNavigateUp = { finish() },

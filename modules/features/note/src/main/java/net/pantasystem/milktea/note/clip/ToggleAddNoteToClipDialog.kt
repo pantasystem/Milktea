@@ -9,9 +9,11 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.ComposeView
 import androidx.fragment.app.viewModels
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
-import com.google.android.material.composethemeadapter.MdcTheme
 import dagger.hilt.android.AndroidEntryPoint
+import net.pantasystem.milktea.common_compose.MilkteaStyleConfigApplyAndTheme
 import net.pantasystem.milktea.model.notes.Note
+import net.pantasystem.milktea.model.setting.LocalConfigRepository
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class ToggleAddNoteToClipDialog : BottomSheetDialogFragment() {
@@ -26,6 +28,9 @@ class ToggleAddNoteToClipDialog : BottomSheetDialogFragment() {
         }
     }
 
+    @Inject
+    internal lateinit var configRepository: LocalConfigRepository
+
     private val viewModel: ToggleAddNoteToClipDialogViewModel by viewModels()
 
     override fun onCreateView(
@@ -37,7 +42,7 @@ class ToggleAddNoteToClipDialog : BottomSheetDialogFragment() {
             requireContext()
         ).apply {
             setContent {
-                MdcTheme {
+                MilkteaStyleConfigApplyAndTheme(configRepository = configRepository) {
                     val uiState by viewModel.uiState.collectAsState()
                     ToggleAddNoteToClipDialogLayout(
                         uiState = uiState,

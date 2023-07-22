@@ -19,16 +19,20 @@ import androidx.compose.ui.platform.rememberNestedScrollInteropConnection
 import androidx.compose.ui.unit.dp
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import com.google.android.material.composethemeadapter.MdcTheme
 import dagger.hilt.android.AndroidEntryPoint
 import net.pantasystem.milktea.common.ResultState
 import net.pantasystem.milktea.common.StateContent
+import net.pantasystem.milktea.common_compose.MilkteaStyleConfigApplyAndTheme
 import net.pantasystem.milktea.common_navigation.SearchNavType
 import net.pantasystem.milktea.common_navigation.SearchNavigation
+import net.pantasystem.milktea.model.setting.LocalConfigRepository
 import javax.inject.Inject
 
 @AndroidEntryPoint
 class TrendFragment : Fragment() {
+
+    @Inject
+    internal lateinit var configRepository: LocalConfigRepository
 
     @Inject
     lateinit var searchNavigation: SearchNavigation
@@ -43,7 +47,7 @@ class TrendFragment : Fragment() {
     ): View {
         return ComposeView(requireContext()).apply {
             setContent {
-                MdcTheme {
+                MilkteaStyleConfigApplyAndTheme(configRepository = configRepository) {
                     val uiState by viewModel.uiState.collectAsState()
                     LazyColumn(
                         modifier = Modifier

@@ -11,11 +11,18 @@ import androidx.compose.runtime.getValue
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.google.android.material.composethemeadapter.MdcTheme
 import dagger.hilt.android.AndroidEntryPoint
 import net.pantasystem.milktea.common.ui.ApplyTheme
-import net.pantasystem.milktea.common_navigation.*
+import net.pantasystem.milktea.common_compose.MilkteaStyleConfigApplyAndTheme
+import net.pantasystem.milktea.common_navigation.ChangedDiffResult
+import net.pantasystem.milktea.common_navigation.MessageNavigation
+import net.pantasystem.milktea.common_navigation.MessageNavigationArgs
+import net.pantasystem.milktea.common_navigation.SearchAndSelectUserNavigation
+import net.pantasystem.milktea.common_navigation.SearchAndSelectUserNavigationArgs
+import net.pantasystem.milktea.common_navigation.UserDetailNavigation
+import net.pantasystem.milktea.common_navigation.UserDetailNavigationArgs
 import net.pantasystem.milktea.model.messaging.MessagingId
+import net.pantasystem.milktea.model.setting.LocalConfigRepository
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -35,6 +42,10 @@ class GroupActivity : AppCompatActivity() {
     @Inject
     lateinit var messageNavigation: MessageNavigation
 
+    @Inject
+    internal lateinit var configRepository: LocalConfigRepository
+
+
     private val groupDetailViewModel: GroupDetailViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -50,7 +61,7 @@ class GroupActivity : AppCompatActivity() {
                 }
             }
 
-            MdcTheme {
+            MilkteaStyleConfigApplyAndTheme(configRepository = configRepository) {
                 NavHost(navController = navController, startDestination = "groups") {
                     composable("groups") {
                         GroupCardListPage(uiState = uiState, onAction = { action ->

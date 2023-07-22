@@ -8,9 +8,10 @@ import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import com.google.android.material.composethemeadapter.MdcTheme
 import dagger.hilt.android.AndroidEntryPoint
 import net.pantasystem.milktea.common.ui.ApplyTheme
+import net.pantasystem.milktea.common_compose.MilkteaStyleConfigApplyAndTheme
+import net.pantasystem.milktea.model.setting.LocalConfigRepository
 import net.pantasystem.milktea.model.user.User
 import net.pantasystem.milktea.user.UserCardActionHandler
 import net.pantasystem.milktea.user.compose.screen.FollowFollowerRoute
@@ -45,6 +46,9 @@ class FollowFollowerActivity : AppCompatActivity() {
     @Inject
     lateinit var applyTheme: ApplyTheme
 
+    @Inject
+    internal lateinit var configRepository: LocalConfigRepository
+
     private val toggleFollowFollowerViewModel: ToggleFollowViewModel by viewModels()
 
     @Inject
@@ -59,7 +63,7 @@ class FollowFollowerActivity : AppCompatActivity() {
         applyTheme()
 
         setContent {
-            MdcTheme {
+            MilkteaStyleConfigApplyAndTheme(configRepository = configRepository) {
                 FollowFollowerRoute(
                     followFollowerViewModel = followFollowerViewModel,
                     toggleFollowViewModel = toggleFollowFollowerViewModel,

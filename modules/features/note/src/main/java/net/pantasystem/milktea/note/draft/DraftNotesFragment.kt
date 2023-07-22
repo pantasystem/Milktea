@@ -9,14 +9,15 @@ import android.view.ViewGroup
 import androidx.compose.ui.platform.ComposeView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import com.google.android.material.composethemeadapter.MdcTheme
 import dagger.hilt.android.AndroidEntryPoint
+import net.pantasystem.milktea.common_compose.MilkteaStyleConfigApplyAndTheme
 import net.pantasystem.milktea.common_navigation.MediaNavigation
 import net.pantasystem.milktea.common_navigation.MediaNavigationArgs
 import net.pantasystem.milktea.model.file.AppFile
 import net.pantasystem.milktea.model.file.FilePreviewSource
 import net.pantasystem.milktea.model.file.from
 import net.pantasystem.milktea.model.notes.draft.DraftNoteFile
+import net.pantasystem.milktea.model.setting.LocalConfigRepository
 import net.pantasystem.milktea.note.DraftNotesActivity
 import net.pantasystem.milktea.note.NoteEditorActivity
 import net.pantasystem.milktea.note.draft.viewmodel.DraftNotesViewModel
@@ -33,6 +34,10 @@ class DraftNotesFragment : Fragment() {
     @Inject
     lateinit var mediaNavigation: MediaNavigation
 
+    @Inject
+    internal lateinit var configRepository: LocalConfigRepository
+
+
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -43,7 +48,7 @@ class DraftNotesFragment : Fragment() {
         val isSelectMode = action == Intent.ACTION_PICK
         return ComposeView(requireContext()).apply {
             setContent {
-                MdcTheme {
+                MilkteaStyleConfigApplyAndTheme(configRepository = configRepository) {
                     DraftNotesScreen(
                         isPickMode = isSelectMode,
                         viewModel = viewModel,

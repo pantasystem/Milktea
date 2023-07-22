@@ -10,13 +10,14 @@ import androidx.fragment.app.viewModels
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
-import com.google.android.material.composethemeadapter.MdcTheme
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import net.pantasystem.milktea.common_compose.MilkteaStyleConfigApplyAndTheme
 import net.pantasystem.milktea.common_navigation.UserDetailNavigation
 import net.pantasystem.milktea.common_navigation.UserDetailNavigationArgs
 import net.pantasystem.milktea.model.notes.Note
 import net.pantasystem.milktea.model.notes.NoteCaptureAPIAdapter
+import net.pantasystem.milktea.model.setting.LocalConfigRepository
 import net.pantasystem.milktea.note.view.RenoteUsersScreen
 import javax.inject.Inject
 
@@ -61,6 +62,9 @@ class RenotesBottomSheetDialog : BottomSheetDialogFragment(){
     @Inject
     lateinit var noteCaptureAPIAdapter: NoteCaptureAPIAdapter
 
+    @Inject
+    internal lateinit var configRepository: LocalConfigRepository
+
     @OptIn(ExperimentalCoroutinesApi::class)
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -70,7 +74,7 @@ class RenotesBottomSheetDialog : BottomSheetDialogFragment(){
 
         return ComposeView(requireContext()).apply {
             setContent {
-                MdcTheme {
+                MilkteaStyleConfigApplyAndTheme(configRepository = configRepository) {
                     RenoteUsersScreen(
                         renotesViewModel = viewModel,
                         onSelected = { nr ->
