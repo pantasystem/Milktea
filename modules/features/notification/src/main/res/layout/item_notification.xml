@@ -76,13 +76,14 @@
                     />
 
 
-                <ImageView
+                <net.pantasystem.milktea.common.ui.AvatarIconView
                         android:id="@+id/imageView5"
                         android:layout_width="30dp"
                         android:layout_height="30dp"
                         android:layout_gravity="center"
                         android:layout_marginEnd="5dp"
-                        app:circleIcon="@{notification.avatarIconUrl}"
+                        imageUrl="@{notification.avatarIconUrl}"
+                        app:iconShape="circle"
                         android:onClick="@{()-> noteCardActionListener.onUserClicked(notification.user)}"
                         android:visibility="@{ notification.user == null ? View.GONE : View.VISIBLE }"
                         tools:ignore="ContentDescription"

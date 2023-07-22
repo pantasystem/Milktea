@@ -61,14 +61,15 @@
                     statusMessageTargetViewNote="@{note}"
                      tools:text="パン太さんができました" />
 
-            <ImageView
+            <net.pantasystem.milktea.common.ui.AvatarIconView
                     android:id="@+id/avatarIcon"
                     android:layout_width="@dimen/note_avatar_icon_size"
                     android:layout_height="@dimen/note_avatar_icon_size"
                     android:layout_below="@id/statusView"
                     android:layout_marginEnd="8dp"
                     android:contentDescription="@string/avataricon"
-                    app:circleIcon='@{note.avatarUrl}'
+                    app:imageUrl='@{note.avatarUrl}'
+                    app:iconShape="circle"
                     app:transitionDestinationUser="@{note.toShowNote.user}"
                     tools:srcCompat="@android:drawable/sym_def_app_icon"
                     android:scaleType="centerCrop"
@@ -237,13 +238,14 @@
                         app:user="@{note.subNote.user}"
                         app:account="@{note.account}">
 
-                    <ImageView
+                    <net.pantasystem.milktea.common.ui.AvatarIconView
                             android:id="@+id/subAvatarIcon"
                             android:layout_width="20dp"
                             android:layout_height="20dp"
                             android:layout_marginEnd="5dp"
                             android:contentDescription="@string/avataricon"
-                            app:circleIcon='@{note.subNoteAvatarUrl}'
+                            imageUrl='@{note.subNoteAvatarUrl}'
+                            app:iconShape="circle"
                             app:transitionDestinationUser="@{note.subNote.user}"
                             android:scaleType="centerCrop"
                             />

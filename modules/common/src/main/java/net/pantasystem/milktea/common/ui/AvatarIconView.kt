@@ -7,7 +7,7 @@ import androidx.databinding.BindingAdapter
 import net.pantasystem.milktea.common.R
 import net.pantasystem.milktea.common.glide.GlideApp
 
-class AvatarIcon : AppCompatImageView {
+class AvatarIconView : AppCompatImageView {
 
     companion object {
         const val SHAPE_CIRCLE = 0
@@ -15,16 +15,16 @@ class AvatarIcon : AppCompatImageView {
 
         @BindingAdapter("imageUrl")
         @JvmStatic
-        fun AvatarIcon.setImageUrl(url: String?) {
+        fun AvatarIconView.setImageUrl(url: String?) {
             GlideApp.with(this.context)
                 .load(url)
                 .error(R.drawable.ic_cloud_off_black_24dp)
                 .into(this)
         }
 
-        @BindingAdapter
+        @BindingAdapter("shape")
         @JvmStatic
-        fun AvatarIcon.setShape(shape: Int) {
+        fun AvatarIconView.setShape(shape: Int) {
             setIconShape(shape)
         }
     }
@@ -42,9 +42,9 @@ class AvatarIcon : AppCompatImageView {
     }
 
     private fun initialize(context: Context, attrs: AttributeSet?) {
-        context.theme.obtainStyledAttributes(attrs, R.styleable.AvatarIcon, 0, 0).apply {
+        context.theme.obtainStyledAttributes(attrs, R.styleable.AvatarIconView, 0, 0).apply {
             try {
-                setIconShape(getInteger(R.styleable.AvatarIcon_iconShape, 0))
+                setIconShape(getInteger(R.styleable.AvatarIconView_iconShape, 0))
             } finally {
                 recycle()
             }
@@ -68,7 +68,6 @@ class AvatarIcon : AppCompatImageView {
             }
         }
     }
-
 
 
 }

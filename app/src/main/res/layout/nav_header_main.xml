@@ -33,17 +33,18 @@
                 >
 
 
-            <ImageView
+            <net.pantasystem.milktea.common.ui.AvatarIconView
                     android:layout_width="60dp"
                     android:layout_height="60dp"
                     tools:srcCompat="@mipmap/ic_launcher_round"
                     android:id="@+id/imageView"
-                    app:circleIcon="@{accountViewModel.user.avatarUrl}"
+                    app:imageUrl="@{accountViewModel.user.avatarUrl}"
                     android:layout_gravity="start"
                     android:paddingTop="@dimen/nav_header_vertical_spacing"
                     android:layout_marginTop="20dp"
                     android:scaleType="centerCrop"
                     android:onClick="@{()-> accountViewModel.showProfile(accountViewModel.currentAccount)}"
+                    app:iconShape="circle"
                     tools:ignore="ContentDescription" />
 
             <ImageButton

@@ -92,13 +92,14 @@
                             android:textColor="@android:color/white"
                         />
 
-                    <ImageView
+                    <net.pantasystem.milktea.common.ui.AvatarIconView
                             android:id="@+id/avatarIcon"
                             android:layout_width="100dp"
                             android:layout_height="100dp"
                             android:layout_marginTop="-50dp"
                             android:layout_marginStart="16dp"
-                            app:circleIcon="@{userViewModel.user.avatarUrl}"
+                            app:imageUrl="@{userViewModel.user.avatarUrl}"
+                            app:iconShape="circle"
                             tools:srcCompat="@drawable/ic_follow"
                             android:layout_marginBottom="8dp"
                             tools:ignore="ContentDescription"
