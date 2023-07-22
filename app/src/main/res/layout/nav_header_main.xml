@@ -44,7 +44,7 @@
                     android:layout_marginTop="20dp"
                     android:scaleType="centerCrop"
                     android:onClick="@{()-> accountViewModel.showProfile(accountViewModel.currentAccount)}"
-                    app:iconShape="circle"
+                    app:iconShape="@{accountViewModel.config.avatarIconShapeType.value}"
                     tools:ignore="ContentDescription" />
 
             <ImageButton
