@@ -15,11 +15,11 @@ class AvatarIconView : AppCompatImageView {
 
         @BindingAdapter("imageUrl")
         @JvmStatic
-        fun AvatarIconView.setImageUrl(url: String?) {
-            GlideApp.with(this.context)
+        fun setImageUrl(iconView: AvatarIconView, url: String?) {
+            GlideApp.with(iconView.context)
                 .load(url)
                 .error(R.drawable.ic_cloud_off_black_24dp)
-                .into(this)
+                .into(iconView)
         }
 
         @BindingAdapter("shape")
@@ -67,6 +67,13 @@ class AvatarIconView : AppCompatImageView {
                 }
             }
         }
+    }
+
+    fun setImageUrl(url: String?) {
+        GlideApp.with(this.context)
+            .load(url)
+            .error(R.drawable.ic_cloud_off_black_24dp)
+            .into(this)
     }
 
 

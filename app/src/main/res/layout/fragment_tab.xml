@@ -23,13 +23,15 @@
                     android:elevation="0dp"
 
                     >
-                <ImageView
+                <net.pantasystem.milktea.common.ui.AvatarIconView
                         android:id="@+id/currentAccountView"
                         android:layout_width="20dp"
                         android:layout_height="20dp"
                         android:layout_marginStart="6dp"
                         tools:ignore="ContentDescription"
-                        android:layout_gravity="center_vertical" />
+                        android:layout_gravity="center_vertical"
+                        app:iconShape="circle"
+                    />
                 <Space
                         android:layout_width="4dp"
                         android:layout_height="wrap_content" />
