@@ -99,7 +99,7 @@
                             android:layout_marginTop="-50dp"
                             android:layout_marginStart="16dp"
                             app:imageUrl="@{userViewModel.user.avatarUrl}"
-                            app:iconShape="circle"
+                            app:iconShape="@{userViewModel.config.avatarIconShapeType.value}"
                             tools:srcCompat="@drawable/ic_follow"
                             android:layout_marginBottom="8dp"
                             tools:ignore="ContentDescription"
