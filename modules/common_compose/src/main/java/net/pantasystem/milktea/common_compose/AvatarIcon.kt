@@ -55,7 +55,7 @@ fun AvatarIcon(
 fun AvatarIcon(
     url: String?,
     modifier: Modifier = Modifier,
-    shape: Shape = Shape.Circle,
+    shape: Shape = Shape.Undefined,
     size: Dp = 50.dp,
     borderStrokeWidth: Dp = 0.dp,
     borderStrokeColor: Color = Color.Transparent
