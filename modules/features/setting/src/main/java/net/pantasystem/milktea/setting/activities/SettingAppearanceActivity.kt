@@ -37,6 +37,7 @@ import net.pantasystem.milktea.common_navigation.DriveNavigationArgs
 import net.pantasystem.milktea.common_navigation.EXTRA_SELECTED_FILE_PROPERTY_IDS
 import net.pantasystem.milktea.model.drive.DriveFileRepository
 import net.pantasystem.milktea.model.drive.FileProperty
+import net.pantasystem.milktea.model.setting.AvatarIconShapeType
 import net.pantasystem.milktea.model.setting.LocalConfigRepository
 import net.pantasystem.milktea.model.setting.Theme
 import net.pantasystem.milktea.setting.R
@@ -221,6 +222,16 @@ class SettingAppearanceActivity : AppCompatActivity() {
                                 }
                             ) {
                                 Text(stringResource(id = R.string.settings_display_timestamps_as_absolute_dates))
+                            }
+
+                            SettingSwitchTile(
+                                checked = currentConfigState.avatarIconShapeType == AvatarIconShapeType.Circle,
+                                onChanged = {
+                                    currentConfigState =
+                                        currentConfigState.copy(avatarIconShapeType = if (it) AvatarIconShapeType.Circle else AvatarIconShapeType.Square)
+                                }
+                            ) {
+                                Text("アバターのアイコンを丸アイコンにする")
                             }
                         }
                         SettingSection(
