@@ -61,7 +61,7 @@
                             android:layout_width="@dimen/note_avatar_icon_size"
                             android:layout_height="@dimen/note_avatar_icon_size"
                             imageUrl="@{hasReplyToNote.replyTo.avatarUrl}"
-                            app:iconShape="circle"
+                            app:iconShape="@{hasReplyToNote.config.avatarIconShapeType.value}"
                             android:layout_marginEnd="8dp"
                             tools:ignore="ContentDescription"
                             app:transitionDestinationUser="@{hasReplyToNote.replyTo.toShowNote.user}"
