@@ -37,7 +37,9 @@
                     imageUrl="@{user.avatarUrl}"
                     app:iconShape="circle"
                     android:scaleType="centerCrop"
-                    transitionDestinationUser="@{user}"/>
+                    transitionDestinationUser="@{user}"
+                    applyShapeFromConfig="@{true}"
+                />
             <TextView
                     android:id="@+id/nameMain"
                     android:layout_toEndOf="@id/avatarIcon"

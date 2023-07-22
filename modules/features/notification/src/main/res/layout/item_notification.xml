@@ -88,7 +88,8 @@
                         android:visibility="@{ notification.user == null ? View.GONE : View.VISIBLE }"
                         tools:ignore="ContentDescription"
                         android:scaleType="centerCrop"
-                        />
+                        applyShapeFromConfig="@{true}"
+                    />
 
 
 
