@@ -30,10 +30,10 @@ fun AvatarIcon(
     val shapeLocal = LocalAvatarIconShape.current
     val clip = when(shape) {
         Shape.Circle -> CircleShape
-        Shape.RoundedCorner -> RoundedCornerShape(16.dp)
+        Shape.RoundedCorner -> RoundedCornerShape(8.dp)
         Shape.Undefined -> when(shapeLocal) {
             Shape.Circle -> CircleShape
-            Shape.RoundedCorner -> RoundedCornerShape(16.dp)
+            Shape.RoundedCorner -> RoundedCornerShape(8.dp)
             Shape.Undefined -> CircleShape
         }
     }
@@ -63,7 +63,7 @@ fun AvatarIcon(
     val shapeLocal = LocalAvatarIconShape.current
     val clip = when(shape) {
         Shape.Circle -> CircleShape
-        Shape.RoundedCorner -> RoundedCornerShape(16.dp)
+        Shape.RoundedCorner -> RoundedCornerShape(8.dp)
         Shape.Undefined -> when(shapeLocal) {
             Shape.Circle -> CircleShape
             Shape.RoundedCorner -> RoundedCornerShape(8.dp)
