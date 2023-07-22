@@ -225,13 +225,13 @@ class SettingAppearanceActivity : AppCompatActivity() {
                             }
 
                             SettingSwitchTile(
-                                checked = currentConfigState.avatarIconShapeType == AvatarIconShapeType.Circle,
+                                checked = currentConfigState.avatarIconShapeType == AvatarIconShapeType.Square,
                                 onChanged = {
                                     currentConfigState =
-                                        currentConfigState.copy(avatarIconShapeType = if (it) AvatarIconShapeType.Circle else AvatarIconShapeType.Square)
+                                        currentConfigState.copy(avatarIconShapeType = if (it) AvatarIconShapeType.Square else AvatarIconShapeType.Circle)
                                 }
                             ) {
-                                Text("アバターのアイコンを丸アイコンにする")
+                                Text(stringResource(id = R.string.settings_display_icons_as_squares))
                             }
                         }
                         SettingSection(
