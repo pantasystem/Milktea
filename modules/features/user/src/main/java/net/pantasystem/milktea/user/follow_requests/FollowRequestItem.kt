@@ -1,24 +1,27 @@
 package net.pantasystem.milktea.user.follow_requests
 
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.*
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.material.Icon
+import androidx.compose.material.IconButton
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Surface
+import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import coil.compose.rememberAsyncImagePainter
+import net.pantasystem.milktea.common_compose.AvatarIcon
 import net.pantasystem.milktea.common_compose.CustomEmojiText
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.user.User
@@ -47,17 +50,13 @@ fun FollowRequestItem(
                 ),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            Image(
-                rememberAsyncImagePainter(model = user.avatarUrl),
-                contentScale = ContentScale.Crop,
-                modifier = Modifier
-                    .size(64.dp)
-                    .clip(CircleShape)
-                    .border(2.dp, MaterialTheme.colors.surface, CircleShape)
-                    .clickable {
-                        onAvatarClicked(user.id)
-                    },
-                contentDescription = null,
+            AvatarIcon(
+                url = user.avatarUrl, size = 64.dp,
+                onAvatarClick = {
+                    onAvatarClicked(user.id)
+                },
+                borderStrokeColor = MaterialTheme.colors.surface,
+                borderStrokeWidth = 2.dp,
             )
             Spacer(modifier = Modifier.width(4.dp))
             Column(
@@ -65,9 +64,21 @@ fun FollowRequestItem(
             ) {
                 if (isUserNameDefault) {
                     Text(text = user.displayUserName, fontSize = 16.sp)
-                    CustomEmojiText(text = user.displayName, emojis = user.emojis, accountHost = currentAccount?.getHost(), sourceHost = user.host, fontSize = 14.sp)
+                    CustomEmojiText(
+                        text = user.displayName,
+                        emojis = user.emojis,
+                        accountHost = currentAccount?.getHost(),
+                        sourceHost = user.host,
+                        fontSize = 14.sp
+                    )
                 } else {
-                    CustomEmojiText(text = user.displayName, emojis = user.emojis, accountHost = currentAccount?.getHost(), sourceHost = user.host, fontSize = 16.sp)
+                    CustomEmojiText(
+                        text = user.displayName,
+                        emojis = user.emojis,
+                        accountHost = currentAccount?.getHost(),
+                        sourceHost = user.host,
+                        fontSize = 16.sp
+                    )
                     Text(text = user.displayUserName, fontSize = 14.sp)
                 }
 
@@ -77,13 +88,19 @@ fun FollowRequestItem(
                 IconButton(onClick = {
                     onAccept(user.id)
                 }) {
-                    Icon(Icons.Default.Check, contentDescription = stringResource(id = R.string.accept))
+                    Icon(
+                        Icons.Default.Check,
+                        contentDescription = stringResource(id = R.string.accept)
+                    )
                 }
                 Spacer(modifier = Modifier.width(4.dp))
                 IconButton(onClick = {
                     onReject(user.id)
                 }) {
-                    Icon(Icons.Default.Close, contentDescription = stringResource(id = R.string.reject))
+                    Icon(
+                        Icons.Default.Close,
+                        contentDescription = stringResource(id = R.string.reject)
+                    )
                 }
             }
 
@@ -95,7 +112,13 @@ fun FollowRequestItem(
 @Composable
 fun Preview_FollowRequestItem() {
     FollowRequestItem(
-        currentAccount = Account(remoteId = "", instanceDomain = "", userName = "", instanceType = Account.InstanceType.MISSKEY, token = ""),
+        currentAccount = Account(
+            remoteId = "",
+            instanceDomain = "",
+            userName = "",
+            instanceType = Account.InstanceType.MISSKEY,
+            token = ""
+        ),
         isUserNameDefault = true,
         user = User.Simple(
             id = User.Id(accountId = 0, id = ""),

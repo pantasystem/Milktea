@@ -1,8 +1,6 @@
 package net.pantasystem.milktea.userlist.compose
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.BookmarkAdd
@@ -11,13 +9,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import coil.compose.rememberAsyncImagePainter
 import kotlinx.datetime.Clock
+import net.pantasystem.milktea.common_compose.AvatarIcon
 import net.pantasystem.milktea.model.list.UserList
 import net.pantasystem.milktea.model.list.UserListMember
 import net.pantasystem.milktea.model.list.UserListWithMembers
@@ -57,14 +53,7 @@ fun UserListCard(userList: UserListBindingModel, onAction: (UserListCardAction) 
                 Spacer(modifier = Modifier.height(2.dp))
                 Row {
                     for (m in userList.userList.members) {
-                        Image(
-                            rememberAsyncImagePainter(m.avatarUrl),
-                            contentDescription = null,
-                            modifier = Modifier
-                                .size(32.dp)
-                                .clip(CircleShape),
-                            contentScale = ContentScale.Crop
-                        )
+                        AvatarIcon(url = m.avatarUrl, size = 32.dp)
                         Spacer(modifier = Modifier.width(4.dp))
                     }
                 }

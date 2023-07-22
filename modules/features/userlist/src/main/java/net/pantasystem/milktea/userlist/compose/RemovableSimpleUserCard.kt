@@ -1,8 +1,6 @@
 package net.pantasystem.milktea.userlist.compose
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
@@ -10,10 +8,8 @@ import androidx.compose.material.icons.filled.Delete
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
-import coil.compose.rememberAsyncImagePainter
+import net.pantasystem.milktea.common_compose.AvatarIcon
 import net.pantasystem.milktea.common_compose.CustomEmojiText
 import net.pantasystem.milktea.model.user.User
 
@@ -48,14 +44,7 @@ fun RemovableSimpleUserCard(
                     .padding(8.dp)
                     .weight(1f),
             ) {
-                Image(
-                    painter = rememberAsyncImagePainter(user.avatarUrl),
-                    contentDescription = null,
-                    modifier = Modifier
-                        .size(48.dp)
-                        .clip(CircleShape),
-                    contentScale = ContentScale.Crop
-                )
+                AvatarIcon(url = user.avatarUrl, modifier = Modifier.size(48.dp))
                 Spacer(modifier = Modifier.width(4.dp))
                 Column {
                     CustomEmojiText(
