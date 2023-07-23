@@ -13,16 +13,17 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.ViewModelProvider
-import com.google.android.material.composethemeadapter.MdcTheme
 import dagger.hilt.android.AndroidEntryPoint
 import net.pantasystem.milktea.app_store.setting.SettingStore
 import net.pantasystem.milktea.common.ui.ApplyMenuTint
 import net.pantasystem.milktea.common.ui.ApplyTheme
 import net.pantasystem.milktea.common_android_ui.PageableFragmentFactory
+import net.pantasystem.milktea.common_compose.MilkteaStyleConfigApplyAndTheme
 import net.pantasystem.milktea.common_navigation.*
 import net.pantasystem.milktea.common_navigation.SearchAndSelectUserNavigation.Companion.EXTRA_SELECTED_USER_CHANGED_DIFF
 import net.pantasystem.milktea.common_viewmodel.confirm.ConfirmViewModel
 import net.pantasystem.milktea.model.list.UserList
+import net.pantasystem.milktea.model.setting.LocalConfigRepository
 import net.pantasystem.milktea.note.viewmodel.NotesViewModel
 import net.pantasystem.milktea.userlist.compose.UserListDetailScreen
 import net.pantasystem.milktea.userlist.viewmodel.UserListDetailViewModel
@@ -67,6 +68,9 @@ class UserListDetailActivity : AppCompatActivity(), UserListEditorDialog.OnSubmi
     @Inject
     lateinit var applyMenuTint: ApplyMenuTint
 
+    @Inject
+    internal lateinit var configRepository: LocalConfigRepository
+
     private val mUserListDetailViewModel: UserListDetailViewModel by viewModels()
 
     val notesViewModel by viewModels<NotesViewModel>()
@@ -84,7 +88,7 @@ class UserListDetailActivity : AppCompatActivity(), UserListEditorDialog.OnSubmi
         ).initViewModelListener()
 
         setContent {
-            MdcTheme {
+            MilkteaStyleConfigApplyAndTheme(configRepository = configRepository) {
                 val userList by mUserListDetailViewModel.userList.collectAsState()
 
                 val users by mUserListDetailViewModel.users.collectAsState()

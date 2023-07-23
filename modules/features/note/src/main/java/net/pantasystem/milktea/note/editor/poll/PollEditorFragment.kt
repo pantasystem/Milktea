@@ -9,17 +9,20 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.ComposeView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import com.google.android.material.composethemeadapter.MdcTheme
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.datetime.Clock
+import net.pantasystem.milktea.common_compose.MilkteaStyleConfigApplyAndTheme
 import net.pantasystem.milktea.model.notes.PollExpiresAt
+import net.pantasystem.milktea.model.setting.LocalConfigRepository
 import net.pantasystem.milktea.note.editor.viewmodel.NoteEditorViewModel
+import javax.inject.Inject
 import kotlin.time.Duration.Companion.days
 
 @AndroidEntryPoint
 class PollEditorFragment : Fragment() {
 
-
+    @Inject
+    internal lateinit var configRepository: LocalConfigRepository
 
     val viewModel: NoteEditorViewModel by activityViewModels()
 
@@ -30,7 +33,7 @@ class PollEditorFragment : Fragment() {
     ): View {
         return ComposeView(requireContext()).apply {
             setContent {
-                MdcTheme {
+                MilkteaStyleConfigApplyAndTheme(configRepository = configRepository) {
                     val uiState by viewModel.uiState.collectAsState()
                     when (val pollState = uiState.poll) {
                         null -> {}

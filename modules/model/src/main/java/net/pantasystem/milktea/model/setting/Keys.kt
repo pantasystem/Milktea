@@ -35,6 +35,7 @@ val Keys.Companion.allKeys by lazy {
         Keys.NoteReactionCounterFontSize,
         Keys.NoteCustomEmojiScaleSizeInText,
         Keys.EmojiPickerEmojiDisplaySize,
+        Keys.AvatarIconShapeType,
     )
 }
 
@@ -100,6 +101,8 @@ sealed interface Keys {
 
     object EmojiPickerEmojiDisplaySize : Keys
 
+    object AvatarIconShapeType : Keys
+
     companion object
 }
 
@@ -138,5 +141,6 @@ fun Keys.str(): String {
         is Keys.NoteReactionCounterFontSize -> "NoteReactionCounterFontSize"
         is Keys.NoteCustomEmojiScaleSizeInText -> "NoteCustomEmojiScaleSizeInText"
         is Keys.EmojiPickerEmojiDisplaySize -> "EmojiPickerEmojiDisplaySize"
+        is Keys.AvatarIconShapeType -> "AvatarIconShapeType"
     }
 }

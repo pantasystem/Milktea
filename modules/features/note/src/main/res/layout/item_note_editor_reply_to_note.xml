@@ -41,7 +41,7 @@
                 android:layout_width="@dimen/note_avatar_icon_size"
                 android:layout_height="@dimen/note_avatar_icon_size"
                 imageUrl='@{note.avatarUrl}'
-                app:iconShape="circle"
+                app:iconShape="@{note.config.avatarIconShapeType.value}"
                 tools:srcCompat="@android:drawable/sym_def_app_icon"
                 android:contentDescription="@string/avataricon"
                 app:transitionDestinationUser="@{note.toShowNote.user}"
@@ -270,7 +270,7 @@
                                 android:layout_width="20dp"
                                 android:layout_height="20dp"
                                 imageUrl='@{note.subNoteAvatarUrl}'
-                                app:iconShape="circle"
+                                app:iconShape="@{note.config.avatarIconShapeType.value}"
                                 android:contentDescription="@string/avataricon"
                                 app:transitionDestinationUser="@{note.subNote.user}"
                                 app:layout_constraintStart_toStartOf="parent"

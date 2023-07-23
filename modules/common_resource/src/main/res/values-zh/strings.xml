@@ -607,6 +607,7 @@
     <string name="reaction_acceptance_non_sensitive_only_likes_from_remote">Non-sensitive only (Only likes from remote)</string>
     <string name="reaction_acceptance_only_likes">Only likes</string>
     <string name="reaction_acceptance">Reaction acceptance</string>
+    <string name="settings_display_icons_as_squares">Display icons as squares</string>
     <!-- User -->
 
 </resources>

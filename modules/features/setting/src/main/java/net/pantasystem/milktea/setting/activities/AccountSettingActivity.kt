@@ -8,14 +8,15 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import com.google.android.material.composethemeadapter.MdcTheme
 import dagger.hilt.android.AndroidEntryPoint
 import net.pantasystem.milktea.common.ui.ApplyTheme
 import net.pantasystem.milktea.common_android_ui.account.viewmodel.AccountViewModel
+import net.pantasystem.milktea.common_compose.MilkteaStyleConfigApplyAndTheme
 import net.pantasystem.milktea.common_navigation.AccountSettingNavigation
 import net.pantasystem.milktea.common_navigation.AuthorizationArgs
 import net.pantasystem.milktea.common_navigation.AuthorizationNavigation
 import net.pantasystem.milktea.common_navigation.UserDetailNavigation
+import net.pantasystem.milktea.model.setting.LocalConfigRepository
 import net.pantasystem.milktea.setting.compose.account.AccountSettingScreen
 import javax.inject.Inject
 
@@ -28,6 +29,9 @@ class AccountSettingActivity : AppCompatActivity() {
     @Inject
     lateinit var userDetailNavigation: UserDetailNavigation
 
+    @Inject
+    internal lateinit var configRepository: LocalConfigRepository
+
     val viewModel: AccountViewModel by viewModels()
 
     @Inject
@@ -38,7 +42,7 @@ class AccountSettingActivity : AppCompatActivity() {
         applyTheme()
         setContent {
             val uiState by viewModel.uiState.collectAsState()
-            MdcTheme {
+            MilkteaStyleConfigApplyAndTheme(configRepository = configRepository) {
                 AccountSettingScreen(
                     uiState = uiState,
                     onAccountClicked = {

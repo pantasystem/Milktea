@@ -2,10 +2,8 @@ package net.pantasystem.milktea.user.compose
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
@@ -20,6 +18,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import coil.compose.rememberAsyncImagePainter
+import net.pantasystem.milktea.common_compose.AvatarIcon
 import net.pantasystem.milktea.common_compose.CustomEmojiText
 import net.pantasystem.milktea.model.user.FollowState
 import net.pantasystem.milktea.model.user.User
@@ -112,19 +111,15 @@ fun UserDetailCard(
                 )
             }
 
-
-            Image(
-                painter = rememberAsyncImagePainter(userDetail.avatarUrl),
-                contentDescription = null,
-                contentScale = ContentScale.Crop,
-                modifier = Modifier
-                    .size(64.dp)
-                    .clip(CircleShape)
-                    .border(2.dp, MaterialTheme.colors.surface, CircleShape)
-                    .constrainAs(avatarIconRef) {
-                        start.linkTo(parent.start, margin = 8.dp)
-                        bottom.linkTo(subNameRef.bottom)
-                    }
+            AvatarIcon(
+                url = userDetail.avatarUrl,
+                size = 64.dp,
+                modifier = Modifier.constrainAs(avatarIconRef) {
+                    start.linkTo(parent.start, margin = 8.dp)
+                    bottom.linkTo(subNameRef.bottom)
+                },
+                borderStrokeColor = MaterialTheme.colors.surface,
+                borderStrokeWidth = 2.dp
             )
 
             CustomEmojiText(

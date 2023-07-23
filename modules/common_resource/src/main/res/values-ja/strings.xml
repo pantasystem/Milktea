@@ -463,6 +463,8 @@
     <string name="donation">寄付</string>
     <string name="privacy_policy">プライバシーポリシー</string>
     <string name="terms_of_service">利用規約</string>
+    <string name="settings_display_icons_as_squares">アイコンを四角形で表示</string>
+
 
 
     <!-- Authorization機能 -->

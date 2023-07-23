@@ -30,7 +30,9 @@
                 app:iconShape="circle"
                 tools:ignore="ContentDescription"
                 android:layout_gravity="center_vertical"
-                android:layout_marginEnd="4dp"/>
+                android:layout_marginEnd="4dp"
+                applyShapeFromConfig="@{true}"
+            />
         <TextView
                 android:id="@+id/mainName"
                 android:layout_width="wrap_content"

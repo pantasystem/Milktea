@@ -87,6 +87,7 @@ data class Config(
     val noteReactionCounterFontSize: Float,
     val noteCustomEmojiScaleSizeInText: Float,
     val emojiPickerEmojiDisplaySize: Int,
+    val avatarIconShapeType: AvatarIconShapeType,
 ) {
     companion object
 
@@ -148,6 +149,7 @@ object DefaultConfig {
         noteReactionCounterFontSize = 15f,
         noteCustomEmojiScaleSizeInText = 1.2f,
         emojiPickerEmojiDisplaySize = 28,
+        avatarIconShapeType = AvatarIconShapeType.Circle,
     )
 
     fun getRememberVisibilityConfig(accountId: Long): RememberVisibility.Remember {
@@ -161,4 +163,9 @@ object DefaultConfig {
 enum class ReactionPickerType {
     LIST,
     SIMPLE
+}
+
+enum class AvatarIconShapeType(val value: Int) {
+    Circle(0),
+    Square(1),
 }

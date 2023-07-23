@@ -5,14 +5,15 @@ import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import com.google.android.material.composethemeadapter.MdcTheme
 import com.wada811.databinding.dataBinding
 import dagger.hilt.android.AndroidEntryPoint
+import net.pantasystem.milktea.common_compose.MilkteaStyleConfigApplyAndTheme
 import net.pantasystem.milktea.common_navigation.UserDetailNavigation
 import net.pantasystem.milktea.common_navigation.UserDetailNavigationArgs
 import net.pantasystem.milktea.messaging.databinding.FragmentMessagingHistoryBinding
 import net.pantasystem.milktea.messaging.viewmodel.MessageHistoryViewModel
 import net.pantasystem.milktea.model.messaging.messagingId
+import net.pantasystem.milktea.model.setting.LocalConfigRepository
 import javax.inject.Inject
 
 
@@ -23,6 +24,10 @@ class MessagingHistoryFragment : Fragment(R.layout.fragment_messaging_history) {
 
     @Inject
     lateinit var userDetailNavigation: UserDetailNavigation
+
+    @Inject
+    internal lateinit var configRepository: LocalConfigRepository
+
 
     val binding: FragmentMessagingHistoryBinding by dataBinding()
 
@@ -36,7 +41,7 @@ class MessagingHistoryFragment : Fragment(R.layout.fragment_messaging_history) {
 
         binding.composeBase.apply {
             setContent {
-                MdcTheme {
+                MilkteaStyleConfigApplyAndTheme(configRepository = configRepository) {
                     MessageHistoryScreen(
                         historyViewModel = historyViewModel,
                         onAction = { action ->

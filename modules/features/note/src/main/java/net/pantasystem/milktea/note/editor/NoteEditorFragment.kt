@@ -24,7 +24,6 @@ import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.*
-import com.google.android.material.composethemeadapter.MdcTheme
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.wada811.databinding.dataBinding
 import dagger.hilt.android.AndroidEntryPoint
@@ -42,6 +41,7 @@ import net.pantasystem.milktea.common_android.ui.putActivity
 import net.pantasystem.milktea.common_android.ui.text.CustomEmojiTokenizer
 import net.pantasystem.milktea.common_android_ui.account.viewmodel.AccountViewModel
 import net.pantasystem.milktea.common_android_ui.confirm.ConfirmDialog
+import net.pantasystem.milktea.common_compose.MilkteaStyleConfigApplyAndTheme
 import net.pantasystem.milktea.common_navigation.*
 import net.pantasystem.milktea.common_viewmodel.confirm.ConfirmViewModel
 import net.pantasystem.milktea.model.channel.Channel
@@ -53,6 +53,7 @@ import net.pantasystem.milktea.model.file.toAppFile
 import net.pantasystem.milktea.model.instance.FeatureType
 import net.pantasystem.milktea.model.instance.MetaRepository
 import net.pantasystem.milktea.model.notes.Note
+import net.pantasystem.milktea.model.setting.LocalConfigRepository
 import net.pantasystem.milktea.model.user.User
 import net.pantasystem.milktea.note.DraftNotesActivity
 import net.pantasystem.milktea.note.R
@@ -166,6 +167,10 @@ class NoteEditorFragment : Fragment(R.layout.fragment_note_editor), EmojiSelecti
 
     @Inject
     lateinit var loggerFactory: Logger.Factory
+
+    @Inject
+    internal lateinit var configRepository: LocalConfigRepository
+
 
     val logger by lazy {
         loggerFactory.create("NoteEditorFragment")
@@ -314,7 +319,7 @@ class NoteEditorFragment : Fragment(R.layout.fragment_note_editor), EmojiSelecti
 
         binding.filePreview.apply {
             setContent {
-                MdcTheme {
+                MilkteaStyleConfigApplyAndTheme(configRepository = configRepository) {
                     NoteFilePreview(noteEditorViewModel = noteEditorViewModel, onShow = {
                         val intent = mediaNavigation.newIntent(
                             MediaNavigationArgs.AFile(
@@ -335,7 +340,7 @@ class NoteEditorFragment : Fragment(R.layout.fragment_note_editor), EmojiSelecti
             }
         }
         binding.noteEditorUserActionMenu.setContent {
-            MdcTheme {
+            MilkteaStyleConfigApplyAndTheme(configRepository = configRepository) {
                 val state by noteEditorViewModel.enableFeatures.collectAsState()
                 val uiState by noteEditorViewModel.uiState.collectAsState()
                 NoteEditorUserActionMenuLayout(iconColor = getColor(color = R.attr.normalIconTint),

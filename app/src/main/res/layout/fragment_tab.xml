@@ -31,6 +31,8 @@
                         tools:ignore="ContentDescription"
                         android:layout_gravity="center_vertical"
                         app:iconShape="circle"
+                        android:scaleType="centerCrop"
+
                     />
                 <Space
                         android:layout_width="4dp"

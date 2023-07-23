@@ -9,10 +9,11 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.ComposeView
 import androidx.fragment.app.activityViewModels
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
-import com.google.android.material.composethemeadapter.MdcTheme
 import dagger.hilt.android.AndroidEntryPoint
 import net.pantasystem.milktea.app_store.account.AccountStore
+import net.pantasystem.milktea.common_compose.MilkteaStyleConfigApplyAndTheme
 import net.pantasystem.milktea.model.notes.Note
+import net.pantasystem.milktea.model.setting.LocalConfigRepository
 import net.pantasystem.milktea.note.viewmodel.NotesViewModel
 import javax.inject.Inject
 
@@ -35,6 +36,9 @@ class RenoteBottomSheetDialog : BottomSheetDialogFragment() {
 
     @Inject
     lateinit var accountStore: AccountStore
+
+    @Inject
+    internal lateinit var configRepository: LocalConfigRepository
 
     val viewModel by activityViewModels<RenoteViewModel>()
 
@@ -63,7 +67,7 @@ class RenoteBottomSheetDialog : BottomSheetDialogFragment() {
 
         return ComposeView(requireContext()).apply {
             setContent {
-                MdcTheme {
+                MilkteaStyleConfigApplyAndTheme(configRepository = configRepository) {
                     val uiState by viewModel.uiState.collectAsState()
                     RenoteDialogContent(
                         uiState = uiState,

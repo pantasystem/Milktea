@@ -13,6 +13,7 @@ import net.pantasystem.milktea.model.emoji.CustomEmojiAspectRatioStore
 import net.pantasystem.milktea.model.emoji.CustomEmojiRepository
 import net.pantasystem.milktea.model.instance.MetaRepository
 import net.pantasystem.milktea.model.setting.ColorSettingStore
+import net.pantasystem.milktea.model.setting.LocalConfigRepository
 
 
 @EntryPoint
@@ -35,4 +36,6 @@ interface BindingProvider {
     fun colorSettingStore(): ColorSettingStore
 
     fun customEmojiAspectRatioStore(): CustomEmojiAspectRatioStore
+
+    fun configRepository(): LocalConfigRepository
 }

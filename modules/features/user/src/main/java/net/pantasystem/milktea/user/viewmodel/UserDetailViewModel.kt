@@ -26,6 +26,8 @@ import net.pantasystem.milktea.model.account.page.Pageable
 import net.pantasystem.milktea.model.account.page.PageableTemplate
 import net.pantasystem.milktea.model.ap.ApResolverService
 import net.pantasystem.milktea.model.instance.InstanceInfoService
+import net.pantasystem.milktea.model.setting.DefaultConfig
+import net.pantasystem.milktea.model.setting.LocalConfigRepository
 import net.pantasystem.milktea.model.user.*
 import net.pantasystem.milktea.model.user.block.BlockRepository
 import net.pantasystem.milktea.model.user.mute.CreateMute
@@ -55,6 +57,7 @@ class UserDetailViewModel @Inject constructor(
     private val apResolverService: ApResolverService,
     private val savedStateHandle: SavedStateHandle,
     private val userDetailTabTypeFactory: UserDetailTabTypeFactory,
+    configRepository: LocalConfigRepository,
 ) : ViewModel() {
 
     companion object;
@@ -145,6 +148,12 @@ class UserDetailViewModel @Inject constructor(
     }.catch {
         logger.error("ユーザープロフィールのタブの取得に失敗", it)
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
+
+    val config = configRepository.observe().stateIn(
+        viewModelScope,
+        SharingStarted.WhileSubscribed(5_000),
+        DefaultConfig.config,
+    )
 
     val accountUiState = AccountViewModelUiStateHelper(
         currentAccount,

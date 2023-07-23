@@ -5,7 +5,11 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Surface
@@ -22,19 +26,23 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import com.google.android.material.composethemeadapter.MdcTheme
 import dagger.hilt.android.AndroidEntryPoint
 import getStringFromStringSource
 import net.pantasystem.milktea.common.ResultState
 import net.pantasystem.milktea.common.StateContent
+import net.pantasystem.milktea.common_compose.MilkteaStyleConfigApplyAndTheme
+import net.pantasystem.milktea.model.setting.LocalConfigRepository
 import net.pantasystem.milktea.user.UserCardActionHandler
 import net.pantasystem.milktea.user.compose.UserDetailCard
 import net.pantasystem.milktea.user.compose.UserDetailCardAction
 import net.pantasystem.milktea.user.viewmodel.ToggleFollowViewModel
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class ExploreFragment : Fragment() {
 
+    @Inject
+    internal lateinit var configRepository: LocalConfigRepository
 
     private val exploreViewModel: ExploreViewModel by viewModels()
     private val toggleFollowViewModel: ToggleFollowViewModel by viewModels()
@@ -61,7 +69,7 @@ class ExploreFragment : Fragment() {
                 val uiState by exploreViewModel.uiState.collectAsState()
                 val account by exploreViewModel.account.collectAsState()
 
-                MdcTheme {
+                MilkteaStyleConfigApplyAndTheme(configRepository = configRepository) {
                     LazyColumn(
                         modifier = Modifier
                             .fillMaxSize()
