@@ -183,25 +183,6 @@ class NotesViewModel @Inject constructor(
         }
     }
 
-    fun toggleReblog(noteId: Note.Id) {
-        viewModelScope.launch {
-            noteRepository.find(noteId).mapCancellableCatching {
-                when(val type = it.type) {
-                    is Note.Type.Mastodon -> {
-                        if (type.reblogged == true) {
-                            noteRepository.unrenote(noteId)
-                        } else {
-                            noteRepository.renote(noteId)
-                        }
-                    }
-                    is Note.Type.Misskey -> {
-                        return@launch
-                    }
-                }
-            }
-        }
-    }
-
     fun onToggleFavoriteUseCase(note: Note) {
         viewModelScope.launch {
             toggleFavoriteUseCase(note.id).onFailure {
