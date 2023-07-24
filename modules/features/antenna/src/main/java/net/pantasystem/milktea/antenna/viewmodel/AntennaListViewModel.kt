@@ -74,7 +74,7 @@ class AntennaListViewModel @Inject constructor(
     }.stateIn(
         viewModelScope,
         SharingStarted.WhileSubscribed(5_000),
-        ResultState.Loading(StateContent.NotExist())
+        ResultState.initialState()
     )
 
     val uiState = combine(currentAccount, addTabToAccount, antennasState) { ca, ata, state ->

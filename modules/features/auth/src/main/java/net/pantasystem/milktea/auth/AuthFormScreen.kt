@@ -48,6 +48,7 @@ import net.pantasystem.milktea.auth.viewmodel.app.AuthUiState
 import net.pantasystem.milktea.auth.viewmodel.app.AuthUserInputState
 import net.pantasystem.milktea.common.ResultState
 import net.pantasystem.milktea.common.StateContent
+import net.pantasystem.milktea.common.initialState
 import net.pantasystem.milktea.common.ui.isScrolledToTheEnd
 import net.pantasystem.milktea.data.infrastructure.auth.Authorization
 
@@ -318,7 +319,7 @@ fun Preview_AuthFormScreen() {
                         isTermsOfServiceAgreement = false,
                         isAcceptMastodonAlphaTest = false,
                     ),
-                    metaState = ResultState.Loading(StateContent.NotExist()),
+                    metaState = ResultState.initialState(),
                     stateType = Authorization.BeforeAuthentication,
                     misskeyInstanceInfosResponse = emptyList(),
                 ),

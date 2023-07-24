@@ -4,7 +4,9 @@ package net.pantasystem.milktea.model.notes
 import kotlinx.datetime.Instant
 import net.pantasystem.milktea.model.file.AppFile
 import net.pantasystem.milktea.model.notes.poll.CreatePoll
-import java.util.*
+import java.util.Calendar
+import java.util.Date
+import java.util.UUID
 
 
 
@@ -61,8 +63,15 @@ data class PollEditingState(
     val expiresAt: PollExpiresAt = PollExpiresAt.Infinity
 ) : java.io.Serializable {
 
-    val isExpiresAtDateTime: Boolean
-        get() = expiresAt is PollExpiresAt.DateAndTime
+    companion object {
+        val EMPTY_POLL_EDITING_STATE = PollEditingState(
+            listOf(
+                PollChoiceState("", UUID.randomUUID()),
+                PollChoiceState("", UUID.randomUUID()),
+                PollChoiceState("", UUID.randomUUID())
+            ), false
+        )
+    }
 
     fun checkValidate(): Boolean {
         return choices.all {

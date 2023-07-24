@@ -15,6 +15,7 @@ import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.common.ResultState
 import net.pantasystem.milktea.common.StateContent
 import net.pantasystem.milktea.common.asLoadingStateFlow
+import net.pantasystem.milktea.common.initialState
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.group.GroupRepository
@@ -53,9 +54,9 @@ class MessageHistoryViewModel @Inject constructor(
         emit(ResultState.Error(StateContent.NotExist(), e))
     }.flowOn(Dispatchers.IO).stateIn(
         viewModelScope,
-        SharingStarted.WhileSubscribed(),
-        ResultState.Loading(StateContent.NotExist())
-    ).stateIn(viewModelScope, SharingStarted.Eagerly, ResultState.Loading(StateContent.NotExist()))
+        SharingStarted.WhileSubscribed(5_000),
+        ResultState.initialState()
+    )
 
     @OptIn(ExperimentalCoroutinesApi::class)
     private val fetchGroupMsgHistories = _actionFetchMessageHistories.map {
@@ -68,8 +69,8 @@ class MessageHistoryViewModel @Inject constructor(
     }.flowOn(Dispatchers.IO).stateIn(
         viewModelScope,
         SharingStarted.WhileSubscribed(),
-        ResultState.Loading(StateContent.NotExist())
-    ).stateIn(viewModelScope, SharingStarted.Eagerly, ResultState.Loading(StateContent.NotExist()))
+        ResultState.initialState(),
+    ).stateIn(viewModelScope, SharingStarted.Eagerly, ResultState.initialState())
 
     private val usersAndGroups =
         combine(fetchUserMsgHistories, fetchGroupMsgHistories) { users, groups ->
@@ -101,7 +102,7 @@ class MessageHistoryViewModel @Inject constructor(
     private val histories = usersAndGroups.stateIn(
         viewModelScope,
         SharingStarted.Lazily,
-        ResultState.Loading(StateContent.NotExist())
+        ResultState.initialState(),
     )
 
     private val isUserNameDefault = MutableStateFlow(false)
@@ -162,5 +163,5 @@ class MessageHistoryViewModel @Inject constructor(
 
 data class MessageHistoryScreenUiState(
     val isUserNameDefault: Boolean = true,
-    val histories: ResultState<List<MessageHistoryRelation>> = ResultState.Loading(StateContent.NotExist())
+    val histories: ResultState<List<MessageHistoryRelation>> = ResultState.initialState()
 )

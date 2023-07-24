@@ -10,8 +10,8 @@ import kotlinx.coroutines.launch
 import net.pantasystem.milktea.app_store.account.AccountStore
 import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.common.ResultState
-import net.pantasystem.milktea.common.StateContent
 import net.pantasystem.milktea.common.asLoadingStateFlow
+import net.pantasystem.milktea.common.initialState
 import net.pantasystem.milktea.common_navigation.ClipListNavigationArgs
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.clip.Clip
@@ -81,7 +81,7 @@ class ClipListViewModel @Inject constructor(
     }.stateIn(
         viewModelScope,
         SharingStarted.WhileSubscribed(5_000),
-        ResultState.Loading(StateContent.NotExist())
+        ResultState.initialState(),
     )
 
     private val clipItemStatuses = combine(
@@ -101,7 +101,7 @@ class ClipListViewModel @Inject constructor(
     }.stateIn(
         viewModelScope,
         SharingStarted.WhileSubscribed(5_000),
-        ResultState.Loading(StateContent.NotExist())
+        ResultState.initialState()
     )
 
     val uiState = combine(
@@ -146,5 +146,5 @@ data class ClipItemState(
 data class ClipListUiState(
     val account: Account? = null,
     val addToTabAccount: Account? = null,
-    val clipStatusesState: ResultState<List<ClipItemState>> = ResultState.Loading(StateContent.NotExist()),
+    val clipStatusesState: ResultState<List<ClipItemState>> = ResultState.initialState(),
 )

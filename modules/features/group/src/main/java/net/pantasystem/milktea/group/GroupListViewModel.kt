@@ -10,8 +10,8 @@ import kotlinx.coroutines.flow.*
 import net.pantasystem.milktea.app_store.account.AccountStore
 import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.common.ResultState
-import net.pantasystem.milktea.common.StateContent
 import net.pantasystem.milktea.common.asLoadingStateFlow
+import net.pantasystem.milktea.common.initialState
 import net.pantasystem.milktea.model.group.Group
 import net.pantasystem.milktea.model.group.GroupDataSource
 import net.pantasystem.milktea.model.group.GroupRepository
@@ -56,7 +56,7 @@ class GroupListViewModel @Inject constructor(
     }.flowOn(Dispatchers.IO).stateIn(
         viewModelScope,
         SharingStarted.Eagerly,
-        ResultState.Loading(StateContent.NotExist())
+        ResultState.initialState()
     )
 
     private val joinedGroupSyncState = syncEvents.flatMapLatest {
@@ -69,7 +69,7 @@ class GroupListViewModel @Inject constructor(
     }.flowOn(Dispatchers.IO).stateIn(
         viewModelScope,
         SharingStarted.Eagerly,
-        ResultState.Loading(StateContent.NotExist())
+        ResultState.initialState(),
     )
 
     val uiState = combine(
@@ -90,8 +90,8 @@ class GroupListViewModel @Inject constructor(
         GroupListUiState(
             emptyList(),
             emptyList(),
-            ResultState.Loading(StateContent.NotExist()),
-            ResultState.Loading(StateContent.NotExist())
+            ResultState.initialState(),
+            ResultState.initialState()
         )
     )
 
