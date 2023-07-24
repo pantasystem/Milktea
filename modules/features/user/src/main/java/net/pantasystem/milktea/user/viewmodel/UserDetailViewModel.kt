@@ -2,7 +2,6 @@ package net.pantasystem.milktea.user.viewmodel
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
@@ -67,7 +66,6 @@ class UserDetailViewModel @Inject constructor(
 
     private val logger = loggerFactory.create("UserDetailViewModel")
 
-    //    private val currentAccountId = MutableStateFlow(userId?.accountId)
     private val userId =
         savedStateHandle.getStateFlow<String?>(UserDetailActivity.EXTRA_USER_ID, null)
     private val specifiedAccountId =
@@ -120,7 +118,7 @@ class UserDetailViewModel @Inject constructor(
     }.stateIn(viewModelScope, SharingStarted.Lazily, null)
 
 
-    val user = userState.asLiveData()
+    val user = userState
 
     val isMine = combine(userState, currentAccount) { userState, account ->
         userState?.id?.id == account?.remoteId
