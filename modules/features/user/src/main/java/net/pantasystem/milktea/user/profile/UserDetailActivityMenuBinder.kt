@@ -1,4 +1,4 @@
-package net.pantasystem.milktea.user.activity.binder
+package net.pantasystem.milktea.user.profile
 
 import android.app.Activity
 import android.util.Log

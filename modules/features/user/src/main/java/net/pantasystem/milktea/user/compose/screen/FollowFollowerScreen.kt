@@ -27,9 +27,9 @@ import net.pantasystem.milktea.user.R
 import net.pantasystem.milktea.user.compose.UserDetailCardAction
 import net.pantasystem.milktea.user.compose.UserDetailCardPageableList
 import net.pantasystem.milktea.user.compose.UserDetailCardPageableListAction
-import net.pantasystem.milktea.user.viewmodel.FollowFollowerUiState
-import net.pantasystem.milktea.user.viewmodel.FollowFollowerViewModel
-import net.pantasystem.milktea.user.viewmodel.LoadType
+import net.pantasystem.milktea.user.followlist.FollowFollowerUiState
+import net.pantasystem.milktea.user.followlist.FollowFollowerViewModel
+import net.pantasystem.milktea.user.followlist.LoadType
 import net.pantasystem.milktea.user.viewmodel.ToggleFollowViewModel
 
 @Composable

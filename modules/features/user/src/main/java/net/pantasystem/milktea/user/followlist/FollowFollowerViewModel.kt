@@ -1,4 +1,4 @@
-package net.pantasystem.milktea.user.viewmodel
+package net.pantasystem.milktea.user.followlist
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider

@@ -13,7 +13,7 @@
     <androidx.coordinatorlayout.widget.CoordinatorLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            tools:context="net.pantasystem.milktea.user.activity.UserDetailActivity"
+            tools:context="net.pantasystem.milktea.user.profile.UserDetailActivity"
             >
 
         <com.google.android.material.appbar.AppBarLayout

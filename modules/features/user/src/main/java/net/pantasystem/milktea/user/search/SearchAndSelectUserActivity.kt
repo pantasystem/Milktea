@@ -1,4 +1,4 @@
-package net.pantasystem.milktea.user.activity
+package net.pantasystem.milktea.user.search
 
 import android.app.Activity
 import android.content.Context
@@ -17,10 +17,6 @@ import net.pantasystem.milktea.common_navigation.SearchAndSelectUserNavigation
 import net.pantasystem.milktea.common_navigation.SearchAndSelectUserNavigationArgs
 import net.pantasystem.milktea.model.setting.LocalConfigRepository
 import net.pantasystem.milktea.model.user.User
-import net.pantasystem.milktea.user.search.SearchAndSelectUserScreen
-import net.pantasystem.milktea.user.search.SearchUserViewModel
-import net.pantasystem.milktea.user.viewmodel.SelectedUserViewModel
-import net.pantasystem.milktea.user.viewmodel.provideViewModel
 import java.io.Serializable
 import javax.inject.Inject
 

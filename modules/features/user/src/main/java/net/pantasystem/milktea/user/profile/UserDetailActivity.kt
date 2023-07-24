@@ -1,4 +1,4 @@
-package net.pantasystem.milktea.user.activity
+package net.pantasystem.milktea.user.profile
 
 import android.app.Activity
 import android.content.Context
@@ -42,13 +42,9 @@ import net.pantasystem.milktea.note.NoteEditorActivity
 import net.pantasystem.milktea.note.view.ActionNoteHandler
 import net.pantasystem.milktea.note.viewmodel.NotesViewModel
 import net.pantasystem.milktea.user.R
-import net.pantasystem.milktea.user.activity.binder.UserDetailActivityMenuBinder
+import net.pantasystem.milktea.user.followlist.FollowFollowerActivity
 import net.pantasystem.milktea.user.databinding.ActivityUserDetailBinding
 import net.pantasystem.milktea.user.nickname.EditNicknameDialog
-import net.pantasystem.milktea.user.profile.ConfirmUserBlockDialog
-import net.pantasystem.milktea.user.profile.ProfileAccountSwitchDialog
-import net.pantasystem.milktea.user.profile.ProfileTabPagerAdapter
-import net.pantasystem.milktea.user.profile.UserProfileFieldListAdapter
 import net.pantasystem.milktea.user.profile.mute.SpecifyMuteExpiredAtDialog
 import net.pantasystem.milktea.user.profile.viewmodel.UserDetailViewModel
 import javax.inject.Inject
@@ -75,9 +71,9 @@ class UserDetailNavigationImpl @Inject constructor(
 class UserDetailActivity : AppCompatActivity() {
     companion object {
         internal const val EXTRA_USER_ID =
-            "net.pantasystem.milktea.user.activity.UserDetailActivity.EXTRA_USER_ID"
+            "net.pantasystem.milktea.user.profile.UserDetailActivity.EXTRA_USER_ID"
         internal const val EXTRA_USER_NAME =
-            "net.pantasystem.milktea.user.activity.UserDetailActivity.EXTRA_USER_NAME"
+            "net.pantasystem.milktea.user.profile.UserDetailActivity.EXTRA_USER_NAME"
         internal const val EXTRA_ACCOUNT_ID =
             "jp.panta.misskeyandroiclient.UserDetailActivity.EXTRA_ACCOUNT_ID"
         const val EXTRA_IS_MAIN_ACTIVE = "jp.panta.misskeyandroidclient.EXTRA_IS_MAIN_ACTIVE"

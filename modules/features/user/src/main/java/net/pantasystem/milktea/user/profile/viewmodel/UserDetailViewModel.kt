@@ -36,7 +36,7 @@ import net.pantasystem.milktea.model.user.nickname.DeleteNicknameUseCase
 import net.pantasystem.milktea.model.user.nickname.UpdateNicknameUseCase
 import net.pantasystem.milktea.model.user.renote.mute.RenoteMuteRepository
 import net.pantasystem.milktea.user.R
-import net.pantasystem.milktea.user.activity.UserDetailActivity
+import net.pantasystem.milktea.user.profile.UserDetailActivity
 import javax.inject.Inject
 
 @HiltViewModel

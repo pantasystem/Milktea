@@ -1,4 +1,4 @@
-package net.pantasystem.milktea.user.activity
+package net.pantasystem.milktea.user.profile
 
 import android.content.Context
 import android.widget.Toast

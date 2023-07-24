@@ -37,7 +37,7 @@ import net.pantasystem.milktea.common_viewmodel.CurrentPageableTimelineViewModel
 import net.pantasystem.milktea.model.instance.online.user.count.OnlineUserCountResult
 import net.pantasystem.milktea.model.setting.LocalConfigRepository
 import net.pantasystem.milktea.model.user.User
-import net.pantasystem.milktea.user.activity.FollowFollowerActivity
+import net.pantasystem.milktea.user.followlist.FollowFollowerActivity
 import javax.inject.Inject
 
 @AndroidEntryPoint
