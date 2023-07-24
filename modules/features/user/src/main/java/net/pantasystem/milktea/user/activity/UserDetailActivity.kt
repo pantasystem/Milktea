@@ -50,7 +50,7 @@ import net.pantasystem.milktea.user.profile.ProfileAccountSwitchDialog
 import net.pantasystem.milktea.user.profile.ProfileTabPagerAdapter
 import net.pantasystem.milktea.user.profile.UserProfileFieldListAdapter
 import net.pantasystem.milktea.user.profile.mute.SpecifyMuteExpiredAtDialog
-import net.pantasystem.milktea.user.viewmodel.UserDetailViewModel
+import net.pantasystem.milktea.user.profile.viewmodel.UserDetailViewModel
 import javax.inject.Inject
 
 class UserDetailNavigationImpl @Inject constructor(

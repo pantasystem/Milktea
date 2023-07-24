@@ -6,7 +6,7 @@
         <import type="android.view.View"/>
         <variable
                 name="userViewModel"
-                type="net.pantasystem.milktea.user.viewmodel.UserDetailViewModel" />
+                type="net.pantasystem.milktea.user.profile.viewmodel.UserDetailViewModel" />
         <import type="net.pantasystem.milktea.common_android.ui.SafeUnbox" />
     </data>
 

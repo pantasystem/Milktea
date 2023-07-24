@@ -8,7 +8,7 @@ import net.pantasystem.milktea.common_android_ui.PageableFragmentFactory
 import net.pantasystem.milktea.common_android_ui.UserPinnedNotesFragmentFactory
 import net.pantasystem.milktea.model.account.page.Pageable
 import net.pantasystem.milktea.user.reaction.UserReactionsFragment
-import net.pantasystem.milktea.user.viewmodel.UserDetailTabType
+import net.pantasystem.milktea.user.profile.viewmodel.UserDetailTabType
 
 class ProfileTabPagerAdapter(
     private val pageableFragmentFactory: PageableFragmentFactory,

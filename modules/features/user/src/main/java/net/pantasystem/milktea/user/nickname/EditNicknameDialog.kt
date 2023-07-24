@@ -8,7 +8,7 @@ import androidx.lifecycle.ViewModelProvider
 import dagger.hilt.android.AndroidEntryPoint
 import net.pantasystem.milktea.user.R
 import net.pantasystem.milktea.user.databinding.DialogEditNicknameBinding
-import net.pantasystem.milktea.user.viewmodel.UserDetailViewModel
+import net.pantasystem.milktea.user.profile.viewmodel.UserDetailViewModel
 
 @AndroidEntryPoint
 class EditNicknameDialog : AppCompatDialogFragment() {

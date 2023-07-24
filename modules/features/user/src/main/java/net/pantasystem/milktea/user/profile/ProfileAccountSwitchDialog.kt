@@ -16,7 +16,7 @@ import net.pantasystem.milktea.common_navigation.AuthorizationNavigation
 import net.pantasystem.milktea.common_navigation.UserDetailNavigation
 import net.pantasystem.milktea.common_navigation.UserDetailNavigationArgs
 import net.pantasystem.milktea.model.setting.LocalConfigRepository
-import net.pantasystem.milktea.user.viewmodel.UserDetailViewModel
+import net.pantasystem.milktea.user.profile.viewmodel.UserDetailViewModel
 import javax.inject.Inject
 
 @AndroidEntryPoint

@@ -13,7 +13,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import kotlinx.datetime.Clock
 import net.pantasystem.milktea.user.R
-import net.pantasystem.milktea.user.viewmodel.SpecifyUserMuteUiState
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
