@@ -17,7 +17,6 @@ import net.pantasystem.milktea.app_store.setting.SettingStore
 import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.common.mapCancellableCatching
 import net.pantasystem.milktea.common.runCancellableCatching
-import net.pantasystem.milktea.common_android.eventbus.EventBus
 import net.pantasystem.milktea.common_android.resource.StringSource
 import net.pantasystem.milktea.common_android_ui.account.viewmodel.AccountViewModelUiStateHelper
 import net.pantasystem.milktea.model.account.Account
@@ -172,8 +171,6 @@ class UserDetailViewModel @Inject constructor(
         renoteMuteRepository.observeOne(it.id)
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
 
-    val showFollowers = EventBus<User?>()
-    val showFollows = EventBus<User?>()
 
     init {
         sync()
@@ -202,14 +199,6 @@ class UserDetailViewModel @Inject constructor(
             }
 
         }
-    }
-
-    fun showFollows() {
-        showFollows.event = user.value
-    }
-
-    fun showFollowers() {
-        showFollowers.event = user.value
     }
 
     fun mute(expiredAt: Instant?) {

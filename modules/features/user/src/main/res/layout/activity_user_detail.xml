@@ -278,32 +278,32 @@
                                 android:text="@string/post"
                                 android:layout_marginEnd="8dp" />
                         <TextView
+                                android:id="@+id/followingCounter"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_marginEnd="4dp"
                                 tools:text="20"
                                 android:text="@{Integer.toString(userViewModel.user.info.followingCount)}"
-                                android:onClick="@{()-> userViewModel.showFollows()}"
                                 />
                         <TextView
+                                android:id="@+id/followsText"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="@string/follow"
                                 android:layout_marginEnd="8dp"
-                                android:onClick="@{()-> userViewModel.showFollows()}"
                                 />
                         <TextView
+                                android:id="@+id/followersCounter"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 tools:text="40"
                                 android:text="@{Integer.toString(userViewModel.user.info.followersCount)}"
                                 android:layout_marginEnd="4dp"
-                                android:onClick="@{()-> userViewModel.showFollowers()}"
                                 />
                         <TextView
+                                android:id="@+id/followersText"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:onClick="@{()-> userViewModel.showFollowers()}"
                                 android:text="@string/follower"/>
                     </LinearLayout>
 

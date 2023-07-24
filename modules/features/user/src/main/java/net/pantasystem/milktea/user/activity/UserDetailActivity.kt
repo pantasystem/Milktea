@@ -165,7 +165,6 @@ class UserDetailActivity : AppCompatActivity() {
     @Inject
     lateinit var userPinnedNotesFragmentFactory: UserPinnedNotesFragmentFactory
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         applyTheme()
@@ -237,24 +236,21 @@ class UserDetailActivity : AppCompatActivity() {
             }
         }
 
-        mViewModel.showFollowers.observe(this) {
-            if (it != null) {
-                supportActionBar?.title = it.displayUserName
-            }
-
-            it?.let {
-                val intent = FollowFollowerActivity.newIntent(this, it.id, isFollowing = false)
-                startActivity(intent)
-            }
+        binding.followsText.setOnClickListener {
+            showFollowings()
         }
 
-        mViewModel.showFollows.observe(this) {
-            it?.let {
-                val intent = FollowFollowerActivity.newIntent(this, it.id, true)
-                startActivity(intent)
-            }
+        binding.followingCounter.setOnClickListener {
+            showFollowings()
         }
 
+        binding.followersCounter.setOnClickListener {
+            showFollowers()
+        }
+
+        binding.followersText.setOnClickListener {
+            showFollowers()
+        }
 
         lifecycleScope.launch {
             mViewModel.userState.collect {
@@ -459,6 +455,20 @@ class UserDetailActivity : AppCompatActivity() {
     @ExperimentalCoroutinesApi
     private fun addPageToTab() {
         mViewModel.toggleUserTimelineTab()
+    }
+
+    private fun showFollowers() {
+        mViewModel.userState.value?.let {
+            val intent = FollowFollowerActivity.newIntent(this, it.id, isFollowing = false)
+            startActivity(intent)
+        }
+    }
+
+    private fun showFollowings() {
+        mViewModel.userState.value?.let {
+            val intent = FollowFollowerActivity.newIntent(this, it.id, isFollowing = true)
+            startActivity(intent)
+        }
     }
 }
 
