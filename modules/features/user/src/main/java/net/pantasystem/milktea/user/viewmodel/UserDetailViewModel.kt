@@ -117,9 +117,6 @@ class UserDetailViewModel @Inject constructor(
         _errors.tryEmit(it)
     }.stateIn(viewModelScope, SharingStarted.Lazily, null)
 
-
-    val user = userState
-
     val isMine = combine(userState, currentAccount) { userState, account ->
         userState?.id?.id == account?.remoteId
     }.stateIn(viewModelScope, SharingStarted.Lazily, false)

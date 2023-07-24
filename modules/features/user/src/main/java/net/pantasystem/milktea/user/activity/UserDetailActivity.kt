@@ -263,7 +263,7 @@ class UserDetailActivity : AppCompatActivity() {
         binding.showRemoteUser.setOnClickListener {
             val account = accountStore.currentAccount
             if (account != null) {
-                mViewModel.user.value?.getProfileUrl(account)?.let {
+                mViewModel.userState.value?.getProfileUrl(account)?.let {
                     val uri = Uri.parse(it)
                     startActivity(
                         Intent(Intent.ACTION_VIEW, uri)
@@ -276,7 +276,7 @@ class UserDetailActivity : AppCompatActivity() {
             val account = accountStore.currentAccount
             if (account != null) {
 
-                mViewModel.user.value?.getRemoteProfileUrl(account)?.let {
+                mViewModel.userState.value?.getRemoteProfileUrl(account)?.let {
                     val uri = Uri.parse(it)
                     startActivity(
                         Intent(Intent.ACTION_VIEW, uri)
@@ -286,7 +286,7 @@ class UserDetailActivity : AppCompatActivity() {
         }
 
         binding.createMention.setOnClickListener {
-            mViewModel.user.value?.displayUserName?.let {
+            mViewModel.userState.value?.displayUserName?.let {
                 val intent = NoteEditorActivity.newBundle(this, mentions = listOf(it))
                 startActivity(intent)
             }
@@ -375,7 +375,7 @@ class UserDetailActivity : AppCompatActivity() {
             R.id.share -> {
                 val account = accountStore.currentAccount
                 val url = account?.let {
-                    mViewModel.user.value?.getRemoteProfileUrl(it)
+                    mViewModel.userState.value?.getRemoteProfileUrl(it)
                 } ?: return false
 
 
