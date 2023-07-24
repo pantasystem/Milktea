@@ -195,9 +195,7 @@ class UserDetailViewModel @Inject constructor(
     fun changeFollow() {
         viewModelScope.launch {
             userState.value?.let { user ->
-                toggleFollowUseCase(user.id).mapCancellableCatching {
-                    userRepository.sync(user.id).getOrThrow()
-                }.onFailure {
+                toggleFollowUseCase(user.id).onFailure {
                     logger.error("unmute failed", e = it)
                     _errors.tryEmit(it)
                 }
