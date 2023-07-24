@@ -32,7 +32,8 @@ import net.pantasystem.milktea.model.user.*
 import net.pantasystem.milktea.model.user.block.BlockUserUseCase
 import net.pantasystem.milktea.model.user.block.UnBlockUserUseCase
 import net.pantasystem.milktea.model.user.mute.CreateMute
-import net.pantasystem.milktea.model.user.mute.MuteRepository
+import net.pantasystem.milktea.model.user.mute.MuteUserUseCase
+import net.pantasystem.milktea.model.user.mute.UnMuteUserUseCase
 import net.pantasystem.milktea.model.user.nickname.DeleteNicknameUseCase
 import net.pantasystem.milktea.model.user.nickname.UpdateNicknameUseCase
 import net.pantasystem.milktea.model.user.renote.mute.RenoteMuteRepository
@@ -50,7 +51,8 @@ class UserDetailViewModel @Inject constructor(
     private val renoteMuteRepository: RenoteMuteRepository,
     private val blockUserUseCase: BlockUserUseCase,
     private val unBlockUserUseCase: UnBlockUserUseCase,
-    private val muteRepository: MuteRepository,
+    private val muteUserUseCase: MuteUserUseCase,
+    private val unMuteUserUseCase: UnMuteUserUseCase,
     userDataSource: UserDataSource,
     loggerFactory: Logger.Factory,
     instanceInfoService: InstanceInfoService,
@@ -213,9 +215,7 @@ class UserDetailViewModel @Inject constructor(
     fun mute(expiredAt: Instant?) {
         viewModelScope.launch {
             userState.value?.let { user ->
-                muteRepository.create(CreateMute(user.id, expiredAt)).mapCancellableCatching {
-                    userRepository.sync(user.id).getOrThrow()
-                }.onFailure {
+                muteUserUseCase(CreateMute(user.id, expiredAt)).onFailure {
                     logger.error("unmute", e = it)
                     _errors.tryEmit(it)
                 }
@@ -226,9 +226,7 @@ class UserDetailViewModel @Inject constructor(
     fun unmute() {
         viewModelScope.launch {
             userState.value?.let { user ->
-                muteRepository.delete(user.id).mapCancellableCatching {
-                    userRepository.sync(user.id).getOrThrow()
-                }.onFailure {
+                unMuteUserUseCase(user.id).onFailure {
                     logger.error("unmute", e = it)
                     _errors.tryEmit(it)
                 }
