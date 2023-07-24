@@ -70,7 +70,7 @@ dependencies {
     //glide
     kapt libs.glide.compiler
     implementation "com.google.accompanist:accompanist-glide:0.14.0"
-    implementation 'com.github.penfeizhou.android.animation:apng:2.23.0'
+    implementation 'com.github.penfeizhou.android.animation:apng:2.25.0'
     implementation 'com.caverock:androidsvg-aar:1.4'
     implementation libs.kotlin.datetime
 

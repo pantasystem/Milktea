@@ -58,7 +58,7 @@ dependencyResolutionManagement {
             library('glide-glide', 'com.github.bumptech.glide:glide:4.14.2')
             library('glide-compiler', 'com.github.bumptech.glide:compiler:4.14.2')
             library('accompanist-glide', 'com.google.accompanist:accompanist-glide:0.14.0')
-            library('animation-apng', 'com.github.penfeizhou.android.animation:apng:2.23.0')
+            library('animation-apng', 'com.github.penfeizhou.android.animation:apng:2.25.0')
 
             library('wada811-databinding', 'com.github.wada811:DataBinding-ktx:5.0.2')
 
