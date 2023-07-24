@@ -7,6 +7,8 @@ import kotlinx.coroutines.flow.map
 
 
 sealed class ResultState<out T>(val content: StateContent<T>) {
+    companion object
+
     class Fixed<out T>(content: StateContent<T>) : ResultState<T>(content)
     class Loading<out T>(content: StateContent<T>) : ResultState<T>(content)
     class Error<out T>(content: StateContent<T>, val throwable: Throwable) : ResultState<T>(content)
@@ -48,6 +50,10 @@ sealed class ResultState<out T>(val content: StateContent<T>) {
 sealed class StateContent<out T> {
     data class Exist<out T>(val rawContent: T) : StateContent<T>()
     class NotExist<out T> : StateContent<T>()
+}
+
+fun<T> ResultState.Companion.initialState(): ResultState<T> {
+    return ResultState.Loading(StateContent.NotExist())
 }
 
 sealed class PageableState<T>(val content: StateContent<T>) {

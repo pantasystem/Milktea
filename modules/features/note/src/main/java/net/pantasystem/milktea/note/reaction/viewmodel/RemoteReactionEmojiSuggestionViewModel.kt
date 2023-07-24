@@ -10,6 +10,7 @@ import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.common.ResultState
 import net.pantasystem.milktea.common.StateContent
 import net.pantasystem.milktea.common.asLoadingStateFlow
+import net.pantasystem.milktea.common.initialState
 import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.emoji.Emoji
 import net.pantasystem.milktea.model.instance.MetaRepository
@@ -54,9 +55,7 @@ class RemoteReactionEmojiSuggestionViewModel @Inject constructor(
             }.asLoadingStateFlow()
         }
     }.stateIn(
-        viewModelScope, SharingStarted.Lazily, ResultState.Loading(
-            StateContent.NotExist()
-        )
+        viewModelScope, SharingStarted.Lazily, ResultState.initialState()
     )
 
     fun setReaction(accountId: Long, reaction: String, noteId: String) {

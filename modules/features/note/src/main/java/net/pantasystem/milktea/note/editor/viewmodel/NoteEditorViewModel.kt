@@ -249,7 +249,7 @@ class NoteEditorViewModel @Inject constructor(
     }.stateIn(
         viewModelScope,
         SharingStarted.Eagerly,
-        initialValue = ResultState.Loading(StateContent.NotExist())
+        initialValue = ResultState.initialState()
     )
 
     @FlowPreview

@@ -73,9 +73,7 @@ class ListListViewModel @Inject constructor(
                 userListRepository.syncByAccountId(it.accountId).getOrThrow()
             }.asLoadingStateFlow()
         }.stateIn(
-            viewModelScope, SharingStarted.WhileSubscribed(5_000), ResultState.Loading(
-                StateContent.NotExist()
-            )
+            viewModelScope, SharingStarted.WhileSubscribed(5_000), ResultState.initialState()
         )
 
     private val addTargetUserId = MutableStateFlow<User.Id?>(null)

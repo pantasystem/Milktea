@@ -60,7 +60,7 @@ class SearchViewModel @Inject constructor(
     }.stateIn(
         viewModelScope,
         SharingStarted.WhileSubscribed(5_000),
-        ResultState.Loading(StateContent.NotExist())
+        ResultState.initialState(),
     )
 
     @OptIn(ExperimentalCoroutinesApi::class)
@@ -78,7 +78,7 @@ class SearchViewModel @Inject constructor(
     }.stateIn(
         viewModelScope,
         SharingStarted.WhileSubscribed(5_000),
-        ResultState.Loading(StateContent.NotExist())
+        ResultState.initialState(),
     )
 
     @OptIn(ExperimentalCoroutinesApi::class)

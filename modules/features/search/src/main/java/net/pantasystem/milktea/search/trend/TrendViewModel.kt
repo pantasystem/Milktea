@@ -7,8 +7,8 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
 import net.pantasystem.milktea.app_store.account.AccountStore
 import net.pantasystem.milktea.common.ResultState
-import net.pantasystem.milktea.common.StateContent
 import net.pantasystem.milktea.common.asLoadingStateFlow
+import net.pantasystem.milktea.common.initialState
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.hashtag.HashTag
 import net.pantasystem.milktea.model.hashtag.HashtagRepository
@@ -33,7 +33,7 @@ class TrendViewModel @Inject constructor(
     }.stateIn(
         viewModelScope,
         SharingStarted.WhileSubscribed(5_000),
-        ResultState.Loading(StateContent.NotExist())
+        ResultState.initialState(),
     )
 
     val uiState = combine(currentAccount, trends) { ca, t ->
@@ -46,7 +46,7 @@ class TrendViewModel @Inject constructor(
         SharingStarted.WhileSubscribed(5_000),
         TrendUiState(
             null,
-            ResultState.Loading(StateContent.NotExist())
+            ResultState.initialState(),
         )
     )
 

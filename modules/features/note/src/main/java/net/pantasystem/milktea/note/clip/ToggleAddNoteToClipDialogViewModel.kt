@@ -39,7 +39,7 @@ class ToggleAddNoteToClipDialogViewModel @Inject constructor(
     }.stateIn(
         viewModelScope,
         SharingStarted.WhileSubscribed(5_000),
-        ResultState.Loading(StateContent.NotExist())
+        ResultState.initialState(),
     )
 
 
@@ -85,7 +85,7 @@ class ToggleAddNoteToClipDialogViewModel @Inject constructor(
         }.stateIn(
             viewModelScope,
             SharingStarted.WhileSubscribed(5_000),
-            ResultState.Loading(StateContent.NotExist())
+            ResultState.initialState(),
         )
 
     val uiState = combine(noteId, clipStatuses) { noteId, clipStatuses ->
@@ -158,7 +158,7 @@ class ToggleAddNoteToClipDialogViewModel @Inject constructor(
 
 data class ToggleAddNoteToClipDialogUiState(
     val noteId: Note.Id? = null,
-    val clips: ResultState<List<ClipWithAddedState>> = ResultState.Loading(StateContent.NotExist()),
+    val clips: ResultState<List<ClipWithAddedState>> = ResultState.initialState(),
 )
 
 data class ClipWithAddedState(

@@ -10,6 +10,7 @@ import net.pantasystem.milktea.app_store.account.AccountStore
 import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.common.ResultState
 import net.pantasystem.milktea.common.StateContent
+import net.pantasystem.milktea.common.initialState
 import net.pantasystem.milktea.model.drive.DriveFileRepository
 import net.pantasystem.milktea.model.notes.draft.DraftNote
 import net.pantasystem.milktea.model.notes.draft.DraftNoteFile
@@ -44,7 +45,7 @@ class DraftNotesViewModel @Inject constructor(
     }.stateIn(
         viewModelScope,
         SharingStarted.WhileSubscribed(),
-        ResultState.Loading(StateContent.NotExist())
+        ResultState.initialState()
     )
 
     val uiState = combine(visibleContentDraftNoteIds, draftNotesState) { ids, state ->
@@ -55,7 +56,7 @@ class DraftNotesViewModel @Inject constructor(
     }.stateIn(
         viewModelScope,
         SharingStarted.WhileSubscribed(),
-        DraftNotesPageUiState(emptySet(), ResultState.Loading(StateContent.NotExist()))
+        DraftNotesPageUiState(emptySet(), ResultState.initialState())
     )
 
 
