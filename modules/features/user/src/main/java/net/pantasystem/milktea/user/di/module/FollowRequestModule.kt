@@ -5,7 +5,7 @@ import dagger.Module
 import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ActivityComponent
 import net.pantasystem.milktea.common_android_ui.user.FollowRequestsFragmentFactory
-import net.pantasystem.milktea.user.follow_requests.FollowRequestFragmentFactoryImpl
+import net.pantasystem.milktea.user.followrequests.FollowRequestFragmentFactoryImpl
 
 @InstallIn(ActivityComponent::class)
 @Module

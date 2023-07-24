@@ -1,4 +1,4 @@
-package net.pantasystem.milktea.user.follow_requests
+package net.pantasystem.milktea.user.followrequests
 
 import android.os.Bundle
 import android.view.LayoutInflater

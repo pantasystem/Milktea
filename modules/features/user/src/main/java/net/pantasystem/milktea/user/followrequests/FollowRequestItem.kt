@@ -1,4 +1,4 @@
-package net.pantasystem.milktea.user.follow_requests
+package net.pantasystem.milktea.user.followrequests
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row

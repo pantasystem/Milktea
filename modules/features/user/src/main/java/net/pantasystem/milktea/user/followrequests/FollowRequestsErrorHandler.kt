@@ -1,4 +1,4 @@
-package net.pantasystem.milktea.user.follow_requests
+package net.pantasystem.milktea.user.followrequests
 
 import android.content.Context
 import android.widget.Toast
