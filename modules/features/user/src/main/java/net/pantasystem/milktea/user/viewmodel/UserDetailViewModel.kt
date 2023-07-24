@@ -180,9 +180,7 @@ class UserDetailViewModel @Inject constructor(
 
     private fun sync() {
         viewModelScope.launch {
-            runCancellableCatching {
-                getUserId()
-            }.mapCancellableCatching { userId ->
+            getUserId().mapCancellableCatching { userId ->
                 userRepository.sync(userId).getOrThrow()
             }.onFailure {
                 logger.error("user sync error", it)
@@ -291,7 +289,7 @@ class UserDetailViewModel @Inject constructor(
     fun toggleUserTimelineTab() {
         viewModelScope.launch {
             runCancellableCatching {
-                val userId = getUserId()
+                val userId = getUserId().getOrThrow()
                 val account = accountRepository.get(userId.accountId).getOrThrow()
                 val page = account.pages.firstOrNull {
                     val pageable = it.pageable()
@@ -313,9 +311,7 @@ class UserDetailViewModel @Inject constructor(
 
     fun muteRenotes() {
         viewModelScope.launch {
-            runCancellableCatching {
-                getUserId()
-            }.mapCancellableCatching {
+            getUserId().mapCancellableCatching {
                 renoteMuteRepository.create(it).getOrThrow()
             }.onFailure {
                 _errors.tryEmit(it)
@@ -325,9 +321,7 @@ class UserDetailViewModel @Inject constructor(
 
     fun unMuteRenotes() {
         viewModelScope.launch {
-            runCancellableCatching {
-                getUserId()
-            }.mapCancellableCatching {
+            getUserId().mapCancellableCatching {
                 renoteMuteRepository.delete(it).getOrThrow()
             }.onFailure {
                 _errors.tryEmit(it)
@@ -338,7 +332,7 @@ class UserDetailViewModel @Inject constructor(
     fun setCurrentAccount(accountId: Long) {
         viewModelScope.launch {
             accountRepository.get(accountId).mapCancellableCatching {
-                it to apResolverService.resolve(getUserId(), accountId).getOrThrow()
+                it to apResolverService.resolve(getUserId().getOrThrow(), accountId).getOrThrow()
             }.onSuccess { (account, resolved) ->
                 savedStateHandle[UserDetailActivity.EXTRA_USER_ID] = resolved.id.id
                 savedStateHandle[UserDetailActivity.EXTRA_ACCOUNT_ID] = resolved.id.accountId
@@ -351,11 +345,11 @@ class UserDetailViewModel @Inject constructor(
     }
 
     private suspend fun findUser(): User {
-        return userRepository.find(getUserId())
+        return userRepository.find(getUserId().getOrThrow())
     }
 
 
-    private suspend fun getUserId(): User.Id {
+    private suspend fun getUserId(): Result<User.Id> = runCancellableCatching {
         val strUserId = savedStateHandle.get<String?>(UserDetailActivity.EXTRA_USER_ID)
         val specifiedAccountId = savedStateHandle.get<Long?>(UserDetailActivity.EXTRA_ACCOUNT_ID)
         val fqdnUserName = savedStateHandle.get<String?>(UserDetailActivity.EXTRA_USER_NAME)
@@ -376,7 +370,7 @@ class UserDetailViewModel @Inject constructor(
             }
         }
 
-        return when (argType) {
+        when (argType) {
             is UserProfileArgType.FqdnUserName -> {
                 val (userName, host) = Acct(argType.fqdnUserName).let {
                     it.userName to it.host
