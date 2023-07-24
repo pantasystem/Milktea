@@ -1,5 +1,6 @@
 package net.pantasystem.milktea.note.editor.viewmodel
 
+//import net.pantasystem.milktea.model.instance.InstanceInfoRepository
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
@@ -30,7 +31,6 @@ import net.pantasystem.milktea.model.file.UpdateAppFileSensitiveUseCase
 import net.pantasystem.milktea.model.instance.FeatureEnables
 import net.pantasystem.milktea.model.instance.FeatureType
 import net.pantasystem.milktea.model.instance.InstanceInfo
-//import net.pantasystem.milktea.model.instance.InstanceInfoRepository
 import net.pantasystem.milktea.model.instance.InstanceInfoService
 import net.pantasystem.milktea.model.notes.*
 import net.pantasystem.milktea.model.notes.draft.DraftNoteRepository
@@ -517,15 +517,12 @@ class NoteEditorViewModel @Inject constructor(
 
             is AppFile.Remote -> {
                 viewModelScope.launch {
-                    runCancellableCatching {
-                        val file = driveFileRepository.find(appFile.id)
-                        driveFileRepository.update(
-                            UpdateFileProperty(
-                                fileId = file.id,
-                                name = ValueType.Some(name)
-                            )
-                        ).getOrThrow()
-                    }.onFailure {
+                    driveFileRepository.update(
+                        UpdateFileProperty(
+                            fileId = appFile.id,
+                            name = ValueType.Some(name)
+                        )
+                    ).onFailure {
                         logger.error("update file name failed", it)
                     }
 
@@ -539,18 +536,14 @@ class NoteEditorViewModel @Inject constructor(
             is AppFile.Local -> {
                 savedStateHandle.setFiles(files.value.updateFileComment(appFile, comment))
             }
-
             is AppFile.Remote -> {
                 viewModelScope.launch {
-                    runCancellableCatching {
-                        val file = driveFileRepository.find(appFile.id)
-                        driveFileRepository.update(
-                            UpdateFileProperty(
-                                fileId = file.id,
-                                comment = ValueType.Some(comment),
-                            )
-                        ).getOrThrow()
-                    }.onFailure {
+                    driveFileRepository.update(
+                        UpdateFileProperty(
+                            fileId = appFile.id,
+                            comment = ValueType.Some(comment),
+                        )
+                    ).onFailure {
                         logger.error("update file comment failed", it)
                     }
                 }
@@ -610,13 +603,7 @@ class NoteEditorViewModel @Inject constructor(
 
     fun enablePoll() {
         val poll =
-            if (savedStateHandle.getPoll() == null) PollEditingState(
-                listOf(
-                    PollChoiceState("", UUID.randomUUID()),
-                    PollChoiceState("", UUID.randomUUID()),
-                    PollChoiceState("", UUID.randomUUID())
-                ), false
-            ) else null
+            if (savedStateHandle.getPoll() == null) PollEditingState.EMPTY_POLL_EDITING_STATE else null
         savedStateHandle.setPoll(poll)
     }
 
