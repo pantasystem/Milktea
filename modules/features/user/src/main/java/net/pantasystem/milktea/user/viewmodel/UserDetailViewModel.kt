@@ -29,7 +29,8 @@ import net.pantasystem.milktea.model.instance.InstanceInfoService
 import net.pantasystem.milktea.model.setting.DefaultConfig
 import net.pantasystem.milktea.model.setting.LocalConfigRepository
 import net.pantasystem.milktea.model.user.*
-import net.pantasystem.milktea.model.user.block.BlockRepository
+import net.pantasystem.milktea.model.user.block.BlockUserUseCase
+import net.pantasystem.milktea.model.user.block.UnBlockUserUseCase
 import net.pantasystem.milktea.model.user.mute.CreateMute
 import net.pantasystem.milktea.model.user.mute.MuteRepository
 import net.pantasystem.milktea.model.user.nickname.DeleteNicknameUseCase
@@ -47,7 +48,8 @@ class UserDetailViewModel @Inject constructor(
     private val accountRepository: AccountRepository,
     private val settingStore: SettingStore,
     private val renoteMuteRepository: RenoteMuteRepository,
-    private val blockRepository: BlockRepository,
+    private val blockUserUseCase: BlockUserUseCase,
+    private val unBlockUserUseCase: UnBlockUserUseCase,
     private val muteRepository: MuteRepository,
     userDataSource: UserDataSource,
     loggerFactory: Logger.Factory,
@@ -241,9 +243,7 @@ class UserDetailViewModel @Inject constructor(
     fun block() {
         viewModelScope.launch {
             userState.value?.let { user ->
-                blockRepository.create(user.id).mapCancellableCatching {
-                    userRepository.sync(user.id).getOrThrow()
-                }.onFailure {
+                blockUserUseCase(user.id).onFailure {
                     logger.error("block failed", it)
                     _errors.tryEmit(it)
                 }
@@ -254,9 +254,7 @@ class UserDetailViewModel @Inject constructor(
     fun unblock() {
         viewModelScope.launch {
             userState.value?.let { user ->
-                blockRepository.delete(user.id).mapCancellableCatching {
-                    userRepository.sync(user.id).getOrThrow()
-                }.onFailure {
+                unBlockUserUseCase(user.id).onFailure {
                     logger.info("unblock failed", e = it)
                     _errors.tryEmit(it)
                 }
