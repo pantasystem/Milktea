@@ -7,7 +7,7 @@ import androidx.fragment.app.activityViewModels
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
 import net.pantasystem.milktea.user.R
-import net.pantasystem.milktea.user.viewmodel.UserDetailViewModel
+import net.pantasystem.milktea.user.profile.viewmodel.UserDetailViewModel
 
 @AndroidEntryPoint
 class ConfirmUserBlockDialog : AppCompatDialogFragment() {

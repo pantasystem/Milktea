@@ -1,4 +1,4 @@
-package net.pantasystem.milktea.user.viewmodel
+package net.pantasystem.milktea.user.profile.viewmodel
 
 import androidx.annotation.StringRes
 import net.pantasystem.milktea.model.account.Account

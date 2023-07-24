@@ -1,4 +1,4 @@
-package net.pantasystem.milktea.user.activity.binder
+package net.pantasystem.milktea.user.profile
 
 import android.app.Activity
 import android.util.Log
@@ -7,7 +7,7 @@ import net.pantasystem.milktea.app_store.account.AccountStore
 import net.pantasystem.milktea.common.ui.ApplyMenuTint
 import net.pantasystem.milktea.model.account.page.Pageable
 import net.pantasystem.milktea.user.R
-import net.pantasystem.milktea.user.viewmodel.UserDetailViewModel
+import net.pantasystem.milktea.user.profile.viewmodel.UserDetailViewModel
 
 class UserDetailActivityMenuBinder(
     val activity: Activity,

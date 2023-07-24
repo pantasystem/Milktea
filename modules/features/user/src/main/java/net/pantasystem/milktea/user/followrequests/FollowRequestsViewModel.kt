@@ -1,4 +1,4 @@
-package net.pantasystem.milktea.user.follow_requests
+package net.pantasystem.milktea.user.followrequests
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope

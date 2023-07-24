@@ -24,7 +24,7 @@ import net.pantasystem.milktea.model.setting.LocalConfigRepository
 import net.pantasystem.milktea.model.user.User
 import net.pantasystem.milktea.note.NoteDetailActivity
 import net.pantasystem.milktea.search.databinding.ActivitySearchBinding
-import net.pantasystem.milktea.user.activity.UserDetailActivity
+import net.pantasystem.milktea.user.profile.UserDetailActivity
 import javax.inject.Inject
 
 @AndroidEntryPoint

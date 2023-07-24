@@ -1,4 +1,4 @@
-package net.pantasystem.milktea.user.activity
+package net.pantasystem.milktea.user.profile
 
 import android.app.Activity
 import android.content.Context
@@ -13,11 +13,7 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.TaskStackBuilder
 import androidx.databinding.DataBindingUtil
-import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.*
-import androidx.recyclerview.widget.DiffUtil
-import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import dagger.hilt.android.AndroidEntryPoint
@@ -38,7 +34,6 @@ import net.pantasystem.milktea.common_android_ui.UserPinnedNotesFragmentFactory
 import net.pantasystem.milktea.common_android_ui.report.ReportDialog
 import net.pantasystem.milktea.common_navigation.*
 import net.pantasystem.milktea.common_viewmodel.confirm.ConfirmViewModel
-import net.pantasystem.milktea.model.account.page.Pageable
 import net.pantasystem.milktea.model.setting.Config
 import net.pantasystem.milktea.model.setting.LocalConfigRepository
 import net.pantasystem.milktea.model.setting.Theme
@@ -47,16 +42,11 @@ import net.pantasystem.milktea.note.NoteEditorActivity
 import net.pantasystem.milktea.note.view.ActionNoteHandler
 import net.pantasystem.milktea.note.viewmodel.NotesViewModel
 import net.pantasystem.milktea.user.R
-import net.pantasystem.milktea.user.activity.binder.UserDetailActivityMenuBinder
+import net.pantasystem.milktea.user.followlist.FollowFollowerActivity
 import net.pantasystem.milktea.user.databinding.ActivityUserDetailBinding
 import net.pantasystem.milktea.user.nickname.EditNicknameDialog
-import net.pantasystem.milktea.user.profile.ConfirmUserBlockDialog
-import net.pantasystem.milktea.user.profile.ProfileAccountSwitchDialog
-import net.pantasystem.milktea.user.profile.UserProfileFieldListAdapter
 import net.pantasystem.milktea.user.profile.mute.SpecifyMuteExpiredAtDialog
-import net.pantasystem.milktea.user.reaction.UserReactionsFragment
-import net.pantasystem.milktea.user.viewmodel.UserDetailTabType
-import net.pantasystem.milktea.user.viewmodel.UserDetailViewModel
+import net.pantasystem.milktea.user.profile.viewmodel.UserDetailViewModel
 import javax.inject.Inject
 
 class UserDetailNavigationImpl @Inject constructor(
@@ -81,9 +71,9 @@ class UserDetailNavigationImpl @Inject constructor(
 class UserDetailActivity : AppCompatActivity() {
     companion object {
         internal const val EXTRA_USER_ID =
-            "net.pantasystem.milktea.user.activity.UserDetailActivity.EXTRA_USER_ID"
+            "net.pantasystem.milktea.user.profile.UserDetailActivity.EXTRA_USER_ID"
         internal const val EXTRA_USER_NAME =
-            "net.pantasystem.milktea.user.activity.UserDetailActivity.EXTRA_USER_NAME"
+            "net.pantasystem.milktea.user.profile.UserDetailActivity.EXTRA_USER_NAME"
         internal const val EXTRA_ACCOUNT_ID =
             "jp.panta.misskeyandroiclient.UserDetailActivity.EXTRA_ACCOUNT_ID"
         const val EXTRA_IS_MAIN_ACTIVE = "jp.panta.misskeyandroidclient.EXTRA_IS_MAIN_ACTIVE"
@@ -165,7 +155,6 @@ class UserDetailActivity : AppCompatActivity() {
     @Inject
     lateinit var userPinnedNotesFragmentFactory: UserPinnedNotesFragmentFactory
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         applyTheme()
@@ -210,7 +199,7 @@ class UserDetailActivity : AppCompatActivity() {
         )
             .initViewModelListener()
 
-        val adapter = UserTimelinePagerAdapterV2(
+        val adapter = ProfileTabPagerAdapter(
             pageableFragmentFactory,
             userPinnedNotesFragmentFactory,
             this
@@ -237,24 +226,21 @@ class UserDetailActivity : AppCompatActivity() {
             }
         }
 
-        mViewModel.showFollowers.observe(this) {
-            if (it != null) {
-                supportActionBar?.title = it.displayUserName
-            }
-
-            it?.let {
-                val intent = FollowFollowerActivity.newIntent(this, it.id, isFollowing = false)
-                startActivity(intent)
-            }
+        binding.followsText.setOnClickListener {
+            showFollowings()
         }
 
-        mViewModel.showFollows.observe(this) {
-            it?.let {
-                val intent = FollowFollowerActivity.newIntent(this, it.id, true)
-                startActivity(intent)
-            }
+        binding.followingCounter.setOnClickListener {
+            showFollowings()
         }
 
+        binding.followersCounter.setOnClickListener {
+            showFollowers()
+        }
+
+        binding.followersText.setOnClickListener {
+            showFollowers()
+        }
 
         lifecycleScope.launch {
             mViewModel.userState.collect {
@@ -273,7 +259,7 @@ class UserDetailActivity : AppCompatActivity() {
         binding.showRemoteUser.setOnClickListener {
             val account = accountStore.currentAccount
             if (account != null) {
-                mViewModel.user.value?.getProfileUrl(account)?.let {
+                mViewModel.userState.value?.getProfileUrl(account)?.let {
                     val uri = Uri.parse(it)
                     startActivity(
                         Intent(Intent.ACTION_VIEW, uri)
@@ -286,7 +272,7 @@ class UserDetailActivity : AppCompatActivity() {
             val account = accountStore.currentAccount
             if (account != null) {
 
-                mViewModel.user.value?.getRemoteProfileUrl(account)?.let {
+                mViewModel.userState.value?.getRemoteProfileUrl(account)?.let {
                     val uri = Uri.parse(it)
                     startActivity(
                         Intent(Intent.ACTION_VIEW, uri)
@@ -296,7 +282,7 @@ class UserDetailActivity : AppCompatActivity() {
         }
 
         binding.createMention.setOnClickListener {
-            mViewModel.user.value?.displayUserName?.let {
+            mViewModel.userState.value?.displayUserName?.let {
                 val intent = NoteEditorActivity.newBundle(this, mentions = listOf(it))
                 startActivity(intent)
             }
@@ -385,7 +371,7 @@ class UserDetailActivity : AppCompatActivity() {
             R.id.share -> {
                 val account = accountStore.currentAccount
                 val url = account?.let {
-                    mViewModel.user.value?.getRemoteProfileUrl(it)
+                    mViewModel.userState.value?.getRemoteProfileUrl(it)
                 } ?: return false
 
 
@@ -460,113 +446,19 @@ class UserDetailActivity : AppCompatActivity() {
     private fun addPageToTab() {
         mViewModel.toggleUserTimelineTab()
     }
+
+    private fun showFollowers() {
+        mViewModel.userState.value?.let {
+            val intent = FollowFollowerActivity.newIntent(this, it.id, isFollowing = false)
+            startActivity(intent)
+        }
+    }
+
+    private fun showFollowings() {
+        mViewModel.userState.value?.let {
+            val intent = FollowFollowerActivity.newIntent(this, it.id, isFollowing = true)
+            startActivity(intent)
+        }
+    }
 }
 
-class UserTimelinePagerAdapterV2(
-    val pageableFragmentFactory: PageableFragmentFactory,
-    val userPinnedNotesFragmentFactory: UserPinnedNotesFragmentFactory,
-    activity: FragmentActivity,
-) : FragmentStateAdapter(activity) {
-
-    var tabs: List<UserDetailTabType> = emptyList()
-        private set
-
-    override fun createFragment(position: Int): Fragment {
-        return when (val tab = tabs[position]) {
-            is UserDetailTabType.Gallery -> pageableFragmentFactory.create(
-                tab.accountId,
-                Pageable.Gallery.User(tab.userId.id),
-            )
-            is UserDetailTabType.Media -> pageableFragmentFactory.create(
-                tab.userId.accountId,
-                Pageable.UserTimeline(
-                    tab.userId.id,
-                    withFiles = true
-                )
-            )
-            is UserDetailTabType.PinNote -> userPinnedNotesFragmentFactory.create(tab.userId)
-            is UserDetailTabType.Reactions -> UserReactionsFragment.newInstance(tab.userId)
-            is UserDetailTabType.UserTimeline -> pageableFragmentFactory.create(
-                tab.userId.accountId,
-                Pageable.UserTimeline(
-                    tab.userId.id,
-                    includeReplies = false
-                )
-            )
-            is UserDetailTabType.UserTimelineWithReplies -> pageableFragmentFactory.create(
-                tab.userId.accountId,
-                Pageable.UserTimeline(
-                    tab.userId.id,
-                    includeReplies = true
-                )
-            )
-            is UserDetailTabType.MastodonMedia -> pageableFragmentFactory.create(
-                tab.userId.accountId,
-                Pageable.Mastodon.UserTimeline(
-                    tab.userId.id,
-                    isOnlyMedia = true,
-                )
-            )
-            is UserDetailTabType.MastodonUserTimeline -> pageableFragmentFactory.create(
-                tab.userId.accountId,
-                Pageable.Mastodon.UserTimeline(
-                    tab.userId.id,
-                    excludeReplies = true,
-                )
-            )
-            is UserDetailTabType.MastodonUserTimelineWithReplies -> pageableFragmentFactory.create(
-                tab.userId.accountId,
-                Pageable.Mastodon.UserTimeline(
-                    tab.userId.id,
-                    excludeReplies = false,
-                )
-            )
-            is UserDetailTabType.MastodonUserTimelineOnlyPosts -> pageableFragmentFactory.create(
-                tab.userId.accountId,
-                Pageable.Mastodon.UserTimeline(
-                    tab.userId.id,
-                    excludeReblogs = true,
-                )
-            )
-            is UserDetailTabType.UserTimelineOnlyPosts -> pageableFragmentFactory.create(
-                tab.userId.accountId,
-                Pageable.UserTimeline(
-                    tab.userId.id,
-                    includeMyRenotes = false,
-                ),
-            )
-        }
-
-    }
-
-    override fun getItemCount(): Int {
-        return tabs.size
-    }
-
-    fun submitList(list: List<UserDetailTabType>) {
-
-        val old = tabs
-        tabs = list
-        val callback = object : DiffUtil.Callback() {
-            override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
-                return old[oldItemPosition] == list[newItemPosition]
-            }
-
-            override fun getNewListSize(): Int {
-                return list.size
-            }
-
-            override fun getOldListSize(): Int {
-                return old.size
-            }
-
-            override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
-                return old[oldItemPosition] == list[newItemPosition]
-            }
-        }
-        val result = DiffUtil.calculateDiff(callback)
-        result.dispatchUpdatesTo(this)
-    }
-
-
-}

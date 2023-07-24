@@ -25,7 +25,7 @@ import net.pantasystem.milktea.model.notification.toPushNotification
 import net.pantasystem.milktea.model.sw.register.DeviceTokenRepository
 import net.pantasystem.milktea.model.user.User
 import net.pantasystem.milktea.note.NoteDetailActivity
-import net.pantasystem.milktea.user.activity.UserDetailActivity
+import net.pantasystem.milktea.user.profile.UserDetailActivity
 import net.pantasystem.milktea.worker.sw.SubscriptionRegistrationWorker
 import javax.inject.Inject
 

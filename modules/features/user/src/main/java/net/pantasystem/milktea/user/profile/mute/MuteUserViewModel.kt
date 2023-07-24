@@ -1,4 +1,4 @@
-package net.pantasystem.milktea.user.viewmodel
+package net.pantasystem.milktea.user.profile.mute
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -9,7 +9,8 @@ import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
-import java.util.*
+import java.util.Calendar
+import java.util.Date
 import javax.inject.Inject
 import kotlin.time.Duration
 

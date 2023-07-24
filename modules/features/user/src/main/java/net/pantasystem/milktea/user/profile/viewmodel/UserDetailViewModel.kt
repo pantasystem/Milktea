@@ -1,8 +1,7 @@
-package net.pantasystem.milktea.user.viewmodel
+package net.pantasystem.milktea.user.profile.viewmodel
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
@@ -17,7 +16,6 @@ import net.pantasystem.milktea.app_store.setting.SettingStore
 import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.common.mapCancellableCatching
 import net.pantasystem.milktea.common.runCancellableCatching
-import net.pantasystem.milktea.common_android.eventbus.EventBus
 import net.pantasystem.milktea.common_android.resource.StringSource
 import net.pantasystem.milktea.common_android_ui.account.viewmodel.AccountViewModelUiStateHelper
 import net.pantasystem.milktea.model.account.Account
@@ -29,14 +27,16 @@ import net.pantasystem.milktea.model.instance.InstanceInfoService
 import net.pantasystem.milktea.model.setting.DefaultConfig
 import net.pantasystem.milktea.model.setting.LocalConfigRepository
 import net.pantasystem.milktea.model.user.*
-import net.pantasystem.milktea.model.user.block.BlockRepository
+import net.pantasystem.milktea.model.user.block.BlockUserUseCase
+import net.pantasystem.milktea.model.user.block.UnBlockUserUseCase
 import net.pantasystem.milktea.model.user.mute.CreateMute
-import net.pantasystem.milktea.model.user.mute.MuteRepository
+import net.pantasystem.milktea.model.user.mute.MuteUserUseCase
+import net.pantasystem.milktea.model.user.mute.UnMuteUserUseCase
 import net.pantasystem.milktea.model.user.nickname.DeleteNicknameUseCase
 import net.pantasystem.milktea.model.user.nickname.UpdateNicknameUseCase
 import net.pantasystem.milktea.model.user.renote.mute.RenoteMuteRepository
 import net.pantasystem.milktea.user.R
-import net.pantasystem.milktea.user.activity.UserDetailActivity
+import net.pantasystem.milktea.user.profile.UserDetailActivity
 import javax.inject.Inject
 
 @HiltViewModel
@@ -47,8 +47,10 @@ class UserDetailViewModel @Inject constructor(
     private val accountRepository: AccountRepository,
     private val settingStore: SettingStore,
     private val renoteMuteRepository: RenoteMuteRepository,
-    private val blockRepository: BlockRepository,
-    private val muteRepository: MuteRepository,
+    private val blockUserUseCase: BlockUserUseCase,
+    private val unBlockUserUseCase: UnBlockUserUseCase,
+    private val muteUserUseCase: MuteUserUseCase,
+    private val unMuteUserUseCase: UnMuteUserUseCase,
     userDataSource: UserDataSource,
     loggerFactory: Logger.Factory,
     instanceInfoService: InstanceInfoService,
@@ -64,7 +66,6 @@ class UserDetailViewModel @Inject constructor(
 
     private val logger = loggerFactory.create("UserDetailViewModel")
 
-    //    private val currentAccountId = MutableStateFlow(userId?.accountId)
     private val userId =
         savedStateHandle.getStateFlow<String?>(UserDetailActivity.EXTRA_USER_ID, null)
     private val specifiedAccountId =
@@ -116,9 +117,6 @@ class UserDetailViewModel @Inject constructor(
         _errors.tryEmit(it)
     }.stateIn(viewModelScope, SharingStarted.Lazily, null)
 
-
-    val user = userState.asLiveData()
-
     val isMine = combine(userState, currentAccount) { userState, account ->
         userState?.id?.id == account?.remoteId
     }.stateIn(viewModelScope, SharingStarted.Lazily, false)
@@ -168,8 +166,6 @@ class UserDetailViewModel @Inject constructor(
         renoteMuteRepository.observeOne(it.id)
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
 
-    val showFollowers = EventBus<User?>()
-    val showFollows = EventBus<User?>()
 
     init {
         sync()
@@ -178,9 +174,7 @@ class UserDetailViewModel @Inject constructor(
 
     private fun sync() {
         viewModelScope.launch {
-            runCancellableCatching {
-                getUserId()
-            }.mapCancellableCatching { userId ->
+            getUserId().mapCancellableCatching { userId ->
                 userRepository.sync(userId).getOrThrow()
             }.onFailure {
                 logger.error("user sync error", it)
@@ -193,9 +187,7 @@ class UserDetailViewModel @Inject constructor(
     fun changeFollow() {
         viewModelScope.launch {
             userState.value?.let { user ->
-                toggleFollowUseCase(user.id).mapCancellableCatching {
-                    userRepository.sync(user.id).getOrThrow()
-                }.onFailure {
+                toggleFollowUseCase(user.id).onFailure {
                     logger.error("unmute failed", e = it)
                     _errors.tryEmit(it)
                 }
@@ -204,20 +196,10 @@ class UserDetailViewModel @Inject constructor(
         }
     }
 
-    fun showFollows() {
-        showFollows.event = user.value
-    }
-
-    fun showFollowers() {
-        showFollowers.event = user.value
-    }
-
     fun mute(expiredAt: Instant?) {
         viewModelScope.launch {
             userState.value?.let { user ->
-                muteRepository.create(CreateMute(user.id, expiredAt)).mapCancellableCatching {
-                    userRepository.sync(user.id).getOrThrow()
-                }.onFailure {
+                muteUserUseCase(CreateMute(user.id, expiredAt)).onFailure {
                     logger.error("unmute", e = it)
                     _errors.tryEmit(it)
                 }
@@ -228,9 +210,7 @@ class UserDetailViewModel @Inject constructor(
     fun unmute() {
         viewModelScope.launch {
             userState.value?.let { user ->
-                muteRepository.delete(user.id).mapCancellableCatching {
-                    userRepository.sync(user.id).getOrThrow()
-                }.onFailure {
+                unMuteUserUseCase(user.id).onFailure {
                     logger.error("unmute", e = it)
                     _errors.tryEmit(it)
                 }
@@ -241,9 +221,7 @@ class UserDetailViewModel @Inject constructor(
     fun block() {
         viewModelScope.launch {
             userState.value?.let { user ->
-                blockRepository.create(user.id).mapCancellableCatching {
-                    userRepository.sync(user.id).getOrThrow()
-                }.onFailure {
+                blockUserUseCase(user.id).onFailure {
                     logger.error("block failed", it)
                     _errors.tryEmit(it)
                 }
@@ -254,9 +232,7 @@ class UserDetailViewModel @Inject constructor(
     fun unblock() {
         viewModelScope.launch {
             userState.value?.let { user ->
-                blockRepository.delete(user.id).mapCancellableCatching {
-                    userRepository.sync(user.id).getOrThrow()
-                }.onFailure {
+                unBlockUserUseCase(user.id).onFailure {
                     logger.info("unblock failed", e = it)
                     _errors.tryEmit(it)
                 }
@@ -295,7 +271,7 @@ class UserDetailViewModel @Inject constructor(
     fun toggleUserTimelineTab() {
         viewModelScope.launch {
             runCancellableCatching {
-                val userId = getUserId()
+                val userId = getUserId().getOrThrow()
                 val account = accountRepository.get(userId.accountId).getOrThrow()
                 val page = account.pages.firstOrNull {
                     val pageable = it.pageable()
@@ -317,9 +293,7 @@ class UserDetailViewModel @Inject constructor(
 
     fun muteRenotes() {
         viewModelScope.launch {
-            runCancellableCatching {
-                getUserId()
-            }.mapCancellableCatching {
+            getUserId().mapCancellableCatching {
                 renoteMuteRepository.create(it).getOrThrow()
             }.onFailure {
                 _errors.tryEmit(it)
@@ -329,9 +303,7 @@ class UserDetailViewModel @Inject constructor(
 
     fun unMuteRenotes() {
         viewModelScope.launch {
-            runCancellableCatching {
-                getUserId()
-            }.mapCancellableCatching {
+            getUserId().mapCancellableCatching {
                 renoteMuteRepository.delete(it).getOrThrow()
             }.onFailure {
                 _errors.tryEmit(it)
@@ -342,7 +314,7 @@ class UserDetailViewModel @Inject constructor(
     fun setCurrentAccount(accountId: Long) {
         viewModelScope.launch {
             accountRepository.get(accountId).mapCancellableCatching {
-                it to apResolverService.resolve(getUserId(), accountId).getOrThrow()
+                it to apResolverService.resolve(getUserId().getOrThrow(), accountId).getOrThrow()
             }.onSuccess { (account, resolved) ->
                 savedStateHandle[UserDetailActivity.EXTRA_USER_ID] = resolved.id.id
                 savedStateHandle[UserDetailActivity.EXTRA_ACCOUNT_ID] = resolved.id.accountId
@@ -355,11 +327,11 @@ class UserDetailViewModel @Inject constructor(
     }
 
     private suspend fun findUser(): User {
-        return userRepository.find(getUserId())
+        return userRepository.find(getUserId().getOrThrow())
     }
 
 
-    private suspend fun getUserId(): User.Id {
+    private suspend fun getUserId(): Result<User.Id> = runCancellableCatching {
         val strUserId = savedStateHandle.get<String?>(UserDetailActivity.EXTRA_USER_ID)
         val specifiedAccountId = savedStateHandle.get<Long?>(UserDetailActivity.EXTRA_ACCOUNT_ID)
         val fqdnUserName = savedStateHandle.get<String?>(UserDetailActivity.EXTRA_USER_NAME)
@@ -380,7 +352,7 @@ class UserDetailViewModel @Inject constructor(
             }
         }
 
-        return when (argType) {
+        when (argType) {
             is UserProfileArgType.FqdnUserName -> {
                 val (userName, host) = Acct(argType.fqdnUserName).let {
                     it.userName to it.host
