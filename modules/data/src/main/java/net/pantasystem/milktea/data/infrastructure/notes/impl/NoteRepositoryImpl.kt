@@ -29,6 +29,7 @@ import net.pantasystem.milktea.model.notes.NoteDeletedException
 import net.pantasystem.milktea.model.notes.NoteNotFoundException
 import net.pantasystem.milktea.model.notes.NoteRemovedException
 import net.pantasystem.milktea.model.notes.NoteRepository
+import net.pantasystem.milktea.model.notes.NoteResult
 import net.pantasystem.milktea.model.notes.NoteState
 import net.pantasystem.milktea.model.notes.NoteThreadContext
 import net.pantasystem.milktea.model.notes.poll.Poll
@@ -119,27 +120,21 @@ class NoteRepositoryImpl @Inject constructor(
         withContext(ioDispatcher) {
             val account = getAccount.get(noteId.accountId)
 
-            var note = try {
-                noteDataSource.get(noteId).getOrThrow()
-            } catch (e: NoteDeletedException) {
-                throw e
-            } catch (e: Throwable) {
-                null
-            }
-
-            if (note != null) {
-                return@withContext note
+            when(val state = noteDataSource.getWithState(noteId).getOrThrow()) {
+                NoteResult.Deleted -> throw NoteDeletedException(noteId)
+                is NoteResult.Success -> return@withContext state.note
+                NoteResult.NotFound -> Unit
             }
 
             logger.debug("request notes/show=$noteId")
-            note = try {
+            val note = try {
                 convertAndAdd(account, noteApiAdapter.showNote(noteId))
             } catch (e: APIError.NotFoundException) {
                 // NOTE(pantasystem): 削除フラグが立つようになり次からNoteDeletedExceptionが投げられる
                 noteDataSource.delete(noteId)
-                null
+                throw NoteNotFoundException(noteId)
             }
-            note ?: throw NoteNotFoundException(noteId)
+            note
         }
     }
 

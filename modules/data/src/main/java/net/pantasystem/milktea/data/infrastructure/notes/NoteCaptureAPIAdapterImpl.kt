@@ -282,7 +282,7 @@ class NoteCaptureAPIAdapterImpl(
         try {
             when (e) {
                 is Event.Delete -> {
-                    noteDataSource.remove(Note.Id(account.accountId, e.id))
+                    noteDataSource.delete(Note.Id(account.accountId, e.id))
                 }
                 is Event.Notification -> {}
                 is Event.Update -> {
