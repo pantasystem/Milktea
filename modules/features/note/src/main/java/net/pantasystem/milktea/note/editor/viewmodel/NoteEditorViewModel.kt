@@ -37,7 +37,6 @@ import net.pantasystem.milktea.model.notes.draft.DraftNoteRepository
 import net.pantasystem.milktea.model.notes.draft.DraftNoteService
 import net.pantasystem.milktea.model.notes.reservation.NoteReservationPostExecutor
 import net.pantasystem.milktea.model.setting.LocalConfigRepository
-import net.pantasystem.milktea.model.setting.RememberVisibility
 import net.pantasystem.milktea.model.user.User
 import net.pantasystem.milktea.model.user.UserDataSource
 import net.pantasystem.milktea.note.viewmodel.PlaneNoteViewDataCache
@@ -64,7 +63,7 @@ class NoteEditorViewModel @Inject constructor(
     private val noteEditorSwitchAccountExecutor: NoteEditorSwitchAccountExecutor,
     private val createNoteWorkerExecutor: CreateNoteWorkerExecutor,
     private val accountRepository: AccountRepository,
-    private val localConfigRepository: LocalConfigRepository,
+    localConfigRepository: LocalConfigRepository,
     private val featureEnables: FeatureEnables,
     private val noteRelationGetter: NoteRelationGetter,
 //    private val instanceInfoRepository: InstanceInfoRepository,
@@ -174,19 +173,14 @@ class NoteEditorViewModel @Inject constructor(
         null
     )
 
-    val visibility = combine(_visibility, _currentAccount.filterNotNull().map {
-        localConfigRepository.getRememberVisibility(it.accountId).getOrElse {
-            RememberVisibility.None
-        }
-    }, channelId) { formVisibilityState, settingVisibilityState, channelId ->
-        when {
-            formVisibilityState != null -> formVisibilityState
-            settingVisibilityState is RememberVisibility.None -> Visibility.Public(false)
-            settingVisibilityState is RememberVisibility.Remember -> settingVisibilityState.visibility
-            channelId != null -> Visibility.Public(true)
-            else -> Visibility.Public(false)
-        }
-    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), Visibility.Public(false))
+    val visibility = NoteEditorVisibilityCombiner(
+        viewModelScope,
+        localConfigRepository,
+    ).create(
+        _visibility,
+        _currentAccount,
+        channelId,
+    )
 
     val isLocalOnly = visibility.map {
         it.isLocalOnly()
