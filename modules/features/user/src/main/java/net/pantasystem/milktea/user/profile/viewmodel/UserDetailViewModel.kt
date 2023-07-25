@@ -4,7 +4,6 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -12,7 +11,6 @@ import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import net.pantasystem.milktea.app_store.account.AccountStore
-import net.pantasystem.milktea.app_store.setting.SettingStore
 import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.common.mapCancellableCatching
 import net.pantasystem.milktea.common.runCancellableCatching
@@ -20,8 +18,6 @@ import net.pantasystem.milktea.common_android.resource.StringSource
 import net.pantasystem.milktea.common_android_ui.account.viewmodel.AccountViewModelUiStateHelper
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.AccountRepository
-import net.pantasystem.milktea.model.account.page.Pageable
-import net.pantasystem.milktea.model.account.page.PageableTemplate
 import net.pantasystem.milktea.model.ap.ApResolverService
 import net.pantasystem.milktea.model.instance.InstanceInfoService
 import net.pantasystem.milktea.model.setting.DefaultConfig
@@ -45,7 +41,6 @@ class UserDetailViewModel @Inject constructor(
     private val updateNicknameUseCase: UpdateNicknameUseCase,
     private val accountStore: AccountStore,
     private val accountRepository: AccountRepository,
-    private val settingStore: SettingStore,
     private val renoteMuteRepository: RenoteMuteRepository,
     private val blockUserUseCase: BlockUserUseCase,
     private val unBlockUserUseCase: UnBlockUserUseCase,
@@ -59,6 +54,7 @@ class UserDetailViewModel @Inject constructor(
     private val apResolverService: ApResolverService,
     private val savedStateHandle: SavedStateHandle,
     private val userDetailTabTypeFactory: UserDetailTabTypeFactory,
+    private val toggleUserTimelineAddTabUseCase: ToggleUserTimelineAddTabUseCase,
     configRepository: LocalConfigRepository,
 ) : ViewModel() {
 
@@ -242,8 +238,7 @@ class UserDetailViewModel @Inject constructor(
 
     fun changeNickname(name: String) {
         viewModelScope.launch {
-            runCancellableCatching {
-                val user = findUser()
+            findUser().mapCancellableCatching { user ->
                 updateNicknameUseCase(user, name)
             }.onSuccess {
                 logger.debug("ニックネーム更新処理成功")
@@ -256,8 +251,7 @@ class UserDetailViewModel @Inject constructor(
 
     fun deleteNickname() {
         viewModelScope.launch {
-            runCancellableCatching {
-                val user = findUser()
+            findUser().mapCancellableCatching { user ->
                 deleteNicknameUseCase(user)
             }.onSuccess {
                 logger.debug("ニックネーム削除処理成功")
@@ -270,20 +264,8 @@ class UserDetailViewModel @Inject constructor(
 
     fun toggleUserTimelineTab() {
         viewModelScope.launch {
-            runCancellableCatching {
-                val userId = getUserId().getOrThrow()
-                val account = accountRepository.get(userId.accountId).getOrThrow()
-                val page = account.pages.firstOrNull {
-                    val pageable = it.pageable()
-                    pageable is Pageable.UserTimeline && pageable.userId == userId.id
-                }
-                if (page == null) {
-                    accountStore.addPage(
-                        PageableTemplate(account).user(findUser(), settingStore.isUserNameDefault)
-                    )
-                } else {
-                    accountStore.removePage(page)
-                }
+            getUserId().mapCancellableCatching {
+                toggleUserTimelineAddTabUseCase(it)
             }.onFailure {
                 logger.error("toggle user timeline tab failed", it)
                 _errors.tryEmit(it)
@@ -326,8 +308,8 @@ class UserDetailViewModel @Inject constructor(
         }
     }
 
-    private suspend fun findUser(): User {
-        return userRepository.find(getUserId().getOrThrow())
+    private suspend fun findUser(): Result<User> = runCancellableCatching {
+        userRepository.find(getUserId().getOrThrow())
     }
 
 
@@ -380,36 +362,3 @@ sealed interface UserProfileArgType {
 
 }
 
-class UserProfileArgTypeCombiner(
-    private val scope: CoroutineScope,
-) {
-    fun create(
-        userIdFlow: StateFlow<String?>,
-        fqdnUserNameFlow: StateFlow<String?>,
-        currentAccountFlow: StateFlow<Account?>
-    ): StateFlow<UserProfileArgType> {
-        return combine(
-            userIdFlow,
-            fqdnUserNameFlow,
-            currentAccountFlow,
-        ) { userId, fqdnUserName, currentAccount ->
-            when {
-                userId != null && currentAccount != null -> {
-                    UserProfileArgType.UserId(User.Id(currentAccount.accountId, userId))
-                }
-
-                fqdnUserName != null && currentAccount != null -> {
-                    UserProfileArgType.FqdnUserName(fqdnUserName, currentAccount)
-                }
-
-                else -> {
-                    UserProfileArgType.None
-                }
-            }
-        }.stateIn(
-            scope,
-            SharingStarted.WhileSubscribed(5_000),
-            UserProfileArgType.None
-        )
-    }
-}
