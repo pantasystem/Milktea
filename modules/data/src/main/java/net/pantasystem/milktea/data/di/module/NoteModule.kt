@@ -13,6 +13,8 @@ import net.pantasystem.milktea.common.getPreferences
 import net.pantasystem.milktea.data.infrastructure.notes.*
 import net.pantasystem.milktea.data.infrastructure.notes.draft.DraftNoteRepositoryImpl
 import net.pantasystem.milktea.data.infrastructure.notes.impl.DraftNoteServiceImpl
+import net.pantasystem.milktea.data.infrastructure.notes.impl.NoteApiAdapter
+import net.pantasystem.milktea.data.infrastructure.notes.impl.NoteApiAdapterFactoryImpl
 import net.pantasystem.milktea.data.infrastructure.notes.impl.NoteRepositoryImpl
 import net.pantasystem.milktea.data.infrastructure.notes.impl.ObjectBoxNoteDataSource
 import net.pantasystem.milktea.data.infrastructure.notes.renote.RenotesPagingServiceImpl
@@ -57,6 +59,9 @@ abstract class NoteBindModule{
     @Binds
     @Singleton
     abstract fun bindReplyStreaming(impl: ReplyStreamingImpl): ReplyStreaming
+
+    @Binds
+    internal abstract fun bindNoteApiAdapterFactory(impl: NoteApiAdapterFactoryImpl): NoteApiAdapter.Factory
 
 }
 

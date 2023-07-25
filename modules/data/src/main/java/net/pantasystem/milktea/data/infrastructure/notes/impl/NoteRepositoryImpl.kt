@@ -45,7 +45,7 @@ class NoteRepositoryImpl @Inject constructor(
     val mastodonAPIProvider: MastodonAPIProvider,
     val noteDataSourceAdder: NoteDataSourceAdder,
     val getAccount: GetAccount,
-    private val noteApiAdapter: NoteApiAdapter,
+    private val noteApiAdapterFactory: NoteApiAdapter.Factory,
     @IODispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : NoteRepository {
 
@@ -54,7 +54,7 @@ class NoteRepositoryImpl @Inject constructor(
 
     override suspend fun create(createNote: CreateNote): Result<Note> = runCancellableCatching {
         withContext(ioDispatcher) {
-            convertAndAdd(createNote.author, noteApiAdapter.create(createNote))
+            convertAndAdd(createNote.author, noteApiAdapterFactory.create(createNote.author).create(createNote))
         }
     }
 
@@ -105,7 +105,7 @@ class NoteRepositoryImpl @Inject constructor(
         withContext(ioDispatcher) {
             val account = getAccount.get(noteId.accountId)
             val note = find(noteId).getOrThrow()
-            when (val result = noteApiAdapter.delete(noteId)) {
+            when (val result = noteApiAdapterFactory.create(account).delete(noteId)) {
                 is DeleteNoteResultType.Mastodon -> noteDataSourceAdder.addTootStatusDtoIntoDataSource(
                     account,
                     result.status
@@ -127,7 +127,7 @@ class NoteRepositoryImpl @Inject constructor(
 
             logger.debug("request notes/show=$noteId")
             val note = try {
-                convertAndAdd(account, noteApiAdapter.showNote(noteId))
+                convertAndAdd(account, noteApiAdapterFactory.create(account).showNote(noteId))
             } catch (e: APIError.NotFoundException) {
                 // NOTE(pantasystem): 削除フラグが立つようになり次からNoteDeletedExceptionが投げられる
                 noteDataSource.delete(noteId)
@@ -204,7 +204,7 @@ class NoteRepositoryImpl @Inject constructor(
                 async {
                     try {
                         val account = accountMap.getValue(noteId.accountId)
-                        convertAndAdd(account, noteApiAdapter.showNote(noteId))
+                        convertAndAdd(account, noteApiAdapterFactory.create(account).showNote(noteId))
                     } catch (e: Throwable) {
                         if (e is APIError.NotFoundException) {
                             noteDataSource.delete(noteId)
@@ -268,14 +268,14 @@ class NoteRepositoryImpl @Inject constructor(
     override suspend fun sync(noteId: Note.Id): Result<Unit> = runCancellableCatching {
         withContext(ioDispatcher) {
             val account = getAccount.get(noteId.accountId)
-            convertAndAdd(account, noteApiAdapter.showNote(noteId))
+            convertAndAdd(account, noteApiAdapterFactory.create(account).showNote(noteId))
         }
     }
 
     override suspend fun createThreadMute(noteId: Note.Id): Result<Unit> = runCancellableCatching {
         withContext(ioDispatcher) {
             val account = getAccount.get(noteId.accountId)
-            when (val result = noteApiAdapter.createThreadMute(noteId)) {
+            when (val result = noteApiAdapterFactory.create(account).createThreadMute(noteId)) {
                 is ToggleThreadMuteResultType.Mastodon -> {
                     noteDataSourceAdder.addTootStatusDtoIntoDataSource(account, result.status)
                 }
@@ -287,7 +287,7 @@ class NoteRepositoryImpl @Inject constructor(
     override suspend fun deleteThreadMute(noteId: Note.Id): Result<Unit> = runCancellableCatching {
         withContext(ioDispatcher) {
             val account = getAccount.get(noteId.accountId)
-            when (val result = noteApiAdapter.deleteThreadMute(noteId)) {
+            when (val result = noteApiAdapterFactory.create(account).deleteThreadMute(noteId)) {
                 is ToggleThreadMuteResultType.Mastodon -> {
                     noteDataSourceAdder.addTootStatusDtoIntoDataSource(account, result.status)
                 }
