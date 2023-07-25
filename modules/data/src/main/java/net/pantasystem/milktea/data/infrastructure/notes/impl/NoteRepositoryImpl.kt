@@ -375,11 +375,11 @@ class NoteRepositoryImpl @Inject constructor(
         val descendants = getMisskeyDescendants(targetNoteId).map {
             noteDataSourceAdder.addNoteDtoToDataSource(account, it)
         }
-        val tc = noteDataSource.findNoteThreadContext(targetNoteId).getOrThrow()
+        val threadContext = noteDataSource.findNoteThreadContext(targetNoteId).getOrThrow()
         noteDataSource.addNoteThreadContext(
             targetNoteId,
-            tc.copy(
-                descendants = tc.descendants + descendants
+            threadContext.copy(
+                descendants = threadContext.descendants + descendants
             )
         )
         coroutineScope {
