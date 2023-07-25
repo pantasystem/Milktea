@@ -16,7 +16,6 @@ import net.pantasystem.milktea.data.api.mastodon.MastodonAPIProvider
 import net.pantasystem.milktea.data.infrastructure.notes.NoteDataSourceAdder
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.GetAccount
-import net.pantasystem.milktea.model.drive.FilePropertyDataSource
 import net.pantasystem.milktea.model.notes.CreateNote
 import net.pantasystem.milktea.model.notes.Note
 import net.pantasystem.milktea.model.notes.NoteDataSource
@@ -27,14 +26,11 @@ import net.pantasystem.milktea.model.notes.NoteResult
 import net.pantasystem.milktea.model.notes.NoteState
 import net.pantasystem.milktea.model.notes.NoteThreadContext
 import net.pantasystem.milktea.model.notes.poll.Poll
-import net.pantasystem.milktea.model.user.UserDataSource
 import javax.inject.Inject
 
 class NoteRepositoryImpl @Inject constructor(
     val loggerFactory: Logger.Factory,
-    val userDataSource: UserDataSource,
     val noteDataSource: NoteDataSource,
-    val filePropertyDataSource: FilePropertyDataSource,
     val mastodonAPIProvider: MastodonAPIProvider,
     val noteDataSourceAdder: NoteDataSourceAdder,
     val getAccount: GetAccount,
