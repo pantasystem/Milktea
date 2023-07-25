@@ -17,6 +17,8 @@ import net.pantasystem.milktea.data.infrastructure.notes.impl.NoteApiAdapter
 import net.pantasystem.milktea.data.infrastructure.notes.impl.NoteApiAdapterFactoryImpl
 import net.pantasystem.milktea.data.infrastructure.notes.impl.NoteRepositoryImpl
 import net.pantasystem.milktea.data.infrastructure.notes.impl.ObjectBoxNoteDataSource
+import net.pantasystem.milktea.data.infrastructure.notes.impl.ThreadContextApiAdapter
+import net.pantasystem.milktea.data.infrastructure.notes.impl.ThreadContextApiAdapterFactoryImpl
 import net.pantasystem.milktea.data.infrastructure.notes.renote.RenotesPagingServiceImpl
 import net.pantasystem.milktea.model.notes.*
 import net.pantasystem.milktea.model.notes.draft.DraftNoteRepository
@@ -62,6 +64,9 @@ abstract class NoteBindModule{
 
     @Binds
     internal abstract fun bindNoteApiAdapterFactory(impl: NoteApiAdapterFactoryImpl): NoteApiAdapter.Factory
+
+    @Binds
+    internal abstract fun bindThreadContextApiAdapterFactory(impl: ThreadContextApiAdapterFactoryImpl): ThreadContextApiAdapter.Factory
 
 }
 

@@ -24,6 +24,9 @@ import net.pantasystem.milktea.model.drive.FilePropertyDataSource
 import net.pantasystem.milktea.model.file.AppFile
 import net.pantasystem.milktea.model.notes.CreateNote
 import net.pantasystem.milktea.model.notes.Note
+import net.pantasystem.milktea.model.notes.NoteState
+import net.pantasystem.milktea.model.notes.poll.Poll
+import net.pantasystem.milktea.model.notes.poll.Vote
 import net.pantasystem.milktea.model.notes.type4Mastodon
 import javax.inject.Inject
 
@@ -41,6 +44,10 @@ interface NoteApiAdapter {
     suspend fun createThreadMute(noteId: Note.Id): ToggleThreadMuteResultType
     suspend fun deleteThreadMute(noteId: Note.Id): ToggleThreadMuteResultType
     suspend fun renote(target: Note): RenoteResultType
+
+    suspend fun vote(noteId: Note.Id, choice: Poll.Choice, target: Note)
+
+    suspend fun findNoteState(target: Note): NoteState
 }
 
 internal class NoteApiAdapterFactoryImpl @Inject constructor(
@@ -152,6 +159,36 @@ internal class NoteApiAdapterMisskeyPattern(
         )
     }
 
+    override suspend fun vote(noteId: Note.Id, choice: Poll.Choice, target: Note) {
+        val account = accountRepository.get(target.id.accountId).getOrThrow()
+        misskeyAPIProvider.get(account).vote(
+            Vote(
+                i = account.token,
+                choice = choice.index,
+                noteId = noteId.noteId
+            )
+        ).throwIfHasError()
+    }
+
+    override suspend fun findNoteState(target: Note): NoteState {
+        val account = accountRepository.get(target.id.accountId).getOrThrow()
+        return misskeyAPIProvider.get(account.normalizedInstanceUri).noteState(
+            NoteRequest(
+                i = account.token,
+                noteId = target.id.noteId
+            )
+        ).throwIfHasError().body()!!.let {
+            NoteState(
+                isFavorited = it.isFavorited,
+                isMutedThread = it.isMutedThread,
+                isWatching = when (val watching = it.isWatching) {
+                    null -> NoteState.Watching.None
+                    else -> NoteState.Watching.Some(watching)
+                }
+            )
+        }
+    }
+
 }
 
 internal class NoteApiAdapterMastodonPattern(
@@ -239,6 +276,21 @@ internal class NoteApiAdapterMastodonPattern(
         return NoteResultType.Mastodon(requireNotNull(toot))
     }
 
+    override suspend fun vote(noteId: Note.Id, choice: Poll.Choice, target: Note) {
+        val account = accountRepository.get(noteId.accountId).getOrThrow()
+        mastodonAPIProvider.get(account).voteOnPoll(
+            requireNotNull((target.type as Note.Type.Mastodon).pollId),
+            choices = listOf(choice.index)
+        )
+    }
+
+    override suspend fun findNoteState(target: Note): NoteState {
+        return NoteState(
+            isFavorited = (target.type as Note.Type.Mastodon).favorited ?: false,
+            isMutedThread = (target.type as Note.Type.Mastodon).muted ?: false,
+            isWatching = NoteState.Watching.None,
+        )
+    }
 }
 
 sealed interface NoteResultType {

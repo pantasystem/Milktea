@@ -7,17 +7,12 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.withContext
-import net.pantasystem.milktea.api.misskey.notes.GetNoteChildrenRequest
-import net.pantasystem.milktea.api.misskey.notes.NoteDTO
-import net.pantasystem.milktea.api.misskey.notes.NoteRequest
 import net.pantasystem.milktea.common.APIError
 import net.pantasystem.milktea.common.Logger
-import net.pantasystem.milktea.common.mapCancellableCatching
 import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.common.throwIfHasError
 import net.pantasystem.milktea.common_android.hilt.IODispatcher
 import net.pantasystem.milktea.data.api.mastodon.MastodonAPIProvider
-import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
 import net.pantasystem.milktea.data.infrastructure.notes.NoteDataSourceAdder
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.GetAccount
@@ -32,7 +27,6 @@ import net.pantasystem.milktea.model.notes.NoteResult
 import net.pantasystem.milktea.model.notes.NoteState
 import net.pantasystem.milktea.model.notes.NoteThreadContext
 import net.pantasystem.milktea.model.notes.poll.Poll
-import net.pantasystem.milktea.model.notes.poll.Vote
 import net.pantasystem.milktea.model.user.UserDataSource
 import javax.inject.Inject
 
@@ -41,11 +35,11 @@ class NoteRepositoryImpl @Inject constructor(
     val userDataSource: UserDataSource,
     val noteDataSource: NoteDataSource,
     val filePropertyDataSource: FilePropertyDataSource,
-    val misskeyAPIProvider: MisskeyAPIProvider,
     val mastodonAPIProvider: MastodonAPIProvider,
     val noteDataSourceAdder: NoteDataSourceAdder,
     val getAccount: GetAccount,
     private val noteApiAdapterFactory: NoteApiAdapter.Factory,
+    private val threadContextApiAdapterFactory: ThreadContextApiAdapter.Factory,
     @IODispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : NoteRepository {
 
@@ -147,24 +141,7 @@ class NoteRepositoryImpl @Inject constructor(
             withContext(ioDispatcher) {
                 val account = getAccount.get(noteId.accountId)
                 val note = find(noteId).getOrThrow()
-                when (val type = note.type) {
-                    is Note.Type.Mastodon -> {
-                        mastodonAPIProvider.get(account).voteOnPoll(
-                            requireNotNull(type.pollId),
-                            choices = listOf(choice.index)
-                        )
-                    }
-                    is Note.Type.Misskey -> {
-                        misskeyAPIProvider.get(account).vote(
-                            Vote(
-                                i = getAccount.get(noteId.accountId).token,
-                                choice = choice.index,
-                                noteId = noteId.noteId
-                            )
-                        ).throwIfHasError()
-                    }
-                }
-
+                noteApiAdapterFactory.create(account).vote(noteId, choice, note)
             }
         }
 
@@ -200,45 +177,7 @@ class NoteRepositoryImpl @Inject constructor(
     override suspend fun syncThreadContext(noteId: Note.Id): Result<Unit> = runCancellableCatching {
         withContext(ioDispatcher) {
             val account = getAccount.get(noteId.accountId)
-            when (account.instanceType) {
-                Account.InstanceType.MISSKEY, Account.InstanceType.FIREFISH -> {
-                    val ancestors = requireNotNull(
-                        misskeyAPIProvider.get(account).conversation(
-                            NoteRequest(
-                                i = account.token,
-                                noteId = noteId.noteId,
-                            )
-                        ).throwIfHasError().body()
-                    ).map {
-                        noteDataSourceAdder.addNoteDtoToDataSource(account, it)
-                    }
-                    noteDataSource.clearNoteThreadContext(noteId)
-                    noteDataSource.addNoteThreadContext(noteId, NoteThreadContext(
-                        ancestors = ancestors,
-                        descendants = emptyList()
-                    ))
-                    syncRecursiveThreadContext4Misskey(noteId, noteId)
-                }
-                Account.InstanceType.MASTODON, Account.InstanceType.PLEROMA -> {
-                    val body = requireNotNull(
-                        mastodonAPIProvider.get(account).getStatusesContext(noteId.noteId)
-                            .throwIfHasError()
-                            .body()
-                    )
-                    val ancestors = body.ancestors.map {
-                        noteDataSourceAdder.addTootStatusDtoIntoDataSource(account, it)
-                    }
-
-                    val descendants = body.descendants.map {
-                        noteDataSourceAdder.addTootStatusDtoIntoDataSource(account, it)
-                    }
-                    noteDataSource.clearNoteThreadContext(noteId)
-                    noteDataSource.addNoteThreadContext(noteId, NoteThreadContext(
-                        ancestors = ancestors,
-                        descendants = descendants
-                    ))
-                }
-            }
+            threadContextApiAdapterFactory.create(account).syncThreadContext(noteId)
         }
     }
 
@@ -281,35 +220,8 @@ class NoteRepositoryImpl @Inject constructor(
         runCancellableCatching {
             withContext(ioDispatcher) {
                 val account = getAccount.get(noteId.accountId)
-                when (account.instanceType) {
-                    Account.InstanceType.MISSKEY, Account.InstanceType.FIREFISH -> {
-                        misskeyAPIProvider.get(account.normalizedInstanceUri).noteState(
-                            NoteRequest(
-                                i = account.token,
-                                noteId = noteId.noteId
-                            )
-                        ).throwIfHasError().body()!!.let {
-                            NoteState(
-                                isFavorited = it.isFavorited,
-                                isMutedThread = it.isMutedThread,
-                                isWatching = when (val watching = it.isWatching) {
-                                    null -> NoteState.Watching.None
-                                    else -> NoteState.Watching.Some(watching)
-                                }
-                            )
-                        }
-                    }
-                    Account.InstanceType.MASTODON, Account.InstanceType.PLEROMA -> {
-                        find(noteId).mapCancellableCatching {
-                            NoteState(
-                                isFavorited = (it.type as Note.Type.Mastodon).favorited ?: false,
-                                isMutedThread = (it.type as Note.Type.Mastodon).muted ?: false,
-                                isWatching = NoteState.Watching.None,
-                            )
-                        }.getOrThrow()
-                    }
-                }
-
+                val target = find(noteId).getOrThrow()
+                noteApiAdapterFactory.create(account).findNoteState(target)
             }
         }
 
@@ -334,41 +246,4 @@ class NoteRepositoryImpl @Inject constructor(
         }
     }
 
-    private suspend fun getMisskeyDescendants(targetNoteId: Note.Id): List<NoteDTO> {
-        val account = getAccount.get(targetNoteId.accountId)
-        return requireNotNull(
-            misskeyAPIProvider.get(account).children(
-                GetNoteChildrenRequest(
-                    i = account.token,
-                    noteId = targetNoteId.noteId,
-                    limit = 30,
-                    depth = 2,
-                )
-            ).throwIfHasError().body()
-        )
-    }
-
-    private suspend fun syncRecursiveThreadContext4Misskey(
-        targetNoteId: Note.Id,
-        appendTo: Note.Id,
-    ) {
-        val account = getAccount.get(appendTo.accountId)
-        val descendants = getMisskeyDescendants(targetNoteId).map {
-            noteDataSourceAdder.addNoteDtoToDataSource(account, it)
-        }
-        val threadContext = noteDataSource.findNoteThreadContext(targetNoteId).getOrThrow()
-        noteDataSource.addNoteThreadContext(
-            targetNoteId,
-            threadContext.copy(
-                descendants = threadContext.descendants + descendants
-            )
-        )
-        coroutineScope {
-            descendants.map { note ->
-                async {
-                    syncRecursiveThreadContext4Misskey(note.id, appendTo)
-                }
-            }.awaitAll()
-        }
-    }
 }
