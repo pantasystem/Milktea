@@ -111,7 +111,7 @@ class UserDetailViewModel @Inject constructor(
             }
         }
     }.mapNotNull {
-        it as? User.Detail
+        it?.castAndPartiallyFill()
     }.catch {
         logger.error("observe user error", it)
         _errors.tryEmit(it)
