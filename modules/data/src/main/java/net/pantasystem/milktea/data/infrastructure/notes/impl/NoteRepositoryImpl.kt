@@ -61,27 +61,8 @@ class NoteRepositoryImpl @Inject constructor(
     override suspend fun renote(noteId: Note.Id): Result<Note> = runCancellableCatching {
         withContext(ioDispatcher) {
             val account = getAccount.get(noteId.accountId)
-            when (account.instanceType) {
-                Account.InstanceType.MISSKEY, Account.InstanceType.FIREFISH -> {
-                    val n = find(noteId).getOrThrow()
-                    create(
-                        CreateNote(
-                            author = account, renoteId = noteId,
-                            text = null,
-                            visibility = n.visibility
-                        )
-                    ).getOrThrow()
-                }
-                Account.InstanceType.MASTODON, Account.InstanceType.PLEROMA -> {
-                    val toot = mastodonAPIProvider.get(account).reblog(noteId.noteId)
-                        .throwIfHasError()
-                        .body()
-                    noteDataSourceAdder.addTootStatusDtoIntoDataSource(
-                        account,
-                        requireNotNull(toot)
-                    )
-                }
-            }
+            val n = find(noteId).getOrThrow()
+            convertAndAdd(account, noteApiAdapterFactory.create(account).renote(n))
         }
     }
 

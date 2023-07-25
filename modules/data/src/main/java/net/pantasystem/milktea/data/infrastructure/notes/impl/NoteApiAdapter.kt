@@ -40,6 +40,7 @@ interface NoteApiAdapter {
     suspend fun delete(noteId: Note.Id): DeleteNoteResultType
     suspend fun createThreadMute(noteId: Note.Id): ToggleThreadMuteResultType
     suspend fun deleteThreadMute(noteId: Note.Id): ToggleThreadMuteResultType
+    suspend fun renote(target: Note): RenoteResultType
 }
 
 internal class NoteApiAdapterFactoryImpl @Inject constructor(
@@ -74,7 +75,7 @@ internal class NoteApiAdapterMisskeyPattern(
     private val uploader: FileUploaderProvider,
     val loggerFactory: Logger.Factory
 ) : NoteApiAdapter {
-    override suspend fun create(createNote: CreateNote): NoteCreatedResultType {
+    override suspend fun create(createNote: CreateNote): NoteResultType.Misskey {
         val task = PostNoteTask(
             createNote,
             createNote.author,
@@ -138,6 +139,17 @@ internal class NoteApiAdapterMisskeyPattern(
             )
         ).throwIfHasError()
         return ToggleThreadMuteResultType.Misskey
+    }
+
+    override suspend fun renote(target: Note): RenoteResultType {
+        val account = accountRepository.get(target.id.accountId).getOrThrow()
+        return create(
+            CreateNote(
+                author = account, renoteId = target.id,
+                text = null,
+                visibility = target.visibility
+            )
+        )
     }
 
 }
@@ -219,6 +231,14 @@ internal class NoteApiAdapterMastodonPattern(
         return ToggleThreadMuteResultType.Mastodon(requireNotNull(body))
     }
 
+    override suspend fun renote(target: Note): RenoteResultType {
+        val account = accountRepository.get(target.id.accountId).getOrThrow()
+        val toot = mastodonAPIProvider.get(account).reblog(target.id.noteId)
+            .throwIfHasError()
+            .body()
+        return NoteResultType.Mastodon(requireNotNull(toot))
+    }
+
 }
 
 sealed interface NoteResultType {
@@ -241,3 +261,5 @@ sealed interface ToggleThreadMuteResultType {
     object Misskey : ToggleThreadMuteResultType
     data class Mastodon(val status: TootStatusDTO) : ToggleThreadMuteResultType
 }
+
+typealias RenoteResultType = NoteResultType
