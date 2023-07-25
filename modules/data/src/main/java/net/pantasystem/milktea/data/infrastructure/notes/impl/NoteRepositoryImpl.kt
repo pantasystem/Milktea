@@ -27,7 +27,6 @@ import net.pantasystem.milktea.model.notes.Note
 import net.pantasystem.milktea.model.notes.NoteDataSource
 import net.pantasystem.milktea.model.notes.NoteDeletedException
 import net.pantasystem.milktea.model.notes.NoteNotFoundException
-import net.pantasystem.milktea.model.notes.NoteRemovedException
 import net.pantasystem.milktea.model.notes.NoteRepository
 import net.pantasystem.milktea.model.notes.NoteResult
 import net.pantasystem.milktea.model.notes.NoteState
@@ -148,15 +147,12 @@ class NoteRepositoryImpl @Inject constructor(
                 return@withContext notes
             }
 
-            val notExistsAndNoteDeletedNoteIds = notExistsIds.filterNot { noteId ->
-                noteDataSource.get(noteId).fold(
-                    onSuccess = { true },
-                    onFailure = {
-                        // NOTE: 削除済みとキャッシュ上からも削除済みのケースの場合はFetchしない。
-                        // NOTE: Fetchしない理由としてはうっかりバグが発生してAPIに過剰にリクエストを送信してしまう可能性があるから
-                        it is NoteDeletedException || it is NoteRemovedException
-                    }
-                )
+            val notExistsAndNoteDeletedNoteIds = notExistsIds.filter { noteId ->
+                when(noteDataSource.getWithState(noteId).getOrThrow()) {
+                    NoteResult.Deleted -> false
+                    is NoteResult.Success -> false
+                    NoteResult.NotFound -> true
+                }
             }
 
             fetchIn(notExistsAndNoteDeletedNoteIds)
