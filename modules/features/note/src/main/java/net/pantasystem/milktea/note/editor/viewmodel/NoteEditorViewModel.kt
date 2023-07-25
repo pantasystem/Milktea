@@ -26,7 +26,6 @@ import net.pantasystem.milktea.model.channel.ChannelRepository
 import net.pantasystem.milktea.model.drive.*
 import net.pantasystem.milktea.model.emoji.Emoji
 import net.pantasystem.milktea.model.file.AppFile
-import net.pantasystem.milktea.model.file.FilePreviewSource
 import net.pantasystem.milktea.model.file.UpdateAppFileSensitiveUseCase
 import net.pantasystem.milktea.model.instance.FeatureEnables
 import net.pantasystem.milktea.model.instance.FeatureType
@@ -99,37 +98,12 @@ class NoteEditorViewModel @Inject constructor(
     val isSensitiveMedia =
         savedStateHandle.getStateFlow<Boolean?>(NoteEditorSavedStateKey.IsSensitive.name, null)
 
-    @OptIn(ExperimentalCoroutinesApi::class)
-    private val driveFiles = files.flatMapLatest { files ->
-        val fileIds = files.mapNotNull {
-            it as? AppFile.Remote
-        }.map {
-            it.id
-        }
-        filePropertyDataSource.observeIn(fileIds)
-    }.catch {
-        logger.error("drive fileの取得に失敗", it)
-    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
-
-    private val filePreviewSources = combine(files, driveFiles) { files, driveFiles ->
-        files.mapNotNull { appFile ->
-            when (appFile) {
-                is AppFile.Local -> {
-                    FilePreviewSource.Local(appFile)
-                }
-
-                is AppFile.Remote -> {
-                    runCancellableCatching {
-                        driveFiles.firstOrNull {
-                            it.id == appFile.id
-                        } ?: driveFileRepository.find(appFile.id)
-                    }.getOrNull()?.let {
-                        FilePreviewSource.Remote(appFile, it)
-                    }
-                }
-            }
-        }
-    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
+    private val filePreviewSources = NoteEditorFilePreviewSourcesMapper(
+        filePropertyDataSource,
+        driveFileRepository,
+        logger,
+        viewModelScope
+    ).create(files)
 
     val totalImageCount = files.map {
         it.size
@@ -530,6 +504,7 @@ class NoteEditorViewModel @Inject constructor(
             is AppFile.Local -> {
                 savedStateHandle.setFiles(files.value.updateFileComment(appFile, comment))
             }
+
             is AppFile.Remote -> {
                 viewModelScope.launch {
                     driveFileRepository.update(
