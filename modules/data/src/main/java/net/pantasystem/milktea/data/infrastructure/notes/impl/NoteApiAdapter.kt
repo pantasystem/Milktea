@@ -75,7 +75,7 @@ internal class NoteApiAdapterFactoryImpl @Inject constructor(
         }
     }
 }
-internal class NoteApiAdapterMisskeyPattern(
+private class NoteApiAdapterMisskeyPattern(
     val accountRepository: AccountRepository,
     val misskeyAPIProvider: MisskeyAPIProvider,
     val filePropertyDataSource: FilePropertyDataSource,
@@ -191,7 +191,7 @@ internal class NoteApiAdapterMisskeyPattern(
 
 }
 
-internal class NoteApiAdapterMastodonPattern(
+private class NoteApiAdapterMastodonPattern(
     private val uploader: FileUploaderProvider,
     private val mastodonAPIProvider: MastodonAPIProvider,
     private val accountRepository: AccountRepository,
