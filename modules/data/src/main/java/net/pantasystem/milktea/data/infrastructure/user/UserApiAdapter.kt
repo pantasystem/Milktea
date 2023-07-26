@@ -7,16 +7,23 @@ import net.pantasystem.milktea.api.mastodon.accounts.MastodonAccountDTO
 import net.pantasystem.milktea.api.misskey.users.RequestUser
 import net.pantasystem.milktea.api.misskey.users.SearchByUserAndHost
 import net.pantasystem.milktea.api.misskey.users.UserDTO
+import net.pantasystem.milktea.api.misskey.users.from
 import net.pantasystem.milktea.common.throwIfHasError
 import net.pantasystem.milktea.data.api.mastodon.MastodonAPIProvider
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
 import net.pantasystem.milktea.data.converters.UserDTOEntityConverter
+import net.pantasystem.milktea.data.infrastructure.notes.reaction.impl.history.ReactionHistoryDao
 import net.pantasystem.milktea.data.infrastructure.toUserRelated
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.nodeinfo.NodeInfoRepository
 import net.pantasystem.milktea.model.user.User
+import net.pantasystem.milktea.model.user.UserDataSource
 import net.pantasystem.milktea.model.user.UserNotFoundException
+import net.pantasystem.milktea.model.user.query.FindUsersFromFrequentlyReactionUsers
+import net.pantasystem.milktea.model.user.query.FindUsersQuery
+import net.pantasystem.milktea.model.user.query.FindUsersQuery4Mastodon
+import net.pantasystem.milktea.model.user.query.FindUsersQuery4Misskey
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -28,7 +35,7 @@ internal interface UserApiAdapter {
         accountId: Long,
         userName: String,
         host: String?,
-    ): SearchResult
+    ): List<User>
 
     suspend fun showUsers(
         userIds: List<User.Id>,
@@ -44,6 +51,7 @@ internal interface UserApiAdapter {
     ): User
 
 }
+
 
 @Singleton
 internal class UserApiAdapterImpl @Inject constructor(
@@ -95,7 +103,7 @@ internal class UserApiAdapterImpl @Inject constructor(
         accountId: Long,
         userName: String,
         host: String?,
-    ): SearchResult {
+    ): List<User> {
         val account = accountRepository.get(accountId).getOrThrow()
         return when (account.instanceType) {
             Account.InstanceType.MISSKEY, Account.InstanceType.FIREFISH -> {
@@ -110,16 +118,20 @@ internal class UserApiAdapterImpl @Inject constructor(
                             )
                         ).body()
                 )
-                SearchResult.Misskey(body)
+                body.map {
+                    userDTOEntityConverter.convert(account, it, true)
+                }
             }
             Account.InstanceType.MASTODON, Account.InstanceType.PLEROMA -> {
-                val body = requireNotNull(
+                requireNotNull(
                     mastodonAPIProvider.get(account).search(
                         if (host == null) userName else "$userName@$host",
                         type = "accounts"
                     ).throwIfHasError().body()
-                ).accounts
-                SearchResult.Mastodon(body)
+                ).accounts.map {
+                    it.toModel(account)
+                }
+
             }
         }
     }
@@ -214,6 +226,70 @@ internal class UserApiAdapterImpl @Inject constructor(
             host = host
         )
 
+    }
+}
+
+
+internal interface UserSuggestionsApiAdapter {
+
+    suspend fun showSuggestions(accountId: Long, query: FindUsersQuery): List<User>
+
+}
+
+
+class UserSuggestionsApiAdapterImpl @Inject constructor(
+    private val accountRepository: AccountRepository,
+    private val misskeyAPIProvider: MisskeyAPIProvider,
+    private val mastodonAPIProvider: MastodonAPIProvider,
+    private val reactionHistoryDao: ReactionHistoryDao,
+    private val userDataSource: UserDataSource,
+    private val userDTOEntityConverter: UserDTOEntityConverter,
+): UserSuggestionsApiAdapter {
+    override suspend fun showSuggestions(accountId: Long, query: FindUsersQuery): List<User> {
+        val account = accountRepository.get(accountId).getOrThrow()
+        return when(query) {
+            is FindUsersQuery4Mastodon.SuggestUsers -> {
+                val api = mastodonAPIProvider.get(account)
+                val body = requireNotNull(api.getSuggestionUsers(
+                    limit = query.limit
+                ).throwIfHasError().body())
+                val accounts = body.map {
+                    it.account
+                }
+                val relationships = requireNotNull(
+                    api.getAccountRelationships(ids = accounts.map { it.id })
+                        .throwIfHasError()
+                        .body()
+                ).let { list ->
+                    list.associateBy {
+                        it.id
+                    }
+                }
+                val models = accounts.map {
+                    it.toModel(account, relationships[it.id]?.toUserRelated())
+                }
+                models
+            }
+            is FindUsersQuery4Misskey -> {
+                val request = RequestUser.from(query, account.token)
+                val res = misskeyAPIProvider.get(account).getUsers(request)
+                    .throwIfHasError()
+                res.body()?.map {
+                    userDTOEntityConverter.convert(account, it, true)
+                }?.onEach {
+                    userDataSource.add(it)
+                } ?: emptyList()
+            }
+            is FindUsersFromFrequentlyReactionUsers -> {
+                val userIds = reactionHistoryDao.findFrequentlyReactionUserAndUnFollowed(
+                    accountId = accountId,
+                    limit = 20,
+                ).map {
+                    it.targetUserId
+                }
+                userDataSource.getIn(accountId, userIds).getOrThrow()
+            }
+        }
     }
 }
 
