@@ -1,5 +1,8 @@
 package net.pantasystem.milktea.data.infrastructure.user
 
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
 import net.pantasystem.milktea.api.mastodon.accounts.MastodonAccountDTO
 import net.pantasystem.milktea.api.misskey.users.RequestUser
 import net.pantasystem.milktea.api.misskey.users.SearchByUserAndHost
@@ -25,6 +28,13 @@ internal interface UserApiAdapter {
         userName: String,
         host: String?,
     ): SearchResult
+
+    suspend fun showUsers(
+        userIds: List<User.Id>,
+        detail: Boolean,
+    ): List<User>
+
+
 
 }
 
@@ -105,6 +115,48 @@ internal class UserApiAdapterImpl @Inject constructor(
                 SearchResult.Mastodon(body)
             }
         }
+    }
+
+    override suspend fun showUsers(userIds: List<User.Id>, detail: Boolean): List<User> {
+        val accountIds = userIds.map { it.accountId }.distinct()
+        return coroutineScope {
+            accountIds.map { accountId ->
+                async {
+                    val account = accountRepository.get(accountId).getOrThrow()
+                    when(account.instanceType) {
+                        Account.InstanceType.MISSKEY, Account.InstanceType.FIREFISH -> {
+                            misskeyAPIProvider.get(account)
+                                .showUsers(
+                                    RequestUser(
+                                        i = account.token,
+                                        userIds = userIds.filter { it.accountId == accountId }.map { it.id },
+                                        detail = true
+                                    )
+                                ).throwIfHasError()
+                                .body()!!.map {
+                                    userDTOEntityConverter.convert(account, it, true)
+                                }
+
+
+                        }
+                        Account.InstanceType.MASTODON, Account.InstanceType.PLEROMA -> {
+                            userIds.filter { it.accountId == accountId }.map { it.id }.map {
+                                async {
+                                    requireNotNull(
+                                        mastodonAPIProvider.get(account)
+                                            .getAccount(it)
+                                            .throwIfHasError()
+                                            .body()
+                                    ).toModel(account)
+                                }
+                            }.awaitAll()
+
+                        }
+                    }
+
+                }
+            }.awaitAll()
+        }.flatten()
     }
 }
 
