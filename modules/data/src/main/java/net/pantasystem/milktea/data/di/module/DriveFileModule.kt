@@ -1,4 +1,4 @@
-package jp.panta.misskeyandroidclient.di.module
+package net.pantasystem.milktea.data.di.module
 
 import android.content.Context
 import dagger.Binds

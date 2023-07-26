@@ -93,4 +93,8 @@ abstract class UserModule {
     @Binds
     @Singleton
     internal abstract fun bindFollowApiAdapter(impl: FollowApiAdapterImpl): FollowApiAdapter
+
+    @Binds
+    @Singleton
+    internal abstract fun bindUserSuggestionApiAdapter(impl: UserSuggestionsApiAdapterImpl): UserSuggestionsApiAdapter
 }
