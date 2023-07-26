@@ -85,31 +85,11 @@ internal class UserRepositoryImpl @Inject constructor(
         if (local != null) {
             return@withContext local
         }
-        val account = accountRepository.get(accountId).getOrThrow()
-        val misskeyAPI = misskeyAPIProvider.get(account.normalizedInstanceUri)
-        val res = misskeyAPI.showUser(
-            RequestUser(
-                i = account.token,
-                userName = userName,
-                host = host,
-                detail = detail
-            )
-        )
-        logger.debug("res:$res")
-        res.throwIfHasError()
+        val user = userApiAdapter.showByUserName(accountId, userName, host, detail).also {
+            userDataSource.add(it)
 
-        res.body()?.let {
-            val user = userDTOEntityConverter.convert(account, it, detail)
-            userDataSource.add(user)
-            return@withContext userDataSource.get(user.id).getOrThrow()
         }
-
-        throw UserNotFoundException(
-            null,
-            userName = userName,
-            host = host
-        )
-
+        userDataSource.get(user.id).getOrThrow()
     }
 
 

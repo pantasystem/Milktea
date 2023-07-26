@@ -16,6 +16,7 @@ import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.nodeinfo.NodeInfoRepository
 import net.pantasystem.milktea.model.user.User
+import net.pantasystem.milktea.model.user.UserNotFoundException
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -35,6 +36,12 @@ internal interface UserApiAdapter {
     ): List<User>
 
 
+    suspend fun showByUserName(
+        accountId: Long,
+        userName: String,
+        host: String?,
+        detail: Boolean,
+    ): User
 
 }
 
@@ -157,6 +164,56 @@ internal class UserApiAdapterImpl @Inject constructor(
                 }
             }.awaitAll()
         }.flatten()
+    }
+
+    override suspend fun showByUserName(
+        accountId: Long,
+        userName: String,
+        host: String?,
+        detail: Boolean
+    ): User {
+        val account = accountRepository.get(accountId).getOrThrow()
+        return when(account.instanceType) {
+            Account.InstanceType.MISSKEY, Account.InstanceType.FIREFISH -> {
+                val misskeyAPI = misskeyAPIProvider.get(account.normalizedInstanceUri)
+                val res = misskeyAPI.showUser(
+                    RequestUser(
+                        i = account.token,
+                        userName = userName,
+                        host = host,
+                        detail = detail
+                    )
+                )
+                res.throwIfHasError()
+                res.body()?.let {
+                    userDTOEntityConverter.convert(account, it, detail)
+                }
+            }
+            Account.InstanceType.MASTODON, Account.InstanceType.PLEROMA -> {
+                val result = mastodonAPIProvider.get(account).search(
+                    if (host == null) "@$userName" else "@$userName@$host",
+                    resolve = true,
+                ).throwIfHasError().body()
+                val dto = requireNotNull(result).accounts.firstOrNull {
+                    it.username == userName && (host == null || it.acct.endsWith("@$host"))
+                }
+                val relationships = if (detail) {
+                    mastodonAPIProvider.get(account).getAccountRelationships(
+                        listOf(dto!!.id)
+                    ).throwIfHasError().body()?.associate {
+                        it.id to it
+                    }
+                } else {
+                    emptyMap()
+                }
+                dto?.toModel(account, relationships?.get(dto.id)?.toUserRelated())
+            }
+        } ?: throw UserNotFoundException(
+            null,
+            userName = userName,
+            host = host
+        )
+
     }
 }
 
