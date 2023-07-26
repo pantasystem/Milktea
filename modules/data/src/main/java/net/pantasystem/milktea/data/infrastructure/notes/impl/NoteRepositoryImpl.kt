@@ -8,11 +8,8 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.withContext
 import net.pantasystem.milktea.common.APIError
-import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.common.runCancellableCatching
-import net.pantasystem.milktea.common.throwIfHasError
 import net.pantasystem.milktea.common_android.hilt.IODispatcher
-import net.pantasystem.milktea.data.api.mastodon.MastodonAPIProvider
 import net.pantasystem.milktea.data.infrastructure.notes.NoteDataSourceAdder
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.GetAccount
@@ -29,17 +26,13 @@ import net.pantasystem.milktea.model.notes.poll.Poll
 import javax.inject.Inject
 
 class NoteRepositoryImpl @Inject constructor(
-    val loggerFactory: Logger.Factory,
     val noteDataSource: NoteDataSource,
-    val mastodonAPIProvider: MastodonAPIProvider,
     val noteDataSourceAdder: NoteDataSourceAdder,
     val getAccount: GetAccount,
     private val noteApiAdapterFactory: NoteApiAdapter.Factory,
     private val threadContextApiAdapterFactory: ThreadContextApiAdapter.Factory,
     @IODispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : NoteRepository {
-
-    private val logger = loggerFactory.create("NoteRepositoryImpl")
 
 
     override suspend fun create(createNote: CreateNote): Result<Note> = runCancellableCatching {
@@ -59,15 +52,11 @@ class NoteRepositoryImpl @Inject constructor(
     override suspend fun unrenote(noteId: Note.Id): Result<Unit> = runCancellableCatching {
         withContext(ioDispatcher) {
             val account = getAccount.get(noteId.accountId)
-            when (account.instanceType) {
-                Account.InstanceType.MISSKEY, Account.InstanceType.FIREFISH -> delete(noteId).getOrThrow()
-                Account.InstanceType.MASTODON, Account.InstanceType.PLEROMA -> {
-                    val res = mastodonAPIProvider.get(account).unreblog(noteId.noteId)
-                        .throwIfHasError()
-                        .body()
-                    noteDataSourceAdder.addTootStatusDtoIntoDataSource(account, requireNotNull(res))
+            when(val result = noteApiAdapterFactory.create(account).unrenote(noteId)) {
+                is UnrenoteResultType.Mastodon -> {
+                    noteDataSourceAdder.addTootStatusDtoIntoDataSource(account, requireNotNull(result.status))
                 }
-
+                UnrenoteResultType.Misskey -> Unit
             }
         }
     }
@@ -96,7 +85,6 @@ class NoteRepositoryImpl @Inject constructor(
                 NoteResult.NotFound -> Unit
             }
 
-            logger.debug("request notes/show=$noteId")
             val note = try {
                 convertAndAdd(account, noteApiAdapterFactory.create(account).showNote(noteId))
             } catch (e: APIError.NotFoundException) {

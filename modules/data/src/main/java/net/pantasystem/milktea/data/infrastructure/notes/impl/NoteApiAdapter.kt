@@ -48,6 +48,8 @@ interface NoteApiAdapter {
     suspend fun vote(noteId: Note.Id, choice: Poll.Choice, target: Note)
 
     suspend fun findNoteState(target: Note): NoteState
+
+    suspend fun unrenote(noteId: Note.Id): UnrenoteResultType
 }
 
 internal class NoteApiAdapterFactoryImpl @Inject constructor(
@@ -115,7 +117,7 @@ private class NoteApiAdapterMisskeyPattern(
         return NoteResultType.Misskey(requireNotNull(body))
     }
 
-    override suspend fun delete(noteId: Note.Id): DeleteNoteResultType {
+    override suspend fun delete(noteId: Note.Id): DeleteNoteResultType.Misskey {
         val account = accountRepository.get(noteId.accountId).getOrThrow()
         misskeyAPIProvider.get(account).delete(
             DeleteNote(
@@ -187,6 +189,11 @@ private class NoteApiAdapterMisskeyPattern(
                 }
             )
         }
+    }
+
+    override suspend fun unrenote(noteId: Note.Id): UnrenoteResultType {
+        delete(noteId)
+        return UnrenoteResultType.Misskey
     }
 
 }
@@ -291,6 +298,14 @@ private class NoteApiAdapterMastodonPattern(
             isWatching = NoteState.Watching.None,
         )
     }
+
+    override suspend fun unrenote(noteId: Note.Id): UnrenoteResultType {
+        val account = accountRepository.get(noteId.accountId).getOrThrow()
+        val res = mastodonAPIProvider.get(account).unreblog(noteId.noteId)
+            .throwIfHasError()
+            .body()
+        return UnrenoteResultType.Mastodon(requireNotNull(res))
+    }
 }
 
 sealed interface NoteResultType {
@@ -315,3 +330,8 @@ sealed interface ToggleThreadMuteResultType {
 }
 
 typealias RenoteResultType = NoteResultType
+
+sealed interface UnrenoteResultType {
+    object Misskey : UnrenoteResultType
+    data class Mastodon(val status: TootStatusDTO) : UnrenoteResultType
+}
