@@ -23,9 +23,9 @@ buildscript {
     }
     ext {
         compose_version = '1.4.2'
-        coroutines_version = '1.6.4'
+        coroutines_version = '1.7.3'
         retrofit = '2.9.0'
-        room_version = "2.5.0"
+        room_version = "2.5.2"
         nav_version = "2.5.3"
     }
 }
