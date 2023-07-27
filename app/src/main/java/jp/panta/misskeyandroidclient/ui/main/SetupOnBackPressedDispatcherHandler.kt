@@ -17,6 +17,7 @@ class SetupOnBackPressedDispatcherHandler(
     private val backPressedDelegate: DoubleBackPressedFinishDelegate = DoubleBackPressedFinishDelegate(),
 ) {
 
+    @Suppress("RestrictedApi")
     fun setup() {
         activity.onBackPressedDispatcher.addCallback {
             val drawerLayout: DrawerLayout = binding.drawerLayout
