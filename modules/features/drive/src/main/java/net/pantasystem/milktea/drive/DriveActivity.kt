@@ -12,7 +12,6 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.material.ExperimentalMaterialApi
-import androidx.lifecycle.ViewTreeLifecycleOwner
 import com.google.accompanist.pager.ExperimentalPagerApi
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -63,7 +62,6 @@ class DriveActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setTheme.invoke()
 
-        ViewTreeLifecycleOwner.set(window.decorView, this)
 
 
         setContent {

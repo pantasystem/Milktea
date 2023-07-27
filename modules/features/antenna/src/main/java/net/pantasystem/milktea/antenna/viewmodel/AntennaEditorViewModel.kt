@@ -20,7 +20,6 @@ import javax.inject.Inject
 
 
 
-@Suppress("BlockingMethodInNonBlockingContext")
 @HiltViewModel
 class AntennaEditorViewModel @Inject constructor(
     private val userViewDataFactory: UserViewData.Factory,
@@ -47,15 +46,15 @@ class AntennaEditorViewModel @Inject constructor(
     val source = MediatorLiveData<AntennaSource>()
 
 
-    val isList = Transformations.map(source) {
+    val isList = source.map {
         it is AntennaSource.List
     }
 
-    val isUsers = Transformations.map(source) {
+    val isUsers = source.map {
         it is AntennaSource.Users
     }
 
-    val isGroup = Transformations.map(source) {
+    val isGroup = source.map {
         it is AntennaSource.Users
     }
 

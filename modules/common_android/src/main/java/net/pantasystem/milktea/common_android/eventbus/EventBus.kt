@@ -14,7 +14,9 @@ class EventBus <T> {
     var event: T? = null
         set(value){
             field = value
-            handleEvent(value)
+            if (value != null) {
+                handleEvent(value)
+            }
         }
 
 
@@ -37,7 +39,7 @@ class EventBus <T> {
 
 
 
-    private fun handleEvent(e: T?){
+    private fun handleEvent(e: T){
         Log.d("EventBus", "handleEventが呼び出された")
         synchronized(mObservers){
             val iterator = mObservers.iterator()
