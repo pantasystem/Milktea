@@ -21,8 +21,8 @@ dependencyResolutionManagement {
             library("compose-material-material-icons-extended", "androidx.compose.material:material-icons-extended:1.4.3")
             bundle("compose-material", ["compose-material-material", "compose-material-material-icons-core", "compose-material-material-icons-extended"])
 
-            library("compose-ui-ui-test-junit4", "androidx.compose.ui:ui-test-junit4:1.3.0-alpha03")
-            library("compose-runtime-runtime-livedata", "androidx.compose.runtime:runtime-livedata:1.3.0-beta01")
+            library("compose-ui-ui-test-junit4", "androidx.compose.ui:ui-test-junit4:1.3.3")
+            library("compose-runtime-runtime-livedata", "androidx.compose.runtime:runtime-livedata:1.3.3")
             library("android-material-compose-theme-adapter", "com.google.android.material:compose-theme-adapter:1.1.16")
             library("accompanist-swiperefresh", "com.google.accompanist:accompanist-swiperefresh:0.25.1")
             library("activity-compose", "androidx.activity:activity-compose:1.6.1")
