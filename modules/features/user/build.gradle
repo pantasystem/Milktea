@@ -104,7 +104,7 @@ dependencies {
     implementation libs.wada811.databinding
     implementation libs.fragment.ktx
 
-    implementation 'com.google.android.gms:play-services-oss-licenses:17.0.0'
+    implementation 'com.google.android.gms:play-services-oss-licenses:17.0.1'
 
     implementation libs.flexbox
     implementation libs.recyclerview

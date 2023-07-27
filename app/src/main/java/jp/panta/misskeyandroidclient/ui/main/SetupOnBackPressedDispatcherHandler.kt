@@ -33,7 +33,8 @@ class SetupOnBackPressedDispatcherHandler(
                 //    | navigation |
                 //    |------------|
                 // 参考: https://qiita.com/kaleidot725/items/a6010dc4e67c944f44f1
-                navController.backQueue.filterNot { it.destination.id == R.id.main_nav }.size > 1 -> {
+
+                navController.currentBackStack.value.filterNot { it.destination.id == R.id.main_nav }.size > 1 -> {
                     navController.popBackStack()
                 }
                 else -> {
