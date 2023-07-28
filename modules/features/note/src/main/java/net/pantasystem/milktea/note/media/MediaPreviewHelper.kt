@@ -111,9 +111,9 @@ object MediaPreviewHelper {
         val isHiding = when(file.visibleType) {
             PreviewAbleFile.VisibleType.Visible -> false
             PreviewAbleFile.VisibleType.HideWhenMobileNetwork -> {
-                if (config.mediaDisplayMode == MediaDisplayMode.ALWAYS_WHEN_MOBILE_NETWORK) {
+                if (config.mediaDisplayMode == MediaDisplayMode.ALWAYS_HIDE_WHEN_MOBILE_NETWORK) {
                     !context.isWifiConnected()
-                } else config.mediaDisplayMode == MediaDisplayMode.ALWAYS
+                } else config.mediaDisplayMode == MediaDisplayMode.ALWAYS_HIDE
             }
             PreviewAbleFile.VisibleType.SensitiveHide -> true
         }
@@ -156,7 +156,7 @@ object MediaPreviewHelper {
             PreviewAbleFile.VisibleType.HideWhenMobileNetwork -> {
                 this.text = context.getString(R.string.notes_media_click_to_load_image)
                 if (context.isWifiConnected()) {
-                    if (config.mediaDisplayMode == MediaDisplayMode.ALWAYS) {
+                    if (config.mediaDisplayMode == MediaDisplayMode.ALWAYS_HIDE) {
                         this.setMemoVisibility(View.VISIBLE)
                     } else {
                         this.setMemoVisibility(View.GONE)

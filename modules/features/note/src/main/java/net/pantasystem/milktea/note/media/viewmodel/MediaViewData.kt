@@ -27,8 +27,8 @@ class MediaViewData(
                 PreviewAbleFile.VisibleType.SensitiveHide
             else if (when(config?.mediaDisplayMode ?: DefaultConfig.config.mediaDisplayMode) {
                     MediaDisplayMode.AUTO -> false
-                    MediaDisplayMode.ALWAYS -> true
-                    MediaDisplayMode.ALWAYS_WHEN_MOBILE_NETWORK -> true
+                    MediaDisplayMode.ALWAYS_HIDE -> true
+                    MediaDisplayMode.ALWAYS_HIDE_WHEN_MOBILE_NETWORK -> true
                 })
                 PreviewAbleFile.VisibleType.HideWhenMobileNetwork
             else

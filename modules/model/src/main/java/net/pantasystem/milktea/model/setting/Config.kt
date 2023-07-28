@@ -172,6 +172,6 @@ enum class AvatarIconShapeType(val value: Int) {
 
 enum class MediaDisplayMode(val value: Int) {
     AUTO(0),
-    ALWAYS(1),
-    ALWAYS_WHEN_MOBILE_NETWORK(2),
+    ALWAYS_HIDE(1),
+    ALWAYS_HIDE_WHEN_MOBILE_NETWORK(2),
 }

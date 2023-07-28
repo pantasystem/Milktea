@@ -271,7 +271,7 @@ class SettingMovementActivity : AppCompatActivity() {
 private fun stringFromDisplayMode(displayMode: MediaDisplayMode): String {
     return when(displayMode) {
         MediaDisplayMode.AUTO -> stringResource(R.string.media_display_mode_default)
-        MediaDisplayMode.ALWAYS -> stringResource(id = R.string.media_display_mode_always)
-        MediaDisplayMode.ALWAYS_WHEN_MOBILE_NETWORK -> stringResource(id = R.string.settings_hide_media_when_mobile_network)
+        MediaDisplayMode.ALWAYS_HIDE -> stringResource(id = R.string.media_display_mode_always)
+        MediaDisplayMode.ALWAYS_HIDE_WHEN_MOBILE_NETWORK -> stringResource(id = R.string.settings_hide_media_when_mobile_network)
     }
 }
