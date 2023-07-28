@@ -96,10 +96,6 @@ class KeysKtTest {
                     "IsVisibleInstanceUrlInToolbar",
                     key.str()
                 )
-                Keys.IsHideMediaWhenMobileNetwork -> Assertions.assertEquals(
-                    "IsHideMediaWhenMobileNetwork",
-                    key.str()
-                )
                 Keys.NoteContentFontSize -> Assertions.assertEquals(
                     "NoteContentFontSize",
                     key.str()
@@ -127,6 +123,10 @@ class KeysKtTest {
 
                 Keys.AvatarIconShapeType -> Assertions.assertEquals(
                     "AvatarIconShapeType",
+                    key.str()
+                )
+                Keys.MediaDisplayMode -> Assertions.assertEquals(
+                    "MediaDisplayMode",
                     key.str()
                 )
             }
