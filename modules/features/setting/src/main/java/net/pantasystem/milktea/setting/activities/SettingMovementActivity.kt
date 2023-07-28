@@ -5,8 +5,10 @@ import android.util.Log
 import android.view.MenuItem
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
@@ -16,8 +18,10 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import com.google.android.material.composethemeadapter.MdcTheme
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
@@ -205,7 +209,7 @@ class SettingMovementActivity : AppCompatActivity() {
                             }
                         }
                         SettingSection(title = stringResource(id = R.string.media)) {
-                            Box(modifier = Modifier.fillMaxWidth()) {
+                            Box(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp)) {
                                 var isVisibleDropdown by remember {
                                     mutableStateOf(false)
                                 }
@@ -213,8 +217,14 @@ class SettingMovementActivity : AppCompatActivity() {
                                     onClick = { isVisibleDropdown = true },
                                     Modifier.fillMaxWidth()
                                 ) {
-                                    Text(stringFromDisplayMode(displayMode = currentConfigState.mediaDisplayMode))
-                                    Icon(Icons.Default.KeyboardArrowDown, contentDescription = null)
+                                    Row(
+                                        Modifier.fillMaxWidth(),
+                                        verticalAlignment = Alignment.CenterVertically,
+                                        horizontalArrangement = Arrangement.SpaceBetween,
+                                    ) {
+                                        Text(stringFromDisplayMode(displayMode = currentConfigState.mediaDisplayMode))
+                                        Icon(Icons.Default.KeyboardArrowDown, contentDescription = null)
+                                    }
                                 }
                                 DropdownMenu(
                                     expanded = isVisibleDropdown,
