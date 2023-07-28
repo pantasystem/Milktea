@@ -49,11 +49,11 @@ data class IsAnalyticsCollectionEnabled(
  * @param isEnableStreamingAPIAndNoteCapture 自動更新のON/OFF
  * @Param isEnableNoteDivider ノートの区切り線の有無 trueで有り falseで無し
  * @param isVisibleInstanceUrlInToolbar toolbar内にインスタンス情報を表示するか？
- * @param isHideMediaWhenMobileNetwork モバイルネットワークの時はメディアを表示しない
  * @param noteHeaderFontSize ノートのヘッダー部分のテキストサイズ
  * @param noteContentFontSize ノートのコンテンツ部分のテキストサイズ
  * @param noteReactionCounterFontSize ノートのリアクションカウンターのカスタム絵文字、絵文字と件数表示のフォントサイズ
  * @param emojiPickerEmojiDisplaySize 絵文字ピッカーの絵文字の表示サイズ
+ * @param mediaDisplayMode メディアの表示モード
  */
 data class Config(
     val isSimpleEditorEnabled: Boolean,
@@ -80,7 +80,6 @@ data class Config(
     val isEnableStreamingAPIAndNoteCapture: Boolean,
     val isEnableNoteDivider: Boolean,
     val isVisibleInstanceUrlInToolbar: Boolean,
-    val isHideMediaWhenMobileNetwork: Boolean,
     val noteHeaderFontSize: Float,
     val noteContentFontSize: Float,
     val isDisplayTimestampsAsAbsoluteDates: Boolean,
@@ -88,6 +87,7 @@ data class Config(
     val noteCustomEmojiScaleSizeInText: Float,
     val emojiPickerEmojiDisplaySize: Int,
     val avatarIconShapeType: AvatarIconShapeType,
+    val mediaDisplayMode: MediaDisplayMode,
 ) {
     companion object
 
@@ -142,7 +142,6 @@ object DefaultConfig {
         isEnableStreamingAPIAndNoteCapture = true,
         isEnableNoteDivider = true,
         isVisibleInstanceUrlInToolbar = true,
-        isHideMediaWhenMobileNetwork = false,
         noteContentFontSize = 15f,
         noteHeaderFontSize = 15f,
         isDisplayTimestampsAsAbsoluteDates = false,
@@ -150,6 +149,7 @@ object DefaultConfig {
         noteCustomEmojiScaleSizeInText = 1.2f,
         emojiPickerEmojiDisplaySize = 28,
         avatarIconShapeType = AvatarIconShapeType.Circle,
+        mediaDisplayMode = MediaDisplayMode.AUTO,
     )
 
     fun getRememberVisibilityConfig(accountId: Long): RememberVisibility.Remember {
@@ -168,4 +168,10 @@ enum class ReactionPickerType {
 enum class AvatarIconShapeType(val value: Int) {
     Circle(0),
     Square(1),
+}
+
+enum class MediaDisplayMode(val value: Int) {
+    AUTO(0),
+    ALWAYS_HIDE(1),
+    ALWAYS_HIDE_WHEN_MOBILE_NETWORK(2),
 }

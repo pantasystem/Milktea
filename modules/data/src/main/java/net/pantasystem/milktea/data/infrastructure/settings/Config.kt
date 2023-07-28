@@ -124,9 +124,7 @@ fun Config.Companion.from(map: Map<Keys, PrefType?>): Config {
         isVisibleInstanceUrlInToolbar = map.getValue<PrefType.BoolPref>(
             Keys.IsVisibleInstanceUrlInToolbar
         )?.value ?: DefaultConfig.config.isVisibleInstanceUrlInToolbar,
-        isHideMediaWhenMobileNetwork = map.getValue<PrefType.BoolPref>(
-            Keys.IsHideMediaWhenMobileNetwork
-        )?.value ?: DefaultConfig.config.isHideMediaWhenMobileNetwork,
+
         noteHeaderFontSize = map.getValue<PrefType.FloatPref>(
             Keys.NoteHeaderFontSize
         )?.value ?: DefaultConfig.config.noteHeaderFontSize,
@@ -150,6 +148,11 @@ fun Config.Companion.from(map: Map<Keys, PrefType?>): Config {
         )?.value?.let { value ->
             AvatarIconShapeType.values().find { it.value == value }
         } ?: DefaultConfig.config.avatarIconShapeType,
+        mediaDisplayMode = map.getValue<PrefType.IntPref>(
+            Keys.MediaDisplayMode
+        )?.value?.let { value ->
+            MediaDisplayMode.values().find { it.value == value }
+        } ?: DefaultConfig.config.mediaDisplayMode,
     )
 }
 
@@ -268,10 +271,6 @@ fun Config.pref(key: Keys): PrefType {
             PrefType.BoolPref(isVisibleInstanceUrlInToolbar)
         }
 
-        Keys.IsHideMediaWhenMobileNetwork -> {
-            PrefType.BoolPref(isHideMediaWhenMobileNetwork)
-        }
-
         Keys.NoteContentFontSize -> {
             PrefType.FloatPref(noteContentFontSize)
         }
@@ -298,6 +297,10 @@ fun Config.pref(key: Keys): PrefType {
 
         Keys.AvatarIconShapeType -> {
             PrefType.IntPref(avatarIconShapeType.value)
+        }
+
+        Keys.MediaDisplayMode -> {
+            PrefType.IntPref(mediaDisplayMode.value)
         }
     }
 }

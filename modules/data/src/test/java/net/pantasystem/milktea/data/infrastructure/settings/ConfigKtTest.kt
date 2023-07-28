@@ -140,10 +140,6 @@ class ConfigKtTest {
                     config.isVisibleInstanceUrlInToolbar,
                     (u as PrefType.BoolPref).value
                 )
-                Keys.IsHideMediaWhenMobileNetwork -> Assertions.assertEquals(
-                    config.isHideMediaWhenMobileNetwork,
-                    (u as PrefType.BoolPref).value
-                )
                 Keys.NoteContentFontSize -> Assertions.assertEquals(
                     config.noteContentFontSize,
                     (u as PrefType.FloatPref).value
@@ -170,6 +166,10 @@ class ConfigKtTest {
                 )
                 Keys.AvatarIconShapeType -> Assertions.assertEquals(
                     config.avatarIconShapeType.value,
+                    (u as PrefType.IntPref).value
+                )
+                Keys.MediaDisplayMode -> Assertions.assertEquals(
+                    config.mediaDisplayMode.value,
                     (u as PrefType.IntPref).value
                 )
             }
