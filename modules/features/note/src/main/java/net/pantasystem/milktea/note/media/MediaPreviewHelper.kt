@@ -25,6 +25,7 @@ import net.pantasystem.milktea.common_android.ui.VisibilityHelper.setMemoVisibil
 import net.pantasystem.milktea.common_android_ui.NavigationEntryPointForBinding
 import net.pantasystem.milktea.common_navigation.MediaNavigationArgs
 import net.pantasystem.milktea.model.setting.Config
+import net.pantasystem.milktea.model.setting.MediaDisplayMode
 import net.pantasystem.milktea.note.R
 import net.pantasystem.milktea.note.media.viewmodel.MediaViewData
 import net.pantasystem.milktea.note.media.viewmodel.PreviewAbleFile
@@ -110,11 +111,9 @@ object MediaPreviewHelper {
         val isHiding = when(file.visibleType) {
             PreviewAbleFile.VisibleType.Visible -> false
             PreviewAbleFile.VisibleType.HideWhenMobileNetwork -> {
-                if (config.isHideMediaWhenMobileNetwork) {
+                if (config.mediaDisplayMode == MediaDisplayMode.ALWAYS_WHEN_MOBILE_NETWORK) {
                     !context.isWifiConnected()
-                } else {
-                    false
-                }
+                } else config.mediaDisplayMode == MediaDisplayMode.ALWAYS
             }
             PreviewAbleFile.VisibleType.SensitiveHide -> true
         }
@@ -155,11 +154,15 @@ object MediaPreviewHelper {
                 return
             }
             PreviewAbleFile.VisibleType.HideWhenMobileNetwork -> {
+                this.text = context.getString(R.string.notes_media_click_to_load_image)
                 if (context.isWifiConnected()) {
-                    this.setMemoVisibility(View.GONE)
+                    if (config.mediaDisplayMode == MediaDisplayMode.ALWAYS) {
+                        this.setMemoVisibility(View.VISIBLE)
+                    } else {
+                        this.setMemoVisibility(View.GONE)
+                    }
                 } else {
                     this.setMemoVisibility(View.VISIBLE)
-                    this.text = context.getString(R.string.notes_media_click_to_load_image)
                 }
             }
             PreviewAbleFile.VisibleType.SensitiveHide -> {

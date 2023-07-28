@@ -10,6 +10,8 @@ import kotlinx.coroutines.flow.update
 import net.pantasystem.milktea.model.file.FilePreviewSource
 import net.pantasystem.milktea.model.file.isSensitive
 import net.pantasystem.milktea.model.setting.Config
+import net.pantasystem.milktea.model.setting.DefaultConfig
+import net.pantasystem.milktea.model.setting.MediaDisplayMode
 
 class MediaViewData(
     files: List<FilePreviewSource>,
@@ -23,7 +25,11 @@ class MediaViewData(
             it,
             if (it.isSensitive)
                 PreviewAbleFile.VisibleType.SensitiveHide
-            else if (config?.isHideMediaWhenMobileNetwork == true)
+            else if (when(config?.mediaDisplayMode ?: DefaultConfig.config.mediaDisplayMode) {
+                    MediaDisplayMode.AUTO -> false
+                    MediaDisplayMode.ALWAYS -> true
+                    MediaDisplayMode.ALWAYS_WHEN_MOBILE_NETWORK -> true
+                })
                 PreviewAbleFile.VisibleType.HideWhenMobileNetwork
             else
                 PreviewAbleFile.VisibleType.Visible
