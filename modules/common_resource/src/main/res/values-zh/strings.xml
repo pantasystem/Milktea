@@ -609,7 +609,7 @@
     <string name="reaction_acceptance">Reaction acceptance</string>
     <string name="settings_display_icons_as_squares">Display icons as squares</string>
     <string name="media_display_mode_default">Default</string>
-    <string name="media_display_mode_always">Always</string>
+    <string name="media_display_mode_always">Always hide</string>
     <!-- User -->
 
 </resources>
