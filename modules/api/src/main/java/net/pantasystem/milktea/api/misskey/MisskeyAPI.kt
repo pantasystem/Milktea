@@ -76,6 +76,7 @@ import net.pantasystem.milktea.model.notes.poll.Vote
 import net.pantasystem.milktea.model.sw.register.SubscriptionState
 import retrofit2.Response
 import retrofit2.http.Body
+import retrofit2.http.Headers
 import retrofit2.http.POST
 
 interface MisskeyAPI {
@@ -290,6 +291,7 @@ interface MisskeyAPI {
     suspend fun renotes(@Body req: FindRenotes) : Response<List<NoteDTO>>
 
     @POST("api/notes/translate")
+    @Headers("Content-Type: application/json")
     suspend fun translate(@Body req: Translate) : Response<TranslationResult>
 
     @POST("api/users/report-abuse")
