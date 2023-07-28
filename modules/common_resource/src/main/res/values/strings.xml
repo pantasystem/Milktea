@@ -616,6 +616,8 @@
     <string name="reaction_acceptance_non_sensitive_only">Non-sensitive only</string>
     <string name="reaction_acceptance_non_sensitive_only_likes_from_remote">Non-sensitive only (Only likes from remote)</string>
     <string name="reaction_acceptance_only_likes">Only likes</string>
+    <string name="media_display_mode_default">Default</string>
+    <string name="media_display_mode_always">Always hide media</string>
     <!-- reaction-acceptance -->
 
 </resources>
