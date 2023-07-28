@@ -268,6 +268,11 @@ class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view)
                     val firstVisibleItemPosition = lm.findFirstVisibleItemPosition()
                     mFirstVisibleItemPosition = firstVisibleItemPosition
                     mViewModel.position = firstVisibleItemPosition
+                    val topView = layoutManager.findViewByPosition(firstVisibleItemPosition)
+                    if (topView != null) {
+                        val top = topView.top - topView.paddingTop
+                        mViewModel.offset = top
+                    }
                 }
 
                 override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
@@ -296,7 +301,7 @@ class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view)
 
         currentPageableTimelineViewModel.setCurrentPageable(mViewModel.accountId?.value, mPageable)
         try {
-            layoutManager.scrollToPosition(mViewModel.position)
+            layoutManager.scrollToPositionWithOffset(mViewModel.position, mViewModel.offset)
         } catch (_: Exception) {
         }
 

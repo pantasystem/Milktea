@@ -63,6 +63,7 @@ class TimelineViewModel @AssistedInject constructor(
 
 
     var position: Int = 0
+    var offset: Int = 0
     private val currentAccountWatcher = CurrentAccountWatcher(
         if (accountId?.value != null && accountId.value <= 0) null else accountId?.value,
         accountRepository
