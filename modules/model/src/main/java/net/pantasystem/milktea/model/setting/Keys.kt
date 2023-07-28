@@ -28,7 +28,6 @@ val Keys.Companion.allKeys by lazy {
         Keys.IsEnableStreamingAPIAndNoteCapture,
         Keys.IsEnableNoteDivider,
         Keys.IsVisibleInstanceUrlInToolbar,
-        Keys.IsHideMediaWhenMobileNetwork,
         Keys.NoteHeaderFontSize,
         Keys.NoteContentFontSize,
         Keys.IsDisplayTimestampsAsAbsoluteDates,
@@ -36,6 +35,7 @@ val Keys.Companion.allKeys by lazy {
         Keys.NoteCustomEmojiScaleSizeInText,
         Keys.EmojiPickerEmojiDisplaySize,
         Keys.AvatarIconShapeType,
+        Keys.MediaDisplayMode,
     )
 }
 
@@ -87,8 +87,6 @@ sealed interface Keys {
 
     object IsVisibleInstanceUrlInToolbar : Keys
 
-    object IsHideMediaWhenMobileNetwork : Keys
-
     object NoteHeaderFontSize: Keys
 
     object NoteContentFontSize: Keys
@@ -102,6 +100,8 @@ sealed interface Keys {
     object EmojiPickerEmojiDisplaySize : Keys
 
     object AvatarIconShapeType : Keys
+
+    object MediaDisplayMode : Keys
 
     companion object
 }
@@ -134,7 +134,6 @@ fun Keys.str(): String {
         is Keys.IsEnableStreamingAPIAndNoteCapture -> "IsEnableStreamingAPIAndNoteCapture"
         is Keys.IsEnableNoteDivider -> "IsEnableNoteDivider"
         is Keys.IsVisibleInstanceUrlInToolbar -> "IsVisibleInstanceUrlInToolbar"
-        is Keys.IsHideMediaWhenMobileNetwork -> "IsHideMediaWhenMobileNetwork"
         is Keys.NoteContentFontSize -> "NoteContentFontSize"
         is Keys.NoteHeaderFontSize -> "NoteHeaderFontSize"
         is Keys.IsDisplayTimestampsAsAbsoluteDates -> "IsDisplayTimestampsAsAbsoluteDates"
@@ -142,5 +141,6 @@ fun Keys.str(): String {
         is Keys.NoteCustomEmojiScaleSizeInText -> "NoteCustomEmojiScaleSizeInText"
         is Keys.EmojiPickerEmojiDisplaySize -> "EmojiPickerEmojiDisplaySize"
         is Keys.AvatarIconShapeType -> "AvatarIconShapeType"
+        is Keys.MediaDisplayMode -> "MediaDisplayMode"
     }
 }
