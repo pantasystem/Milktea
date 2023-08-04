@@ -119,6 +119,11 @@ class SocketImpl(
                 return false
             }
 
+            if (messageListeners.isEmpty()) {
+                logger.debug { "messageListenerが空なのでキャンセル" }
+                return false
+            }
+
             if (!(mState is Socket.State.NeverConnected || mState is Socket.State.Failure || mState is Socket.State.Closed)) {
                 return false
             }
@@ -208,7 +213,9 @@ class SocketImpl(
 
     override fun onNetworkActive() {
         isNetworkActive = true
-        connect()
+        if (messageListeners.isNotEmpty()) {
+            connect()
+        }
     }
 
     override fun onNetworkInActive() {
