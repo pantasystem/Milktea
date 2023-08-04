@@ -32,9 +32,6 @@ class AppStateController @Inject constructor(
             launch {
                 manageAnalyticsCollectionState()
             }
-            launch {
-                initializeSettings()
-            }
             setFirebaseUserIds()
         }
 
