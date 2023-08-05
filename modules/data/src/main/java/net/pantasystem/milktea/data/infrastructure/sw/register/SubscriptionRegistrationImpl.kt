@@ -56,7 +56,12 @@ class SubscriptionRegistrationImpl(
         )
         res.throwIfHasError()
         logger.debug("res code:${res.code()}, body:${res.body()}")
-        res.body()
+        res.body()?.let {
+            SubscriptionState(
+                state = it.state,
+                key = it.key
+            )
+        }
 
     }
 

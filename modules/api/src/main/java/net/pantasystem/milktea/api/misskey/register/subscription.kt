@@ -6,6 +6,12 @@ import kotlinx.serialization.Serializable
 import java.io.Serializable as JSerializable
 
 @Serializable
+data class SubscriptionStateNetworkDTO(
+    @SerialName("state") val state: String,
+    @SerialName("key") val key: String? = null,
+)
+
+@Serializable
 data class Subscription(
     @SerialName("i")
     val i: String,

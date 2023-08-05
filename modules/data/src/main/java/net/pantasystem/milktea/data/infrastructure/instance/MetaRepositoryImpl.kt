@@ -12,7 +12,7 @@ import net.pantasystem.milktea.model.instance.HostWithVersion
 import net.pantasystem.milktea.model.instance.Meta
 import net.pantasystem.milktea.model.instance.MetaDataSource
 import net.pantasystem.milktea.model.instance.MetaRepository
-import net.pantasystem.milktea.model.instance.RequestMeta
+import net.pantasystem.milktea.api.misskey.instance.RequestMeta
 import java.net.URL
 import javax.inject.Inject
 
