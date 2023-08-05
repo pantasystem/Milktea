@@ -62,7 +62,9 @@ internal class CustomEmojiApiAdapterImpl @Inject constructor(
                         .getMeta(RequestMeta(detail = true))
                         .throwIfHasError()
                         .body()
-                        ?.emojis
+                        ?.emojis?.map {
+                            it.toModel()
+                        }
                 }
             }
             is NodeInfo.SoftwareType.Firefish -> {
@@ -70,7 +72,9 @@ internal class CustomEmojiApiAdapterImpl @Inject constructor(
                     .getMeta(RequestMeta(detail = true))
                     .throwIfHasError()
                     .body()
-                    ?.emojis
+                    ?.emojis?.map {
+                        it.toModel()
+                    }
             }
             is NodeInfo.SoftwareType.Other -> throw IllegalStateException()
         } ?: throw IllegalArgumentException()

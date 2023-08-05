@@ -2,12 +2,8 @@ package net.pantasystem.milktea.model.instance
 
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
-import net.pantasystem.milktea.model.emoji.Emoji
-import net.pantasystem.milktea.model.notes.reaction.Reaction
 import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
-
 import java.io.BufferedInputStream
 import java.io.BufferedReader
 import java.io.File
@@ -26,18 +22,6 @@ class MetaTest {
         assertEquals(Version("12.7.54"), version)
     }
 
-    @Test
-    fun isOwnEmojiBy() {
-        val emojiSources = listOf("a", "b", "c", "d", "e", "f", "g")
-        val meta = Meta(
-            uri = "https://misskey.io",
-            emojis = emojiSources.map {
-                Emoji(name = it)
-            }
-        )
-        assertTrue(meta.isOwnEmojiBy(Reaction("a")))
-        assertTrue(meta.isOwnEmojiBy(Reaction(":b:")))
-    }
 
     @Test
     fun decodeJsonGiveV12Meta() {

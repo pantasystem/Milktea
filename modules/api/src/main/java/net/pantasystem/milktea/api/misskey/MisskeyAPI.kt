@@ -19,6 +19,7 @@ import net.pantasystem.milktea.api.misskey.groups.ShowGroupDTO
 import net.pantasystem.milktea.api.misskey.groups.TransferGroupDTO
 import net.pantasystem.milktea.api.misskey.groups.UpdateGroupDTO
 import net.pantasystem.milktea.api.misskey.hashtag.SearchHashtagRequest
+import net.pantasystem.milktea.api.misskey.instance.MetaNetworkDTO
 import net.pantasystem.milktea.api.misskey.list.*
 import net.pantasystem.milktea.api.misskey.messaging.MessageAction
 import net.pantasystem.milktea.api.misskey.messaging.MessageDTO
@@ -69,7 +70,6 @@ import net.pantasystem.milktea.api.misskey.v12_75_0.Show
 import net.pantasystem.milktea.api.misskey.v12_75_0.UnLike
 import net.pantasystem.milktea.api.misskey.v12_75_0.Update
 import net.pantasystem.milktea.api.misskey.v13.EmojisResponse
-import net.pantasystem.milktea.model.instance.Meta
 import net.pantasystem.milktea.model.instance.RequestMeta
 import net.pantasystem.milktea.model.messaging.RequestMessageHistory
 import net.pantasystem.milktea.model.notes.poll.Vote
@@ -252,7 +252,7 @@ interface MisskeyAPI {
 
     //meta
     @POST("api/meta")
-    suspend fun getMeta(@Body requestMeta: RequestMeta): Response<Meta>
+    suspend fun getMeta(@Body requestMeta: RequestMeta): Response<MetaNetworkDTO>
 
 
     //message

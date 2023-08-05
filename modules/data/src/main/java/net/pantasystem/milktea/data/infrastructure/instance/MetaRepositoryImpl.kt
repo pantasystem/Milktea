@@ -4,14 +4,15 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.withContext
-import net.pantasystem.milktea.api.misskey.EmptyRequest
 import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.common.throwIfHasError
-import net.pantasystem.milktea.common_android.emoji.V13EmojiUrlResolver
 import net.pantasystem.milktea.common_android.hilt.IODispatcher
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
-import net.pantasystem.milktea.model.emoji.Emoji
-import net.pantasystem.milktea.model.instance.*
+import net.pantasystem.milktea.model.instance.HostWithVersion
+import net.pantasystem.milktea.model.instance.Meta
+import net.pantasystem.milktea.model.instance.MetaDataSource
+import net.pantasystem.milktea.model.instance.MetaRepository
+import net.pantasystem.milktea.model.instance.RequestMeta
 import java.net.URL
 import javax.inject.Inject
 
@@ -67,26 +68,7 @@ class MetaRepositoryImpl @Inject constructor(
     private suspend fun fetch(instanceDomain: String): Meta {
         val res = misskeyAPIProvider.get(instanceDomain).getMeta(RequestMeta(detail = true))
             .throwIfHasError()
-        val meta = res.body()!!
-        return if (meta.emojis == null) {
-            meta.copy(
-                emojis = runCancellableCatching {
-                    fetchEmojis(instanceDomain)?.map {
-                        it.copy(
-                            url = if (it.url == null) V13EmojiUrlResolver.resolve(it, instanceDomain) else it.url,
-                            uri = if (it.uri == null) V13EmojiUrlResolver.resolve(it, instanceDomain) else it.uri,
-                        )
-                    }
-                }.getOrNull()
-            )
-        } else {
-            meta
-        }
+        return res.body()!!.toModel()
     }
 
-    private suspend fun fetchEmojis(instanceDomain: String): List<Emoji>? {
-        return misskeyAPIProvider.get(instanceDomain).getEmojis(EmptyRequest).throwIfHasError().body()?.emojis?.map {
-            it.toModel()
-        }
-    }
 }

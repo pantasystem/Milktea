@@ -12,8 +12,8 @@ import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.common_android.emoji.V13EmojiUrlResolver
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.AccountRepository
+import net.pantasystem.milktea.model.emoji.CustomEmojiRepository
 import net.pantasystem.milktea.model.emoji.Emoji
-import net.pantasystem.milktea.model.instance.MetaRepository
 import net.pantasystem.milktea.model.notes.Note
 import net.pantasystem.milktea.model.notes.NoteRepository
 import net.pantasystem.milktea.model.notes.reaction.*
@@ -25,11 +25,11 @@ import net.pantasystem.milktea.note.from
 
 class ReactionHistoryViewModel @AssistedInject constructor(
     loggerFactory: Logger.Factory,
-    private val metaRepository: MetaRepository,
     private val accountRepository: AccountRepository,
     noteRepository: NoteRepository,
     private val userRepository: UserRepository,
     private val reactionUserRepository: ReactionUserRepository,
+    private val customEmojiRepository: CustomEmojiRepository,
     @Assisted val noteId: Note.Id,
     @Assisted val type: String?
 ) : ViewModel() {
@@ -52,9 +52,7 @@ class ReactionHistoryViewModel @AssistedInject constructor(
     private val emojis = flowOf(noteId).mapNotNull {
         accountRepository.get(it.accountId).getOrNull()
     }.flatMapLatest {
-        metaRepository.observe(it.normalizedInstanceUri)
-    }.map {
-        it?.emojis ?: emptyList()
+        customEmojiRepository.observeBy(it.getHost())
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
 
     private val note = noteRepository.observeOne(noteId)

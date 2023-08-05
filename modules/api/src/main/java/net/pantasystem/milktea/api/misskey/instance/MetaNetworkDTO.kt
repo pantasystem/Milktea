@@ -1,10 +1,12 @@
-package net.pantasystem.milktea.model.instance
+package net.pantasystem.milktea.api.misskey.instance
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import net.pantasystem.milktea.api.misskey.emoji.CustomEmojiNetworkDTO
+import net.pantasystem.milktea.model.instance.Meta
 
 @Serializable
-data class Meta(
+data class MetaNetworkDTO(
     @SerialName("uri") var uri: String,
     @SerialName("bannerUrl") var bannerUrl: String? = null,
     @SerialName("cacheRemoteFiles") var cacheRemoteFiles: Boolean? = null,
@@ -34,12 +36,39 @@ data class Meta(
     @SerialName("swPublickey") var swPublicKey: String? = null,
     @SerialName("ToSUrl") var toSUrl: String? = null,
     @SerialName("version") var version: String = "",
+    @SerialName("emojis") var emojis: List<CustomEmojiNetworkDTO>? = null
 ) {
-
-
-    fun getVersion(): Version {
-        return Version(version)
+    fun toModel(): Meta {
+        return Meta(
+            uri = uri,
+            bannerUrl = bannerUrl,
+            cacheRemoteFiles = cacheRemoteFiles,
+            description = description,
+            disableGlobalTimeline = disableGlobalTimeline,
+            disableLocalTimeline = disableLocalTimeline,
+            disableRegistration = disableRegistration,
+            driveCapacityPerLocalUserMb = driveCapacityPerLocalUserMb,
+            driveCapacityPerRemoteUserMb = driveCapacityPerRemoteUserMb,
+            enableDiscordIntegration = enableDiscordIntegration,
+            enableEmail = enableEmail,
+            enableEmojiReaction = enableEmojiReaction,
+            enableGithubIntegration = enableGithubIntegration,
+            enableRecaptcha = enableRecaptcha,
+            enableServiceWorker = enableServiceWorker,
+            enableTwitterIntegration = enableTwitterIntegration,
+            errorImageUrl = errorImageUrl,
+            feedbackUrl = feedbackUrl,
+            iconUrl = iconUrl,
+            maintainerEmail = maintainerEmail,
+            maintainerName = maintainerName,
+            mascotImageUrl = mascotImageUrl,
+            maxNoteTextLength = maxNoteTextLength,
+            name = name,
+            recaptchaSiteKey = recaptchaSiteKey,
+            secure = secure,
+            swPublicKey = swPublicKey,
+            toSUrl = toSUrl,
+            version = version,
+        )
     }
-
-
 }
