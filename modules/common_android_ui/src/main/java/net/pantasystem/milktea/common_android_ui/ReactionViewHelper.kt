@@ -1,7 +1,6 @@
 package net.pantasystem.milktea.common_android_ui
 
 import android.content.Context
-import android.util.Log
 import android.view.View
 import android.widget.FrameLayout
 import android.widget.ImageView
@@ -65,21 +64,20 @@ object ReactionViewHelper {
             context.applicationContext,
             BindingProvider::class.java
         )
-        val cache = entryPoint.metaRepository()
+        val cache = entryPoint.customEmojiRepository()
         val accountStore = entryPoint.accountStore()
 
 
         //Log.d("ReactionViewHelper", "reaction $reaction")
         if (reaction.startsWith(":") && reaction.endsWith(":")) {
             val account = accountStore.currentAccount
-            val emojis = if (account?.normalizedInstanceUri != null) {
-                cache.get(account.normalizedInstanceUri)?.emojis ?: emptyList()
+            val emojis = if (account?.getHost() != null) {
+                cache.getAndConvertToMap(account.getHost()) ?: emptyMap()
             } else {
-                emptyList()
+                emptyMap()
             }
-            val emoji = emojis.firstOrNull {
-                it.name == reaction.replace(":", "")
-            }
+
+            val emoji = emojis[reaction.replace(":", "")]
 
             if (emoji != null) {
                 //Log.d("ReactionViewHelper", "カスタム絵文字を発見した: ${emoji}")
@@ -101,7 +99,6 @@ object ReactionViewHelper {
                 reactionStringView.setMemoVisibility(View.GONE)
                 return
             } else {
-                Log.d("ReactionViewHelper", "emoji not found")
                 reactionImageView.setMemoVisibility(View.GONE)
                 reactionStringView.setMemoVisibility(View.VISIBLE)
             }

@@ -16,20 +16,17 @@ import net.pantasystem.milktea.model.account.CurrentAccountWatcher
 import net.pantasystem.milktea.model.account.page.Pageable
 import net.pantasystem.milktea.model.emoji.CustomEmojiRepository
 import net.pantasystem.milktea.model.filter.WordFilterService
-import net.pantasystem.milktea.model.instance.MetaRepository
 import net.pantasystem.milktea.model.notes.*
 import net.pantasystem.milktea.model.setting.LocalConfigRepository
 import net.pantasystem.milktea.note.viewmodel.PlaneNoteViewData
 import net.pantasystem.milktea.note.viewmodel.PlaneNoteViewDataCache
 
-@OptIn(FlowPreview::class)
 class NoteDetailViewModel @AssistedInject constructor(
     accountRepository: AccountRepository,
     private val noteCaptureAdapter: NoteCaptureAPIAdapter,
     private val noteRelationGetter: NoteRelationGetter,
     private val noteRepository: NoteRepository,
     private val noteTranslationStore: NoteTranslationStore,
-    val metaRepository: MetaRepository,
     private val noteDataSource: NoteDataSource,
     private val configRepository: LocalConfigRepository,
     private val emojiRepository: CustomEmojiRepository,
@@ -58,7 +55,7 @@ class NoteDetailViewModel @AssistedInject constructor(
     private val cache =
         planeNoteViewDataCacheFactory.create(currentAccountWatcher::getAccount, viewModelScope)
 
-    @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
+    @OptIn(ExperimentalCoroutinesApi::class)
     private val note = suspend {
         currentAccountWatcher.getAccount()
     }.asFlow().flatMapLatest {

@@ -15,9 +15,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import net.pantasystem.milktea.user.R
-import net.pantasystem.milktea.user.viewmodel.MuteUserViewModel
-import net.pantasystem.milktea.user.viewmodel.SpecifyUserMuteUiState
-import net.pantasystem.milktea.user.viewmodel.UserDetailViewModel
+import net.pantasystem.milktea.user.profile.viewmodel.UserDetailViewModel
 
 @AndroidEntryPoint
 class SpecifyMuteExpiredAtDialog : AppCompatDialogFragment() {

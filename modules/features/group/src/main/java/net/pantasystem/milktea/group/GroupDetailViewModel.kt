@@ -35,7 +35,7 @@ class GroupDetailViewModel @Inject constructor(
         suspend {
             groupRepository.syncOne(it)
         }.asLoadingStateFlow()
-    }.stateIn(viewModelScope, SharingStarted.Eagerly, ResultState.Loading(StateContent.NotExist()))
+    }.stateIn(viewModelScope, SharingStarted.Eagerly, ResultState.initialState())
 
     private val membersSyncState = uiStateType.mapNotNull { type ->
         type.groupId
@@ -45,7 +45,7 @@ class GroupDetailViewModel @Inject constructor(
         suspend {
             userRepository.syncIn(it.group.userIds).getOrThrow()
         }.asLoadingStateFlow()
-    }.stateIn(viewModelScope, SharingStarted.Eagerly, ResultState.Loading(StateContent.NotExist()))
+    }.stateIn(viewModelScope, SharingStarted.Eagerly, ResultState.initialState())
 
     private val members = uiStateType.mapNotNull { type ->
         type.groupId

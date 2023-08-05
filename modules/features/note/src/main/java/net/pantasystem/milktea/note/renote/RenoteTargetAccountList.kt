@@ -1,7 +1,14 @@
 package net.pantasystem.milktea.note.renote
 
-import androidx.compose.foundation.*
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.background
+import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
@@ -11,13 +18,11 @@ import androidx.compose.material.icons.outlined.Circle
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import coil.compose.rememberAsyncImagePainter
+import net.pantasystem.milktea.common_compose.AvatarIcon
 import net.pantasystem.milktea.common_compose.CustomEmojiText
 import net.pantasystem.milktea.model.emoji.Emoji
 
@@ -71,15 +76,11 @@ fun SelectableAvatarOnlyAccount(
             contentAlignment = Alignment.TopEnd,
         ) {
 
-            Image(
-                painter = rememberAsyncImagePainter(avatarUrl),
-                contentDescription = null,
-                contentScale = ContentScale.Crop,
-                modifier = Modifier
-                    .clip(CircleShape)
-                    .size(48.dp)
-                    .clickable { onClick() }
-                    .background(Color.Black)
+            AvatarIcon(
+                url = avatarUrl,
+                onAvatarClick = onClick,
+                size = 48.dp,
+                modifier = Modifier.background(Color.Black)
             )
             val tint = MaterialTheme.colors.primary
             val background = if (isSelected) Color.White else Color.Transparent

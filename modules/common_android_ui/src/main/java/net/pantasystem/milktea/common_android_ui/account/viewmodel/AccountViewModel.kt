@@ -16,22 +16,22 @@ import net.pantasystem.milktea.model.account.SignOutUseCase
 import net.pantasystem.milktea.model.account.page.Page
 import net.pantasystem.milktea.model.instance.InstanceInfoService
 import net.pantasystem.milktea.model.instance.SyncMetaExecutor
+import net.pantasystem.milktea.model.setting.DefaultConfig
+import net.pantasystem.milktea.model.setting.LocalConfigRepository
 import net.pantasystem.milktea.model.user.User
-import net.pantasystem.milktea.model.user.UserDataSource
 import net.pantasystem.milktea.model.user.UserRepository
 import javax.inject.Inject
 
 @OptIn(ExperimentalCoroutinesApi::class)
-@Suppress("UNCHECKED_CAST")
 @HiltViewModel
 class AccountViewModel @Inject constructor(
     loggerFactory: Logger.Factory,
     instanceInfoService: InstanceInfoService,
     private val accountStore: AccountStore,
-    private val userDataSource: UserDataSource,
     private val userRepository: UserRepository,
     private val signOutUseCase: SignOutUseCase,
     private val syncMetaExecutor: SyncMetaExecutor,
+    configRepository: LocalConfigRepository,
 ) : ViewModel() {
 
     private val logger = loggerFactory.create("AccountViewModel")
@@ -40,7 +40,7 @@ class AccountViewModel @Inject constructor(
     private val uiStateHelper = AccountViewModelUiStateHelper(
         accountStore.observeCurrentAccount,
         accountStore,
-        userDataSource,
+        userRepository,
         instanceInfoService,
         viewModelScope
     )
@@ -51,13 +51,19 @@ class AccountViewModel @Inject constructor(
         accountStore.observeCurrentAccount.stateIn(viewModelScope, SharingStarted.Lazily, null)
 
     val user = currentAccount.filterNotNull().flatMapLatest { account ->
-        userDataSource.observe(User.Id(account.accountId, account.remoteId)).map {
+        userRepository.observe(User.Id(account.accountId, account.remoteId)).map {
             it as? User.Detail
         }
     }.flowOn(Dispatchers.IO).stateIn(
         viewModelScope,
         SharingStarted.WhileSubscribed(5_000),
         null,
+    )
+
+    val config = configRepository.observe().stateIn(
+        viewModelScope,
+        SharingStarted.WhileSubscribed(5_000),
+        DefaultConfig.config,
     )
 
     private val _switchAccountEvent = MutableSharedFlow<Unit>(

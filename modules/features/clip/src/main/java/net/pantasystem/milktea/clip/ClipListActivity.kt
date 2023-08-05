@@ -8,12 +8,13 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import com.google.android.material.composethemeadapter.MdcTheme
 import dagger.hilt.android.AndroidEntryPoint
 import net.pantasystem.milktea.common.ui.ApplyTheme
+import net.pantasystem.milktea.common_compose.MilkteaStyleConfigApplyAndTheme
 import net.pantasystem.milktea.common_navigation.ClipDetailNavigation
 import net.pantasystem.milktea.common_navigation.ClipListNavigation
 import net.pantasystem.milktea.common_navigation.ClipListNavigationArgs
+import net.pantasystem.milktea.model.setting.LocalConfigRepository
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -24,6 +25,9 @@ class ClipListActivity : AppCompatActivity() {
 
     @Inject
     internal lateinit var clipDetailNavigation: ClipDetailNavigation
+
+    @Inject
+    internal lateinit var configRepository: LocalConfigRepository
 
     private val mode: ClipListNavigationArgs.Mode by lazy {
         intent.getStringExtra(ClipListNavigationImpl.EXTRA_MODE)?.let {
@@ -41,7 +45,7 @@ class ClipListActivity : AppCompatActivity() {
         setContent {
             val uiState by clipListViewModel.uiState.collectAsState()
 
-            MdcTheme {
+            MilkteaStyleConfigApplyAndTheme(configRepository = configRepository) {
                 ClipListScreen(
                     uiState = uiState,
                     mode = mode,

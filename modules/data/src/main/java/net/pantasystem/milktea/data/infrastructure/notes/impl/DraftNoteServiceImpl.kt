@@ -10,11 +10,17 @@ import net.pantasystem.milktea.data.infrastructure.notes.draft.db.from
 import net.pantasystem.milktea.model.drive.DriveFileRepository
 import net.pantasystem.milktea.model.file.AppFile
 import net.pantasystem.milktea.model.notes.CreateNote
-import net.pantasystem.milktea.model.notes.draft.*
+import net.pantasystem.milktea.model.notes.draft.DraftNote
+import net.pantasystem.milktea.model.notes.draft.DraftNoteFile
+import net.pantasystem.milktea.model.notes.draft.DraftNoteRepository
+import net.pantasystem.milktea.model.notes.draft.DraftNoteSavedEvent
+import net.pantasystem.milktea.model.notes.draft.DraftNoteService
+import net.pantasystem.milktea.model.notes.draft.DraftPoll
+import net.pantasystem.milktea.model.notes.draft.from
 import net.pantasystem.milktea.model.notes.isLocalOnly
 import net.pantasystem.milktea.model.notes.type
 import net.pantasystem.milktea.model.notes.visibleUserIds
-import java.util.*
+import java.util.Date
 import javax.inject.Inject
 
 class DraftNoteServiceImpl @Inject constructor(
@@ -72,7 +78,8 @@ class DraftNoteServiceImpl @Inject constructor(
                         },
                     channelId = createNote.channelId,
                     draftNoteId = createNote.draftNoteId ?: 0L,
-                    isSensitive = createNote.isSensitive
+                    isSensitive = createNote.isSensitive,
+                    reactionAcceptanceType = createNote.reactionAcceptance
                 )
             ).getOrThrow()
         }.onFailure {

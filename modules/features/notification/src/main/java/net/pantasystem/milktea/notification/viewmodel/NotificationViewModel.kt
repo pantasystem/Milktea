@@ -20,10 +20,12 @@ import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.account.UnauthorizedException
 import net.pantasystem.milktea.model.account.page.Pageable
 import net.pantasystem.milktea.model.filter.WordFilterService
-import net.pantasystem.milktea.model.group.GroupRepository
+import net.pantasystem.milktea.model.group.AcceptGroupInvitationUseCase
+import net.pantasystem.milktea.model.group.RejectGroupInvitationUseCase
 import net.pantasystem.milktea.model.notification.*
 import net.pantasystem.milktea.model.setting.LocalConfigRepository
-import net.pantasystem.milktea.model.user.FollowRequestRepository
+import net.pantasystem.milktea.model.user.follow.requests.AcceptFollowRequestUseCase
+import net.pantasystem.milktea.model.user.follow.requests.RejectFollowRequestUseCase
 import net.pantasystem.milktea.note.viewmodel.PlaneNoteViewDataCache
 import javax.inject.Inject
 
@@ -31,12 +33,14 @@ import javax.inject.Inject
 @HiltViewModel
 class NotificationViewModel @Inject constructor(
     private val accountRepository: AccountRepository,
-    private val groupRepository: GroupRepository,
     private val notificationStreaming: NotificationStreaming,
-    private val followRequestRepository: FollowRequestRepository,
     private val notificationRepository: NotificationRepository,
     private val noteWordFilterService: WordFilterService,
     private val configRepository: LocalConfigRepository,
+    private val acceptFollowRequestUseCase: AcceptFollowRequestUseCase,
+    private val rejectFollowRequestUseCase: RejectFollowRequestUseCase,
+    private val acceptGroupInvitationUseCase: AcceptGroupInvitationUseCase,
+    private val rejectGroupInvitationUseCase: RejectGroupInvitationUseCase,
     planeNoteViewDataCacheFactory: PlaneNoteViewDataCache.Factory,
     loggerFactory: Logger.Factory,
     accountStore: AccountStore,
@@ -149,9 +153,7 @@ class NotificationViewModel @Inject constructor(
     fun acceptFollowRequest(notification: Notification) {
         if (notification is ReceiveFollowRequestNotification) {
             viewModelScope.launch {
-                runCancellableCatching {
-                    followRequestRepository.accept(notification.userId)
-                }.onSuccess {
+                acceptFollowRequestUseCase(notification.userId).onSuccess {
                     loadInit()
                 }.onFailure {
                     logger.error("acceptFollowRequest error:$it")
@@ -165,9 +167,7 @@ class NotificationViewModel @Inject constructor(
     fun rejectFollowRequest(notification: Notification) {
         if (notification is ReceiveFollowRequestNotification) {
             viewModelScope.launch(Dispatchers.IO) {
-                runCancellableCatching {
-                    followRequestRepository.reject(notification.userId)
-                }.onSuccess {
+                rejectFollowRequestUseCase(notification.userId).onSuccess {
                     loadInit()
                 }.onFailure {
                     logger.error("rejectFollowRequest error:$it")
@@ -180,7 +180,7 @@ class NotificationViewModel @Inject constructor(
     fun acceptGroupInvitation(notification: Notification) {
         viewModelScope.launch {
             if (notification is GroupInvitedNotification) {
-                groupRepository.accept(notification.invitationId)
+                acceptGroupInvitationUseCase(notification.invitationId)
                     .onSuccess {
                         loadInit()
                     }
@@ -196,7 +196,7 @@ class NotificationViewModel @Inject constructor(
     fun rejectGroupInvitation(notification: Notification) {
         viewModelScope.launch(Dispatchers.IO) {
             if (notification is GroupInvitedNotification) {
-                groupRepository.reject(notification.invitationId)
+                rejectGroupInvitationUseCase(notification.invitationId)
                     .onSuccess {
                         loadInit()
                     }

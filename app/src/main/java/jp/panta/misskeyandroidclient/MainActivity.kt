@@ -22,12 +22,24 @@ import com.google.firebase.analytics.ktx.logEvent
 import com.wada811.databinding.dataBinding
 import dagger.hilt.android.AndroidEntryPoint
 import jp.panta.misskeyandroidclient.databinding.ActivityMainBinding
-import jp.panta.misskeyandroidclient.ui.main.*
+import jp.panta.misskeyandroidclient.ui.main.AccountViewModelHandler
+import jp.panta.misskeyandroidclient.ui.main.ChangeNavMenuVisibilityFromAPIVersion
+import jp.panta.misskeyandroidclient.ui.main.FabClickHandler
+import jp.panta.misskeyandroidclient.ui.main.MainActivityEventHandler
+import jp.panta.misskeyandroidclient.ui.main.MainActivityInitialIntentHandler
+import jp.panta.misskeyandroidclient.ui.main.MainActivityMenuProvider
+import jp.panta.misskeyandroidclient.ui.main.MainActivityNavigationDrawerMenuItemClickListener
+import jp.panta.misskeyandroidclient.ui.main.SetSimpleEditor
+import jp.panta.misskeyandroidclient.ui.main.SetUpNavHeader
+import jp.panta.misskeyandroidclient.ui.main.SetupOnBackPressedDispatcherHandler
+import jp.panta.misskeyandroidclient.ui.main.ToggleNavigationDrawerDelegate
 import jp.panta.misskeyandroidclient.ui.main.viewmodel.MainViewModel
+import jp.panta.misskeyandroidclient.ui.setLongPressListenerOnNavigationItem
 import net.pantasystem.milktea.app_store.account.AccountStore
 import net.pantasystem.milktea.app_store.setting.SettingStore
 import net.pantasystem.milktea.common.ui.ApplyTheme
 import net.pantasystem.milktea.common.ui.ToolbarSetter
+import net.pantasystem.milktea.common_android_ui.account.AccountSwitchingDialog
 import net.pantasystem.milktea.common_android_ui.account.viewmodel.AccountViewModel
 import net.pantasystem.milktea.common_android_ui.report.ReportViewModel
 import net.pantasystem.milktea.common_navigation.AuthorizationNavigation
@@ -111,6 +123,12 @@ class MainActivity : AppCompatActivity(), ToolbarSetter {
 
         binding.appBarMain.bottomNavigation.setOnItemReselectedListener {
             scrollToTopViewModel.scrollToTop()
+        }
+        binding.appBarMain.bottomNavigation.setLongPressListenerOnNavigationItem(
+            R.id.navigation_message_list
+        ) {
+            AccountSwitchingDialog().show(supportFragmentManager, "account_switching")
+            true
         }
 
         AccountViewModelHandler(binding, this, mAccountViewModel).setup()

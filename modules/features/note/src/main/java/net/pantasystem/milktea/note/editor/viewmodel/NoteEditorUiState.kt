@@ -6,9 +6,16 @@ import net.pantasystem.milktea.model.channel.Channel
 import net.pantasystem.milktea.model.file.AppFile
 import net.pantasystem.milktea.model.file.FilePreviewSource
 import net.pantasystem.milktea.model.file.from
-import net.pantasystem.milktea.model.notes.*
+import net.pantasystem.milktea.model.notes.CreateNote
+import net.pantasystem.milktea.model.notes.Note
+import net.pantasystem.milktea.model.notes.PollChoiceState
+import net.pantasystem.milktea.model.notes.PollEditingState
+import net.pantasystem.milktea.model.notes.PollExpiresAt
+import net.pantasystem.milktea.model.notes.ReactionAcceptanceType
+import net.pantasystem.milktea.model.notes.Visibility
 import net.pantasystem.milktea.model.notes.draft.DraftNote
 import net.pantasystem.milktea.model.notes.draft.DraftNoteFile
+import net.pantasystem.milktea.model.notes.toCreatePoll
 import net.pantasystem.milktea.model.user.User
 
 
@@ -31,6 +38,7 @@ data class NoteEditorSendToState(
     val replyId: Note.Id? = null,
     val schedulePostAt: Instant? = null,
     val draftNoteId: Long? = null,
+    val reactionAcceptanceType: ReactionAcceptanceType? = null,
 )
 
 data class NoteEditorUiState(
@@ -58,7 +66,11 @@ data class NoteEditorUiState(
             return false
         }
 
-        if (this.sendToState.renoteId != null && currentAccount?.instanceType == Account.InstanceType.MISSKEY) {
+        if (this.sendToState.renoteId != null && (
+                    currentAccount?.instanceType == Account.InstanceType.MISSKEY
+                            || currentAccount?.instanceType == Account.InstanceType.FIREFISH
+                    )
+        ) {
             return true
         }
         if (this.poll != null && this.poll.checkValidate()) {
@@ -98,6 +110,7 @@ fun NoteEditorUiState.toCreateNote(account: Account): CreateNote {
         channelId = sendToState.channelId,
         scheduleWillPostAt = sendToState.schedulePostAt,
         isSensitive = formState.isSensitive,
+        reactionAcceptance = sendToState.reactionAcceptanceType
     )
 }
 
@@ -128,6 +141,7 @@ fun DraftNote.toNoteEditingState(): NoteEditorUiState {
             schedulePostAt = reservationPostingAt?.let {
                 Instant.fromEpochMilliseconds(it.time)
             },
+            reactionAcceptanceType = reactionAcceptanceType,
         ),
         poll = this.draftPoll?.let {
             PollEditingState(
@@ -143,10 +157,11 @@ fun DraftNote.toNoteEditingState(): NoteEditorUiState {
             )
         },
         files = draftFiles?.map {
-            when(it) {
+            when (it) {
                 is DraftNoteFile.Local -> {
                     FilePreviewSource.Local(AppFile.from(it) as AppFile.Local)
                 }
+
                 is DraftNoteFile.Remote -> {
                     FilePreviewSource.Remote(AppFile.from(it) as AppFile.Remote, it.fileProperty)
                 }

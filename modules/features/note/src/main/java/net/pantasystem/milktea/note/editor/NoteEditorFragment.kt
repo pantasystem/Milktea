@@ -24,7 +24,6 @@ import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.*
-import com.google.android.material.composethemeadapter.MdcTheme
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.wada811.databinding.dataBinding
 import dagger.hilt.android.AndroidEntryPoint
@@ -42,17 +41,19 @@ import net.pantasystem.milktea.common_android.ui.putActivity
 import net.pantasystem.milktea.common_android.ui.text.CustomEmojiTokenizer
 import net.pantasystem.milktea.common_android_ui.account.viewmodel.AccountViewModel
 import net.pantasystem.milktea.common_android_ui.confirm.ConfirmDialog
+import net.pantasystem.milktea.common_compose.MilkteaStyleConfigApplyAndTheme
 import net.pantasystem.milktea.common_navigation.*
 import net.pantasystem.milktea.common_viewmodel.confirm.ConfirmViewModel
 import net.pantasystem.milktea.model.channel.Channel
 import net.pantasystem.milktea.model.confirm.ConfirmCommand
 import net.pantasystem.milktea.model.confirm.ResultType
 import net.pantasystem.milktea.model.drive.FileProperty
+import net.pantasystem.milktea.model.emoji.CustomEmojiRepository
 import net.pantasystem.milktea.model.emoji.Emoji
 import net.pantasystem.milktea.model.file.toAppFile
 import net.pantasystem.milktea.model.instance.FeatureType
-import net.pantasystem.milktea.model.instance.MetaRepository
 import net.pantasystem.milktea.model.notes.Note
+import net.pantasystem.milktea.model.setting.LocalConfigRepository
 import net.pantasystem.milktea.model.user.User
 import net.pantasystem.milktea.note.DraftNotesActivity
 import net.pantasystem.milktea.note.R
@@ -61,13 +62,18 @@ import net.pantasystem.milktea.note.databinding.ViewNoteEditorToolbarBinding
 import net.pantasystem.milktea.note.editor.account.NoteEditorSwitchAccountDialog
 import net.pantasystem.milktea.note.editor.file.EditFileCaptionDialog
 import net.pantasystem.milktea.note.editor.file.EditFileNameDialog
+import net.pantasystem.milktea.note.editor.poll.PollDatePickerDialog
+import net.pantasystem.milktea.note.editor.poll.PollEditorFragment
+import net.pantasystem.milktea.note.editor.poll.PollTimePickerDialog
 import net.pantasystem.milktea.note.editor.viewmodel.NoteEditorFocusEditTextType
 import net.pantasystem.milktea.note.editor.viewmodel.NoteEditorViewModel
+import net.pantasystem.milktea.note.editor.visibility.VisibilitySelectionDialogV2
 import net.pantasystem.milktea.note.emojis.CustomEmojiPickerDialog
 import net.pantasystem.milktea.note.emojis.viewmodel.EmojiSelection
 import net.pantasystem.milktea.note.emojis.viewmodel.EmojiSelectionViewModel
 import javax.inject.Inject
 
+@Suppress("DEPRECATION")
 @AndroidEntryPoint
 class NoteEditorFragment : Fragment(R.layout.fragment_note_editor), EmojiSelection {
 
@@ -136,10 +142,6 @@ class NoteEditorFragment : Fragment(R.layout.fragment_note_editor), EmojiSelecti
     internal lateinit var accountStore: AccountStore
 
     @Inject
-    internal lateinit var metaRepository: MetaRepository
-
-
-    @Inject
     internal lateinit var settingStore: SettingStore
 
     @Inject
@@ -162,6 +164,13 @@ class NoteEditorFragment : Fragment(R.layout.fragment_note_editor), EmojiSelecti
 
     @Inject
     lateinit var loggerFactory: Logger.Factory
+
+    @Inject
+    internal lateinit var configRepository: LocalConfigRepository
+
+    @Inject
+    internal lateinit var customEmojiRepository: CustomEmojiRepository
+
 
     val logger by lazy {
         loggerFactory.create("NoteEditorFragment")
@@ -277,9 +286,7 @@ class NoteEditorFragment : Fragment(R.layout.fragment_note_editor), EmojiSelecti
 
 
         accountViewModel.currentAccount.filterNotNull().flatMapLatest {
-            metaRepository.observe(it.normalizedInstanceUri)
-        }.mapNotNull {
-            it?.emojis
+            customEmojiRepository.observeBy(it.getHost())
         }.distinctUntilChanged().onEach { emojis ->
             binding.inputMain.setAdapter(
                 CustomEmojiCompleteAdapter(
@@ -310,7 +317,7 @@ class NoteEditorFragment : Fragment(R.layout.fragment_note_editor), EmojiSelecti
 
         binding.filePreview.apply {
             setContent {
-                MdcTheme {
+                MilkteaStyleConfigApplyAndTheme(configRepository = configRepository) {
                     NoteFilePreview(noteEditorViewModel = noteEditorViewModel, onShow = {
                         val intent = mediaNavigation.newIntent(
                             MediaNavigationArgs.AFile(
@@ -331,7 +338,7 @@ class NoteEditorFragment : Fragment(R.layout.fragment_note_editor), EmojiSelecti
             }
         }
         binding.noteEditorUserActionMenu.setContent {
-            MdcTheme {
+            MilkteaStyleConfigApplyAndTheme(configRepository = configRepository) {
                 val state by noteEditorViewModel.enableFeatures.collectAsState()
                 val uiState by noteEditorViewModel.uiState.collectAsState()
                 NoteEditorUserActionMenuLayout(iconColor = getColor(color = R.attr.normalIconTint),
@@ -421,12 +428,13 @@ class NoteEditorFragment : Fragment(R.layout.fragment_note_editor), EmojiSelecti
             noteEditorViewModel.setText((e?.toString() ?: ""))
         }
 
-        noteEditorViewModel.isPost.observe(viewLifecycleOwner) {
+        noteEditorViewModel.isPost.onEach {
             if (it) {
                 noteEditorToolbar.postButton.isEnabled = false
                 requireActivity().finish()
             }
-        }
+        }.flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.RESUMED)
+            .launchIn(viewLifecycleOwner.lifecycleScope)
 
 
         lifecycleScope.launch {
@@ -437,13 +445,15 @@ class NoteEditorFragment : Fragment(R.layout.fragment_note_editor), EmojiSelecti
             }
         }
 
-        noteEditorViewModel.showPollTimePicker.observe(viewLifecycleOwner) {
+        noteEditorViewModel.showPollTimePicker.onEach {
             PollTimePickerDialog().show(childFragmentManager, "TimePicker")
-        }
+        }.flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.RESUMED)
+            .launchIn(viewLifecycleOwner.lifecycleScope)
 
-        noteEditorViewModel.showPollDatePicker.observe(viewLifecycleOwner) {
+        noteEditorViewModel.showPollDatePicker.onEach {
             PollDatePickerDialog().show(childFragmentManager, "DatePicker")
-        }
+        }.flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.RESUMED)
+            .launchIn(viewLifecycleOwner.lifecycleScope)
 
         emojiSelectionViewModel.selectedEmoji.observe(viewLifecycleOwner) {
             onSelect(it)
@@ -513,7 +523,7 @@ class NoteEditorFragment : Fragment(R.layout.fragment_note_editor), EmojiSelecti
         ).launchIn(viewLifecycleOwner.lifecycleScope)
 
 
-        noteEditorViewModel.isSaveNoteAsDraft.observe(viewLifecycleOwner) {
+        noteEditorViewModel.isSaveNoteAsDraft.onEach {
             Handler(Looper.getMainLooper()).post {
                 if (it == null) {
                     Toast.makeText(requireContext(), "下書きに失敗しました", Toast.LENGTH_LONG).show()
@@ -521,7 +531,9 @@ class NoteEditorFragment : Fragment(R.layout.fragment_note_editor), EmojiSelecti
                     upTo()
                 }
             }
-        }
+        }.flowWithLifecycle(
+            viewLifecycleOwner.lifecycle, Lifecycle.State.RESUMED
+        ).launchIn(viewLifecycleOwner.lifecycleScope)
 
         viewLifecycleOwner.lifecycleScope.launch {
             noteEditorViewModel.textCursorPos.collect {

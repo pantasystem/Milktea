@@ -7,9 +7,16 @@ import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
-import net.pantasystem.milktea.api_streaming.*
+import net.pantasystem.milktea.api_streaming.ChannelBody
+import net.pantasystem.milktea.api_streaming.ChannelEvent
+import net.pantasystem.milktea.api_streaming.Send
+import net.pantasystem.milktea.api_streaming.Socket
+import net.pantasystem.milktea.api_streaming.SocketMessageEventListener
+import net.pantasystem.milktea.api_streaming.SocketStateEventListener
+import net.pantasystem.milktea.api_streaming.StreamingEvent
+import net.pantasystem.milktea.api_streaming.toJson
 import net.pantasystem.milktea.common.Logger
-import java.util.*
+import java.util.UUID
 
 class ChannelAPI(
     val socket: Socket,
@@ -106,7 +113,7 @@ class ChannelAPI(
             }
 
             if (typeIdMap.isEmpty()) {
-                socket.addMessageEventListener(this@ChannelAPI)
+                socket.addMessageEventListener(true, this@ChannelAPI)
             }
             if (typeIdMap[type] == null) {
                 logger.debug { "接続処理を開始" }

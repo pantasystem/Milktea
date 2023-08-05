@@ -12,15 +12,18 @@ import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.account.page.Pageable
+import net.pantasystem.milktea.model.instance.FeatureEnables
+import net.pantasystem.milktea.model.instance.FeatureType
 import net.pantasystem.milktea.model.notes.*
 import javax.inject.Inject
 
 @HiltViewModel
 class NoteOptionViewModel @Inject constructor(
-    val accountRepository: AccountRepository,
-    val noteRepository: NoteRepository,
-    val noteRelationGetter: NoteRelationGetter,
-    val loggerFactory: Logger.Factory,
+    private val accountRepository: AccountRepository,
+    private val noteRepository: NoteRepository,
+    private val noteRelationGetter: NoteRelationGetter,
+    private val loggerFactory: Logger.Factory,
+    private val featureEnables: FeatureEnables,
     private val savedStateHandle: SavedStateHandle
 ) : ViewModel() {
     companion object {
@@ -61,14 +64,23 @@ class NoteOptionViewModel @Inject constructor(
         }.getOrNull()
     }.flowOn(Dispatchers.IO).stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
 
-    val uiState = combine(noteIdFlow, noteState, note, currentAccount) { id, state, note, ac ->
+    private val noteInfo = combine(noteIdFlow, noteState, note) { id, state, note ->
+        Triple(id, state, note)
+    }
+
+    private val enableFeatures = currentAccount.filterNotNull().map {
+        featureEnables.enableFeatures(it.normalizedInstanceUri)
+    }.distinctUntilChanged()
+
+    val uiState = combine(noteInfo, currentAccount, enableFeatures) { (id, state, note), ac, features ->
         NoteOptionUiState(
             noteId = id,
             noteState = state,
             note = note?.note,
             isMyNote = note?.note?.userId?.id == ac?.remoteId,
             currentAccount = ac,
-            noteRelation = note
+            noteRelation = note,
+            isSupportReactionUsers = features.contains(FeatureType.PostReactionUsers),
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), NoteOptionUiState())
 
@@ -108,5 +120,8 @@ data class NoteOptionUiState(
     val note: Note? = null,
     val noteRelation: NoteRelation? = null,
     val isMyNote: Boolean = false,
-    val currentAccount: Account? = null
-)
+    val currentAccount: Account? = null,
+    val isSupportReactionUsers: Boolean = false,
+) {
+    val isVisibleReactionUsersSelection = currentAccount != null && note?.id != null && isSupportReactionUsers
+}

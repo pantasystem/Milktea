@@ -601,6 +601,15 @@
     <string name="settings_note_cache">帖子缓存</string>
     <string name="settings_custom_emoji_cache">自定义表情缓存</string>
     <string name="move_files_here">将文件移至此处</string>
+    <string name="reaction_acceptance_all">All</string>
+    <string name="reaction_acceptance_like_only_for_remote">All (Only likes for remote instances)</string>
+    <string name="reaction_acceptance_non_sensitive_only">Non-sensitive only</string>
+    <string name="reaction_acceptance_non_sensitive_only_likes_from_remote">Non-sensitive only (Only likes from remote)</string>
+    <string name="reaction_acceptance_only_likes">Only likes</string>
+    <string name="reaction_acceptance">Reaction acceptance</string>
+    <string name="settings_display_icons_as_squares">Display icons as squares</string>
+    <string name="media_display_mode_default">Default</string>
+    <string name="media_display_mode_always">Always hide</string>
     <!-- User -->
 
 </resources>

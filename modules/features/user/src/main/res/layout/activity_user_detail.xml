@@ -6,14 +6,14 @@
         <import type="android.view.View"/>
         <variable
                 name="userViewModel"
-                type="net.pantasystem.milktea.user.viewmodel.UserDetailViewModel" />
+                type="net.pantasystem.milktea.user.profile.viewmodel.UserDetailViewModel" />
         <import type="net.pantasystem.milktea.common_android.ui.SafeUnbox" />
     </data>
 
     <androidx.coordinatorlayout.widget.CoordinatorLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            tools:context="net.pantasystem.milktea.user.activity.UserDetailActivity"
+            tools:context="net.pantasystem.milktea.user.profile.UserDetailActivity"
             >
 
         <com.google.android.material.appbar.AppBarLayout
@@ -29,7 +29,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="?attr/actionBarSize"
-                        app:user="@{userViewModel.user}"
+                        app:user="@{userViewModel.userState}"
                         app:account="@{userViewModel.currentAccount}"
                         app:mainNameView="@{mainName}"
                         app:subNameView="@{subName}"
@@ -62,7 +62,7 @@
                                 android:text="@string/view_remotely"
                                 style="@style/Widget.MaterialComponents.Button.TextButton"
                                 android:layout_weight="1"
-                                android:visibility="@{userViewModel.user.remoteUser ? View.VISIBLE : View.GONE}"
+                                android:visibility="@{userViewModel.userState.remoteUser ? View.VISIBLE : View.GONE}"
                                 
                                 />
                     </LinearLayout>
@@ -70,7 +70,7 @@
                             android:id="@+id/headerView"
                             android:layout_width="match_parent"
                             android:layout_height="140dp"
-                            app:headerImageUrl="@{userViewModel.user.info.bannerUrl}"
+                            app:headerImageUrl="@{userViewModel.userState.info.bannerUrl}"
                             tools:ignore="ContentDescription"
                             app:layout_constraintTop_toBottomOf="@id/remoteUserState"
                             app:layout_constraintStart_toStartOf="parent"
@@ -86,19 +86,20 @@
                             app:layout_constraintStart_toStartOf="@id/headerView"
                             android:layout_marginStart="8dp"
                             android:layout_marginTop="8dp"
-                            android:visibility="@{userViewModel.user.related.follower ? View.VISIBLE : View.GONE}"
+                            android:visibility="@{userViewModel.userState.related.follower ? View.VISIBLE : View.GONE}"
                             android:background="@drawable/shape_follower_state_background"
                             android:padding="4dp"
                             android:textColor="@android:color/white"
                         />
 
-                    <ImageView
+                    <net.pantasystem.milktea.common.ui.AvatarIconView
                             android:id="@+id/avatarIcon"
                             android:layout_width="100dp"
                             android:layout_height="100dp"
                             android:layout_marginTop="-50dp"
                             android:layout_marginStart="16dp"
-                            app:circleIcon="@{userViewModel.user.avatarUrl}"
+                            app:imageUrl="@{userViewModel.userState.avatarUrl}"
+                            app:iconShape="@{userViewModel.config.avatarIconShapeType.value}"
                             tools:srcCompat="@drawable/ic_follow"
                             android:layout_marginBottom="8dp"
                             tools:ignore="ContentDescription"
@@ -126,7 +127,7 @@
                                 android:layout_height="wrap_content"
                                 android:layout_gravity="bottom"
                                 tools:text="フォロー"
-                                followState="@{userViewModel.user.followState}"
+                                followState="@{userViewModel.userState.followState}"
                                 android:visibility="@{userViewModel.mine ? View.GONE : View.VISIBLE}"
                                 android:onClick="@{()-> userViewModel.changeFollow()}"
                                 app:cornerRadius="32dp"
@@ -169,7 +170,7 @@
                             android:layout_marginEnd="8dp"
                             android:src="@drawable/ic_delete_black_24dp"
                             android:contentDescription="@string/delete_nickname"
-                            android:visibility="@{ userViewModel.user.nickname == null ? View.GONE : View.VISIBLE }"
+                            android:visibility="@{ userViewModel.userState.nickname == null ? View.GONE : View.VISIBLE }"
                             android:onClick="@{() -> userViewModel.deleteNickname() }"/>
                     <ImageButton
                             android:id="@+id/editNicknameButton"
@@ -189,14 +190,14 @@
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_alignStart="@id/avatarIcon"
-                            app:sourceText="@{userViewModel.user.info.description}"
+                            app:sourceText="@{userViewModel.userState.info.description}"
                             app:account="@{userViewModel.currentAccount}"
-                            app:host="@{userViewModel.user.host}"
-                            app:emojis="@{userViewModel.user.emojis}"
+                            app:host="@{userViewModel.userState.host}"
+                            app:emojis="@{userViewModel.userState.emojis}"
                             tools:text="awoijfoiwaehfoaiwehfoiawjefoiawjefiojawioefjioawhfoiawehfoiawef"
                             android:layout_marginEnd="16dp"
                             android:layout_marginTop="8dp"
-                            android:visibility="@{userViewModel.user.info.description == null ? View.GONE : View.VISIBLE}"
+                            android:visibility="@{userViewModel.userState.info.description == null ? View.GONE : View.VISIBLE}"
                             app:layout_constraintStart_toStartOf="parent"
                             app:layout_constraintTop_toBottomOf="@id/subName"
                             android:layout_marginStart="16dp"
@@ -233,7 +234,7 @@
                             android:layout_marginHorizontal="16dp"
 
                             app:drawableLeftCompat="@drawable/ic_baseline_calendar_month_24"
-                            android:visibility="@{ userViewModel.user.info.createdAt == null ? View.GONE : View.VISIBLE }"
+                            android:visibility="@{ userViewModel.userState.info.createdAt == null ? View.GONE : View.VISIBLE }"
                             stringSource="@{userViewModel.registrationDate}"
                             app:drawableTint="?attr/normalIconTint" />
 
@@ -269,7 +270,7 @@
                                 android:layout_height="wrap_content"
                                 tools:text="500"
                                 android:layout_marginEnd="4dp"
-                                android:text="@{Integer.toString(userViewModel.user.info.notesCount)}"
+                                android:text="@{Integer.toString(userViewModel.userState.info.notesCount)}"
                                 />
                         <TextView
                                 android:layout_width="wrap_content"
@@ -277,32 +278,32 @@
                                 android:text="@string/post"
                                 android:layout_marginEnd="8dp" />
                         <TextView
+                                android:id="@+id/followingCounter"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_marginEnd="4dp"
                                 tools:text="20"
-                                android:text="@{Integer.toString(userViewModel.user.info.followingCount)}"
-                                android:onClick="@{()-> userViewModel.showFollows()}"
+                                android:text="@{Integer.toString(userViewModel.userState.info.followingCount)}"
                                 />
                         <TextView
+                                android:id="@+id/followsText"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="@string/follow"
                                 android:layout_marginEnd="8dp"
-                                android:onClick="@{()-> userViewModel.showFollows()}"
                                 />
                         <TextView
+                                android:id="@+id/followersCounter"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 tools:text="40"
-                                android:text="@{Integer.toString(userViewModel.user.info.followersCount)}"
+                                android:text="@{Integer.toString(userViewModel.userState.info.followersCount)}"
                                 android:layout_marginEnd="4dp"
-                                android:onClick="@{()-> userViewModel.showFollowers()}"
                                 />
                         <TextView
+                                android:id="@+id/followersText"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:onClick="@{()-> userViewModel.showFollowers()}"
                                 android:text="@string/follower"/>
                     </LinearLayout>
 

@@ -13,16 +13,18 @@ import androidx.compose.ui.platform.ComposeView
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
-import com.google.android.material.composethemeadapter.MdcTheme
 import dagger.hilt.android.AndroidEntryPoint
+import net.pantasystem.milktea.common_compose.MilkteaStyleConfigApplyAndTheme
 import net.pantasystem.milktea.model.account.page.Pageable
 import net.pantasystem.milktea.model.notes.Note
+import net.pantasystem.milktea.model.setting.LocalConfigRepository
 import net.pantasystem.milktea.model.user.report.toReport
 import net.pantasystem.milktea.note.NoteDetailActivity
 import net.pantasystem.milktea.note.R
 import net.pantasystem.milktea.note.clip.ToggleAddNoteToClipDialog
 import net.pantasystem.milktea.note.reaction.history.ReactionHistoryPagerDialog
 import net.pantasystem.milktea.note.viewmodel.NotesViewModel
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class NoteOptionDialog : BottomSheetDialogFragment() {
@@ -37,6 +39,10 @@ class NoteOptionDialog : BottomSheetDialogFragment() {
             }
         }
     }
+
+    @Inject
+    internal lateinit var configRepository: LocalConfigRepository
+
     val viewModel: NoteOptionViewModel by viewModels()
     val notesViewModel: NotesViewModel by activityViewModels()
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
@@ -44,7 +50,7 @@ class NoteOptionDialog : BottomSheetDialogFragment() {
         dialog.setContentView(ComposeView(requireContext()).apply {
             setContent {
                 val uiState by viewModel.uiState.collectAsState()
-                MdcTheme {
+                MilkteaStyleConfigApplyAndTheme(configRepository = configRepository) {
                     NoteOptionDialogLayout(
                         uiState = uiState,
                         onShowDetailButtonClicked = {

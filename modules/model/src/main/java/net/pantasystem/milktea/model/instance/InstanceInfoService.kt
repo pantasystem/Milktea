@@ -1,8 +1,11 @@
 package net.pantasystem.milktea.model.instance
 
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.FlowPreview
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.asFlow
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.map
 import net.pantasystem.milktea.common.mapCancellableCatching
 import net.pantasystem.milktea.model.emoji.CustomEmojiRepository
 import net.pantasystem.milktea.model.nodeinfo.NodeInfo
@@ -32,6 +35,11 @@ open class InstanceInfoService @Inject constructor(
                         metaRepository.find(instanceDomain).getOrThrow()
                     )
                 }
+                is NodeInfo.SoftwareType.Firefish -> {
+                    InstanceInfoType.Firefish(
+                        metaRepository.find(instanceDomain).getOrThrow()
+                    )
+                }
                 is NodeInfo.SoftwareType.Pleroma -> {
                     InstanceInfoType.Pleroma(
                         mastodonInstanceInfoRepository.find(instanceDomain).getOrThrow()
@@ -57,12 +65,16 @@ open class InstanceInfoService @Inject constructor(
                     mastodonInstanceInfoRepository.sync(instanceDomain).getOrThrow()
                     customEmojiRepository.sync(it.host)
                 }
+                is NodeInfo.SoftwareType.Firefish -> {
+                    metaRepository.sync(instanceDomain)
+                    customEmojiRepository.sync(it.host).getOrThrow()
+                }
                 is NodeInfo.SoftwareType.Other -> throw NoSuchElementException()
             }
         }
     }
 
-    @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
+    @OptIn(ExperimentalCoroutinesApi::class)
     open fun observe(instanceDomain: String): Flow<InstanceInfoType?> {
         return suspend {
             nodeInfoRepository.find(URL(instanceDomain).host).getOrNull()
@@ -82,7 +94,22 @@ open class InstanceInfoService @Inject constructor(
                         }
                     }
                 }
-                else -> flowOf(null)
+                is NodeInfo.SoftwareType.Firefish -> {
+                    metaRepository.observe(instanceDomain).map {
+                        it?.let {
+                            InstanceInfoType.Firefish(it)
+                        }
+                    }
+                }
+                is NodeInfo.SoftwareType.Pleroma -> {
+                    mastodonInstanceInfoRepository.observe(instanceDomain).map {
+                        it?.let {
+                            InstanceInfoType.Pleroma(it)
+                        }
+                    }
+                }
+                is NodeInfo.SoftwareType.Other -> flowOf(null)
+                null -> flowOf(null)
             }
         }
     }

@@ -6,7 +6,7 @@ import net.pantasystem.milktea.common_android.emoji.V13EmojiUrlResolver
 import net.pantasystem.milktea.data.api.mastodon.MastodonAPIProvider
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
 import net.pantasystem.milktea.model.emoji.Emoji
-import net.pantasystem.milktea.model.instance.RequestMeta
+import net.pantasystem.milktea.api.misskey.instance.RequestMeta
 import net.pantasystem.milktea.model.instance.Version
 import net.pantasystem.milktea.model.nodeinfo.NodeInfo
 import net.pantasystem.milktea.model.nodeinfo.getVersion
@@ -62,8 +62,19 @@ internal class CustomEmojiApiAdapterImpl @Inject constructor(
                         .getMeta(RequestMeta(detail = true))
                         .throwIfHasError()
                         .body()
-                        ?.emojis
+                        ?.emojis?.map {
+                            it.toModel()
+                        }
                 }
+            }
+            is NodeInfo.SoftwareType.Firefish -> {
+                misskeyAPIProvider.get("https://${nodeInfo.host}")
+                    .getMeta(RequestMeta(detail = true))
+                    .throwIfHasError()
+                    .body()
+                    ?.emojis?.map {
+                        it.toModel()
+                    }
             }
             is NodeInfo.SoftwareType.Other -> throw IllegalStateException()
         } ?: throw IllegalArgumentException()

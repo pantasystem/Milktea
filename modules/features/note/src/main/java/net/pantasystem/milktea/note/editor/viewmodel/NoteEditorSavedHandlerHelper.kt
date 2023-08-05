@@ -10,11 +10,12 @@ import net.pantasystem.milktea.model.file.AppFile
 import net.pantasystem.milktea.model.file.FilePreviewSource
 import net.pantasystem.milktea.model.notes.Note
 import net.pantasystem.milktea.model.notes.PollEditingState
+import net.pantasystem.milktea.model.notes.ReactionAcceptanceType
 import net.pantasystem.milktea.model.notes.Visibility
-import java.util.*
+import java.util.Date
 
 enum class NoteEditorSavedStateKey() {
-    Text, Cw, PickedFiles, Visibility, ChannelId, ReplyId, RenoteId, ScheduleAt, DraftNoteId, HasCW, Poll, IsSensitive,
+    Text, Cw, PickedFiles, Visibility, ChannelId, ReplyId, RenoteId, ScheduleAt, DraftNoteId, HasCW, Poll, IsSensitive, ReactionAcceptance,
 }
 
 
@@ -95,6 +96,9 @@ fun SavedStateHandle.setPoll(value: PollEditingState?) {
     this[NoteEditorSavedStateKey.Poll.name] = value
 }
 
+fun SavedStateHandle.setReactionAcceptanceType(value: ReactionAcceptanceType?) {
+    this[NoteEditorSavedStateKey.ReactionAcceptance.name] = value?.name
+}
 fun SavedStateHandle.setVisibility(visibility: Visibility?) {
     this[NoteEditorSavedStateKey.Visibility.name] = visibility
 }
@@ -113,6 +117,12 @@ fun SavedStateHandle.getDraftNoteId(): Long? {
 
 fun SavedStateHandle.getSensitive(): Boolean {
     return this[NoteEditorSavedStateKey.IsSensitive.name] ?: false
+}
+
+fun SavedStateHandle.getReactionAcceptance(): ReactionAcceptanceType? {
+    return this.get<String?>(NoteEditorSavedStateKey.ReactionAcceptance.name).let { type ->
+        ReactionAcceptanceType.values().find { it.name == type }
+    }
 }
 
 fun SavedStateHandle.applyBy(note: NoteEditorUiState) {
@@ -134,6 +144,7 @@ fun SavedStateHandle.applyBy(note: NoteEditorUiState) {
     setSensitive(
         note.formState.isSensitive,
     )
+    setReactionAcceptanceType(note.sendToState.reactionAcceptanceType)
 }
 
 suspend fun SavedStateHandle.getNoteEditingUiState(account: Account?, visibility: Visibility?, fileRepository: DriveFileRepository): NoteEditorUiState {
@@ -142,7 +153,7 @@ suspend fun SavedStateHandle.getNoteEditingUiState(account: Account?, visibility
             text = getText(),
             cw = getCw(),
             hasCw = getHasCw(),
-            isSensitive = getSensitive()
+            isSensitive = getSensitive(),
         ),
         sendToState = NoteEditorSendToState(
             visibility = visibility ?: getVisibility() ?: Visibility.Public(false),
@@ -152,7 +163,8 @@ suspend fun SavedStateHandle.getNoteEditingUiState(account: Account?, visibility
             schedulePostAt = getScheduleAt()?.let {
                 Instant.fromEpochMilliseconds(it.time)
             },
-            draftNoteId = getDraftNoteId()
+            draftNoteId = getDraftNoteId(),
+            reactionAcceptanceType = getReactionAcceptance()
         ),
         poll = getPoll(),
         files = getFiles().mapNotNull { appFile ->

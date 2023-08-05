@@ -96,10 +96,6 @@ class KeysKtTest {
                     "IsVisibleInstanceUrlInToolbar",
                     key.str()
                 )
-                Keys.IsHideMediaWhenMobileNetwork -> Assertions.assertEquals(
-                    "IsHideMediaWhenMobileNetwork",
-                    key.str()
-                )
                 Keys.NoteContentFontSize -> Assertions.assertEquals(
                     "NoteContentFontSize",
                     key.str()
@@ -124,6 +120,15 @@ class KeysKtTest {
                     "EmojiPickerEmojiDisplaySize",
                     key.str()
                 )
+
+                Keys.AvatarIconShapeType -> Assertions.assertEquals(
+                    "AvatarIconShapeType",
+                    key.str()
+                )
+                Keys.MediaDisplayMode -> Assertions.assertEquals(
+                    "MediaDisplayMode",
+                    key.str()
+                )
             }
         }
     }
@@ -131,8 +136,8 @@ class KeysKtTest {
 
     @Test
     fun checkAllKeysCount() {
-        Assertions.assertEquals(33, Keys.allKeys.size)
-        Assertions.assertEquals(33, Keys.allKeys.map { it.str() }.toSet().size)
+        Assertions.assertEquals(34, Keys.allKeys.size)
+        Assertions.assertEquals(34, Keys.allKeys.map { it.str() }.toSet().size)
     }
 
 

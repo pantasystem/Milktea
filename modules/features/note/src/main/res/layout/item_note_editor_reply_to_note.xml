@@ -36,11 +36,12 @@
             app:foldingContent="@{contentMain}"
             app:isFolding="@{note.contentFolding}">
 
-        <ImageView
+        <net.pantasystem.milktea.common.ui.AvatarIconView
                 android:id="@+id/avatarIcon"
                 android:layout_width="@dimen/note_avatar_icon_size"
                 android:layout_height="@dimen/note_avatar_icon_size"
-                app:circleIcon='@{note.avatarUrl}'
+                imageUrl='@{note.avatarUrl}'
+                app:iconShape="@{note.config.avatarIconShapeType.value}"
                 tools:srcCompat="@android:drawable/sym_def_app_icon"
                 android:contentDescription="@string/avataricon"
                 app:transitionDestinationUser="@{note.toShowNote.user}"
@@ -264,11 +265,12 @@
                             app:account="@{note.account}"
                             android:layout_marginTop="4dp">
 
-                        <ImageView
+                        <net.pantasystem.milktea.common.ui.AvatarIconView
                                 android:id="@+id/subAvatarIcon"
                                 android:layout_width="20dp"
                                 android:layout_height="20dp"
-                                app:circleIcon='@{note.subNoteAvatarUrl}'
+                                imageUrl='@{note.subNoteAvatarUrl}'
+                                app:iconShape="@{note.config.avatarIconShapeType.value}"
                                 android:contentDescription="@string/avataricon"
                                 app:transitionDestinationUser="@{note.subNote.user}"
                                 app:layout_constraintStart_toStartOf="parent"

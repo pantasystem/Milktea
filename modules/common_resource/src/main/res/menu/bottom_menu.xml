@@ -12,11 +12,11 @@
     <item
             android:id="@+id/navigation_search"
             android:title="@string/search"
-            android:icon="@drawable/ic_search_black_24dp"/>
+            android:icon="@drawable/ic_search_40px"/>
     <item
             android:id="@+id/navigation_notification"
             android:title="@string/notification" android:icon="@drawable/ic_selectable_notification"/>
     <item
             android:id="@+id/navigation_message_list"
-            android:title="@string/message" android:icon="@drawable/ic_account_circle_24px"/>
+            android:title="@string/message" android:icon="@drawable/ic_account_circle_40px"/>
 </menu>

@@ -2,7 +2,7 @@ package net.pantasystem.milktea.data.infrastructure.auth.custom
 
 import net.pantasystem.milktea.api.misskey.auth.Session
 import net.pantasystem.milktea.model.app.AppType
-import java.util.*
+import java.util.Date
 
 
 sealed interface TemporarilyAuthState {
@@ -30,11 +30,32 @@ sealed interface TemporarilyAuthState {
         val app: AppType.Pleroma,
         val scope: String,
     ) : TemporarilyAuthState
+
+    data class Firefish(
+        val secret: String,
+        override val instanceDomain: String,
+        val session: Session,
+        override val enabledDateEnd: Date,
+        val viaName: String?
+    ) : TemporarilyAuthState
+
 }
 
 fun AppType.Misskey.createAuth(instanceDomain: String, session: Session, timeLimit: Date = Date(System.currentTimeMillis() + 3600 * 1000)): TemporarilyAuthState.Misskey {
     requireNotNull(secret)
     return TemporarilyAuthState.Misskey(
+        secret = secret!!,
+        instanceDomain = instanceDomain,
+        session = session,
+        enabledDateEnd = timeLimit,
+        viaName = name
+    )
+}
+
+
+fun AppType.Firefish.createAuth(instanceDomain: String, session: Session, timeLimit: Date = Date(System.currentTimeMillis() + 3600 * 1000)): TemporarilyAuthState.Firefish {
+    requireNotNull(secret)
+    return TemporarilyAuthState.Firefish(
         secret = secret!!,
         instanceDomain = instanceDomain,
         session = session,

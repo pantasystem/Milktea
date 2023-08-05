@@ -7,8 +7,17 @@ import kotlinx.coroutines.sync.withLock
 import net.pantasystem.milktea.api.mastodon.accounts.MastodonAccountDTO
 import net.pantasystem.milktea.api.misskey.notes.FindRenotes
 import net.pantasystem.milktea.api.misskey.notes.NoteDTO
-import net.pantasystem.milktea.common.*
-import net.pantasystem.milktea.common.paginator.*
+import net.pantasystem.milktea.common.MastodonLinkHeaderDecoder
+import net.pantasystem.milktea.common.PageableState
+import net.pantasystem.milktea.common.StateContent
+import net.pantasystem.milktea.common.paginator.EntityConverter
+import net.pantasystem.milktea.common.paginator.IdGetter
+import net.pantasystem.milktea.common.paginator.PaginationState
+import net.pantasystem.milktea.common.paginator.PreviousLoader
+import net.pantasystem.milktea.common.paginator.PreviousPagingController
+import net.pantasystem.milktea.common.paginator.StateLocker
+import net.pantasystem.milktea.common.runCancellableCatching
+import net.pantasystem.milktea.common.throwIfHasError
 import net.pantasystem.milktea.data.api.mastodon.MastodonAPIProvider
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
 import net.pantasystem.milktea.data.infrastructure.notes.NoteDataSourceAdder
@@ -106,7 +115,7 @@ class RenotesPagingImpl(
             val account = accountRepository.get(targetNoteId.accountId).getOrThrow()
             val i = account.token
             when(account.instanceType) {
-                Account.InstanceType.MISSKEY -> {
+                Account.InstanceType.MISSKEY, Account.InstanceType.FIREFISH -> {
                     misskeyAPIProvider.get(account.normalizedInstanceUri)
                         .renotes(FindRenotes(i = i, noteId = targetNoteId.noteId, untilId = getUntilId()))
                         .throwIfHasError().body()!!.let { list ->

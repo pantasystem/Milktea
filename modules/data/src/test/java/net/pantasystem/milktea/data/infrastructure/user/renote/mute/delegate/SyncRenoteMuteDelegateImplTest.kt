@@ -246,6 +246,7 @@ internal class SyncRenoteMuteDelegateImplTest {
         var insertAllActualData: List<RenoteMuteRecord>? = null
         var callPushArgsActualData: List<User.Id> = emptyList()
         var isDeleteByAccountCalled = false
+        val lock = Mutex()
 
         val delegate = SyncRenoteMuteDelegateImpl(
             getAccount = {
@@ -287,14 +288,17 @@ internal class SyncRenoteMuteDelegateImplTest {
             },
             createAndPushToRemote = object : CreateRenoteMuteAndPushToRemoteDelegate {
                 override suspend fun invoke(userId: User.Id): Result<RenoteMute> {
-                    callPushArgsActualData = callPushArgsActualData + userId
-                    return Result.success(
-                        unPushedLocalData.first {
-                            it.userId == userId.id
-                        }.toModel().copy(
-                            postedAt = postedAt
+                    lock.withLock {
+                        callPushArgsActualData = callPushArgsActualData + userId
+                        return Result.success(
+                            unPushedLocalData.first {
+                                it.userId == userId.id
+                            }.toModel().copy(
+                                postedAt = postedAt
+                            )
                         )
-                    )
+                    }
+
                 }
             },
             unPushedRenoteMutesDiffFilter = UnPushedRenoteMutesDiffFilter(),

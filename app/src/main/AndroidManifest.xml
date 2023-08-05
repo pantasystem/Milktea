@@ -122,12 +122,12 @@
                 android:name="com.google.android.gms.oss.licenses.OssLicensesMenuActivity"
                 android:theme="@style/LicensePageTheme" />
         <activity
-                android:name="net.pantasystem.milktea.user.activity.SearchAndSelectUserActivity"
+                android:name="net.pantasystem.milktea.user.search.SearchAndSelectUserActivity"
                 android:windowSoftInputMode="adjustResize" />
         <activity android:name="net.pantasystem.milktea.userlist.UserListDetailActivity" />
         <activity android:name="net.pantasystem.milktea.userlist.ListListActivity" />
         <activity android:name="net.pantasystem.milktea.favorite.FavoriteActivity" />
-        <activity android:name="net.pantasystem.milktea.user.activity.FollowFollowerActivity" />
+        <activity android:name="net.pantasystem.milktea.user.followlist.FollowFollowerActivity" />
         <activity
             android:name="net.pantasystem.milktea.search.SearchActivity"
             android:windowSoftInputMode="adjustResize"
@@ -154,7 +154,7 @@
                 android:name="net.pantasystem.milktea.setting.activities.SettingsActivity"
                 android:label="@string/title_activity_settings" />
         <activity
-                android:name="net.pantasystem.milktea.user.activity.UserDetailActivity"
+                android:name="net.pantasystem.milktea.user.profile.UserDetailActivity"
                 android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />

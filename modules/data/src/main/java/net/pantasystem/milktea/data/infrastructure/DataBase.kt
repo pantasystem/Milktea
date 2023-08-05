@@ -116,7 +116,7 @@ import net.pantasystem.milktea.data.infrastructure.user.renote.mute.db.RenoteMut
 
         PleromaMetadataFeatures::class,
     ],
-    version = 49,
+    version = 50,
     exportSchema = true,
     autoMigrations = [
         AutoMigration(from = 11, to = 12),
@@ -157,6 +157,7 @@ import net.pantasystem.milktea.data.infrastructure.user.renote.mute.db.RenoteMut
         AutoMigration(from = 46, to = 47),
         AutoMigration(from = 47, to = 48),
         AutoMigration(from = 48, to = 49),
+        AutoMigration(from = 49, to = 50),
     ],
     views = [UserView::class, GroupMemberView::class, UserListMemberView::class]
 )

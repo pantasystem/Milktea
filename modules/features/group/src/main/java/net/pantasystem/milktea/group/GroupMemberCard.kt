@@ -1,18 +1,14 @@
 package net.pantasystem.milktea.group
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.Card
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
-import coil.compose.rememberAsyncImagePainter
+import net.pantasystem.milktea.common_compose.AvatarIcon
 import net.pantasystem.milktea.model.user.User
 
 @OptIn(ExperimentalMaterialApi::class)
@@ -37,13 +33,9 @@ fun GroupMemberCard(
                 .fillMaxWidth()
                 .padding(8.dp)
         ) {
-            Image(
-                rememberAsyncImagePainter(member.avatarUrl),
-                contentDescription = null,
-                contentScale = ContentScale.Crop,
-                modifier = Modifier
-                    .size(52.dp)
-                    .clip(CircleShape)
+            AvatarIcon(
+                member.avatarUrl,
+                size = 50.dp,
             )
             Spacer(modifier = Modifier.width(4.dp))
             Column {

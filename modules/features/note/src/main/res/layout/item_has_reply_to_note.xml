@@ -56,11 +56,12 @@
                         app:user="@{hasReplyToNote.replyTo.toShowNote.user}"
                         app:account="@{hasReplyToNote.account}"
                         >
-                    <ImageView
+                    <net.pantasystem.milktea.common.ui.AvatarIconView
                             android:id="@+id/replyToAvatarIcon"
                             android:layout_width="@dimen/note_avatar_icon_size"
                             android:layout_height="@dimen/note_avatar_icon_size"
-                            app:circleIcon="@{hasReplyToNote.replyTo.avatarUrl}"
+                            imageUrl="@{hasReplyToNote.replyTo.avatarUrl}"
+                            app:iconShape="@{hasReplyToNote.config.avatarIconShapeType.value}"
                             android:layout_marginEnd="8dp"
                             tools:ignore="ContentDescription"
                             app:transitionDestinationUser="@{hasReplyToNote.replyTo.toShowNote.user}"

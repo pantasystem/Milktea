@@ -36,11 +36,26 @@ data class App(
             secret = secret
         )
     }
+
+    fun toFirefishModel(): AppType.Firefish {
+        return AppType.Firefish(
+            id = id,
+            name = name,
+            callbackUrl = callbackUrl,
+            isAuthorized = isAuthorized,
+            permission = permission ?: emptyList(),
+            secret = secret
+        )
+    }
 }
 
 
 fun AppType.Companion.fromDTO(app: App): AppType {
     return app.toModel()
+}
+
+fun AppType.Companion.fromFirefishDTO(app: App): AppType {
+    return app.toFirefishModel()
 }
 
 fun AppType.Companion.fromDTO(app: net.pantasystem.milktea.api.mastodon.apps.App): AppType {

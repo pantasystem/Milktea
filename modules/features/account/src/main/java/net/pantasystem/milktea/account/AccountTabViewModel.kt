@@ -28,7 +28,7 @@ class AccountTabViewModel @Inject constructor(
         val isEnableMessaging =
             featureEnables.isEnable(account.normalizedInstanceUri, FeatureType.Messaging, false)
         when (account.instanceType) {
-            Account.InstanceType.MISSKEY -> {
+            Account.InstanceType.MISSKEY, Account.InstanceType.FIREFISH -> {
                 listOfNotNull(
                     AccountTabTypes.Account,
                     if (isEnableMessaging) AccountTabTypes.Message else null,

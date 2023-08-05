@@ -38,6 +38,7 @@ import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.common.throwIfHasError
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
 import net.pantasystem.milktea.data.infrastructure.auth.Authorization
+import net.pantasystem.milktea.data.infrastructure.auth.custom.toFirefishModel
 import net.pantasystem.milktea.data.infrastructure.auth.custom.toModel
 import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.account.ClientIdRepository
@@ -179,6 +180,7 @@ class AppAuthViewModel @Inject constructor(
                         is InstanceType.Mastodon -> "https://${info.instance.uri}"
                         is InstanceType.Pleroma -> info.instance.uri
                         is InstanceType.Misskey -> info.instance.uri
+                        is InstanceType.Firefish -> info.instance.uri
                     }
                     logger.debug { "instanceBaseUrl: $instanceBase" }
                     authService.createWaiting4Approval(
@@ -276,29 +278,56 @@ class AppAuthViewModel @Inject constructor(
         }.filterNotNull().flatMapLatest { a ->
             (0..Int.MAX_VALUE).asFlow().map {
                 delay(4000)
-                if (a is Authorization.Waiting4UserAuthorization.Misskey) {
-                    try {
-                        val token = misskeyAPIServiceBuilder.buildAuthAPI(a.instanceBaseURL)
-                            .getAccessToken(
-                                UserKey(
-                                    appSecret = a.appSecret,
-                                    a.session.token
+                when (a) {
+                    is Authorization.Waiting4UserAuthorization.Misskey -> {
+                        try {
+                            val token = misskeyAPIServiceBuilder.buildAuthAPI(a.instanceBaseURL)
+                                .getAccessToken(
+                                    UserKey(
+                                        appSecret = a.appSecret,
+                                        a.session.token
+                                    )
                                 )
-                            )
-                            .throwIfHasError()
-                            .body()
-                            ?: throw IllegalStateException("response bodyがありません。")
+                                .throwIfHasError()
+                                .body()
+                                ?: throw IllegalStateException("response bodyがありません。")
 
-                        val authenticated = Authorization.Approved(
-                            a.instanceBaseURL,
-                            accessToken = token.toModel(a.appSecret)
-                        )
-                        ResultState.Fixed(StateContent.Exist(authenticated))
-                    } catch (e: Throwable) {
-                        ResultState.Error(StateContent.NotExist(), e)
+                            val authenticated = Authorization.Approved(
+                                a.instanceBaseURL,
+                                accessToken = token.toModel(a.appSecret)
+                            )
+                            ResultState.Fixed(StateContent.Exist(authenticated))
+                        } catch (e: Throwable) {
+                            ResultState.Error(StateContent.NotExist(), e)
+                        }
                     }
-                } else {
-                    ResultState.Fixed(StateContent.NotExist())
+
+                    is Authorization.Waiting4UserAuthorization.Firefish -> {
+                        try {
+                            val token = misskeyAPIServiceBuilder.buildAuthAPI(a.instanceBaseURL)
+                                .getAccessToken(
+                                    UserKey(
+                                        appSecret = a.appSecret,
+                                        a.session.token
+                                    )
+                                )
+                                .throwIfHasError()
+                                .body()
+                                ?: throw IllegalStateException("response bodyがありません。")
+
+                            val authenticated = Authorization.Approved(
+                                a.instanceBaseURL,
+                                accessToken = token.toFirefishModel(a.appSecret)
+                            )
+                            ResultState.Fixed(StateContent.Exist(authenticated))
+                        } catch (e: Throwable) {
+                            ResultState.Error(StateContent.NotExist(), e)
+                        }
+                    }
+
+                    else -> {
+                        ResultState.Fixed(StateContent.NotExist())
+                    }
                 }
             }
         }.mapNotNull {

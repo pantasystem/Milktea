@@ -193,7 +193,7 @@ dependencies {
 
     implementation libs.flexbox
 
-    implementation 'com.google.android.gms:play-services-oss-licenses:17.0.0'
+    implementation 'com.google.android.gms:play-services-oss-licenses:17.0.1'
 
     // Swipe refresh
     implementation libs.androidx.swiperefreshlayout
@@ -243,7 +243,7 @@ dependencies {
     testImplementation libs.hilt.android.testing
     kaptTest libs.hilt.compiler
 
-    implementation("com.jakewharton.retrofit:retrofit2-kotlinx-serialization-converter:0.8.0")
+    implementation("com.jakewharton.retrofit:retrofit2-kotlinx-serialization-converter:1.0.0")
 
 
     // Java language implementation
@@ -266,9 +266,9 @@ dependencies {
 //    implementation libs.activity.ktx
     implementation libs.activity.ktx
 
-    debugImplementation 'com.facebook.flipper:flipper:0.163.0'
+    debugImplementation 'com.facebook.flipper:flipper:0.183.0'
     debugImplementation 'com.facebook.soloader:soloader:0.10.4'
-    debugImplementation 'com.facebook.flipper:flipper-network-plugin:0.163.0'
+    debugImplementation 'com.facebook.flipper:flipper-network-plugin:0.183.0'
 
     implementation libs.hilt.work
     kapt libs.androidx.hilt.compiler
@@ -281,6 +281,9 @@ dependencies {
     debugImplementation 'com.squareup.leakcanary:leakcanary-android:2.10'
 
     implementation libs.objectbox.kotlin
+
+    testImplementation "org.mockito.kotlin:mockito-kotlin:4.0.0"
+
 }
 
 kapt {

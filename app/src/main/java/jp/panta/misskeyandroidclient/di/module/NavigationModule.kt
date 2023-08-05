@@ -8,8 +8,8 @@ import jp.panta.misskeyandroidclient.MainNavigationImpl
 import net.pantasystem.milktea.common_navigation.*
 import net.pantasystem.milktea.search.SearchNavigationImpl
 import net.pantasystem.milktea.setting.activities.AccountSettingActivityNavigationImpl
-import net.pantasystem.milktea.user.activity.SearchAndSelectUserNavigationImpl
-import net.pantasystem.milktea.user.activity.UserDetailNavigationImpl
+import net.pantasystem.milktea.user.search.SearchAndSelectUserNavigationImpl
+import net.pantasystem.milktea.user.profile.UserDetailNavigationImpl
 
 @Module
 @InstallIn(ActivityComponent::class)

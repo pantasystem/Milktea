@@ -9,12 +9,14 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.ComposeView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import com.google.android.material.composethemeadapter.MdcTheme
 import dagger.hilt.android.AndroidEntryPoint
+import net.pantasystem.milktea.common_compose.MilkteaStyleConfigApplyAndTheme
+import net.pantasystem.milktea.model.setting.LocalConfigRepository
 import net.pantasystem.milktea.user.UserCardListActionHandler
 import net.pantasystem.milktea.user.compose.UserDetailCardList
 import net.pantasystem.milktea.user.compose.UserDetailCardListAction
 import net.pantasystem.milktea.user.viewmodel.ToggleFollowViewModel
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class SearchUserFragment : Fragment() {
@@ -32,6 +34,8 @@ class SearchUserFragment : Fragment() {
         }
     }
 
+    @Inject
+    internal lateinit var configRepository: LocalConfigRepository
 
     val viewModel: SearchUserViewModel by viewModels()
 
@@ -48,7 +52,7 @@ class SearchUserFragment : Fragment() {
     ): View? {
         return ComposeView(requireContext()).apply {
             setContent {
-                MdcTheme {
+                MilkteaStyleConfigApplyAndTheme(configRepository = configRepository) {
                     val users by viewModel.users.collectAsState()
                     val state by viewModel.searchState.collectAsState()
                     val account by viewModel.currentAccount.collectAsState()

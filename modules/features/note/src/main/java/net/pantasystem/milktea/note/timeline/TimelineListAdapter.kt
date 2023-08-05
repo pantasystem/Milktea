@@ -1,6 +1,7 @@
 package net.pantasystem.milktea.note.timeline
 
 
+import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -14,11 +15,16 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.bumptech.glide.ListPreloader.PreloadModelProvider
+import com.bumptech.glide.RequestBuilder
+import com.bumptech.glide.integration.recyclerview.RecyclerViewPreloader
+import com.bumptech.glide.util.FixedPreloadSizeProvider
 import com.google.android.flexbox.AlignItems
 import com.google.android.flexbox.FlexboxLayoutManager
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import net.pantasystem.milktea.common.glide.GlideApp
 import net.pantasystem.milktea.model.setting.DefaultConfig
 import net.pantasystem.milktea.model.setting.LocalConfigRepository
 import net.pantasystem.milktea.note.R
@@ -33,6 +39,7 @@ import net.pantasystem.milktea.note.view.NoteCardAction
 import net.pantasystem.milktea.note.view.NoteCardActionListenerAdapter
 import net.pantasystem.milktea.note.viewmodel.HasReplyToNoteViewData
 import net.pantasystem.milktea.note.viewmodel.PlaneNoteViewData
+import java.util.Collections
 
 class TimelineListAdapter(
     private val configRepository: LocalConfigRepository,
@@ -40,27 +47,29 @@ class TimelineListAdapter(
     val onRefreshAction: () -> Unit,
     val onReauthenticateAction: () -> Unit,
     val onAction: (NoteCardAction) -> Unit,
-) : ListAdapter<TimelineListItem, TimelineListAdapter.TimelineListItemViewHolderBase>(object : DiffUtil.ItemCallback<TimelineListItem>() {
-    override fun areContentsTheSame(
-        oldItem: TimelineListItem,
-        newItem: TimelineListItem,
-    ): Boolean {
-        if (oldItem is TimelineListItem.Note && newItem is TimelineListItem.Note) {
-            return oldItem.note.id == newItem.note.id
+) : ListAdapter<TimelineListItem, TimelineListAdapter.TimelineListItemViewHolderBase>(
+    object : DiffUtil.ItemCallback<TimelineListItem>() {
+        override fun areContentsTheSame(
+            oldItem: TimelineListItem,
+            newItem: TimelineListItem,
+        ): Boolean {
+            if (oldItem is TimelineListItem.Note && newItem is TimelineListItem.Note) {
+                return oldItem.note.id == newItem.note.id
+            }
+            return oldItem == newItem
         }
-        return oldItem == newItem
-    }
 
-    override fun areItemsTheSame(
-        oldItem: TimelineListItem,
-        newItem: TimelineListItem,
-    ): Boolean {
-        if (oldItem is TimelineListItem.Note && newItem is TimelineListItem.Note) {
-            return oldItem.note.id == newItem.note.id
+        override fun areItemsTheSame(
+            oldItem: TimelineListItem,
+            newItem: TimelineListItem,
+        ): Boolean {
+            if (oldItem is TimelineListItem.Note && newItem is TimelineListItem.Note) {
+                return oldItem.note.id == newItem.note.id
+            }
+            return oldItem == newItem
         }
-        return oldItem == newItem
-    }
-}){
+    },
+) {
 
     val cardActionListener = NoteCardActionListenerAdapter(onAction)
 
@@ -72,7 +81,8 @@ class TimelineListAdapter(
 
     sealed class TimelineListItemViewHolderBase(view: View) : RecyclerView.ViewHolder(view)
 
-    sealed class NoteViewHolderBase<out T: ViewDataBinding>(view: View) : TimelineListItemViewHolderBase(view){
+    sealed class NoteViewHolderBase<out T : ViewDataBinding>(view: View) :
+        TimelineListItemViewHolderBase(view) {
         abstract val binding: T
         abstract val lifecycleOwner: LifecycleOwner
         abstract val reactionCountsView: RecyclerView
@@ -120,18 +130,18 @@ class TimelineListAdapter(
             reactionCountsView.isNestedScrollingEnabled = false
             reactionCountAdapter.submitList(reactionList)
             job = note.reactionCountsViewData.onEach { counts ->
-                if(reactionCountAdapter.note?.id == mCurrentNote?.id) {
+                if (reactionCountAdapter.note?.id == mCurrentNote?.id) {
                     reactionCountsView.itemAnimator?.endAnimations()
                     bindReactionCountVisibility(counts)
                     reactionCountAdapter.submitList(counts)
                 }
             }.flowWithLifecycle(lifecycleOwner.lifecycle).launchIn(lifecycleOwner.lifecycleScope)
         }
-        
+
         private fun bindReactionCountVisibility(reactionCounts: List<ReactionViewData>?) {
-            reactionCountsView.visibility = if(reactionCounts.isNullOrEmpty()){
+            reactionCountsView.visibility = if (reactionCounts.isNullOrEmpty()) {
                 View.GONE
-            }else{
+            } else {
                 View.VISIBLE
             }
         }
@@ -147,7 +157,8 @@ class TimelineListAdapter(
 
     class LoadingViewHolder(view: View) : TimelineListItemViewHolderBase(view)
 
-    class ErrorViewHolder(val binding: ItemTimelineErrorBinding) : TimelineListItemViewHolderBase(binding.root) {
+    class ErrorViewHolder(val binding: ItemTimelineErrorBinding) :
+        TimelineListItemViewHolderBase(binding.root) {
         fun bind(item: TimelineListItem.Error) {
             binding.errorItem = item
             binding.errorView.isVisible = false
@@ -159,13 +170,15 @@ class TimelineListAdapter(
         }
     }
 
-    class EmptyViewHolder(val binding: ItemTimelineEmptyBinding) : TimelineListItemViewHolderBase(binding.root)
+    class EmptyViewHolder(val binding: ItemTimelineEmptyBinding) :
+        TimelineListItemViewHolderBase(binding.root)
 
     enum class ViewHolderType {
         NormalNote, HasReplyToNote, Loading, Empty, Error
     }
 
-    inner class NoteViewHolder(override val binding: ItemNoteBinding): NoteViewHolderBase<ItemNoteBinding>(binding.root){
+    inner class NoteViewHolder(override val binding: ItemNoteBinding) :
+        NoteViewHolderBase<ItemNoteBinding>(binding.root) {
 
         override val lifecycleOwner: LifecycleOwner
             get() = this@TimelineListAdapter.lifecycleOwner
@@ -185,7 +198,8 @@ class TimelineListAdapter(
 
     }
 
-    inner class HasReplyToNoteViewHolder(override val binding: ItemHasReplyToNoteBinding): NoteViewHolderBase<ItemHasReplyToNoteBinding>(binding.root){
+    inner class HasReplyToNoteViewHolder(override val binding: ItemHasReplyToNoteBinding) :
+        NoteViewHolderBase<ItemHasReplyToNoteBinding>(binding.root) {
         override val lifecycleOwner: LifecycleOwner
             get() = this@TimelineListAdapter.lifecycleOwner
 
@@ -196,7 +210,7 @@ class TimelineListAdapter(
             get() = this@TimelineListAdapter.cardActionListener
 
         override fun onBind(note: PlaneNoteViewData) {
-            if(note is HasReplyToNoteViewData){
+            if (note is HasReplyToNoteViewData) {
                 binding.hasReplyToNote = note
 
                 binding.noteCardActionListener = noteCardActionListenerAdapter
@@ -214,9 +228,9 @@ class TimelineListAdapter(
             is TimelineListItem.Error -> ViewHolderType.Error
             TimelineListItem.Loading -> ViewHolderType.Loading
             is TimelineListItem.Note -> {
-                if(item.note is HasReplyToNoteViewData){
+                if (item.note is HasReplyToNoteViewData) {
                     ViewHolderType.HasReplyToNote
-                }else{
+                } else {
                     ViewHolderType.NormalNote
                 }
             }
@@ -228,22 +242,26 @@ class TimelineListAdapter(
 
         val item = getItem(position)
 
-        when(p0) {
+        when (p0) {
 
             is LoadingViewHolder -> {
                 // 何もしない
             }
+
             is HasReplyToNoteViewHolder -> {
                 p0.bind((item as TimelineListItem.Note).note)
             }
+
             is NoteViewHolder -> {
                 p0.bind((item as TimelineListItem.Note).note)
             }
+
             is EmptyViewHolder -> {
                 p0.binding.retryLoadButton.setOnClickListener {
                     onRefreshAction()
                 }
             }
+
             is ErrorViewHolder -> {
                 p0.binding.retryLoadButton.setOnClickListener {
                     onRefreshAction()
@@ -261,37 +279,72 @@ class TimelineListAdapter(
         val config = configRepository.get().getOrElse {
             DefaultConfig.config
         }
-        return when(ViewHolderType.values()[p1]) {
+        return when (ViewHolderType.values()[p1]) {
             ViewHolderType.NormalNote -> {
-                val binding = DataBindingUtil.inflate<ItemNoteBinding>(LayoutInflater.from(p0.context), R.layout.item_note, p0, false)
+                val binding = DataBindingUtil.inflate<ItemNoteBinding>(
+                    LayoutInflater.from(p0.context),
+                    R.layout.item_note,
+                    p0,
+                    false
+                )
                 binding.simpleNote.reactionView.setRecycledViewPool(reactionCounterRecyclerViewPool)
                 binding.simpleNote.urlPreviewList.setRecycledViewPool(urlPreviewListRecyclerViewPool)
-                binding.simpleNote.manyFilePreviewListView.setRecycledViewPool(manyFilePreviewListViewRecyclerViewPool)
+                binding.simpleNote.manyFilePreviewListView.setRecycledViewPool(
+                    manyFilePreviewListViewRecyclerViewPool
+                )
                 NoteFontSizeBinder.from(binding.simpleNote).bind(
                     headerFontSize = config.noteHeaderFontSize,
                     contentFontSize = config.noteContentFontSize,
                 )
                 NoteViewHolder(binding)
             }
+
             ViewHolderType.HasReplyToNote -> {
-                val binding = DataBindingUtil.inflate<ItemHasReplyToNoteBinding>(LayoutInflater.from(p0.context), R.layout.item_has_reply_to_note, p0, false)
+                val binding = DataBindingUtil.inflate<ItemHasReplyToNoteBinding>(
+                    LayoutInflater.from(p0.context),
+                    R.layout.item_has_reply_to_note,
+                    p0,
+                    false
+                )
                 binding.simpleNote.reactionView.setRecycledViewPool(reactionCounterRecyclerViewPool)
                 binding.simpleNote.urlPreviewList.setRecycledViewPool(urlPreviewListRecyclerViewPool)
-                binding.simpleNote.manyFilePreviewListView.setRecycledViewPool(manyFilePreviewListViewRecyclerViewPool)
+                binding.simpleNote.manyFilePreviewListView.setRecycledViewPool(
+                    manyFilePreviewListViewRecyclerViewPool
+                )
                 NoteFontSizeBinder.from(binding.simpleNote).bind(
                     headerFontSize = config.noteHeaderFontSize,
                     contentFontSize = config.noteContentFontSize,
                 )
                 HasReplyToNoteViewHolder(binding)
             }
+
             ViewHolderType.Loading -> {
-                LoadingViewHolder(LayoutInflater.from(p0.context).inflate(R.layout.item_timeline_loading, p0, false))
+                LoadingViewHolder(
+                    LayoutInflater.from(p0.context)
+                        .inflate(R.layout.item_timeline_loading, p0, false)
+                )
             }
+
             ViewHolderType.Empty -> {
-                EmptyViewHolder(DataBindingUtil.inflate(LayoutInflater.from(p0.context), R.layout.item_timeline_empty, p0, false))
+                EmptyViewHolder(
+                    DataBindingUtil.inflate(
+                        LayoutInflater.from(p0.context),
+                        R.layout.item_timeline_empty,
+                        p0,
+                        false
+                    )
+                )
             }
+
             ViewHolderType.Error -> {
-                ErrorViewHolder(DataBindingUtil.inflate(LayoutInflater.from(p0.context), R.layout.item_timeline_error, p0, false))
+                ErrorViewHolder(
+                    DataBindingUtil.inflate(
+                        LayoutInflater.from(p0.context),
+                        R.layout.item_timeline_error,
+                        p0,
+                        false
+                    )
+                )
             }
         }
 
@@ -301,13 +354,14 @@ class TimelineListAdapter(
 
     override fun onViewRecycled(holder: TimelineListItemViewHolderBase) {
         super.onViewRecycled(holder)
-        val simpleNote = when(holder) {
+        val simpleNote = when (holder) {
             is EmptyViewHolder -> return
             is ErrorViewHolder -> return
             is LoadingViewHolder -> return
             is HasReplyToNoteViewHolder -> {
                 holder.binding.simpleNote
             }
+
             is NoteViewHolder -> {
                 holder.binding.simpleNote
             }
@@ -324,7 +378,7 @@ class TimelineListAdapter(
             simpleNote.subNoteMediaPreview.thumbnailBottomLeft,
             simpleNote.subNoteMediaPreview.thumbnailBottomRight,
 
-        )
+            )
         simpleNote.reactionView.itemAnimator?.endAnimations()
 
         imageViews.map {
@@ -336,6 +390,37 @@ class TimelineListAdapter(
         }
     }
 
+
+    inner class AvatarIconPreloadProvider(private val context: Context) : PreloadModelProvider<String> {
+        override fun getPreloadItems(position: Int): MutableList<String> {
+            return when(val item = getItem(position)) {
+                TimelineListItem.Empty -> Collections.emptyList()
+                is TimelineListItem.Error -> Collections.emptyList()
+                TimelineListItem.Loading -> Collections.emptyList()
+                is TimelineListItem.Note -> Collections.singletonList(item.note.avatarUrl)
+            }
+        }
+
+        override fun getPreloadRequestBuilder(item: String): RequestBuilder<*> {
+            return Glide.with(context)
+                .load(item)
+                .override(
+                    avatarIconSize,
+                )
+
+        }
+
+        fun setup(recyclerView: RecyclerView) {
+            val modelProvider = AvatarIconPreloadProvider(context)
+            val sizeProvider = FixedPreloadSizeProvider<String>(modelProvider.avatarIconSize, modelProvider.avatarIconSize)
+            val loader = RecyclerViewPreloader(GlideApp.with(context), modelProvider, sizeProvider, 10)
+            recyclerView.addOnScrollListener(loader)
+        }
+        val avatarIconSize: Int
+            get() {
+                return context.resources.getDimensionPixelSize(R.dimen.note_avatar_icon_size)
+            }
+    }
 
 }
 

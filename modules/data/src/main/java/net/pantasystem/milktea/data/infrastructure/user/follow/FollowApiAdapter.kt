@@ -29,7 +29,7 @@ internal class FollowApiAdapterImpl @Inject constructor(
     override suspend fun follow(userId: User.Id): UserActionResult {
         val account = accountRepository.get(userId.accountId).getOrThrow()
         return when (account.instanceType) {
-            Account.InstanceType.MISSKEY -> {
+            Account.InstanceType.MISSKEY, Account.InstanceType.FIREFISH -> {
                 misskeyAPIProvider.get(account).followUser(
                     RequestUser(userId = userId.id, i = account.token)
                 ).throwIfHasError()
@@ -47,7 +47,7 @@ internal class FollowApiAdapterImpl @Inject constructor(
     override suspend fun unfollow(userId: User.Id): UserActionResult {
         val account = accountRepository.get(userId.accountId).getOrThrow()
         return when (account.instanceType) {
-            Account.InstanceType.MISSKEY -> {
+            Account.InstanceType.MISSKEY, Account.InstanceType.FIREFISH -> {
                 misskeyAPIProvider.get(account)
                     .unFollowUser(RequestUser(userId = userId.id, i = account.token))
                     .throwIfHasError()
@@ -68,7 +68,7 @@ internal class FollowApiAdapterImpl @Inject constructor(
     override suspend fun cancelFollowRequest(userId: User.Id): UserActionResult {
         val account = accountRepository.get(userId.accountId).getOrThrow()
         return when (account.instanceType) {
-            Account.InstanceType.MISSKEY -> {
+            Account.InstanceType.MISSKEY, Account.InstanceType.FIREFISH -> {
                 misskeyAPIProvider.get(account).cancelFollowRequest(
                     CancelFollow(
                         i = account.token,

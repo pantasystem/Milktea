@@ -59,7 +59,7 @@ class OkHttpFileUploaderProvider(
             lock.withLock {
                 val map = instances.toMutableMap()
                 when (account.instanceType) {
-                    Account.InstanceType.MISSKEY -> {
+                    Account.InstanceType.MISSKEY, Account.InstanceType.FIREFISH -> {
                         map[account.accountId] = MisskeyOkHttpDriveFileUploader(
                             context,
                             account,

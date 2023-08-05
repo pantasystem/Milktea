@@ -1,7 +1,13 @@
 package net.pantasystem.milktea.data.infrastructure.channel
 
-import net.pantasystem.milktea.api.misskey.v12.MisskeyAPIV12
-import net.pantasystem.milktea.api.misskey.v12.channel.*
+import net.pantasystem.milktea.api.misskey.MisskeyAPI
+import net.pantasystem.milktea.api.misskey.v12.channel.ChannelDTO
+import net.pantasystem.milktea.api.misskey.v12.channel.CreateChannelDTO
+import net.pantasystem.milktea.api.misskey.v12.channel.FindPageable
+import net.pantasystem.milktea.api.misskey.v12.channel.FollowChannelDTO
+import net.pantasystem.milktea.api.misskey.v12.channel.ShowChannelDTO
+import net.pantasystem.milktea.api.misskey.v12.channel.UnFollowChannelDTO
+import net.pantasystem.milktea.api.misskey.v12.channel.UpdateChannelDTO
 import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.common.throwIfHasError
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
@@ -32,7 +38,7 @@ class ChannelAPIAdapterWebImpl @Inject constructor(
     override suspend fun create(model: CreateChannel): Result<ChannelDTO> {
         return runCancellableCatching {
             val account = accountRepository.get(model.accountId).getOrThrow()
-            (misskeyAPIProvider.get(account) as MisskeyAPIV12).createChannel(
+            (misskeyAPIProvider.get(account)).createChannel(
                 CreateChannelDTO(
                     i = account.token,
                     name = model.name,
@@ -91,7 +97,7 @@ class ChannelAPIAdapterWebImpl @Inject constructor(
     ): Result<List<ChannelDTO>> {
         return runCancellableCatching {
             val account = accountRepository.get(accountId).getOrThrow()
-            val api = misskeyAPIProvider.get(account) as MisskeyAPIV12
+            val api = misskeyAPIProvider.get(account)
             api.followedChannels(FindPageable(
                 i = account.token,
                 sinceId = sinceId?.channelId,
@@ -100,9 +106,9 @@ class ChannelAPIAdapterWebImpl @Inject constructor(
             )).throwIfHasError().body()!!
         }
     }
-    private suspend fun Channel.Id.getAPI(): MisskeyAPIV12 {
+    private suspend fun Channel.Id.getAPI(): MisskeyAPI {
         val account = accountRepository.get(accountId).getOrThrow()
-        return misskeyAPIProvider.get(account) as MisskeyAPIV12
+        return misskeyAPIProvider.get(account)
     }
 
     private suspend fun Channel.Id.getAccount(): Account {

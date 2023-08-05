@@ -53,4 +53,13 @@ sealed interface AppType {
 
         companion object
     }
+
+    data class Firefish(
+        val id: String? = null,
+        override val name: String,
+        override val callbackUrl: String?,
+        val isAuthorized: Boolean? = null,
+        val permission: List<String> = emptyList(),
+        override val secret: String? = null,
+    ) : AppType
 }

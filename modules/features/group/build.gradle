@@ -57,6 +57,7 @@ dependencies {
     implementation project(path: ':modules:app_store')
     implementation project(path: ':modules:common_navigation')
     implementation project(path: ':modules:common_resource')
+    implementation project(path: ':modules:common_compose')
 
     testImplementation libs.junit
     androidTestImplementation libs.androidx.test.ext.junit

@@ -26,7 +26,7 @@ internal class ReportRepositoryImpl @Inject constructor(
         withContext(coroutineDispatcher) {
             val account = getAccount.get(report.userId.accountId)
             when(account.instanceType) {
-                Account.InstanceType.MISSKEY -> {
+                Account.InstanceType.MISSKEY, Account.InstanceType.FIREFISH -> {
                     val api = misskeyAPIProvider.get(account)
 
                     val res = api.report(

@@ -12,18 +12,19 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.ComposeView
 import androidx.lifecycle.lifecycleScope
-import com.google.android.material.composethemeadapter.MdcTheme
 import com.wada811.databinding.dataBinding
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import net.pantasystem.milktea.common.ui.ApplyTheme
+import net.pantasystem.milktea.common_compose.MilkteaStyleConfigApplyAndTheme
 import net.pantasystem.milktea.common_navigation.UserDetailNavigation
 import net.pantasystem.milktea.common_navigation.UserDetailNavigationArgs
 import net.pantasystem.milktea.model.ap.ApResolver
+import net.pantasystem.milktea.model.setting.LocalConfigRepository
 import net.pantasystem.milktea.model.user.User
 import net.pantasystem.milktea.note.NoteDetailActivity
 import net.pantasystem.milktea.search.databinding.ActivitySearchBinding
-import net.pantasystem.milktea.user.activity.UserDetailActivity
+import net.pantasystem.milktea.user.profile.UserDetailActivity
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -40,6 +41,8 @@ class SearchActivity : AppCompatActivity() {
     @Inject
     internal lateinit var userDetailNavigation: UserDetailNavigation
 
+    @Inject
+    internal lateinit var configRepository: LocalConfigRepository
 
     private var mSearchView: SearchView? = null
 
@@ -64,7 +67,7 @@ class SearchActivity : AppCompatActivity() {
         mAcct = intent.getStringExtra(SearchResultViewModel.EXTRA_ACCT)
 
         findViewById<ComposeView>(R.id.composeBase).setContent {
-            MdcTheme {
+            MilkteaStyleConfigApplyAndTheme(configRepository = configRepository) {
                 val uiState by searchViewModel.uiState.collectAsState()
 
                 SearchSuggestionsLayout(

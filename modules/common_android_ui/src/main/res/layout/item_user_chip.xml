@@ -22,14 +22,17 @@
             app:user="@{userViewData.user}"
             app:account="@{userViewData.account}"
             >
-        <ImageView
+        <net.pantasystem.milktea.common.ui.AvatarIconView
                 android:layout_width="25dp"
                 android:layout_height="25dp"
                 tools:src="@drawable/ic_person_black_24dp"
-                app:circleIcon="@{userViewData.user.avatarUrl}"
+                app:imageUrl="@{userViewData.user.avatarUrl}"
+                app:iconShape="circle"
                 tools:ignore="ContentDescription"
                 android:layout_gravity="center_vertical"
-                android:layout_marginEnd="4dp"/>
+                android:layout_marginEnd="4dp"
+                applyShapeFromConfig="@{true}"
+            />
         <TextView
                 android:id="@+id/mainName"
                 android:layout_width="wrap_content"

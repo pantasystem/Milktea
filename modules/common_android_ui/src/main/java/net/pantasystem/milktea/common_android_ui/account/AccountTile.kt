@@ -3,7 +3,14 @@ package net.pantasystem.milktea.common_android_ui.account
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Icon
@@ -25,6 +32,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.rememberAsyncImagePainter
 import net.pantasystem.milktea.common_android_ui.account.viewmodel.AccountInfo
+import net.pantasystem.milktea.common_compose.AvatarIcon
 import net.pantasystem.milktea.common_compose.CustomEmojiText
 
 @Composable
@@ -32,7 +40,7 @@ fun AccountTile(
     modifier: Modifier = Modifier,
     account: AccountInfo,
     onClick: (AccountInfo) -> Unit,
-    onAvatarClick: (AccountInfo) -> Unit
+    onAvatarClick: (AccountInfo) -> Unit,
 ) {
     Surface(
         modifier = modifier.clickable {
@@ -47,16 +55,12 @@ fun AccountTile(
                     horizontal = 16.dp
                 ),
         ) {
-            Image(
-                modifier = Modifier
-                    .size(56.dp)
-                    .clip(CircleShape)
-                    .clickable {
-                        onAvatarClick(account)
-                    },
-                painter = rememberAsyncImagePainter(account.user?.avatarUrl),
-                contentDescription = null,
-                contentScale = ContentScale.Crop
+            AvatarIcon(
+                url = account.user?.avatarUrl,
+                size = 56.dp,
+                onAvatarClick = {
+                    onAvatarClick(account)
+                },
             )
 
             Spacer(modifier = Modifier.width(8.dp))

@@ -32,7 +32,7 @@ class ApResolverRepositoryImpl @Inject constructor(
         withContext(ioDispatcher) {
             val account = getAccount.get(accountId)
             when(account.instanceType) {
-                Account.InstanceType.MISSKEY -> {
+                Account.InstanceType.MISSKEY, Account.InstanceType.FIREFISH -> {
                     val result = apiProvider.get(account).resolve(ApResolveRequest(i = account.token, uri = uri))
                         .throwIfHasError()
                         .body()!!

@@ -20,19 +20,23 @@ fun SharedPreferences.getPrefTypes(keys: Set<Keys> = Keys.allKeys): Map<Keys, Pr
     }.map {
         strKeys[it.key]?.let { key ->
             key to it.value?.let { value ->
-                when(value::class) {
+                when (value::class) {
                     Boolean::class -> {
                         PrefType.BoolPref(value as Boolean)
                     }
+
                     String::class -> {
                         PrefType.StrPref(value as String)
                     }
+
                     Int::class -> {
                         PrefType.IntPref(value as Int)
                     }
+
                     Float::class -> {
                         PrefType.FloatPref(value as Float)
                     }
+
                     else -> null
                 }
             }
@@ -50,9 +54,11 @@ fun Config.Companion.from(map: Map<Keys, PrefType?>): Config {
                     0 -> {
                         ReactionPickerType.LIST
                     }
+
                     1 -> {
                         ReactionPickerType.SIMPLE
                     }
+
                     else -> {
                         DefaultConfig.config.reactionPickerType
                     }
@@ -118,9 +124,7 @@ fun Config.Companion.from(map: Map<Keys, PrefType?>): Config {
         isVisibleInstanceUrlInToolbar = map.getValue<PrefType.BoolPref>(
             Keys.IsVisibleInstanceUrlInToolbar
         )?.value ?: DefaultConfig.config.isVisibleInstanceUrlInToolbar,
-        isHideMediaWhenMobileNetwork = map.getValue<PrefType.BoolPref>(
-            Keys.IsHideMediaWhenMobileNetwork
-        )?.value ?: DefaultConfig.config.isHideMediaWhenMobileNetwork,
+
         noteHeaderFontSize = map.getValue<PrefType.FloatPref>(
             Keys.NoteHeaderFontSize
         )?.value ?: DefaultConfig.config.noteHeaderFontSize,
@@ -139,6 +143,16 @@ fun Config.Companion.from(map: Map<Keys, PrefType?>): Config {
         emojiPickerEmojiDisplaySize = map.getValue<PrefType.IntPref>(
             Keys.EmojiPickerEmojiDisplaySize
         )?.value ?: DefaultConfig.config.emojiPickerEmojiDisplaySize,
+        avatarIconShapeType = map.getValue<PrefType.IntPref>(
+            Keys.AvatarIconShapeType
+        )?.value?.let { value ->
+            AvatarIconShapeType.values().find { it.value == value }
+        } ?: DefaultConfig.config.avatarIconShapeType,
+        mediaDisplayMode = map.getValue<PrefType.IntPref>(
+            Keys.MediaDisplayMode
+        )?.value?.let { value ->
+            MediaDisplayMode.values().find { it.value == value }
+        } ?: DefaultConfig.config.mediaDisplayMode,
     )
 }
 
@@ -151,21 +165,27 @@ fun Config.pref(key: Keys): PrefType {
         Keys.BackgroundImage -> {
             PrefType.StrPref(backgroundImagePath)
         }
+
         Keys.ClassicUI -> {
             PrefType.BoolPref(isClassicUI)
         }
+
         Keys.IsPostButtonToBottom -> {
             PrefType.BoolPref(isPostButtonAtTheBottom)
         }
+
         Keys.IsSimpleEditorEnabled -> {
             PrefType.BoolPref(isSimpleEditorEnabled)
         }
+
         Keys.IsUserNameDefault -> {
             PrefType.BoolPref(isUserNameDefault)
         }
+
         Keys.NoteLimitHeight -> {
             PrefType.IntPref(noteExpandedHeightSize)
         }
+
         Keys.ReactionPickerType -> {
             PrefType.IntPref(
                 when (reactionPickerType) {
@@ -178,80 +198,109 @@ fun Config.pref(key: Keys): PrefType {
         Keys.ThemeType -> {
             PrefType.IntPref(theme.toInt())
         }
+
         Keys.IsIncludeLocalRenotes -> {
             PrefType.BoolPref(isIncludeLocalRenotes)
         }
+
         Keys.IsIncludeMyRenotes -> {
             PrefType.BoolPref(isIncludeMyRenotes)
         }
+
         Keys.IsIncludeRenotedMyNotes -> {
             PrefType.BoolPref(isIncludeRenotedMyNotes)
         }
+
         Keys.SurfaceColorOpacity -> {
             PrefType.IntPref(surfaceColorOpacity)
         }
+
         Keys.IsEnableTimelineScrollAnimation -> {
             PrefType.BoolPref(isEnableTimelineScrollAnimation)
         }
+
         Keys.IsCrashlyticsCollectionEnabled -> {
             PrefType.BoolPref(isCrashlyticsCollectionEnabled.isEnable)
         }
+
         Keys.IsConfirmedCrashlyticsCollection -> {
             PrefType.BoolPref(isCrashlyticsCollectionEnabled.isConfirmed)
         }
+
         Keys.IsAnalyticsCollectionEnabled -> {
             PrefType.BoolPref(isAnalyticsCollectionEnabled.isEnabled)
         }
+
         Keys.IsConfirmedAnalyticsCollection -> {
             PrefType.BoolPref(isAnalyticsCollectionEnabled.isConfirmed)
         }
+
         Keys.IsConfirmedPostNotification -> {
             PrefType.BoolPref(isConfirmedPostNotification)
         }
+
         Keys.IsEnableInstanceTicker -> {
             PrefType.BoolPref(isEnableInstanceTicker)
         }
+
         Keys.IsDriveUsingGridView -> {
             PrefType.BoolPref(isDriveUsingGridView)
         }
+
         Keys.IsEnableNotificationSound -> {
             PrefType.BoolPref(isEnableNotificationSound)
         }
+
         Keys.IsStopNoteCaptureWhenBackground -> {
             PrefType.BoolPref(isStopNoteCaptureWhenBackground)
         }
+
         Keys.IsStopStreamingApiWhenBackground -> {
             PrefType.BoolPref(isStopStreamingApiWhenBackground)
         }
+
         Keys.IsEnableStreamingAPIAndNoteCapture -> {
             PrefType.BoolPref(isEnableStreamingAPIAndNoteCapture)
         }
+
         Keys.IsEnableNoteDivider -> {
             PrefType.BoolPref(isEnableNoteDivider)
         }
+
         Keys.IsVisibleInstanceUrlInToolbar -> {
             PrefType.BoolPref(isVisibleInstanceUrlInToolbar)
         }
-        Keys.IsHideMediaWhenMobileNetwork -> {
-            PrefType.BoolPref(isHideMediaWhenMobileNetwork)
-        }
+
         Keys.NoteContentFontSize -> {
             PrefType.FloatPref(noteContentFontSize)
         }
+
         Keys.NoteHeaderFontSize -> {
             PrefType.FloatPref(noteHeaderFontSize)
         }
+
         Keys.IsDisplayTimestampsAsAbsoluteDates -> {
             PrefType.BoolPref(isDisplayTimestampsAsAbsoluteDates)
         }
+
         Keys.NoteReactionCounterFontSize -> {
             PrefType.FloatPref(noteReactionCounterFontSize)
         }
+
         Keys.NoteCustomEmojiScaleSizeInText -> {
             PrefType.FloatPref(noteCustomEmojiScaleSizeInText)
         }
+
         Keys.EmojiPickerEmojiDisplaySize -> {
             PrefType.IntPref(emojiPickerEmojiDisplaySize)
+        }
+
+        Keys.AvatarIconShapeType -> {
+            PrefType.IntPref(avatarIconShapeType.value)
+        }
+
+        Keys.MediaDisplayMode -> {
+            PrefType.IntPref(mediaDisplayMode.value)
         }
     }
 }

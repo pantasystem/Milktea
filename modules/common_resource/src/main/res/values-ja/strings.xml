@@ -463,6 +463,8 @@
     <string name="donation">寄付</string>
     <string name="privacy_policy">プライバシーポリシー</string>
     <string name="terms_of_service">利用規約</string>
+    <string name="settings_display_icons_as_squares">アイコンを四角形で表示</string>
+
 
 
     <!-- Authorization機能 -->
@@ -609,6 +611,14 @@
     <string name="settings_note_cache">ノートのキャッシュ</string>
     <string name="settings_custom_emoji_cache">カスタム絵文字のキャッシュ</string>
     <string name="move_files_here">ここにファイルを移動</string>
+    <string name="reaction_acceptance_all">全て</string>
+    <string name="reaction_acceptance_like_only_for_remote">全て (リモートはいいねのみ)</string>
+    <string name="reaction_acceptance_non_sensitive_only">非センシティブのみ (リモートはいいねのみ)</string>
+    <string name="reaction_acceptance_non_sensitive_only_likes_from_remote">いいねのみ (リモートはいいねのみ)</string>
+    <string name="reaction_acceptance_only_likes">いいねのみ</string>
+    <string name="reaction_acceptance">リアクションの受け入れ</string>
+    <string name="media_display_mode_default">デフォルト</string>
+    <string name="media_display_mode_always">常にメディアを非表示</string>
     <!-- User -->
 
 

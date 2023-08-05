@@ -10,9 +10,10 @@ import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.common.ResultState
 import net.pantasystem.milktea.common.StateContent
 import net.pantasystem.milktea.common.asLoadingStateFlow
+import net.pantasystem.milktea.common.initialState
 import net.pantasystem.milktea.model.account.AccountRepository
+import net.pantasystem.milktea.model.emoji.CustomEmojiRepository
 import net.pantasystem.milktea.model.emoji.Emoji
-import net.pantasystem.milktea.model.instance.MetaRepository
 import net.pantasystem.milktea.model.notes.Note
 import net.pantasystem.milktea.model.notes.NoteRepository
 import net.pantasystem.milktea.model.notes.reaction.Reaction
@@ -27,9 +28,9 @@ data class RemoteReaction(
 
 @HiltViewModel
 class RemoteReactionEmojiSuggestionViewModel @Inject constructor(
-    val metaRepository: MetaRepository,
     val accountRepository: AccountRepository,
     val noteRepository: NoteRepository,
+    val customEmojiRepository: CustomEmojiRepository,
     val loggerFactory: Logger.Factory,
     val toggleReactionUseCase: ToggleReactionUseCase,
 ) : ViewModel() {
@@ -48,15 +49,13 @@ class RemoteReactionEmojiSuggestionViewModel @Inject constructor(
         } else {
             suspend {
                 val account = accountRepository.get(remoteReaction.currentAccountId).getOrThrow()
-                metaRepository.find(account.normalizedInstanceUri).getOrThrow().emojis?.filter {
+                customEmojiRepository.findBy(account.getHost()).getOrThrow().filter {
                     it.name == name
                 }
             }.asLoadingStateFlow()
         }
     }.stateIn(
-        viewModelScope, SharingStarted.Lazily, ResultState.Loading(
-            StateContent.NotExist()
-        )
+        viewModelScope, SharingStarted.Lazily, ResultState.initialState()
     )
 
     fun setReaction(accountId: Long, reaction: String, noteId: String) {

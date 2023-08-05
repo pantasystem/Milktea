@@ -64,7 +64,7 @@ class SignUpViewModel @Inject constructor(
     }.stateIn(
         viewModelScope,
         SharingStarted.WhileSubscribed(5_000),
-        ResultState.Loading(StateContent.NotExist())
+        ResultState.initialState()
     )
 
     val uiState = combine(
@@ -109,7 +109,7 @@ class SignUpViewModel @Inject constructor(
 data class SignUpUiState(
     val keyword: String = "",
     val selectedUrl: String? = "misskey.io",
-    val instanceInfo: ResultState<InstanceInfoType> = ResultState.Loading(StateContent.NotExist()),
+    val instanceInfo: ResultState<InstanceInfoType> = ResultState.initialState(),
     val instancesInfosResponse: List<SimpleInstanceInfo> = emptyList(),
 ) {
 

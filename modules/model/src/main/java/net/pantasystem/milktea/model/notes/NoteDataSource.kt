@@ -5,19 +5,6 @@ import net.pantasystem.milktea.model.AddResult
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.user.User
 
-data class NoteDataSourceState(
-    val map: Map<Note.Id, Note>,
-) {
-    fun findIn(ids: List<Note.Id>): List<Note> {
-        return ids.mapNotNull {
-            map[it]
-        }
-    }
-
-    fun getOrNull(id: Note.Id): Note? {
-        return map[id]
-    }
-}
 
 /**
  * キャッシュやデータベースの実装の差をなくすためのRepository
@@ -50,6 +37,8 @@ interface NoteDataSource {
     @Throws(NoteNotFoundException::class)
     suspend fun get(noteId: Note.Id): Result<Note>
 
+    suspend fun getWithState(noteId: Note.Id): Result<NoteResult>
+
     suspend fun findByReplyId(id: Note.Id): Result<List<Note>>
 
     suspend fun exists(noteId: Note.Id): Boolean
@@ -61,14 +50,6 @@ interface NoteDataSource {
      * 次からgetなどの関数にアクセスすると、NoteDeletedExceptionの例外が投げられる
      */
     suspend fun delete(noteId: Note.Id): Result<Boolean>
-
-    /**
-     * @param noteId 削除対象のNoteのId
-     * キャッシュ上のノートを削除する。
-     * これを実行するとキャッシュ削除フラグが立ち、
-     * 次からgetなどの関数にアクセスすると、NoteDeletedExceptionの例外が投げられる
-     */
-    suspend fun remove(noteId: Note.Id): Result<Boolean>
 
     suspend fun add(note: Note): Result<AddResult>
 

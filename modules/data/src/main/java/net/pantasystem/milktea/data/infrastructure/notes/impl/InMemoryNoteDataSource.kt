@@ -14,10 +14,9 @@ import net.pantasystem.milktea.data.infrastructure.MemoryCacheCleaner
 import net.pantasystem.milktea.model.AddResult
 import net.pantasystem.milktea.model.notes.Note
 import net.pantasystem.milktea.model.notes.NoteDataSource
-import net.pantasystem.milktea.model.notes.NoteDataSourceState
 import net.pantasystem.milktea.model.notes.NoteDeletedException
 import net.pantasystem.milktea.model.notes.NoteNotFoundException
-import net.pantasystem.milktea.model.notes.NoteRemovedException
+import net.pantasystem.milktea.model.notes.NoteResult
 import net.pantasystem.milktea.model.notes.NoteThreadContext
 import net.pantasystem.milktea.model.user.User
 import javax.inject.Inject
@@ -37,12 +36,11 @@ class InMemoryNoteDataSource @Inject constructor(
     private val _state = MutableStateFlow(NoteDataSourceState(emptyMap()))
 
     private var deleteNoteIds = mutableSetOf<Note.Id>()
-    private var removedNoteIds = mutableSetOf<Note.Id>()
 
     init {
         addEventListener {
             _state.update {
-                it.copy(notes)
+                it.copy(map = notes)
             }
         }
         memoryCacheCleaner.register(this)
@@ -59,9 +57,6 @@ class InMemoryNoteDataSource @Inject constructor(
         mutex.withLock{
             if (deleteNoteIds.contains(noteId)) {
                 throw NoteDeletedException(noteId)
-            }
-            if (removedNoteIds.contains(noteId)) {
-                throw NoteRemovedException(noteId)
             }
             notes[noteId]
                 ?: throw NoteNotFoundException(noteId)
@@ -100,14 +95,6 @@ class InMemoryNoteDataSource @Inject constructor(
         return notes[noteId] != null
     }
 
-    override suspend fun remove(noteId: Note.Id): Result<Boolean> = runCancellableCatching {
-        mutex.withLock{
-            val n = this.notes[noteId]
-            notes = notes - noteId
-            removedNoteIds.add(noteId)
-            n != null
-        }
-    }
     /**
      * @param noteId 削除するNoteのid
      * @return 実際に削除されるとtrue、そもそも存在していなかった場合にはfalseが返されます
@@ -221,4 +208,29 @@ class InMemoryNoteDataSource @Inject constructor(
         return Result.success(notes.size.toLong())
     }
 
+    override suspend fun getWithState(noteId: Note.Id): Result<NoteResult> = runCancellableCatching {
+        if (deleteNoteIds.contains(noteId)) {
+            return@runCancellableCatching NoteResult.Deleted
+        }
+
+        when(val note = notes[noteId]) {
+            null -> NoteResult.NotFound
+            else -> NoteResult.Success(note)
+        }
+    }
+
+}
+
+data class NoteDataSourceState(
+    val map: Map<Note.Id, Note>,
+) {
+    fun findIn(ids: List<Note.Id>): List<Note> {
+        return ids.mapNotNull {
+            map[it]
+        }
+    }
+
+    fun getOrNull(id: Note.Id): Note? {
+        return map[id]
+    }
 }

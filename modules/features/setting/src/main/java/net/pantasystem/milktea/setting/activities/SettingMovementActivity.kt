@@ -5,7 +5,10 @@ import android.util.Log
 import android.view.MenuItem
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
@@ -13,9 +16,12 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import com.google.android.material.composethemeadapter.MdcTheme
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
@@ -29,6 +35,7 @@ import net.pantasystem.milktea.app_store.setting.SettingStore
 import net.pantasystem.milktea.common.ui.ApplyTheme
 import net.pantasystem.milktea.model.setting.DefaultConfig
 import net.pantasystem.milktea.model.setting.LocalConfigRepository
+import net.pantasystem.milktea.model.setting.MediaDisplayMode
 import net.pantasystem.milktea.model.setting.RememberVisibility
 import net.pantasystem.milktea.setting.R
 import net.pantasystem.milktea.setting.SettingSection
@@ -202,15 +209,40 @@ class SettingMovementActivity : AppCompatActivity() {
                             }
                         }
                         SettingSection(title = stringResource(id = R.string.media)) {
-                            SettingSwitchTile(
-                                checked = currentConfigState.isHideMediaWhenMobileNetwork,
-                                onChanged = {
-                                    currentConfigState = currentConfigState.copy(isHideMediaWhenMobileNetwork = it)
+                            Box(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp)) {
+                                var isVisibleDropdown by remember {
+                                    mutableStateOf(false)
                                 }
-                            ) {
-                                Text(stringResource(id = R.string.settings_hide_media_when_mobile_network))
+                                TextButton(
+                                    onClick = { isVisibleDropdown = true },
+                                    Modifier.fillMaxWidth()
+                                ) {
+                                    Row(
+                                        Modifier.fillMaxWidth(),
+                                        verticalAlignment = Alignment.CenterVertically,
+                                        horizontalArrangement = Arrangement.SpaceBetween,
+                                    ) {
+                                        Text(stringFromDisplayMode(displayMode = currentConfigState.mediaDisplayMode))
+                                        Icon(Icons.Default.KeyboardArrowDown, contentDescription = null)
+                                    }
+                                }
+                                DropdownMenu(
+                                    expanded = isVisibleDropdown,
+                                    onDismissRequest = { isVisibleDropdown = false },
+                                    modifier = Modifier.fillMaxWidth()
+                                ) {
+                                    MediaDisplayMode.values().forEach {
+                                        DropdownMenuItem(onClick = {
+                                            currentConfigState = currentConfigState.copy(mediaDisplayMode = it)
+                                            isVisibleDropdown = false
+                                        }) {
+                                            Text(stringFromDisplayMode(displayMode = it))
+                                        }
+                                    }
+                                }
                             }
                         }
+
                     }
 
                 }
@@ -232,5 +264,14 @@ class SettingMovementActivity : AppCompatActivity() {
             .flatMapLatest {
                 localConfigRepository.observeRememberVisibility(it.accountId)
             }
+    }
+}
+
+@Composable
+private fun stringFromDisplayMode(displayMode: MediaDisplayMode): String {
+    return when(displayMode) {
+        MediaDisplayMode.AUTO -> stringResource(R.string.media_display_mode_default)
+        MediaDisplayMode.ALWAYS_HIDE -> stringResource(id = R.string.media_display_mode_always)
+        MediaDisplayMode.ALWAYS_HIDE_WHEN_MOBILE_NETWORK -> stringResource(id = R.string.settings_hide_media_when_mobile_network)
     }
 }

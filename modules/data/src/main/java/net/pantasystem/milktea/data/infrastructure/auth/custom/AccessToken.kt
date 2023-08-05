@@ -35,6 +35,12 @@ sealed interface AccessToken {
         val createdAt: Long,
         val account: MastodonAccountDTO
     ) : AccessToken
+
+    data class Firefish(
+        var appSecret: String,
+        override val accessToken: String,
+        val user: UserDTO
+    ) : AccessToken
 }
 
 
@@ -63,5 +69,13 @@ fun MastodonAccessToken.toPleromaModel(account: MastodonAccountDTO): AccessToken
         createdAt = createdAt,
         scope = scope,
         account = account
+    )
+}
+
+fun MisskeyAccessToken.toFirefishModel(appSecret: String): AccessToken.Firefish {
+    return AccessToken.Firefish(
+        accessToken = accessToken,
+        user = user,
+        appSecret = appSecret
     )
 }

@@ -5,7 +5,11 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.sync.Mutex
 import net.pantasystem.milktea.common.PageableState
 import net.pantasystem.milktea.common.StateContent
-import net.pantasystem.milktea.common.paginator.*
+import net.pantasystem.milktea.common.paginator.EntityConverter
+import net.pantasystem.milktea.common.paginator.IdGetter
+import net.pantasystem.milktea.common.paginator.IdPreviousLoader
+import net.pantasystem.milktea.common.paginator.PaginationState
+import net.pantasystem.milktea.common.paginator.StateLocker
 import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.data.api.mastodon.MastodonAPIProvider
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
@@ -56,7 +60,7 @@ class NotificationStoreImpl(
     override suspend fun loadPrevious(state: PageableState<List<NotificationAndNextId>>, id: String?): Result<List<NotificationItem>> = runCancellableCatching {
         val account = getAccount()
         when(account.instanceType) {
-            Account.InstanceType.MISSKEY -> {
+            Account.InstanceType.MISSKEY, Account.InstanceType.FIREFISH -> {
                 MisskeyNotificationEntityLoader(
                     account = account,
                     misskeyAPIProvider = misskeyAPIProvider,

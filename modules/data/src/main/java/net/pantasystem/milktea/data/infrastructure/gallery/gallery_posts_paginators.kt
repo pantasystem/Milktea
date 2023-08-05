@@ -5,7 +5,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
 import net.pantasystem.milktea.api.misskey.I
 import net.pantasystem.milktea.api.misskey.v12_75_0.GetPosts
-import net.pantasystem.milktea.api.misskey.v12_75_0.MisskeyAPIV1275
 import net.pantasystem.milktea.common.PageableState
 import net.pantasystem.milktea.common.StateContent
 import net.pantasystem.milktea.common.paginator.*
@@ -17,7 +16,6 @@ import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.page.Pageable
 import net.pantasystem.milktea.model.gallery.GalleryDataSource
 import net.pantasystem.milktea.model.gallery.GalleryPost
-import net.pantasystem.milktea.model.instance.IllegalVersionException
 import retrofit2.Response
 import net.pantasystem.milktea.api.misskey.v12_75_0.GalleryPost as GalleryPostDTO
 
@@ -113,8 +111,7 @@ class GalleryPostsLoader(
         untilId: String? = null
     ): suspend () -> Response<List<GalleryPostDTO>> {
         val i = getAccount.invoke().token
-        val api = apiProvider.get(getAccount.invoke().normalizedInstanceUri) as? MisskeyAPIV1275
-            ?: throw IllegalVersionException()
+        val api = apiProvider.get(getAccount.invoke().normalizedInstanceUri)
         when (pageable) {
             is Pageable.Gallery.MyPosts -> {
                 return {

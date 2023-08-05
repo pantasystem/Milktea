@@ -30,7 +30,7 @@ class HashtagRepositoryImpl @Inject constructor(
         withContext(ioDispatcher) {
             val account = accountRepository.get(accountId).getOrThrow()
             when (account.instanceType) {
-                Account.InstanceType.MISSKEY -> {
+                Account.InstanceType.MISSKEY, Account.InstanceType.FIREFISH -> {
                     misskeyAPIProvider.get(account).searchHashtag(
                         SearchHashtagRequest(
                             query = query,
@@ -58,7 +58,7 @@ class HashtagRepositoryImpl @Inject constructor(
         withContext(ioDispatcher) {
             val account = accountRepository.get(accountId).getOrThrow()
             when(account.instanceType) {
-                Account.InstanceType.MISSKEY -> {
+                Account.InstanceType.MISSKEY, Account.InstanceType.FIREFISH -> {
                     val body = requireNotNull(
                         misskeyAPIProvider.get(account).getTrendingHashtags(EmptyRequest)
                             .throwIfHasError()

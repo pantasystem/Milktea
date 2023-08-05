@@ -70,7 +70,7 @@ class NoteCaptureAPIImpl(
         lock.withLock {
             val listeners = noteIdListenMap.getOrNew(noteId)
             if (noteIdListenMap.isEmpty()) {
-                socket.addMessageEventListener(this@NoteCaptureAPIImpl)
+                socket.addMessageEventListener(true,this@NoteCaptureAPIImpl)
             }
             if (listeners.isEmpty()) {
                 if (!sendSub(noteId)) {

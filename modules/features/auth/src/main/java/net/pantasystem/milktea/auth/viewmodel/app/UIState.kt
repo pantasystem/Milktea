@@ -60,6 +60,11 @@ sealed interface InstanceType {
         val instance: MastodonInstanceInfo,
         override val softwareType: NodeInfo.SoftwareType?
     ) : InstanceType
+
+    data class Firefish(
+        val instance: Meta,
+        override val softwareType: NodeInfo.SoftwareType.Firefish?
+    ) : InstanceType
 }
 
 sealed interface GenerateTokenResult {

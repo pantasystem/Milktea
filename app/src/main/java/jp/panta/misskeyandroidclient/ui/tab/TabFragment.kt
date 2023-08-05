@@ -25,7 +25,7 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import net.pantasystem.milktea.app_store.account.AccountStore
-import net.pantasystem.milktea.common.glide.GlideApp
+import net.pantasystem.milktea.common.ui.AvatarIconView.Companion.setShape
 import net.pantasystem.milktea.common.ui.ToolbarSetter
 import net.pantasystem.milktea.common_android_ui.PageableFragmentFactory
 import net.pantasystem.milktea.model.account.page.Page
@@ -111,10 +111,7 @@ class TabFragment : Fragment(R.layout.fragment_tab) {
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.RESUMED) {
                 mTabViewModel.currentUser.filterNotNull().collect {
-                    GlideApp.with(binding.currentAccountView)
-                        .load(it.avatarUrl)
-                        .circleCrop()
-                        .into(binding.currentAccountView)
+                    binding.currentAccountView.setImageUrl(it.avatarUrl)
                 }
             }
         }
@@ -129,6 +126,13 @@ class TabFragment : Fragment(R.layout.fragment_tab) {
                     binding.currentInstanceHostView.text = it.host
                 }
             }
+        }.flowWithLifecycle(
+            viewLifecycleOwner.lifecycle,
+            Lifecycle.State.RESUMED
+        ).launchIn(viewLifecycleOwner.lifecycleScope)
+
+        mTabViewModel.avatarIconShapeType.onEach {
+            binding.currentAccountView.setShape(it.value)
         }.flowWithLifecycle(
             viewLifecycleOwner.lifecycle,
             Lifecycle.State.RESUMED

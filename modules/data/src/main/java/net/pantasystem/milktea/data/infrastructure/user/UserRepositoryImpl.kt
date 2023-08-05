@@ -1,41 +1,24 @@
 package net.pantasystem.milktea.data.infrastructure.user
 
 
-import kotlinx.coroutines.*
-import net.pantasystem.milktea.api.misskey.users.*
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.withContext
 import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.common.runCancellableCatching
-import net.pantasystem.milktea.common.throwIfHasError
 import net.pantasystem.milktea.common_android.hilt.IODispatcher
-import net.pantasystem.milktea.data.api.mastodon.MastodonAPIProvider
-import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
-import net.pantasystem.milktea.data.converters.UserDTOEntityConverter
-import net.pantasystem.milktea.data.infrastructure.notes.reaction.impl.history.ReactionHistoryDao
-import net.pantasystem.milktea.data.infrastructure.toUserRelated
-import net.pantasystem.milktea.model.account.Account
-import net.pantasystem.milktea.model.account.AccountRepository
-import net.pantasystem.milktea.model.drive.FilePropertyDataSource
 import net.pantasystem.milktea.model.user.User
 import net.pantasystem.milktea.model.user.UserDataSource
 import net.pantasystem.milktea.model.user.UserNotFoundException
 import net.pantasystem.milktea.model.user.UserRepository
-import net.pantasystem.milktea.model.user.query.FindUsersFromFrequentlyReactionUsers
 import net.pantasystem.milktea.model.user.query.FindUsersQuery
-import net.pantasystem.milktea.model.user.query.FindUsersQuery4Mastodon
-import net.pantasystem.milktea.model.user.query.FindUsersQuery4Misskey
 import javax.inject.Inject
 
-@Suppress("BlockingMethodInNonBlockingContext")
 internal class UserRepositoryImpl @Inject constructor(
-    val userDataSource: UserDataSource,
-    val filePropertyDataSource: FilePropertyDataSource,
-    val accountRepository: AccountRepository,
-    val misskeyAPIProvider: MisskeyAPIProvider,
-    val loggerFactory: Logger.Factory,
-    val userApiAdapter: UserApiAdapter,
-    private val mastodonAPIProvider: MastodonAPIProvider,
-    val userDTOEntityConverter: UserDTOEntityConverter,
-    private val reactionHistoryDao: ReactionHistoryDao,
+    private val userDataSource: UserDataSource,
+    private val loggerFactory: Logger.Factory,
+    private val userApiAdapter: UserApiAdapter,
+    private val userSuggestionsApiAdapter: UserSuggestionsApiAdapter,
     @IODispatcher val ioDispatcher: CoroutineDispatcher,
 ) : UserRepository {
     private val logger: Logger by lazy {
@@ -59,7 +42,7 @@ internal class UserRepositoryImpl @Inject constructor(
 
             if (localResult.getOrNull() == null) {
                 val user = userApiAdapter.show(userId, detail)
-                val result = userDataSource.add(user)
+                val result = userDataSource.add(user).getOrThrow()
                 logger.debug("add result: $result")
                 return@withContext userDataSource.get(userId).getOrThrow()
             }
@@ -85,31 +68,11 @@ internal class UserRepositoryImpl @Inject constructor(
         if (local != null) {
             return@withContext local
         }
-        val account = accountRepository.get(accountId).getOrThrow()
-        val misskeyAPI = misskeyAPIProvider.get(account.normalizedInstanceUri)
-        val res = misskeyAPI.showUser(
-            RequestUser(
-                i = account.token,
-                userName = userName,
-                host = host,
-                detail = detail
-            )
-        )
-        logger.debug("res:$res")
-        res.throwIfHasError()
+        val user = userApiAdapter.showByUserName(accountId, userName, host, detail).also {
+            userDataSource.add(it)
 
-        res.body()?.let {
-            val user = userDTOEntityConverter.convert(account, it, detail)
-            userDataSource.add(user)
-            return@withContext userDataSource.get(user.id).getOrThrow()
         }
-
-        throw UserNotFoundException(
-            null,
-            userName = userName,
-            host = host
-        )
-
+        userDataSource.get(user.id).getOrThrow()
     }
 
 
@@ -119,24 +82,8 @@ internal class UserRepositoryImpl @Inject constructor(
         host: String?
     ) = runCancellableCatching<Unit> {
         withContext(ioDispatcher) {
-            val ac = accountRepository.get(accountId).getOrThrow()
-
-            when(val result = userApiAdapter.search(accountId, userName, host)) {
-                is SearchResult.Mastodon -> {
-                    userDataSource.addAll(
-                        result.users.map {
-                            it.toModel(ac)
-                        }
-                    )
-                }
-                is SearchResult.Misskey -> {
-                    result.users.forEach {
-                        userDTOEntityConverter.convert(ac, it, true).also { u ->
-                            userDataSource.add(u)
-                        }
-                    }
-                }
-            }
+            val users = userApiAdapter.search(accountId, userName, host)
+            userDataSource.addAll(users).getOrThrow()
         }
     }
 
@@ -154,51 +101,9 @@ internal class UserRepositoryImpl @Inject constructor(
 
     override suspend fun findUsers(accountId: Long, query: FindUsersQuery): List<User> {
         return withContext(ioDispatcher) {
-            val account = accountRepository.get(accountId).getOrThrow()
-            when(query) {
-                is FindUsersQuery4Mastodon.SuggestUsers -> {
-                    val api = mastodonAPIProvider.get(account)
-                    val body = requireNotNull(api.getSuggestionUsers(
-                        limit = query.limit
-                    ).throwIfHasError().body())
-                    val accounts = body.map {
-                        it.account
-                    }
-                    val relationships = requireNotNull(
-                        api.getAccountRelationships(ids = accounts.map { it.id })
-                            .throwIfHasError()
-                            .body()
-                    ).let { list ->
-                        list.associateBy {
-                            it.id
-                        }
-                    }
-                    val models = accounts.map {
-                        it.toModel(account, relationships[it.id]?.toUserRelated())
-                    }
-                    userDataSource.addAll(models).getOrThrow()
-                    models
-                }
-                is FindUsersQuery4Misskey -> {
-                    val request = RequestUser.from(query, account.token)
-                    val res = misskeyAPIProvider.get(account).getUsers(request)
-                        .throwIfHasError()
-                    res.body()?.map {
-                        userDTOEntityConverter.convert(account, it, true)
-                    }?.onEach {
-                        userDataSource.add(it)
-                    } ?: emptyList()
-                }
-                is FindUsersFromFrequentlyReactionUsers -> {
-                    val userIds = reactionHistoryDao.findFrequentlyReactionUserAndUnFollowed(
-                        accountId = accountId,
-                        limit = 20,
-                    ).map {
-                        it.targetUserId
-                    }
-                    userDataSource.getIn(accountId, userIds).getOrThrow()
-                }
-            }
+            val result = userSuggestionsApiAdapter.showSuggestions(accountId, query)
+            userDataSource.addAll(result).getOrThrow()
+            result
         }
     }
 
@@ -206,7 +111,7 @@ internal class UserRepositoryImpl @Inject constructor(
         return runCancellableCatching {
             withContext(ioDispatcher) {
                 val user = userApiAdapter.show(userId, true)
-                userDataSource.add(user)
+                userDataSource.add(user).getOrThrow()
             }
         }
     }
@@ -214,51 +119,29 @@ internal class UserRepositoryImpl @Inject constructor(
     override suspend fun syncIn(userIds: List<User.Id>): Result<List<User.Id>> {
         return runCancellableCatching {
             withContext(ioDispatcher) {
-                val accountIds = userIds.map { it.accountId }.distinct()
-                if (accountIds.isEmpty()) {
-                    return@withContext emptyList()
+                val users = userApiAdapter.showUsers(userIds, true)
+                userDataSource.addAll(users).getOrThrow()
+                users.map {
+                    it.id
                 }
-                coroutineScope {
-                    accountIds.map { accountId ->
-                        async {
-                            val account = accountRepository.get(accountId).getOrThrow()
-                            when(account.instanceType) {
-                                Account.InstanceType.MISSKEY -> {
-                                    val users = misskeyAPIProvider.get(account)
-                                        .showUsers(
-                                            RequestUser(
-                                                i = account.token,
-                                                userIds = userIds.filter { it.accountId == accountId }.map { it.id },
-                                                detail = true
-                                            )
-                                        ).throwIfHasError()
-                                        .body()!!.map {
-                                            userDTOEntityConverter.convert(account, it, true)
-                                        }
-                                    userDataSource.addAll(users)
-                                    users.map { it.id }
-                                }
-                                Account.InstanceType.MASTODON, Account.InstanceType.PLEROMA -> {
-                                    val users = userIds.filter { it.accountId == accountId }.map { it.id }.map {
-                                        async {
-                                            requireNotNull(
-                                                mastodonAPIProvider.get(account)
-                                                    .getAccount(it)
-                                                    .throwIfHasError()
-                                                    .body()
-                                            ).toModel(account)
-                                        }
-                                    }.awaitAll()
-                                    userDataSource.addAll(users)
-                                    users.map { it.id }
-                                }
-                            }
-
-                        }
-                    }.awaitAll()
-                }.flatten()
             }
         }
+    }
+
+    override fun observe(userId: User.Id): Flow<User> {
+        return userDataSource.observe(userId)
+    }
+
+    override fun observe(accountId: Long, acct: String): Flow<User> {
+        return userDataSource.observe(accountId, acct)
+    }
+
+    override fun observe(userName: String, host: String?, accountId: Long): Flow<User?> {
+        return userDataSource.observe(userName, host, accountId)
+    }
+
+    override fun observeIn(accountId: Long, serverIds: List<String>): Flow<List<User>> {
+        return userDataSource.observeIn(accountId, serverIds)
     }
 
 }

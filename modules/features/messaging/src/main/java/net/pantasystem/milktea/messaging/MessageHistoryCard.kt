@@ -1,21 +1,17 @@
 package net.pantasystem.milktea.messaging
 
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.Card
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import coil.compose.rememberAsyncImagePainter
 import kotlinx.datetime.Clock
+import net.pantasystem.milktea.common_compose.AvatarIcon
 import net.pantasystem.milktea.common_compose.CustomEmojiText
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.messaging.*
@@ -47,22 +43,19 @@ fun MessageHistoryCard(
                 vertical = 12.dp
             ),
         ) {
-            Image(
-                rememberAsyncImagePainter(history.thumbnailUrl),
-                contentDescription = null,
-                modifier = Modifier
-                    .size(64.dp)
-                    .clip(CircleShape)
-                    .clickable {
-                        onAction(
-                            Action.OnAvatarIconClick(
-                                when (history) {
-                                    is MessageHistoryRelation.Direct -> history.partner
-                                    is MessageHistoryRelation.Group -> history.user
-                                }
-                            )
+            AvatarIcon(
+                url = history.thumbnailUrl,
+                size = 64.dp,
+                onAvatarClick = {
+                    onAction(
+                        Action.OnAvatarIconClick(
+                            when (history) {
+                                is MessageHistoryRelation.Direct -> history.partner
+                                is MessageHistoryRelation.Group -> history.user
+                            }
                         )
-                    }
+                    )
+                }
             )
 
             Spacer(modifier = Modifier.width(8.dp))

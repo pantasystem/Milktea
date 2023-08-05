@@ -3,7 +3,7 @@ package net.pantasystem.milktea.model.account
 import net.pantasystem.milktea.model.UseCase
 import net.pantasystem.milktea.model.account.page.Page
 import net.pantasystem.milktea.model.account.page.PageableTemplate
-import net.pantasystem.milktea.model.instance.Meta
+import net.pantasystem.milktea.model.instance.MetaRepository
 import net.pantasystem.milktea.model.nodeinfo.NodeInfo
 import net.pantasystem.milktea.model.nodeinfo.NodeInfoRepository
 
@@ -37,13 +37,16 @@ class PageDefaultStringsJp : PageDefaultStrings {
 class MakeDefaultPagesUseCase(
     private val pageDefaultStrings: PageDefaultStrings,
     private val nodeInfoRepository: NodeInfoRepository,
+    private val metaRepository: MetaRepository,
 ) : UseCase {
 
-    operator fun invoke(account: Account, meta: Meta?) : List<Page> {
+    operator suspend fun invoke(account: Account) : List<Page> {
         val nodeInfo = nodeInfoRepository.get(account.getHost())
         val isCalckey = nodeInfo?.type is NodeInfo.SoftwareType.Misskey.Calckey
+        val isFirefish = nodeInfo?.type is NodeInfo.SoftwareType.Firefish
         return when(account.instanceType) {
-            Account.InstanceType.MISSKEY -> {
+            Account.InstanceType.MISSKEY, Account.InstanceType.FIREFISH -> {
+                val meta = metaRepository.find(account.normalizedInstanceUri).getOrNull()
                 val isGlobalEnabled = !(meta?.disableGlobalTimeline ?: false)
                 val isLocalEnabled = !(meta?.disableLocalTimeline ?: false)
                 val defaultPages = ArrayList<Page>()
@@ -59,7 +62,7 @@ class MakeDefaultPagesUseCase(
                 if (isGlobalEnabled) {
                     defaultPages.add(PageableTemplate(account).globalTimeline(pageDefaultStrings.globalTimeline))
                 }
-                if (isCalckey) {
+                if (isCalckey || isFirefish) {
                     defaultPages.add(PageableTemplate(account).calckeyRecommendedTimeline(pageDefaultStrings.recommendedTimeline))
                 }
                 defaultPages

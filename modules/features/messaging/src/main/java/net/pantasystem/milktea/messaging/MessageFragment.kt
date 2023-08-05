@@ -9,16 +9,17 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.ui.platform.ComposeView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import com.google.android.material.composethemeadapter.MdcTheme
 import dagger.hilt.android.AndroidEntryPoint
+import net.pantasystem.milktea.app_store.account.AccountStore
+import net.pantasystem.milktea.common_compose.MilkteaStyleConfigApplyAndTheme
 import net.pantasystem.milktea.common_navigation.DriveNavigation
 import net.pantasystem.milktea.common_navigation.DriveNavigationArgs
 import net.pantasystem.milktea.common_navigation.EXTRA_SELECTED_FILE_PROPERTY_IDS
 import net.pantasystem.milktea.messaging.viewmodel.MessageEditorViewModel
 import net.pantasystem.milktea.messaging.viewmodel.MessageViewModel
-import net.pantasystem.milktea.app_store.account.AccountStore
 import net.pantasystem.milktea.model.drive.FileProperty
 import net.pantasystem.milktea.model.messaging.MessagingId
+import net.pantasystem.milktea.model.setting.LocalConfigRepository
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -55,6 +56,10 @@ class MessageFragment : Fragment() {
     @Inject
     lateinit var driveNavigation: DriveNavigation
 
+    @Inject
+    internal lateinit var configRepository: LocalConfigRepository
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -71,7 +76,7 @@ class MessageFragment : Fragment() {
 
         return ComposeView(requireContext()).apply {
             setContent {
-                MdcTheme {
+                MilkteaStyleConfigApplyAndTheme(configRepository = configRepository) {
                     MessageScreen(
                         messageViewModel = messageViewModel,
                         messageActionViewModel = messageActionViewModel,

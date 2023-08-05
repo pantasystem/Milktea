@@ -6,13 +6,17 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.stateIn
-import net.pantasystem.milktea.model.notes.Visibility
-import net.pantasystem.milktea.model.setting.*
+import net.pantasystem.milktea.model.setting.DefaultConfig
+import net.pantasystem.milktea.model.setting.Keys
+import net.pantasystem.milktea.model.setting.LocalConfigRepository
+import net.pantasystem.milktea.model.setting.NoteExpandedHeightSize
+import net.pantasystem.milktea.model.setting.ReactionPickerType
+import net.pantasystem.milktea.model.setting.str
 
 
 class SettingStore(
     private val sharedPreferences: SharedPreferences,
-    private val localConfigRepository: LocalConfigRepository,
+    localConfigRepository: LocalConfigRepository,
     coroutineScope: CoroutineScope
 ): NoteExpandedHeightSize {
 
@@ -71,15 +75,5 @@ class SettingStore(
         return configState.value.noteExpandedHeightSize
     }
 
-
-
-
-    fun getNoteVisibility(accountId: Long): Visibility {
-        return when (val config =
-            localConfigRepository.getRememberVisibility(accountId).getOrThrow()) {
-            is RememberVisibility.None -> Visibility.Public(false)
-            is RememberVisibility.Remember -> config.visibility
-        }
-    }
 
 }

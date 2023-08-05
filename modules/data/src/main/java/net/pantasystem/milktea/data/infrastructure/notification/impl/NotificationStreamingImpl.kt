@@ -3,7 +3,12 @@ package net.pantasystem.milktea.data.infrastructure.notification.impl
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.asFlow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -44,7 +49,7 @@ class NotificationStreamingImpl @Inject constructor(
     override fun connect(getAccount: () -> Account): Flow<NotificationRelation> {
         return getAccount.asFlow().flatMapLatest { account ->
             when (account.instanceType) {
-                Account.InstanceType.MISSKEY -> {
+                Account.InstanceType.MISSKEY, Account.InstanceType.FIREFISH -> {
                     requireNotNull(channelAPIWithAccountProvider.get(account)).connect(ChannelAPI.Type.Main)
                         .mapNotNull { body ->
                             body as? ChannelBody.Main.Notification

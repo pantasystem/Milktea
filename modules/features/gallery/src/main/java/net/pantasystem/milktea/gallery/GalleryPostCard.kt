@@ -2,29 +2,24 @@
 
 package net.pantasystem.milktea.gallery
 
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import coil.compose.rememberAsyncImagePainter
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.HorizontalPagerIndicator
 import com.google.accompanist.pager.rememberPagerState
-import net.pantasystem.milktea.gallery.viewmodel.GalleryPostUiState
 import kotlinx.datetime.Clock
+import net.pantasystem.milktea.common_compose.AvatarIcon
 import net.pantasystem.milktea.common_compose.FavoriteButton
+import net.pantasystem.milktea.gallery.viewmodel.GalleryPostUiState
 import net.pantasystem.milktea.model.drive.FileProperty
 import net.pantasystem.milktea.model.gallery.GalleryPost
 import net.pantasystem.milktea.model.user.User
@@ -70,23 +65,18 @@ fun GalleryPostCard(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier.padding(start = 8.dp, end = 8.dp)
             ) {
-                Image(
-                    painter = rememberAsyncImagePainter(
-                        galleryState.user.avatarUrl,
-                    ),
-                    contentDescription = null,
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier
-                        .size(50.dp)
-                        .clip(CircleShape)
-                        .clickable(onClick = {
-                            onAction.invoke(
-                                GalleryPostCardAction.OnAvatarIconClicked(
-                                    galleryState.galleryPost
-                                )
+                AvatarIcon(
+                    url = galleryState.user.avatarUrl,
+                    size = 50.dp,
+                    onAvatarClick = {
+                        onAction.invoke(
+                            GalleryPostCardAction.OnAvatarIconClicked(
+                                galleryState.galleryPost
                             )
-                        })
-                        .padding(end = 4.dp),
+                        )
+
+                    },
+                    modifier = Modifier.padding(4.dp),
                 )
                 Spacer(modifier = Modifier.width(4.dp))
                 Column {

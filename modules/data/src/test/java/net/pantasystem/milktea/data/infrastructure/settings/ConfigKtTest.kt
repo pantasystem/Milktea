@@ -1,6 +1,11 @@
 package net.pantasystem.milktea.data.infrastructure.settings
 
-import net.pantasystem.milktea.model.setting.*
+import net.pantasystem.milktea.model.setting.Config
+import net.pantasystem.milktea.model.setting.DefaultConfig
+import net.pantasystem.milktea.model.setting.Keys
+import net.pantasystem.milktea.model.setting.PrefType
+import net.pantasystem.milktea.model.setting.Theme
+import net.pantasystem.milktea.model.setting.allKeys
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 
@@ -135,10 +140,6 @@ class ConfigKtTest {
                     config.isVisibleInstanceUrlInToolbar,
                     (u as PrefType.BoolPref).value
                 )
-                Keys.IsHideMediaWhenMobileNetwork -> Assertions.assertEquals(
-                    config.isHideMediaWhenMobileNetwork,
-                    (u as PrefType.BoolPref).value
-                )
                 Keys.NoteContentFontSize -> Assertions.assertEquals(
                     config.noteContentFontSize,
                     (u as PrefType.FloatPref).value
@@ -161,6 +162,14 @@ class ConfigKtTest {
                 )
                 Keys.EmojiPickerEmojiDisplaySize -> Assertions.assertEquals(
                     config.emojiPickerEmojiDisplaySize,
+                    (u as PrefType.IntPref).value
+                )
+                Keys.AvatarIconShapeType -> Assertions.assertEquals(
+                    config.avatarIconShapeType.value,
+                    (u as PrefType.IntPref).value
+                )
+                Keys.MediaDisplayMode -> Assertions.assertEquals(
+                    config.mediaDisplayMode.value,
                     (u as PrefType.IntPref).value
                 )
             }

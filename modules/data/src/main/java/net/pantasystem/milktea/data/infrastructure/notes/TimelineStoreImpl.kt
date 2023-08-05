@@ -20,7 +20,6 @@ import net.pantasystem.milktea.data.api.mastodon.MastodonAPIProvider
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.page.Pageable
-import net.pantasystem.milktea.model.instance.MetaRepository
 import net.pantasystem.milktea.model.nodeinfo.NodeInfoRepository
 import net.pantasystem.milktea.model.notes.Note
 import net.pantasystem.milktea.model.notes.NoteDataSource
@@ -39,7 +38,6 @@ class TimelineStoreImpl(
     private val misskeyAPIProvider: MisskeyAPIProvider,
     coroutineScope: CoroutineScope,
     private val noteRelationGetter: NoteRelationGetter,
-    private val metaRepository: MetaRepository,
     private val mastodonAPIProvider: MastodonAPIProvider,
     private val nodeInfoRepository: NodeInfoRepository,
 ) : TimelineStore {
@@ -49,7 +47,6 @@ class TimelineStoreImpl(
         private val noteDataSource: NoteDataSource,
         private val misskeyAPIProvider: MisskeyAPIProvider,
         private val noteRelationGetter: NoteRelationGetter,
-        private val metaRepository: MetaRepository,
         private val mastodonAPIProvider: MastodonAPIProvider,
         private val nodeInfoRepository: NodeInfoRepository
     ) : TimelineStore.Factory {
@@ -66,7 +63,6 @@ class TimelineStoreImpl(
                 misskeyAPIProvider,
                 coroutineScope,
                 noteRelationGetter,
-                metaRepository,
                 mastodonAPIProvider,
                 nodeInfoRepository = nodeInfoRepository
             )
@@ -104,7 +100,6 @@ class TimelineStoreImpl(
                     initialLoadQuery
                 },
                 misskeyAPIProvider,
-                metaRepository,
             )
         }
     }

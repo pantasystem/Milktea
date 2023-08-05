@@ -30,16 +30,21 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import coil.compose.rememberAsyncImagePainter
-import com.google.android.material.composethemeadapter.MdcTheme
 import dagger.hilt.android.AndroidEntryPoint
+import net.pantasystem.milktea.common_compose.MilkteaStyleConfigApplyAndTheme
 import net.pantasystem.milktea.common_viewmodel.CurrentPageType
 import net.pantasystem.milktea.common_viewmodel.CurrentPageableTimelineViewModel
 import net.pantasystem.milktea.model.instance.online.user.count.OnlineUserCountResult
+import net.pantasystem.milktea.model.setting.LocalConfigRepository
 import net.pantasystem.milktea.model.user.User
-import net.pantasystem.milktea.user.activity.FollowFollowerActivity
+import net.pantasystem.milktea.user.followlist.FollowFollowerActivity
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class AccountFragment : Fragment() {
+
+    @Inject
+    internal lateinit var configRepository: LocalConfigRepository
 
     private val currentPageableViewModel: CurrentPageableTimelineViewModel by activityViewModels()
 
@@ -54,7 +59,7 @@ class AccountFragment : Fragment() {
     ): View {
         return ComposeView(requireContext()).apply {
             setContent {
-                MdcTheme {
+                MilkteaStyleConfigApplyAndTheme(configRepository = configRepository) {
                     val uiState by accountViewModel.uiState.collectAsState()
 
                     Scaffold() { paddingValues ->
@@ -159,9 +164,11 @@ class AccountFragment : Fragment() {
                                                     Image(
                                                         rememberAsyncImagePainter(info.iconUrl),
                                                         contentDescription = null,
-                                                        modifier = Modifier.size(52.dp).clip(
-                                                            RoundedCornerShape(8.dp)
-                                                        )
+                                                        modifier = Modifier
+                                                            .size(52.dp)
+                                                            .clip(
+                                                                RoundedCornerShape(8.dp)
+                                                            )
                                                     )
                                                     Text(
                                                         info.name,

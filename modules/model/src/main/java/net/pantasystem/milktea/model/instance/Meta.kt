@@ -2,8 +2,6 @@ package net.pantasystem.milktea.model.instance
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import net.pantasystem.milktea.model.emoji.Emoji
-import net.pantasystem.milktea.model.notes.reaction.Reaction
 
 @Serializable
 data class Meta(
@@ -36,7 +34,6 @@ data class Meta(
     @SerialName("swPublickey") var swPublicKey: String? = null,
     @SerialName("ToSUrl") var toSUrl: String? = null,
     @SerialName("version") var version: String = "",
-    @SerialName("emojis") var emojis: List<Emoji>? = null
 ) {
 
 
@@ -45,13 +42,4 @@ data class Meta(
     }
 
 
-    fun isOwnEmojiBy(emoji: Reaction): Boolean {
-        return emojis?.any {
-            it.name == emoji.getName()
-        } == true
-    }
-
-    val emojisMap = emojis?.associateBy {
-        it.name
-    } ?: emptyMap()
 }

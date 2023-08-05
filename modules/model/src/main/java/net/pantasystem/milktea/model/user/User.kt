@@ -206,6 +206,43 @@ sealed interface User : Entity {
     fun getProfileUrl(account: Account): String {
         return "https://${account.getHost()}/${displayUserName}"
     }
+
+    fun castAndPartiallyFill(): Detail {
+        when(this) {
+            is Detail -> return this
+            is Simple -> return Detail(
+                id = id,
+                userName = userName,
+                name = name,
+                avatarUrl = avatarUrl,
+                emojis = emojis,
+                isCat = isCat,
+                isBot = isBot,
+                host = host,
+                nickname = nickname,
+                avatarBlurhash = avatarBlurhash,
+                isSameHost = isSameHost,
+                instance = instance,
+                info = Info(
+                    description = null,
+                    followersCount = null,
+                    followingCount = null,
+                    hostLower = null,
+                    notesCount = null,
+                    pinnedNoteIds = null,
+                    bannerUrl = null,
+                    url = null,
+                    isLocked = false,
+                    birthday = null,
+                    fields = emptyList(),
+                    createdAt = null,
+                    updatedAt = null,
+                    isPublicReactions = false,
+                ),
+                related = null,
+            )
+        }
+    }
 }
 
 enum class FollowState {

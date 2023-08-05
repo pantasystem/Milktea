@@ -6,11 +6,14 @@ sealed interface InstanceInfoType {
 
     data class Pleroma(val info: MastodonInstanceInfo) : InstanceInfoType
 
+    data class Firefish(val meta: Meta) : InstanceInfoType
+
     val iconUrl: String? get() {
         return when(this) {
             is Mastodon -> "https://${info.uri}/favicon.ico"
             is Pleroma -> "https://${info.uri}/favicon.ico"
             is Misskey -> meta.iconUrl ?: "${meta.uri}/favicon.ico"
+            is Firefish -> meta.iconUrl ?: "${meta.uri}/favicon.ico"
         }
     }
 
@@ -19,6 +22,7 @@ sealed interface InstanceInfoType {
             is Mastodon -> "https://${info.uri}"
             is Pleroma -> "https://${info.uri}"
             is Misskey -> meta.uri
+            is Firefish -> meta.uri
         }
     }
 
@@ -27,6 +31,7 @@ sealed interface InstanceInfoType {
             is Mastodon -> info.configuration?.statuses?.maxCharacters ?: 500
             is Pleroma -> info.configuration?.statuses?.maxCharacters ?: 500
             is Misskey -> meta.maxNoteTextLength ?: 3000
+            is Firefish -> meta.maxNoteTextLength ?: 3000
         }
     }
 
@@ -39,6 +44,7 @@ sealed interface InstanceInfoType {
             } else {
                 4
             }
+            is Firefish -> 16
         }
     }
 
@@ -48,6 +54,7 @@ sealed interface InstanceInfoType {
             is Mastodon -> info.configuration?.emojiReactions?.maxReactionsPerAccount ?: 0
             is Pleroma -> info.configuration?.emojiReactions?.maxReactionsPerAccount ?: 0
             is Misskey -> 1
+            is Firefish -> 1
         }
     }
 
@@ -56,6 +63,7 @@ sealed interface InstanceInfoType {
             is Mastodon -> info.title
             is Misskey -> meta.name ?: "Misskey"
             is Pleroma -> info.title
+            is Firefish -> meta.name ?: "Firefish"
         }
     }
 
@@ -68,6 +76,7 @@ sealed interface InstanceInfoType {
             is Mastodon -> info.featureQuote
             is Misskey -> true
             is Pleroma -> true
+            is Firefish -> true
         }
     }
 }

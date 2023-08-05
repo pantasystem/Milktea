@@ -14,7 +14,6 @@ import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.*
-import com.google.android.material.composethemeadapter.MdcTheme
 import com.wada811.databinding.dataBinding
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
@@ -26,24 +25,30 @@ import net.pantasystem.milktea.app_store.account.AccountStore
 import net.pantasystem.milktea.common_android.ui.listview.applyFlexBoxLayout
 import net.pantasystem.milktea.common_android.ui.text.CustomEmojiTokenizer
 import net.pantasystem.milktea.common_android_ui.account.viewmodel.AccountViewModel
+import net.pantasystem.milktea.common_compose.MilkteaStyleConfigApplyAndTheme
 import net.pantasystem.milktea.common_navigation.*
 import net.pantasystem.milktea.common_viewmodel.CurrentPageType
 import net.pantasystem.milktea.common_viewmodel.CurrentPageableTimelineViewModel
 import net.pantasystem.milktea.model.drive.DriveFileRepository
 import net.pantasystem.milktea.model.drive.FileProperty
 import net.pantasystem.milktea.model.drive.FilePropertyDataSource
+import net.pantasystem.milktea.model.emoji.CustomEmojiRepository
 import net.pantasystem.milktea.model.emoji.Emoji
 import net.pantasystem.milktea.model.file.toAppFile
-import net.pantasystem.milktea.model.instance.MetaRepository
 import net.pantasystem.milktea.model.notes.draft.DraftNoteService
+import net.pantasystem.milktea.model.setting.LocalConfigRepository
 import net.pantasystem.milktea.model.user.User
 import net.pantasystem.milktea.note.NoteEditorActivity
 import net.pantasystem.milktea.note.R
 import net.pantasystem.milktea.note.databinding.FragmentSimpleEditorBinding
 import net.pantasystem.milktea.note.editor.file.EditFileCaptionDialog
 import net.pantasystem.milktea.note.editor.file.EditFileNameDialog
+import net.pantasystem.milktea.note.editor.poll.PollDatePickerDialog
+import net.pantasystem.milktea.note.editor.poll.PollEditorFragment
+import net.pantasystem.milktea.note.editor.poll.PollTimePickerDialog
 import net.pantasystem.milktea.note.editor.viewmodel.NoteEditorViewModel
 import net.pantasystem.milktea.note.editor.viewmodel.toCreateNote
+import net.pantasystem.milktea.note.editor.visibility.VisibilitySelectionDialogV2
 import net.pantasystem.milktea.note.emojis.CustomEmojiPickerDialog
 import net.pantasystem.milktea.note.emojis.viewmodel.EmojiSelectionViewModel
 import javax.inject.Inject
@@ -75,7 +80,7 @@ class SimpleEditorFragment : Fragment(R.layout.fragment_simple_editor), SimpleEd
     lateinit var accountStore: AccountStore
 
     @Inject
-    lateinit var metaRepository: MetaRepository
+    internal lateinit var customEmojiRepository: CustomEmojiRepository
 
 
     @Inject
@@ -98,6 +103,9 @@ class SimpleEditorFragment : Fragment(R.layout.fragment_simple_editor), SimpleEd
 
     @Inject
     lateinit var searchAndSelectUserNavigation: SearchAndSelectUserNavigation
+
+    @Inject
+    internal lateinit var configRepository: LocalConfigRepository
 
     @OptIn(ExperimentalCoroutinesApi::class)
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -128,9 +136,7 @@ class SimpleEditorFragment : Fragment(R.layout.fragment_simple_editor), SimpleEd
         }.flowWithLifecycle(lifecycle, Lifecycle.State.RESUMED).launchIn(lifecycleScope)
 
         accountStore.observeCurrentAccount.filterNotNull().flatMapLatest {
-            metaRepository.observe(it.normalizedInstanceUri)
-        }.mapNotNull {
-            it?.emojis
+            customEmojiRepository.observeBy(it.getHost())
         }.distinctUntilChanged().onEach { emojis ->
             mBinding.inputMainText.setAdapter(
                 CustomEmojiCompleteAdapter(
@@ -154,7 +160,7 @@ class SimpleEditorFragment : Fragment(R.layout.fragment_simple_editor), SimpleEd
         mBinding.noteEditorViewModel = viewModel
         mBinding.filePreview.apply {
             setContent {
-                MdcTheme {
+                MilkteaStyleConfigApplyAndTheme(configRepository = configRepository) {
                     NoteFilePreview(
                         noteEditorViewModel = viewModel,
                         onShow = {
@@ -190,10 +196,10 @@ class SimpleEditorFragment : Fragment(R.layout.fragment_simple_editor), SimpleEd
             }
         }
 
-
-        viewModel.isPost.observe(viewLifecycleOwner) {
+        viewModel.isPost.onEach {
             viewModel.clear()
-        }
+        }.flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.RESUMED)
+            .launchIn(viewLifecycleOwner.lifecycleScope)
 
         mBinding.noteVisibility.setOnClickListener {
             val dialog = VisibilitySelectionDialogV2()
@@ -208,13 +214,16 @@ class SimpleEditorFragment : Fragment(R.layout.fragment_simple_editor), SimpleEd
             }
         }
 
-        viewModel.showPollTimePicker.observe(this) {
+        viewModel.showPollDatePicker.onEach {
             PollTimePickerDialog().show(childFragmentManager, "TimePicker")
-        }
+        }.flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.RESUMED)
+            .launchIn(viewLifecycleOwner.lifecycleScope)
 
-        viewModel.showPollDatePicker.observe(this) {
+        viewModel.showPollDatePicker.onEach {
             PollDatePickerDialog().show(childFragmentManager, "DatePicker")
-        }
+        }.flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.RESUMED)
+            .launchIn(viewLifecycleOwner.lifecycleScope)
+
 
         mBinding.inputCw.addTextChangedListener { e ->
             viewModel.setCw((e?.toString() ?: ""))

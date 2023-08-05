@@ -1,0 +1,74 @@
+package net.pantasystem.milktea.api.misskey.instance
+
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+import net.pantasystem.milktea.api.misskey.emoji.CustomEmojiNetworkDTO
+import net.pantasystem.milktea.model.instance.Meta
+
+@Serializable
+data class MetaNetworkDTO(
+    @SerialName("uri") var uri: String,
+    @SerialName("bannerUrl") var bannerUrl: String? = null,
+    @SerialName("cacheRemoteFiles") var cacheRemoteFiles: Boolean? = null,
+    @SerialName("description") var description: String? = null,
+    @SerialName("disableGlobalTimeline") var disableGlobalTimeline: Boolean? = null,
+    @SerialName("disableLocalTimeline") var disableLocalTimeline: Boolean? = null,
+    @SerialName("disableRegistration") var disableRegistration: Boolean? = null,
+    @SerialName("driveCapacityPerLocalUserMb") var driveCapacityPerLocalUserMb: Int? = null,
+    @SerialName("driveCapacityPerRemoteUserMb") var driveCapacityPerRemoteUserMb: Int? = null,
+    @SerialName("enableDiscordIntegration") var enableDiscordIntegration: Boolean? = null,
+    @SerialName("enableEmail") var enableEmail: Boolean? = null,
+    @SerialName("enableEmojiReaction") var enableEmojiReaction: Boolean? = null,
+    @SerialName("enableGithubIntegration") var enableGithubIntegration: Boolean? = null,
+    @SerialName("enableRecaptcha") var enableRecaptcha: Boolean? = null,
+    @SerialName("enableServiceWorker") var enableServiceWorker: Boolean? = null,
+    @SerialName("enableTwitterIntegration") var enableTwitterIntegration: Boolean? = null,
+    @SerialName("errorImageUrl") var errorImageUrl: String? = null,
+    @SerialName("feedbackUrl") var feedbackUrl: String? = null,
+    @SerialName("iconUrl") var iconUrl: String? = null,
+    @SerialName("maintainerEmail") var maintainerEmail: String? = null,
+    @SerialName("maintainerName") var maintainerName: String? = null,
+    @SerialName("mascotImageUrl") var mascotImageUrl: String? = null,
+    @SerialName("maxNoteTextLength") var maxNoteTextLength: Int? = null,
+    @SerialName("name") var name: String? = null,
+    @SerialName("recaptchaSiteKey") var recaptchaSiteKey: String? = null,
+    @SerialName("secure") var secure: Boolean? = null,
+    @SerialName("swPublickey") var swPublicKey: String? = null,
+    @SerialName("ToSUrl") var toSUrl: String? = null,
+    @SerialName("version") var version: String = "",
+    @SerialName("emojis") var emojis: List<CustomEmojiNetworkDTO>? = null
+) {
+    fun toModel(): Meta {
+        return Meta(
+            uri = uri,
+            bannerUrl = bannerUrl,
+            cacheRemoteFiles = cacheRemoteFiles,
+            description = description,
+            disableGlobalTimeline = disableGlobalTimeline,
+            disableLocalTimeline = disableLocalTimeline,
+            disableRegistration = disableRegistration,
+            driveCapacityPerLocalUserMb = driveCapacityPerLocalUserMb,
+            driveCapacityPerRemoteUserMb = driveCapacityPerRemoteUserMb,
+            enableDiscordIntegration = enableDiscordIntegration,
+            enableEmail = enableEmail,
+            enableEmojiReaction = enableEmojiReaction,
+            enableGithubIntegration = enableGithubIntegration,
+            enableRecaptcha = enableRecaptcha,
+            enableServiceWorker = enableServiceWorker,
+            enableTwitterIntegration = enableTwitterIntegration,
+            errorImageUrl = errorImageUrl,
+            feedbackUrl = feedbackUrl,
+            iconUrl = iconUrl,
+            maintainerEmail = maintainerEmail,
+            maintainerName = maintainerName,
+            mascotImageUrl = mascotImageUrl,
+            maxNoteTextLength = maxNoteTextLength,
+            name = name,
+            recaptchaSiteKey = recaptchaSiteKey,
+            secure = secure,
+            swPublicKey = swPublicKey,
+            toSUrl = toSUrl,
+            version = version,
+        )
+    }
+}

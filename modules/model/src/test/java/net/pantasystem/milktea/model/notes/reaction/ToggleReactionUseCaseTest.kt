@@ -50,9 +50,7 @@ class ToggleReactionUseCaseTest {
 
         val meta = Meta(
             uri = "misskey.io",
-            emojis = listOf(
-                Emoji(name = "kawaii")
-            )
+
         )
         val reactionHistoryDao = mock<ReactionHistoryRepository>()
         val account = Account(
@@ -142,9 +140,7 @@ class ToggleReactionUseCaseTest {
 
         val meta = Meta(
             uri = "https://misskey.io",
-            emojis = listOf(
-                Emoji(name = "kawaii"), Emoji(name = "wakaranai")
-            )
+
         )
         val reactionHistoryDao = mock<ReactionHistoryRepository>()
         val account = Account(
@@ -236,9 +232,6 @@ class ToggleReactionUseCaseTest {
 
         val meta = Meta(
             uri = "https://misskey.io",
-            emojis = listOf(
-                Emoji(name = "kawaii")
-            )
         )
         val reactionHistoryDao = mock<ReactionHistoryRepository>()
         val account = Account(

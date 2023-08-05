@@ -7,7 +7,12 @@ import kotlinx.coroutines.withContext
 import net.pantasystem.milktea.api.mastodon.apps.CreateApp
 import net.pantasystem.milktea.api.misskey.I
 import net.pantasystem.milktea.api.misskey.MisskeyAPIServiceBuilder
-import net.pantasystem.milktea.api.misskey.auth.*
+import net.pantasystem.milktea.api.misskey.auth.AppSecret
+import net.pantasystem.milktea.api.misskey.auth.Session
+import net.pantasystem.milktea.api.misskey.auth.SignInRequest
+import net.pantasystem.milktea.api.misskey.auth.fromDTO
+import net.pantasystem.milktea.api.misskey.auth.fromFirefishDTO
+import net.pantasystem.milktea.api.misskey.auth.fromPleromaDTO
 import net.pantasystem.milktea.app_store.account.AccountStore
 import net.pantasystem.milktea.auth.viewmodel.Permissions
 import net.pantasystem.milktea.common.APIError
@@ -41,16 +46,16 @@ val urlPattern: Pattern = Pattern.compile("""(https?)(://)([-_.!~*'()\[\]a-zA-Z0
 class AuthStateHelper @Inject constructor(
     private val mastodonAPIProvider: MastodonAPIProvider,
     private val misskeyAPIProvider: MisskeyAPIProvider,
-    val metaRepository: MetaRepository,
+    private val metaRepository: MetaRepository,
     private val customAuthStore: CustomAuthStore,
     private val misskeyAPIServiceBuilder: MisskeyAPIServiceBuilder,
-    val accountRepository: AccountRepository,
-    val accountStore: AccountStore,
-    val subscriptionRegistration: SubscriptionRegistration,
-    val userDataSource: UserDataSource,
-    val nodeInfoRepository: NodeInfoRepository,
-    val mastodonInstanceInfoRepository: MastodonInstanceInfoRepository,
-    val userDTOEntityConverter: UserDTOEntityConverter
+    private val accountRepository: AccountRepository,
+    private val accountStore: AccountStore,
+    private val subscriptionRegistration: SubscriptionRegistration,
+    private val userDataSource: UserDataSource,
+    private val nodeInfoRepository: NodeInfoRepository,
+    private val mastodonInstanceInfoRepository: MastodonInstanceInfoRepository,
+    private val userDTOEntityConverter: UserDTOEntityConverter
 ) {
 
 
@@ -85,6 +90,20 @@ class AuthStateHelper @Inject constructor(
                     app.createAuth(instanceBase, session)
                 )
                 Authorization.Waiting4UserAuthorization.Misskey(
+                    instanceBase,
+                    appSecret = app.secret!!,
+                    session = session,
+                    viaName = app.name
+                )
+            }
+            is AppType.Firefish -> {
+                val secret = app.secret
+                val session = generateMisskeySession(instanceBase, secret)
+
+                customAuthStore.setCustomAuthBridge(
+                    app.createAuth(instanceBase, session)
+                )
+                Authorization.Waiting4UserAuthorization.Firefish(
                     instanceBase,
                     appSecret = app.secret!!,
                     session = session,
@@ -127,7 +146,7 @@ class AuthStateHelper @Inject constructor(
             }
             is InstanceType.Misskey -> {
                 val version = instanceType.instance.getVersion()
-                val misskeyAPI = misskeyAPIProvider.get(url, version)
+                val misskeyAPI = misskeyAPIProvider.get(url)
                 val app = misskeyAPI.createApp(
                     net.pantasystem.milktea.api.misskey.app.CreateApp(
                         null,
@@ -141,6 +160,20 @@ class AuthStateHelper @Inject constructor(
                     ?: throw IllegalStateException("Appの作成に失敗しました。")
                 return AppType.fromDTO(app)
             }
+            is InstanceType.Firefish -> {
+                val misskeyAPI = misskeyAPIProvider.get(url)
+                val app = misskeyAPI.createApp(
+                    net.pantasystem.milktea.api.misskey.app.CreateApp(
+                        null,
+                        appName,
+                        "misskey android application",
+                        CALL_BACK_URL,
+                        permission = Permissions.getPermission(instanceType.softwareType)
+                    )
+                ).throwIfHasError().body()
+                    ?: throw IllegalStateException("Appの作成に失敗しました。")
+                return AppType.fromFirefishDTO(app)
+            }
         }
 
     }
@@ -152,6 +185,7 @@ class AuthStateHelper @Inject constructor(
             val misskey: Meta?
             val mastodon: MastodonInstanceInfo?
             val pleroma: MastodonInstanceInfo?
+            val firefish: Meta?
 
             suspend fun fetchMeta(): Meta? {
                 return withContext(Dispatchers.IO) {
@@ -171,16 +205,25 @@ class AuthStateHelper @Inject constructor(
                     mastodon = fetchInstance()
                     misskey = null
                     pleroma = null
+                    firefish = null
                 }
                 is NodeInfo.SoftwareType.Misskey -> {
                     misskey = fetchMeta()
                     mastodon = null
                     pleroma = null
+                    firefish = null
                 }
                 is NodeInfo.SoftwareType.Pleroma -> {
                     pleroma = fetchInstance()
                     misskey = null
                     mastodon = null
+                    firefish = null
+                }
+                is NodeInfo.SoftwareType.Firefish -> {
+                    misskey = null
+                    mastodon = null
+                    pleroma = null
+                    firefish = fetchMeta()
                 }
                 else -> {
                     misskey = fetchMeta()
@@ -190,6 +233,7 @@ class AuthStateHelper @Inject constructor(
                         null
                     }
                     pleroma = null
+                    firefish = null
                 }
             }
 
@@ -202,6 +246,9 @@ class AuthStateHelper @Inject constructor(
 
             if (pleroma != null) {
                 return InstanceType.Pleroma(pleroma, nodeInfo?.type as? NodeInfo.SoftwareType.Pleroma)
+            }
+            if (firefish != null) {
+                return InstanceType.Firefish(firefish, nodeInfo?.type as? NodeInfo.SoftwareType.Firefish)
             }
             throw IllegalArgumentException()
         } else {
@@ -227,26 +274,33 @@ class AuthStateHelper @Inject constructor(
             a.accessToken.newAccount(a.instanceBaseURL),
             false
         ).getOrThrow()
-        val user = when (a.accessToken) {
+        val user = when (val token = a.accessToken) {
             is AccessToken.Mastodon -> {
-                (a.accessToken as AccessToken.Mastodon).account.toModel(account)
+                token.account.toModel(account)
             }
             is AccessToken.Misskey -> {
                 userDTOEntityConverter.convert(
                     account,
-                    (a.accessToken as AccessToken.Misskey).user,
+                    token.user,
                     true
                 ) as User.Detail
             }
             is AccessToken.MisskeyIdAndPassword -> {
                 userDTOEntityConverter.convert(
                     account,
-                    (a.accessToken as AccessToken.MisskeyIdAndPassword).user,
+                    token.user,
                     true
                 ) as User.Detail
             }
             is AccessToken.Pleroma -> {
                 (a.accessToken as AccessToken.Pleroma).account.toModel(account)
+            }
+            is AccessToken.Firefish -> {
+                userDTOEntityConverter.convert(
+                    account,
+                    token.user,
+                    true
+                ) as User.Detail
             }
         }
         userDataSource.add(user)

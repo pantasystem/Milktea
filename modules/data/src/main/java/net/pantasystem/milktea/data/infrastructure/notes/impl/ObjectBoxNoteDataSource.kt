@@ -43,7 +43,6 @@ class ObjectBoxNoteDataSource @Inject constructor(
 
     private val lock = Mutex()
     private var deleteNoteIds = mutableSetOf<Note.Id>()
-    private var removedNoteIds = mutableSetOf<Note.Id>()
 
     private val changedIdFlow = MutableStateFlow<String>("")
 
@@ -78,15 +77,29 @@ class ObjectBoxNoteDataSource @Inject constructor(
         if (deleteNoteIds.contains(noteId)) {
             throw NoteDeletedException(noteId)
         }
-        if (removedNoteIds.contains(noteId)) {
-            throw NoteRemovedException(noteId)
-        }
         withContext(coroutineDispatcher) {
             noteBox.query().equal(
                 NoteRecord_.accountIdAndNoteId,
                 NoteRecord.generateAccountAndNoteId(noteId),
                 QueryBuilder.StringOrder.CASE_SENSITIVE
             ).build().findFirst()?.toModel() ?: throw NoteNotFoundException(noteId)
+        }
+    }
+
+    override suspend fun getWithState(noteId: Note.Id): Result<NoteResult> = runCancellableCatching {
+        if (deleteNoteIds.contains(noteId)) {
+            return@runCancellableCatching NoteResult.Deleted
+        }
+        val note = withContext(coroutineDispatcher) {
+            noteBox.query().equal(
+                NoteRecord_.accountIdAndNoteId,
+                NoteRecord.generateAccountAndNoteId(noteId),
+                QueryBuilder.StringOrder.CASE_SENSITIVE
+            ).build().findFirst()?.toModel()
+        }
+        when(note) {
+            null -> NoteResult.NotFound
+            else -> NoteResult.Success(note)
         }
     }
 
@@ -136,23 +149,6 @@ class ObjectBoxNoteDataSource @Inject constructor(
         isDeleted
     }
 
-    override suspend fun remove(noteId: Note.Id): Result<Boolean> = runCancellableCatching {
-        val isRemoved = withContext(coroutineDispatcher) {
-            boxStore.awaitCallInTx {
-                noteBox.query().equal(
-                    NoteRecord_.accountIdAndNoteId,
-                    NoteRecord.generateAccountAndNoteId(noteId),
-                    QueryBuilder.StringOrder.CASE_SENSITIVE
-                ).build().remove()
-            }?.let {
-                it > 0
-            } ?: false
-        }
-        lock.withLock {
-            removedNoteIds.add(noteId)
-        }
-        isRemoved
-    }
 
     override suspend fun add(note: Note): Result<AddResult> = runCancellableCatching {
         withContext(coroutineDispatcher) {

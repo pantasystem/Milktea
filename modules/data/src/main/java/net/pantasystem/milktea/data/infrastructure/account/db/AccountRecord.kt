@@ -1,6 +1,11 @@
 package net.pantasystem.milktea.data.infrastructure.account.db
 
-import androidx.room.*
+import androidx.room.ColumnInfo
+import androidx.room.Entity
+import androidx.room.Ignore
+import androidx.room.Index
+import androidx.room.PrimaryKey
+import androidx.room.TypeConverter
 import net.pantasystem.milktea.common.Encryption
 import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.model.account.Account
@@ -112,6 +117,7 @@ class AccountInstanceTypeConverter {
             Account.InstanceType.MISSKEY -> "misskey"
             Account.InstanceType.MASTODON -> "mastodon"
             Account.InstanceType.PLEROMA -> "pleroma"
+            Account.InstanceType.FIREFISH -> "firefish"
         }
     }
 
@@ -122,6 +128,7 @@ class AccountInstanceTypeConverter {
             "misskey" -> Account.InstanceType.MISSKEY
             "mastodon" -> Account.InstanceType.MASTODON
             "pleroma" -> Account.InstanceType.PLEROMA
+            "firefish" -> Account.InstanceType.FIREFISH
             else -> throw IllegalArgumentException("未知のアカウント種別です")
         }
     }

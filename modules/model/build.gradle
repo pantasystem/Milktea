@@ -66,9 +66,9 @@ dependencies {
     testImplementation libs.hilt.android.testing
     kaptTest libs.hilt.compiler
 
-    testImplementation "org.mockito.kotlin:mockito-kotlin:4.0.0"
     implementation libs.kotlin.serialization
 
     testImplementation libs.junit.jupiter.api
     testRuntimeOnly libs.junit.jupiter.engine
+    testImplementation "org.mockito.kotlin:mockito-kotlin:4.1.0"
 }

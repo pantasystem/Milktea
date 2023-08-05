@@ -40,17 +40,19 @@
             app:foldingContent="@{contentMain}"
             app:isFolding="@{note.contentFolding}">
 
-        <ImageView
+        <net.pantasystem.milktea.common.ui.AvatarIconView
                 android:id="@+id/avatarIcon"
                 android:layout_width="@dimen/note_avatar_icon_size"
                 android:layout_height="@dimen/note_avatar_icon_size"
-                app:circleIcon='@{note.avatarUrl}'
                 tools:srcCompat="@android:drawable/sym_def_app_icon"
                 android:contentDescription="@string/avataricon"
                 app:transitionDestinationUser="@{note.toShowNote.user}"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 android:scaleType="centerCrop"
+                app:iconShape="@{note.config.avatarIconShapeType.value}"
+                app:imageUrl="@{note.avatarUrl}"
+
                 />
 
         <TextView
@@ -273,16 +275,17 @@
                             app:account="@{note.account}"
                             android:layout_marginTop="4dp">
 
-                        <ImageView
+                        <net.pantasystem.milktea.common.ui.AvatarIconView
                                 android:id="@+id/subAvatarIcon"
                                 android:layout_width="20dp"
                                 android:layout_height="20dp"
-                                app:circleIcon='@{note.subNoteAvatarUrl}'
                                 android:contentDescription="@string/avataricon"
                                 app:transitionDestinationUser="@{note.subNote.user}"
                                 app:layout_constraintStart_toStartOf="parent"
                                 app:layout_constraintTop_toTopOf="parent"
                                 android:scaleType="centerCrop"
+                                app:iconShape="@{note.config.avatarIconShapeType.value}"
+                                app:imageUrl="@{note.subNoteAvatarUrl}"
                                 />
 
                         <TextView

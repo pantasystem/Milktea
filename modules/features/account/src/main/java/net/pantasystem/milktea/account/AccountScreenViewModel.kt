@@ -13,7 +13,6 @@ import net.pantasystem.milktea.model.instance.InstanceInfoType
 import net.pantasystem.milktea.model.instance.online.user.count.OnlineUserCountRepository
 import net.pantasystem.milktea.model.instance.online.user.count.OnlineUserCountResult
 import net.pantasystem.milktea.model.user.User
-import net.pantasystem.milktea.model.user.UserDataSource
 import net.pantasystem.milktea.model.user.UserRepository
 import javax.inject.Inject
 
@@ -21,7 +20,6 @@ import javax.inject.Inject
 class AccountScreenViewModel @Inject constructor(
     accountStore: AccountStore,
     private val userRepository: UserRepository,
-    private val userDataSource: UserDataSource,
     private val onlineUserCountRepository: OnlineUserCountRepository,
     private val instanceInfoService: InstanceInfoService,
     private val loggerFactory: Logger.Factory,
@@ -33,7 +31,7 @@ class AccountScreenViewModel @Inject constructor(
 
     @OptIn(ExperimentalCoroutinesApi::class)
     private val user = accountStore.observeCurrentAccount.filterNotNull().flatMapLatest {
-        userDataSource.observe(User.Id(it.accountId, it.remoteId))
+        userRepository.observe(User.Id(it.accountId, it.remoteId))
     }.catch {
         logger.error("observe current accounts user error", it)
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)

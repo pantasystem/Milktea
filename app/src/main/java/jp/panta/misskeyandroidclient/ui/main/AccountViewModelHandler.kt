@@ -15,8 +15,8 @@ import net.pantasystem.milktea.common_android.ui.putActivity
 import net.pantasystem.milktea.common_android_ui.account.AccountSwitchingDialog
 import net.pantasystem.milktea.common_android_ui.account.viewmodel.AccountViewModel
 import net.pantasystem.milktea.model.user.User
-import net.pantasystem.milktea.user.activity.FollowFollowerActivity
-import net.pantasystem.milktea.user.activity.UserDetailActivity
+import net.pantasystem.milktea.user.followlist.FollowFollowerActivity
+import net.pantasystem.milktea.user.profile.UserDetailActivity
 
 class AccountViewModelHandler(
     val binding: ActivityMainBinding,

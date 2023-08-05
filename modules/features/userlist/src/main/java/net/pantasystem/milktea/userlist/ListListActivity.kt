@@ -9,13 +9,14 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import com.google.android.material.composethemeadapter.MdcTheme
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import net.pantasystem.milktea.app_store.account.AccountStore
 import net.pantasystem.milktea.common.ui.ApplyTheme
+import net.pantasystem.milktea.common_compose.MilkteaStyleConfigApplyAndTheme
 import net.pantasystem.milktea.common_navigation.UserListArgs
 import net.pantasystem.milktea.common_navigation.UserListNavigation
+import net.pantasystem.milktea.model.setting.LocalConfigRepository
 import net.pantasystem.milktea.model.user.User
 import net.pantasystem.milktea.userlist.compose.UserListCardScreen
 import net.pantasystem.milktea.userlist.compose.UserListCardScreenAction
@@ -59,6 +60,9 @@ class ListListActivity : AppCompatActivity() {
     @Inject
     lateinit var applyTheme: ApplyTheme
 
+    @Inject
+    internal lateinit var configRepository: LocalConfigRepository
+
 
     private val addUserId: User.Id? by lazy {
         val addUserIdSt = intent.getStringExtra(EXTRA_ADD_USER_ID)
@@ -80,7 +84,7 @@ class ListListActivity : AppCompatActivity() {
 
         setContent {
             val uiState by mListListViewModel.uiState.collectAsState()
-            MdcTheme {
+            MilkteaStyleConfigApplyAndTheme(configRepository = configRepository) {
                 UserListCardScreen(uiState = uiState, onAction = { action ->
                     when (action) {
                         UserListCardScreenAction.OnNavigateUp -> {

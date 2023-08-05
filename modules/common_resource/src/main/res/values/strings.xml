@@ -452,6 +452,8 @@
     <string name="donation">Donation</string>
     <string name="privacy_policy">Privacy policy</string>
     <string name="terms_of_service">Terms of service</string>
+    <string name="settings_display_icons_as_squares">Display icons as squares</string>
+
 
 
     <!-- Authorization Start -->
@@ -606,4 +608,16 @@
     <string name="settings_note_cache">Note cache</string>
     <string name="settings_custom_emoji_cache">Custom emoji cache</string>
     <string name="move_files_here">Move files here</string>
+
+    <!-- reaction-acceptance -->
+    <string name="reaction_acceptance">Reaction acceptance</string>
+    <string name="reaction_acceptance_all">All</string>
+    <string name="reaction_acceptance_like_only_for_remote">All (Only likes for remote instances)</string>
+    <string name="reaction_acceptance_non_sensitive_only">Non-sensitive only</string>
+    <string name="reaction_acceptance_non_sensitive_only_likes_from_remote">Non-sensitive only (Only likes from remote)</string>
+    <string name="reaction_acceptance_only_likes">Only likes</string>
+    <string name="media_display_mode_default">Default</string>
+    <string name="media_display_mode_always">Always hide media</string>
+    <!-- reaction-acceptance -->
+
 </resources>

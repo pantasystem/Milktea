@@ -17,7 +17,7 @@ data class Account(
 ) : Serializable {
 
     enum class InstanceType {
-        MISSKEY, MASTODON, PLEROMA
+        MISSKEY, MASTODON, PLEROMA, FIREFISH
     }
 
     constructor(

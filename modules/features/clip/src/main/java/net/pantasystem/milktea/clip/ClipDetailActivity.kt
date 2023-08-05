@@ -7,19 +7,24 @@ import android.widget.FrameLayout
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.*
+import androidx.compose.material.Icon
+import androidx.compose.material.IconButton
+import androidx.compose.material.Scaffold
+import androidx.compose.material.Text
+import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.viewinterop.AndroidView
-import com.google.android.material.composethemeadapter.MdcTheme
 import dagger.hilt.android.AndroidEntryPoint
 import net.pantasystem.milktea.common.ui.ApplyTheme
 import net.pantasystem.milktea.common_android_ui.PageableFragmentFactory
+import net.pantasystem.milktea.common_compose.MilkteaStyleConfigApplyAndTheme
 import net.pantasystem.milktea.common_navigation.ClipDetailNavigation
 import net.pantasystem.milktea.model.account.page.Pageable
 import net.pantasystem.milktea.model.clip.ClipId
+import net.pantasystem.milktea.model.setting.LocalConfigRepository
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -30,6 +35,9 @@ class ClipDetailActivity : AppCompatActivity() {
 
     @Inject
     internal lateinit var pageableFragmentFactory: PageableFragmentFactory
+
+    @Inject
+    internal lateinit var configRepository: LocalConfigRepository
 
     private val clipId: ClipId by lazy {
         ClipId(
@@ -42,7 +50,7 @@ class ClipDetailActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         applyTheme()
         setContent {
-            MdcTheme {
+            MilkteaStyleConfigApplyAndTheme(configRepository = configRepository) {
                 Scaffold(
                     topBar = {
                         TopAppBar(
