@@ -19,8 +19,6 @@ import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.page.Pageable
 import net.pantasystem.milktea.model.account.page.SincePaginate
 import net.pantasystem.milktea.model.account.page.UntilPaginate
-import net.pantasystem.milktea.model.instance.MetaRepository
-import net.pantasystem.milktea.model.instance.Version
 import net.pantasystem.milktea.model.notes.Note
 import retrofit2.Response
 
@@ -31,7 +29,6 @@ internal class TimelinePagingStoreImpl(
     private val getAccount: suspend () -> Account,
     private val getInitialLoadQuery: () -> InitialLoadQuery?,
     private val misskeyAPIProvider: MisskeyAPIProvider,
-    private val metaRepository: MetaRepository,
 ) : EntityConverter<NoteDTO, Note.Id>, PreviousLoader<NoteDTO>, FutureLoader<NoteDTO>,
     IdGetter<Note.Id>, TimelinePagingBase, StreamingReceivableStore {
 
@@ -82,17 +79,6 @@ internal class TimelinePagingStoreImpl(
         return runCancellableCatching {
             if (pageableTimeline !is SincePaginate) {
                 return@runCancellableCatching emptyList()
-            }
-
-            // NOTE: sinceIdが13.11.0で削除される破壊的変更が行われてしまったのでその判定を行なっている
-            // https://github.com/misskey-dev/misskey/commit/b53d6c7f8ca1a712eab44967e8d05a0cc7bcc034#diff-883a3f5d77794cf2344c96727836aabc74c19f57db5e2e0cd485fdb6d3af7efeL77
-            // sinceId削除の件は不具合で13.11.3で修正された
-            if (pageableTimeline is Pageable.Antenna) {
-                val account = getAccount()
-                val meta = metaRepository.find(account.normalizedInstanceUri).getOrThrow()
-                if (meta.getVersion() >= Version("13.11.0") && meta.getVersion() < Version("13.11.3")) {
-                    return@runCancellableCatching emptyList()
-                }
             }
 
             val builder = NoteRequest.Builder(
