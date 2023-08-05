@@ -133,15 +133,7 @@ class SearchViewModel @Inject constructor(
     }.stateIn(
         viewModelScope,
         SharingStarted.WhileSubscribed(5_000),
-        SearchUiState(
-            keyword.value,
-            emptyList(),
-            emptyList(),
-            emptyList(),
-            searchUserResult.value,
-            hashtagResult.value,
-            null
-        )
+        SearchUiState(keyword.value,)
     )
 
     fun onInputKeyword(word: String) {
@@ -185,13 +177,13 @@ class SearchViewModel @Inject constructor(
 }
 
 data class SearchUiState(
-    val keyword: String,
-    val hashtags: List<String>,
-    val users: List<User>,
-    val history: List<SearchHistory>,
-    val searchUserState: ResultState<List<User>>,
-    val hashtagsState: ResultState<List<String>>,
-    val accountHost: String?,
+    val keyword: String = "",
+    val hashtags: List<String> = emptyList(),
+    val users: List<User> = emptyList(),
+    val history: List<SearchHistory> = emptyList(),
+    val searchUserState: ResultState<List<User>> = ResultState.initialState(),
+    val hashtagsState: ResultState<List<String>> = ResultState.initialState(),
+    val accountHost: String? = null,
 )
 
 private data class States(
