@@ -23,7 +23,8 @@ import net.pantasystem.milktea.model.filter.WordFilterService
 import net.pantasystem.milktea.model.group.GroupRepository
 import net.pantasystem.milktea.model.notification.*
 import net.pantasystem.milktea.model.setting.LocalConfigRepository
-import net.pantasystem.milktea.model.user.FollowRequestRepository
+import net.pantasystem.milktea.model.user.follow.requests.AcceptFollowRequestUseCase
+import net.pantasystem.milktea.model.user.follow.requests.RejectFollowRequestUseCase
 import net.pantasystem.milktea.note.viewmodel.PlaneNoteViewDataCache
 import javax.inject.Inject
 
@@ -33,10 +34,11 @@ class NotificationViewModel @Inject constructor(
     private val accountRepository: AccountRepository,
     private val groupRepository: GroupRepository,
     private val notificationStreaming: NotificationStreaming,
-    private val followRequestRepository: FollowRequestRepository,
     private val notificationRepository: NotificationRepository,
     private val noteWordFilterService: WordFilterService,
     private val configRepository: LocalConfigRepository,
+    private val acceptFollowRequestUseCase: AcceptFollowRequestUseCase,
+    private val rejectFollowRequestUseCase: RejectFollowRequestUseCase,
     planeNoteViewDataCacheFactory: PlaneNoteViewDataCache.Factory,
     loggerFactory: Logger.Factory,
     accountStore: AccountStore,
@@ -149,9 +151,7 @@ class NotificationViewModel @Inject constructor(
     fun acceptFollowRequest(notification: Notification) {
         if (notification is ReceiveFollowRequestNotification) {
             viewModelScope.launch {
-                runCancellableCatching {
-                    followRequestRepository.accept(notification.userId)
-                }.onSuccess {
+                acceptFollowRequestUseCase(notification.userId).onSuccess {
                     loadInit()
                 }.onFailure {
                     logger.error("acceptFollowRequest error:$it")
@@ -165,9 +165,7 @@ class NotificationViewModel @Inject constructor(
     fun rejectFollowRequest(notification: Notification) {
         if (notification is ReceiveFollowRequestNotification) {
             viewModelScope.launch(Dispatchers.IO) {
-                runCancellableCatching {
-                    followRequestRepository.reject(notification.userId)
-                }.onSuccess {
+                rejectFollowRequestUseCase(notification.userId).onSuccess {
                     loadInit()
                 }.onFailure {
                     logger.error("rejectFollowRequest error:$it")
