@@ -96,10 +96,10 @@ open class UserViewData(
 
 
     val user: LiveData<User.Detail?> = if (userId != null) {
-        userDataSource.observe(userId)
+        userRepository.observe(userId)
     } else {
         require(userName != null)
-        userDataSource.observe(userName = userName, host = host, accountId = accountId)
+        userRepository.observe(userName = userName, host = host, accountId = accountId)
     }.filterNotNull().map {
         it as? User.Detail
     }.asLiveData()
@@ -180,7 +180,6 @@ open class UserViewData(
 
     }
 
-    @Suppress("BlockingMethodInNonBlockingContext")
     private suspend fun initLoad() {
 
         if (user.value == null) {
