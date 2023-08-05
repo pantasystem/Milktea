@@ -146,7 +146,7 @@ class AuthStateHelper @Inject constructor(
             }
             is InstanceType.Misskey -> {
                 val version = instanceType.instance.getVersion()
-                val misskeyAPI = misskeyAPIProvider.get(url, version)
+                val misskeyAPI = misskeyAPIProvider.get(url)
                 val app = misskeyAPI.createApp(
                     net.pantasystem.milktea.api.misskey.app.CreateApp(
                         null,
@@ -161,8 +161,7 @@ class AuthStateHelper @Inject constructor(
                 return AppType.fromDTO(app)
             }
             is InstanceType.Firefish -> {
-                val version = instanceType.instance.getVersion()
-                val misskeyAPI = misskeyAPIProvider.get(url, version)
+                val misskeyAPI = misskeyAPIProvider.get(url)
                 val app = misskeyAPI.createApp(
                     net.pantasystem.milktea.api.misskey.app.CreateApp(
                         null,

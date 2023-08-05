@@ -27,7 +27,6 @@ class MetaRepositoryImpl @Inject constructor(
             val meta = fetch(instanceDomain)
             metaDataSource.add(meta)
             metaCache.put(meta.uri, meta)
-            misskeyAPIProvider.applyVersion(instanceDomain, meta.getVersion())
             HostWithVersion.put(URL(meta.uri).host, meta.getVersion())
         }
     }
@@ -46,7 +45,6 @@ class MetaRepositoryImpl @Inject constructor(
                 localMeta
             }.also { meta ->
                 metaCache.put(meta.uri, meta)
-                misskeyAPIProvider.applyVersion(instanceDomain, meta.getVersion())
                 HostWithVersion.put(URL(meta.uri).host, meta.getVersion())
             }
         }
@@ -61,7 +59,6 @@ class MetaRepositoryImpl @Inject constructor(
         return metaDataSource.observe(instanceDomain).onEach { meta ->
             if (meta != null) {
                 metaCache.put(instanceDomain, meta)
-                misskeyAPIProvider.applyVersion(instanceDomain, meta.getVersion())
                 HostWithVersion.put(URL(meta.uri).host, meta.getVersion())
             }
         }

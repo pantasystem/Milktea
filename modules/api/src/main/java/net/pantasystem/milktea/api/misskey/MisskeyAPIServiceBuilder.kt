@@ -3,7 +3,6 @@ package net.pantasystem.milktea.api.misskey
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
-import net.pantasystem.milktea.model.instance.Version
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
@@ -66,9 +65,6 @@ class MisskeyAPIServiceBuilder @Inject constructor(
             .build()
             .create(MisskeyAuthAPI::class.java)
 
-    fun build(baseUrl: String, version: Version): MisskeyAPI {
-        return build(baseUrl)
 
-    }
 }
 

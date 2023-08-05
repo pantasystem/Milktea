@@ -1,13 +1,13 @@
 package net.pantasystem.milktea.model.group
 
-import net.pantasystem.milktea.model.UseCase1
+import net.pantasystem.milktea.model.UseCase
 import javax.inject.Inject
 
 class AcceptGroupInvitationUseCase @Inject constructor(
     private val groupRepository: GroupRepository
-) : UseCase1<InvitationId, Unit> {
+) : UseCase {
 
-    override suspend fun invoke(p1: InvitationId): Result<Unit> {
-        return groupRepository.accept(p1)
+    suspend operator fun invoke(invitationId: InvitationId): Result<Unit> {
+        return groupRepository.accept(invitationId)
     }
 }

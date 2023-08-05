@@ -123,8 +123,7 @@ internal class TimelinePagingStoreImpl(
 
     private suspend fun getStore(): (suspend (NoteRequest) -> Response<List<NoteDTO>?>)? {
         val account = getAccount.invoke()
-        val meta = metaRepository.find(account.normalizedInstanceUri)
-        val api = misskeyAPIProvider.get(account, meta.getOrNull()?.getVersion())
+        val api = misskeyAPIProvider.get(account)
         return try {
             when (pageableTimeline) {
                 is Pageable.GlobalTimeline -> api::globalTimeline
