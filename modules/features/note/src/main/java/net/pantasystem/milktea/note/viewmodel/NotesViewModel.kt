@@ -9,20 +9,22 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import net.pantasystem.milktea.app_store.account.AccountStore
 import net.pantasystem.milktea.app_store.notes.NoteTranslationStore
 import net.pantasystem.milktea.common.Logger
-import net.pantasystem.milktea.common.mapCancellableCatching
 import net.pantasystem.milktea.common_android.resource.StringSource
 import net.pantasystem.milktea.model.notes.DeleteAndEditUseCase
+import net.pantasystem.milktea.model.notes.DeleteNoteUseCase
 import net.pantasystem.milktea.model.notes.Note
 import net.pantasystem.milktea.model.notes.NoteRelation
-import net.pantasystem.milktea.model.notes.NoteRepository
-import net.pantasystem.milktea.model.notes.bookmark.BookmarkRepository
+import net.pantasystem.milktea.model.notes.RecursiveSearchHasContentNoteUseCase
+import net.pantasystem.milktea.model.notes.bookmark.CreateBookmarkUseCase
+import net.pantasystem.milktea.model.notes.bookmark.DeleteBookmarkUseCase
 import net.pantasystem.milktea.model.notes.draft.DraftNote
-import net.pantasystem.milktea.model.notes.favorite.FavoriteRepository
+import net.pantasystem.milktea.model.notes.favorite.CreateFavoriteUseCase
+import net.pantasystem.milktea.model.notes.favorite.DeleteFavoriteUseCase
 import net.pantasystem.milktea.model.notes.favorite.ToggleFavoriteUseCase
 import net.pantasystem.milktea.model.notes.poll.Poll
+import net.pantasystem.milktea.model.notes.poll.VoteUseCase
 import net.pantasystem.milktea.model.notes.reaction.DeleteReactionsUseCase
 import net.pantasystem.milktea.model.notes.reaction.ToggleReactionUseCase
 import net.pantasystem.milktea.model.user.report.Report
@@ -32,15 +34,18 @@ import javax.inject.Inject
 
 @HiltViewModel
 class NotesViewModel @Inject constructor(
-    private val noteRepository: NoteRepository,
+    private val recursiveSearchHasContentNoteUseCase: RecursiveSearchHasContentNoteUseCase,
     private val toggleReactionUseCase: ToggleReactionUseCase,
-    private val favoriteRepository: FavoriteRepository,
-    val accountStore: AccountStore,
+    private val createFavoriteUseCase: CreateFavoriteUseCase,
+    private val deleteFavoriteUseCase: DeleteFavoriteUseCase,
     private val translationStore: NoteTranslationStore,
-    private val bookmarkRepository: BookmarkRepository,
+    private val createBookmarkUseCase: CreateBookmarkUseCase,
+    private val deleteBookmarkUseCase: DeleteBookmarkUseCase,
+    private val deleteNoteUseCase: DeleteNoteUseCase,
     private val toggleFavoriteUseCase: ToggleFavoriteUseCase,
     private val deleteAndEditUseCase: DeleteAndEditUseCase,
     private val deleteReactionUseCase: DeleteReactionsUseCase,
+    private val voteUseCase: VoteUseCase,
     loggerFactory: Logger.Factory
 ) : ViewModel() {
     private val logger by lazy {
@@ -73,13 +78,7 @@ class NotesViewModel @Inject constructor(
     }
 
     private suspend fun recursiveSearchHasContentNote(noteId: Note.Id): Result<Note> =
-        noteRepository.find(noteId).mapCancellableCatching { note ->
-            if (note.hasContent()) {
-                note
-            } else {
-                recursiveSearchHasContentNote(requireNotNull(note.renoteId)).getOrThrow()
-            }
-        }
+        recursiveSearchHasContentNoteUseCase(noteId)
 
     /**
      * リアクションを送信する
@@ -110,7 +109,7 @@ class NotesViewModel @Inject constructor(
 
     fun addFavorite(noteId: Note.Id) {
         viewModelScope.launch {
-            favoriteRepository.create(noteId).onSuccess {
+            createFavoriteUseCase(noteId).onSuccess {
                 _statusMessage.tryEmit(StringSource(R.string.successfully_added_to_favorites))
             }.onFailure {
                 _statusMessage.tryEmit(StringSource(R.string.failed_to_add_to_favorites))
@@ -120,7 +119,7 @@ class NotesViewModel @Inject constructor(
 
     fun deleteFavorite(noteId: Note.Id) {
         viewModelScope.launch {
-            val result = favoriteRepository.delete(noteId).getOrNull() != null
+            val result = deleteFavoriteUseCase(noteId).getOrNull() != null
             _statusMessage.tryEmit(if (result) {
                 StringSource(R.string.removed_from_favorites)
             } else {
@@ -132,7 +131,7 @@ class NotesViewModel @Inject constructor(
 
     fun addBookmark(noteId: Note.Id) {
         viewModelScope.launch {
-            bookmarkRepository.create(noteId).onFailure {
+            createBookmarkUseCase(noteId).onFailure {
                 logger.error("add book mark error", it)
             }
         }
@@ -140,7 +139,7 @@ class NotesViewModel @Inject constructor(
 
     fun removeBookmark(noteId: Note.Id) {
         viewModelScope.launch {
-            bookmarkRepository.delete(noteId).onFailure {
+            deleteBookmarkUseCase(noteId).onFailure {
                 logger.error("remove book mark error", it)
             }
         }
@@ -148,7 +147,7 @@ class NotesViewModel @Inject constructor(
 
     fun removeNote(noteId: Note.Id) {
         viewModelScope.launch {
-            noteRepository.delete(noteId).onSuccess {
+            deleteNoteUseCase(noteId).onSuccess {
                 _statusMessage.tryEmit(StringSource(R.string.successfully_deleted))
             }.onFailure {
                 logger.error("ノート削除に失敗", it)
@@ -172,13 +171,11 @@ class NotesViewModel @Inject constructor(
         if (noteId == null || poll == null || choice == null) {
             return
         }
-        if (poll.canVote) {
-            viewModelScope.launch {
-                noteRepository.vote(noteId, choice).onSuccess {
-                    logger.debug("投票に成功しました")
-                }.onFailure {
-                    logger.error("投票に失敗しました", it)
-                }
+        viewModelScope.launch {
+            voteUseCase(noteId, choice).onFailure {
+                logger.error("投票に失敗しました", it)
+            }.onSuccess {
+                logger.debug("投票に成功しました")
             }
         }
     }
