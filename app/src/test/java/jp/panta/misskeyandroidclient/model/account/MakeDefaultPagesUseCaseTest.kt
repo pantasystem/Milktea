@@ -1,7 +1,6 @@
 package jp.panta.misskeyandroidclient.model.account
 
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.test.runTest
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.MakeDefaultPagesUseCase
 import net.pantasystem.milktea.model.account.PageDefaultStringsJp
@@ -9,62 +8,63 @@ import net.pantasystem.milktea.model.account.page.PageType
 import net.pantasystem.milktea.model.account.page.Pageable
 import net.pantasystem.milktea.model.instance.Meta
 import net.pantasystem.milktea.model.nodeinfo.NodeInfo
-import net.pantasystem.milktea.model.nodeinfo.NodeInfoRepository
 import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.mockito.kotlin.any
+import org.mockito.kotlin.doReturn
+import org.mockito.kotlin.mock
 
 
 class MakeDefaultPagesUseCaseTest {
 
-    lateinit var makeDefaultPagesUseCase: MakeDefaultPagesUseCase
-    lateinit var account: Account
-
-    @BeforeEach
-    fun setup() {
-        makeDefaultPagesUseCase = MakeDefaultPagesUseCase(
-            PageDefaultStringsJp(),
-            nodeInfoRepository = object : NodeInfoRepository {
-                override suspend fun find(host: String): Result<NodeInfo> = Result.success(get(host))
-
-                override fun get(host: String): NodeInfo {
-                    return NodeInfo(
-                        host = "", version = "", software = NodeInfo.Software(
-                            name = "misskey",
-                            version = ""
-                        )
-                    )
-                }
-
-                override fun observe(host: String): Flow<NodeInfo?> = flowOf()
-                override suspend fun sync(host: String): Result<Unit> = Result.success(Unit)
-                override suspend fun syncAll(): Result<Unit> = Result.success(Unit)
-            }
-        )
-        account = Account(
+    @Test
+    fun disableGlobalTimeline() = runTest {
+        val account = Account(
             "remoteId",
             "https://misskey.io",
             "",
             instanceType = Account.InstanceType.MISSKEY,
             "",
         )
-    }
-
-    @Test
-    fun disableGlobalTimeline() {
         val meta = Meta(
             "",
             disableGlobalTimeline = true,
             disableLocalTimeline = false,
         )
-        val pages = makeDefaultPagesUseCase(account, meta)
+        val nodeInfo = NodeInfo(
+            host = "", version = "", software = NodeInfo.Software(
+                name = "misskey",
+                version = ""
+            )
+        )
+        val makeDefaultPagesUseCase = MakeDefaultPagesUseCase(
+            PageDefaultStringsJp(),
+            mock() {
+                on {
+                    get(any())
+                } doReturn nodeInfo
+                onBlocking {
+                    find(any())
+                } doReturn Result.success(nodeInfo)
+            },
+            mock() {
+                onBlocking {
+                    find(any())
+                } doReturn Result.success(meta)
+            },
+        )
+        val pages = makeDefaultPagesUseCase(account)
         assertEquals(3, pages.size)
         val types = pages.map {
             it.pageParams.type
         }.sorted()
         assertEquals(listOf(PageType.SOCIAL, PageType.SOCIAL, PageType.HOME).sorted(), types)
         assertEquals(
-            listOf(Pageable.HomeTimeline(), Pageable.HybridTimeline(), Pageable.HybridTimeline(withFiles = true)),
+            listOf(
+                Pageable.HomeTimeline(),
+                Pageable.HybridTimeline(),
+                Pageable.HybridTimeline(withFiles = true)
+            ),
             pages.map {
                 it.pageable()
             }
@@ -72,20 +72,54 @@ class MakeDefaultPagesUseCaseTest {
     }
 
     @Test
-    fun disableLocalTimeline() {
+    fun disableLocalTimeline() = runTest {
+        val account = Account(
+            "remoteId",
+            "https://misskey.io",
+            "",
+            instanceType = Account.InstanceType.MISSKEY,
+            "",
+        )
         val meta = Meta(
             "",
             disableGlobalTimeline = false,
             disableLocalTimeline = true,
         )
-        val pages = makeDefaultPagesUseCase(account, meta)
+        val nodeInfo = NodeInfo(
+            host = "", version = "", software = NodeInfo.Software(
+                name = "misskey",
+                version = ""
+            )
+        )
+        val makeDefaultPagesUseCase = MakeDefaultPagesUseCase(
+            PageDefaultStringsJp(),
+            mock() {
+                on {
+                    get(any())
+                } doReturn nodeInfo
+                onBlocking {
+                    find(any())
+                } doReturn Result.success(nodeInfo)
+            },
+            mock() {
+                onBlocking {
+                    find(any())
+                } doReturn Result.success(meta)
+            },
+        )
+
+        val pages = makeDefaultPagesUseCase(account)
         assertEquals(3, pages.size)
         val types = pages.map {
             it.pageParams.type
         }.sorted()
         assertEquals(listOf(PageType.GLOBAL, PageType.HOME, PageType.HOME).sorted(), types)
         assertEquals(
-            listOf(Pageable.HomeTimeline(), Pageable.HomeTimeline(withFiles = true), Pageable.GlobalTimeline()),
+            listOf(
+                Pageable.HomeTimeline(),
+                Pageable.HomeTimeline(withFiles = true),
+                Pageable.GlobalTimeline()
+            ),
             pages.map {
                 it.pageable()
             }
@@ -93,13 +127,44 @@ class MakeDefaultPagesUseCaseTest {
     }
 
     @Test
-    fun onlyEnableHomeTimeline() {
+    fun onlyEnableHomeTimeline() = runTest {
+        val account = Account(
+            "remoteId",
+            "https://misskey.io",
+            "",
+            instanceType = Account.InstanceType.MISSKEY,
+            "",
+        )
         val meta = Meta(
             "",
             disableGlobalTimeline = true,
             disableLocalTimeline = true,
         )
-        val pages = makeDefaultPagesUseCase(account, meta)
+        val nodeInfo = NodeInfo(
+            host = "", version = "", software = NodeInfo.Software(
+                name = "misskey",
+                version = ""
+            )
+        )
+        val makeDefaultPagesUseCase = MakeDefaultPagesUseCase(
+            PageDefaultStringsJp(),
+            mock() {
+                on {
+                    get(any())
+                } doReturn nodeInfo
+                onBlocking {
+                    find(any())
+                } doReturn Result.success(nodeInfo)
+            },
+            mock() {
+                onBlocking {
+                    find(any())
+                } doReturn Result.success(meta)
+            },
+        )
+
+
+        val pages = makeDefaultPagesUseCase(account)
         assertEquals(2, pages.size)
         val types = pages.map {
             it.pageParams.type
@@ -114,18 +179,54 @@ class MakeDefaultPagesUseCaseTest {
     }
 
     @Test
-    fun enabledAll() {
+    fun enabledAll() = runTest {
         val meta = Meta(
             "",
             disableGlobalTimeline = false,
             disableLocalTimeline = false,
         )
-        val pages = makeDefaultPagesUseCase(account, meta)
+        val account = Account(
+            "remoteId",
+            "https://misskey.io",
+            "",
+            instanceType = Account.InstanceType.MISSKEY,
+            "",
+        )
+        val nodeInfo = NodeInfo(
+            host = "", version = "", software = NodeInfo.Software(
+                name = "misskey",
+                version = ""
+            )
+        )
+        val makeDefaultPagesUseCase = MakeDefaultPagesUseCase(
+            PageDefaultStringsJp(),
+            mock() {
+                on {
+                    get(any())
+                } doReturn nodeInfo
+                onBlocking {
+                    find(any())
+                } doReturn Result.success(nodeInfo)
+            },
+            mock() {
+                onBlocking {
+                    find(any())
+                } doReturn Result.success(meta)
+            },
+        )
+        val pages = makeDefaultPagesUseCase(account)
         assertEquals(4, pages.size)
         val types = pages.map {
             it.pageParams.type
         }.sorted()
-        assertEquals(listOf(PageType.HOME, PageType.SOCIAL, PageType.GLOBAL, PageType.SOCIAL).sorted(), types)
+        assertEquals(
+            listOf(
+                PageType.HOME,
+                PageType.SOCIAL,
+                PageType.GLOBAL,
+                PageType.SOCIAL
+            ).sorted(), types
+        )
         assertEquals(
             listOf(
                 Pageable.HomeTimeline(),
@@ -140,13 +241,43 @@ class MakeDefaultPagesUseCaseTest {
     }
 
     @Test
-    fun weightIncrementedByOrder() {
+    fun weightIncrementedByOrder() = runTest {
         val meta = Meta(
             "",
             disableGlobalTimeline = false,
             disableLocalTimeline = false,
         )
-        val pages = makeDefaultPagesUseCase(account, meta)
+        val account = Account(
+            "remoteId",
+            "https://misskey.io",
+            "",
+            instanceType = Account.InstanceType.MISSKEY,
+            "",
+        )
+        val nodeInfo = NodeInfo(
+            host = "", version = "", software = NodeInfo.Software(
+                name = "misskey",
+                version = ""
+            )
+        )
+        val makeDefaultPagesUseCase = MakeDefaultPagesUseCase(
+            PageDefaultStringsJp(),
+            mock() {
+                on {
+                    get(any())
+                } doReturn nodeInfo
+                onBlocking {
+                    find(any())
+                } doReturn Result.success(nodeInfo)
+            },
+            mock() {
+                onBlocking {
+                    find(any())
+                } doReturn Result.success(meta)
+            },
+        )
+
+        val pages = makeDefaultPagesUseCase(account)
         pages.forEachIndexed { index, page ->
             assertEquals(index, page.weight)
         }
