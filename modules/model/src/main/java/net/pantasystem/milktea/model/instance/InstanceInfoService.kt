@@ -1,7 +1,6 @@
 package net.pantasystem.milktea.model.instance
 
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.flatMapLatest
@@ -75,7 +74,7 @@ open class InstanceInfoService @Inject constructor(
         }
     }
 
-    @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
+    @OptIn(ExperimentalCoroutinesApi::class)
     open fun observe(instanceDomain: String): Flow<InstanceInfoType?> {
         return suspend {
             nodeInfoRepository.find(URL(instanceDomain).host).getOrNull()
