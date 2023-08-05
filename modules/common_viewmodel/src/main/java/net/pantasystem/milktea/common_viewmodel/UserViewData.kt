@@ -3,9 +3,12 @@ package net.pantasystem.milktea.common_viewmodel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.asLiveData
 import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.model.account.Account
@@ -95,14 +98,18 @@ open class UserViewData(
     }
 
 
-    val user: LiveData<User.Detail?> = if (userId != null) {
+    val user: StateFlow<User.Detail?> = if (userId != null) {
         userRepository.observe(userId)
     } else {
         require(userName != null)
         userRepository.observe(userName = userName, host = host, accountId = accountId)
     }.filterNotNull().map {
         it as? User.Detail
-    }.asLiveData()
+    }.stateIn(
+        coroutineScope,
+        SharingStarted.WhileSubscribed(5_000),
+        null,
+    )
 
     @OptIn(FlowPreview::class)
     val account: LiveData<Account?> = suspend {

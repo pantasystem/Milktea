@@ -3,7 +3,6 @@ package net.pantasystem.milktea.note.editor.viewmodel
 //import net.pantasystem.milktea.model.instance.InstanceInfoRepository
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.*
@@ -277,7 +276,11 @@ class NoteEditorViewModel @Inject constructor(
 
     val isPostAvailable = uiState.map {
         it.checkValidate(textMaxLength = maxTextLength.value, maxFileCount = maxFileCount.value)
-    }.asLiveData()
+    }.stateIn(
+        viewModelScope,
+        SharingStarted.WhileSubscribed(5_000),
+        false,
+    )
 
     private val cache = planeNoteViewDataCacheFactory.create({
         requireNotNull(_currentAccount.value)
