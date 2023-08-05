@@ -52,9 +52,6 @@ class MetaRepositoryImpl @Inject constructor(
 
     }
 
-    override fun get(instanceDomain: String): Meta? {
-        return metaCache.get(instanceDomain)
-    }
 
     override fun observe(instanceDomain: String): Flow<Meta?> {
         return metaDataSource.observe(instanceDomain).onEach { meta ->
