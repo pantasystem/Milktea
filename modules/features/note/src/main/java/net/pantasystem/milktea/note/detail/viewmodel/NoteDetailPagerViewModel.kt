@@ -26,7 +26,7 @@ import net.pantasystem.milktea.model.account.page.Pageable
 import net.pantasystem.milktea.model.ap.ApResolverService
 import net.pantasystem.milktea.model.instance.InstanceInfoService
 import net.pantasystem.milktea.model.notes.Note
-import net.pantasystem.milktea.model.user.UserDataSource
+import net.pantasystem.milktea.model.user.UserRepository
 import javax.inject.Inject
 
 @HiltViewModel
@@ -37,7 +37,7 @@ class NoteDetailPagerViewModel @Inject constructor(
     private val accountStore: AccountStore,
     private val accountRepository: AccountRepository,
     instanceInfoService: InstanceInfoService,
-    userDataSource: UserDataSource,
+    userRepository: UserRepository,
     loggerFactory: Logger.Factory,
 ) : ViewModel() {
 
@@ -109,7 +109,7 @@ class NoteDetailPagerViewModel @Inject constructor(
     val accountUiState = AccountViewModelUiStateHelper(
         currentAccount,
         accountStore,
-        userDataSource,
+        userRepository,
         instanceInfoService,
         viewModelScope,
     ).uiState

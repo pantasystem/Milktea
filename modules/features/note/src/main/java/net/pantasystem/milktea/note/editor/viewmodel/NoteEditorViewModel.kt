@@ -37,7 +37,7 @@ import net.pantasystem.milktea.model.notes.draft.DraftNoteService
 import net.pantasystem.milktea.model.notes.reservation.NoteReservationPostExecutor
 import net.pantasystem.milktea.model.setting.LocalConfigRepository
 import net.pantasystem.milktea.model.user.User
-import net.pantasystem.milktea.model.user.UserDataSource
+import net.pantasystem.milktea.model.user.UserRepository
 import net.pantasystem.milktea.note.viewmodel.PlaneNoteViewDataCache
 import net.pantasystem.milktea.worker.note.CreateNoteWorkerExecutor
 import java.util.*
@@ -47,7 +47,6 @@ import javax.inject.Inject
 class NoteEditorViewModel @Inject constructor(
     loggerFactory: Logger.Factory,
     planeNoteViewDataCacheFactory: PlaneNoteViewDataCache.Factory,
-    userDataSource: UserDataSource,
     private val accountStore: AccountStore,
     private val getAllMentionUsersUseCase: GetAllMentionUsersUseCase,
     private val filePropertyDataSource: FilePropertyDataSource,
@@ -68,6 +67,7 @@ class NoteEditorViewModel @Inject constructor(
 //    private val instanceInfoRepository: InstanceInfoRepository,
     private val updateSensitiveUseCase: UpdateAppFileSensitiveUseCase,
     private val apResolverRepository: ApResolverRepository,
+    userRepository: UserRepository,
     private val savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
 
@@ -295,7 +295,7 @@ class NoteEditorViewModel @Inject constructor(
     val accountUiState = AccountViewModelUiStateHelper(
         _currentAccount,
         accountStore,
-        userDataSource,
+        userRepository,
         instanceInfoService,
         viewModelScope,
     ).uiState

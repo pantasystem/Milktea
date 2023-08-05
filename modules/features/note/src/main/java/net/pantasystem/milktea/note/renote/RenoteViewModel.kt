@@ -74,7 +74,7 @@ class RenoteViewModel @Inject constructor(
                 it.remoteId
             )
         }.map { (account, userId) ->
-            userDataSource.observe(userId).map { user ->
+            userRepository.observe(userId).map { user ->
                 account to user
             }
         }

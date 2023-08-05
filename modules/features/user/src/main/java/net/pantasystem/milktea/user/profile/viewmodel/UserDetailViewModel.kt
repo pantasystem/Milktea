@@ -46,7 +46,6 @@ class UserDetailViewModel @Inject constructor(
     private val unBlockUserUseCase: UnBlockUserUseCase,
     private val muteUserUseCase: MuteUserUseCase,
     private val unMuteUserUseCase: UnMuteUserUseCase,
-    userDataSource: UserDataSource,
     loggerFactory: Logger.Factory,
     instanceInfoService: InstanceInfoService,
     private val userRepository: UserRepository,
@@ -98,12 +97,12 @@ class UserDetailViewModel @Inject constructor(
     val userState = userProfileArgType.flatMapLatest {
         when (val type = it) {
             is UserProfileArgType.FqdnUserName -> {
-                userDataSource.observe(type.currentAccount.accountId, type.fqdnUserName)
+                userRepository.observe(type.currentAccount.accountId, type.fqdnUserName)
             }
 
             UserProfileArgType.None -> flowOf(null)
             is UserProfileArgType.UserId -> {
-                userDataSource.observe(type.userId)
+                userRepository.observe(type.userId)
             }
         }
     }.mapNotNull {
@@ -152,7 +151,7 @@ class UserDetailViewModel @Inject constructor(
     val accountUiState = AccountViewModelUiStateHelper(
         currentAccount,
         accountStore,
-        userDataSource,
+        userRepository,
         instanceInfoService,
         viewModelScope,
     ).uiState

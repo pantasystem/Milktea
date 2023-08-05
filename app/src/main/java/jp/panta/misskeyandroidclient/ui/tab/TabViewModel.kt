@@ -11,13 +11,13 @@ import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.model.setting.DefaultConfig
 import net.pantasystem.milktea.model.setting.LocalConfigRepository
 import net.pantasystem.milktea.model.user.User
-import net.pantasystem.milktea.model.user.UserDataSource
+import net.pantasystem.milktea.model.user.UserRepository
 import javax.inject.Inject
 
 @HiltViewModel
 class TabViewModel @Inject constructor(
     val accountStore: AccountStore,
-    private val userDataSource: UserDataSource,
+    private val userRepository: UserRepository,
     private val configRepository: LocalConfigRepository,
     loggerFactory: Logger.Factory,
 ): ViewModel() {
@@ -32,7 +32,7 @@ class TabViewModel @Inject constructor(
 
     @OptIn(ExperimentalCoroutinesApi::class)
     val currentUser = accountStore.observeCurrentAccount.filterNotNull().flatMapLatest {
-        userDataSource.observe(User.Id(it.accountId, it.remoteId))
+        userRepository.observe(User.Id(it.accountId, it.remoteId))
     }.flowOn(Dispatchers.IO).stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
 
     @OptIn(ExperimentalCoroutinesApi::class)
