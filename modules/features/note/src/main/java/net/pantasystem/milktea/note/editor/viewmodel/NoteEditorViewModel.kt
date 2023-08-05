@@ -13,7 +13,6 @@ import kotlinx.datetime.Instant
 import net.pantasystem.milktea.app_store.account.AccountStore
 import net.pantasystem.milktea.common.*
 import net.pantasystem.milktea.common.text.UrlPatternChecker
-import net.pantasystem.milktea.common_android.eventbus.EventBus
 import net.pantasystem.milktea.common_android_ui.account.viewmodel.AccountViewModelUiStateHelper
 import net.pantasystem.milktea.common_viewmodel.UserViewData
 import net.pantasystem.milktea.model.account.Account
@@ -304,13 +303,17 @@ class NoteEditorViewModel @Inject constructor(
         MutableSharedFlow<FileSizeInvalidEvent>(extraBufferCapacity = 10)
     val fileSizeInvalidEvent = _fileSizeInvalidEvent.asSharedFlow()
 
-    val isPost = EventBus<Boolean>()
+    private val _isPost = MutableSharedFlow<Boolean>(extraBufferCapacity = 10)
+    val isPost = _isPost.asSharedFlow()
 
-    val showPollDatePicker = EventBus<Unit>()
-    val showPollTimePicker = EventBus<Unit>()
+    private val _showPollDatePicker = MutableSharedFlow<Unit>(extraBufferCapacity = 10)
+    val showPollDatePicker = _showPollDatePicker.asSharedFlow()
 
+    private val _showPollTimePicker = MutableSharedFlow<Unit>(extraBufferCapacity = 10)
+    val showPollTimePicker = _showPollTimePicker.asSharedFlow()
 
-    val isSaveNoteAsDraft = EventBus<Long?>()
+    private val _isSaveNoteAsDraft = MutableSharedFlow<Long?>(extraBufferCapacity = 10)
+    val isSaveNoteAsDraft = _isSaveNoteAsDraft.asSharedFlow()
 
     var focusType: NoteEditorFocusEditTextType = NoteEditorFocusEditTextType.Text
 
@@ -428,9 +431,7 @@ class NoteEditorViewModel @Inject constructor(
                         noteReservationPostExecutor.register(dfNote)
                     }
                 }.onSuccess {
-                    withContext(Dispatchers.Main) {
-                        isPost.event = true
-                    }
+                    _isPost.tryEmit(true)
                 }.onFailure {
                     logger.error("登録失敗", it)
                 }
@@ -679,7 +680,7 @@ class NoteEditorViewModel @Inject constructor(
             }.mapCancellableCatching { account ->
                 draftNoteService.save(uiState.value.toCreateNote(account)).getOrThrow()
             }.onSuccess { result ->
-                isSaveNoteAsDraft.event = result.draftNoteId
+                _isSaveNoteAsDraft.tryEmit(result.draftNoteId)
             }.onFailure { e ->
                 logger.error("下書き保存に失敗した", e)
             }
@@ -755,6 +756,12 @@ class NoteEditorViewModel @Inject constructor(
         savedStateHandle.setReactionAcceptanceType(type)
     }
 
+    fun onExpireAtChangeDateButtonClicked() {
+        _showPollDatePicker.tryEmit(Unit)
+    }
+    fun onExpireAtChangeTimeButtonClicked(){
+        _showPollTimePicker.tryEmit(Unit)
+    }
     private fun setUpUserViewData(userId: User.Id): UserViewData {
         return userViewDataFactory.create(userId, viewModelScope, dispatcher)
     }

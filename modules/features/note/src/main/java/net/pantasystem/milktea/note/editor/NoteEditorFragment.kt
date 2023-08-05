@@ -428,12 +428,13 @@ class NoteEditorFragment : Fragment(R.layout.fragment_note_editor), EmojiSelecti
             noteEditorViewModel.setText((e?.toString() ?: ""))
         }
 
-        noteEditorViewModel.isPost.observe(viewLifecycleOwner) {
+        noteEditorViewModel.isPost.onEach {
             if (it) {
                 noteEditorToolbar.postButton.isEnabled = false
                 requireActivity().finish()
             }
-        }
+        }.flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.RESUMED)
+            .launchIn(viewLifecycleOwner.lifecycleScope)
 
 
         lifecycleScope.launch {
@@ -444,13 +445,15 @@ class NoteEditorFragment : Fragment(R.layout.fragment_note_editor), EmojiSelecti
             }
         }
 
-        noteEditorViewModel.showPollTimePicker.observe(viewLifecycleOwner) {
+        noteEditorViewModel.showPollTimePicker.onEach {
             PollTimePickerDialog().show(childFragmentManager, "TimePicker")
-        }
+        }.flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.RESUMED)
+            .launchIn(viewLifecycleOwner.lifecycleScope)
 
-        noteEditorViewModel.showPollDatePicker.observe(viewLifecycleOwner) {
+        noteEditorViewModel.showPollDatePicker.onEach {
             PollDatePickerDialog().show(childFragmentManager, "DatePicker")
-        }
+        }.flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.RESUMED)
+            .launchIn(viewLifecycleOwner.lifecycleScope)
 
         emojiSelectionViewModel.selectedEmoji.observe(viewLifecycleOwner) {
             onSelect(it)
@@ -520,7 +523,7 @@ class NoteEditorFragment : Fragment(R.layout.fragment_note_editor), EmojiSelecti
         ).launchIn(viewLifecycleOwner.lifecycleScope)
 
 
-        noteEditorViewModel.isSaveNoteAsDraft.observe(viewLifecycleOwner) {
+        noteEditorViewModel.isSaveNoteAsDraft.onEach {
             Handler(Looper.getMainLooper()).post {
                 if (it == null) {
                     Toast.makeText(requireContext(), "下書きに失敗しました", Toast.LENGTH_LONG).show()
@@ -528,7 +531,9 @@ class NoteEditorFragment : Fragment(R.layout.fragment_note_editor), EmojiSelecti
                     upTo()
                 }
             }
-        }
+        }.flowWithLifecycle(
+            viewLifecycleOwner.lifecycle, Lifecycle.State.RESUMED
+        ).launchIn(viewLifecycleOwner.lifecycleScope)
 
         viewLifecycleOwner.lifecycleScope.launch {
             noteEditorViewModel.textCursorPos.collect {

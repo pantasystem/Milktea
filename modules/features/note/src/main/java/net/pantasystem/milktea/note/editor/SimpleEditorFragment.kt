@@ -196,10 +196,10 @@ class SimpleEditorFragment : Fragment(R.layout.fragment_simple_editor), SimpleEd
             }
         }
 
-
-        viewModel.isPost.observe(viewLifecycleOwner) {
+        viewModel.isPost.onEach {
             viewModel.clear()
-        }
+        }.flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.RESUMED)
+            .launchIn(viewLifecycleOwner.lifecycleScope)
 
         mBinding.noteVisibility.setOnClickListener {
             val dialog = VisibilitySelectionDialogV2()
@@ -214,13 +214,16 @@ class SimpleEditorFragment : Fragment(R.layout.fragment_simple_editor), SimpleEd
             }
         }
 
-        viewModel.showPollTimePicker.observe(this) {
+        viewModel.showPollDatePicker.onEach {
             PollTimePickerDialog().show(childFragmentManager, "TimePicker")
-        }
+        }.flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.RESUMED)
+            .launchIn(viewLifecycleOwner.lifecycleScope)
 
-        viewModel.showPollDatePicker.observe(this) {
+        viewModel.showPollDatePicker.onEach {
             PollDatePickerDialog().show(childFragmentManager, "DatePicker")
-        }
+        }.flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.RESUMED)
+            .launchIn(viewLifecycleOwner.lifecycleScope)
+
 
         mBinding.inputCw.addTextChangedListener { e ->
             viewModel.setCw((e?.toString() ?: ""))
