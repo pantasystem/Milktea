@@ -24,7 +24,6 @@ import net.pantasystem.milktea.common_android.ui.text.CustomEmojiDecorator
 import net.pantasystem.milktea.common_android_ui.reaction.ReactionAutoCompleteArrayAdapter
 import net.pantasystem.milktea.common_android_ui.reaction.ReactionChoicesAdapter
 import net.pantasystem.milktea.model.emoji.CustomEmojiRepository
-import net.pantasystem.milktea.model.instance.MetaRepository
 import net.pantasystem.milktea.model.setting.ReactionPickerType
 import net.pantasystem.milktea.setting.R
 import net.pantasystem.milktea.setting.databinding.ActivityReactionSettingBinding
@@ -38,9 +37,6 @@ class ReactionSettingActivity : AppCompatActivity() {
 
 
     val mReactionPickerSettingViewModel: ReactionPickerSettingViewModel by viewModels()
-
-    @Inject
-    lateinit var metaRepository: MetaRepository
 
     @Inject
     lateinit var accountStore: AccountStore

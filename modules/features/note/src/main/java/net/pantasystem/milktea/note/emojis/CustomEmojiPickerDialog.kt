@@ -7,7 +7,6 @@ import android.view.ViewGroup
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import dagger.hilt.android.AndroidEntryPoint
 import net.pantasystem.milktea.app_store.account.AccountStore
-import net.pantasystem.milktea.model.instance.MetaRepository
 import net.pantasystem.milktea.note.R
 import net.pantasystem.milktea.note.emojis.viewmodel.EmojiSelection
 import net.pantasystem.milktea.note.emojis.viewmodel.EmojiSelectionViewModel
@@ -31,8 +30,6 @@ class CustomEmojiPickerDialog : BottomSheetDialogFragment(), EmojiPickerFragment
     @Inject
     lateinit var accountStore: AccountStore
 
-    @Inject
-    lateinit var metaRepository: MetaRepository
 
     private val accountId: Long? by lazy(LazyThreadSafetyMode.NONE) {
         arguments?.getLong("ACCOUNT_ID")?.takeIf {

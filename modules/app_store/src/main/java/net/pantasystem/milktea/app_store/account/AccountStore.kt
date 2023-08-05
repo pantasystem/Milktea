@@ -12,14 +12,12 @@ import net.pantasystem.milktea.model.account.AccountNotFoundException
 import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.account.MakeDefaultPagesUseCase
 import net.pantasystem.milktea.model.account.page.Page
-import net.pantasystem.milktea.model.instance.MetaRepository
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
 class AccountStore @Inject constructor(
     val accountRepository: AccountRepository,
-    val metaRepository: MetaRepository,
     val loggerFactory: Logger.Factory,
     val makeDefaultPagesUseCase: MakeDefaultPagesUseCase,
 ) {
@@ -148,8 +146,7 @@ class AccountStore @Inject constructor(
             return
         }
         try {
-            val meta = metaRepository.find(account.normalizedInstanceUri).getOrNull()
-            val pages = makeDefaultPagesUseCase(account, meta)
+            val pages = makeDefaultPagesUseCase(account)
             accountRepository.add(account.copy(pages = pages), true)
         } catch (e: Exception) {
             logger.error("default pages create error", e)
