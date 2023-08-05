@@ -65,13 +65,13 @@ class SocketImpl(
     private var isDestroyed: Boolean = false
 
 
-    override fun addMessageEventListener(listener: SocketMessageEventListener) {
+    override fun addMessageEventListener(autoConnect: Boolean, listener: SocketMessageEventListener) {
 
         val empty = messageListeners.isEmpty()
         messageListeners = messageListeners.toMutableSet().also {
             it.add(listener)
         }
-        if (empty && messageListeners.isNotEmpty()) {
+        if (empty && messageListeners.isNotEmpty() && autoConnect) {
             try {
                 connect()
             } catch (e: Exception) {
@@ -173,7 +173,6 @@ class SocketImpl(
 
             }
             addStateEventListener(callback)
-            return@suspendCoroutine
         }
     }
 

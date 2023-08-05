@@ -3,7 +3,11 @@ package net.pantasystem.milktea.data.infrastructure.emoji
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
-import net.pantasystem.milktea.api_streaming.*
+import net.pantasystem.milktea.api_streaming.EmojiAdded
+import net.pantasystem.milktea.api_streaming.EmojiDeleted
+import net.pantasystem.milktea.api_streaming.EmojiUpdated
+import net.pantasystem.milktea.api_streaming.SocketMessageEventListener
+import net.pantasystem.milktea.api_streaming.StreamingEvent
 import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.data.streaming.SocketWithAccountProvider
 import net.pantasystem.milktea.model.account.Account
@@ -31,7 +35,7 @@ class EmojiEventHandlerImpl @Inject constructor(
                 socketProvider.get(it)
             }?.removeMessageEventListener(this)
             if (account != null) {
-                socketProvider.get(account.accountId)?.addMessageEventListener(this)
+                socketProvider.get(account.accountId)?.addMessageEventListener(true, this)
             }
             currentAccount = account
 
