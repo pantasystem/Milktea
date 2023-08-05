@@ -1,5 +1,6 @@
 package net.pantasystem.milktea.model.user
 
+import kotlinx.coroutines.flow.Flow
 import net.pantasystem.milktea.model.user.query.FindUsersQuery
 
 interface UserRepository {
@@ -17,4 +18,10 @@ interface UserRepository {
     suspend fun sync(userId: User.Id): Result<Unit>
 
     suspend fun syncIn(userIds: List<User.Id>): Result<List<User.Id>>
+
+    fun observeIn(accountId: Long, serverIds: List<String>): Flow<List<User>>
+    fun observe(userId: User.Id): Flow<User>
+    fun observe(accountId: Long, acct: String): Flow<User>
+
+    fun observe(userName: String, host: String? = null, accountId: Long): Flow<User?>
 }

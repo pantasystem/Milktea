@@ -2,6 +2,7 @@ package net.pantasystem.milktea.data.infrastructure.user
 
 
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.withContext
 import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.common.runCancellableCatching
@@ -125,6 +126,22 @@ internal class UserRepositoryImpl @Inject constructor(
                 }
             }
         }
+    }
+
+    override fun observe(userId: User.Id): Flow<User> {
+        return userDataSource.observe(userId)
+    }
+
+    override fun observe(accountId: Long, acct: String): Flow<User> {
+        return userDataSource.observe(accountId, acct)
+    }
+
+    override fun observe(userName: String, host: String?, accountId: Long): Flow<User?> {
+        return userDataSource.observe(userName, host, accountId)
+    }
+
+    override fun observeIn(accountId: Long, serverIds: List<String>): Flow<List<User>> {
+        return userDataSource.observeIn(accountId, serverIds)
     }
 
 }
