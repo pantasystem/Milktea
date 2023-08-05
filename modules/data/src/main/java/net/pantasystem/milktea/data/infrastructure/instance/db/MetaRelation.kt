@@ -3,7 +3,6 @@ package net.pantasystem.milktea.data.infrastructure.instance.db
 import androidx.room.DatabaseView
 import androidx.room.Embedded
 import androidx.room.Ignore
-import androidx.room.Relation
 import net.pantasystem.milktea.model.instance.Meta
 
 @DatabaseView
@@ -11,12 +10,6 @@ class MetaRelation {
 
     @Embedded
     lateinit var meta: MetaDTO
-
-    @Relation(parentColumn = "uri", entityColumn = "instanceDomain")
-    lateinit var emojis: List<EmojiDTO>
-
-    @Relation(parentColumn = "uri", entityColumn = "instanceDomain")
-    lateinit var aliases: List<EmojiAlias>
 
     @Ignore
     fun toMeta(): Meta {
