@@ -102,7 +102,7 @@ dependencies {
 
 
     implementation "com.squareup.retrofit2:retrofit:$retrofit"
-    implementation("com.jakewharton.retrofit:retrofit2-kotlinx-serialization-converter:0.8.0")
+    implementation("com.jakewharton.retrofit:retrofit2-kotlinx-serialization-converter:1.0.0")
     implementation libs.activity.ktx
 
     // compose
