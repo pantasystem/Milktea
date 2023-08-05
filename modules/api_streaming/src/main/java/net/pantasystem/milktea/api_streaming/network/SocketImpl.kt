@@ -65,13 +65,13 @@ class SocketImpl(
     private var isDestroyed: Boolean = false
 
 
-    override fun addMessageEventListener(listener: SocketMessageEventListener) {
+    override fun addMessageEventListener(autoConnect: Boolean, listener: SocketMessageEventListener) {
 
         val empty = messageListeners.isEmpty()
         messageListeners = messageListeners.toMutableSet().also {
             it.add(listener)
         }
-        if (empty && messageListeners.isNotEmpty()) {
+        if (empty && messageListeners.isNotEmpty() && autoConnect) {
             try {
                 connect()
             } catch (e: Exception) {
@@ -116,6 +116,11 @@ class SocketImpl(
 
             if (isDestroyed) {
                 logger.debug { "destroyedされているのでキャンセル" }
+                return false
+            }
+
+            if (messageListeners.isEmpty()) {
+                logger.debug { "messageListenerが空なのでキャンセル" }
                 return false
             }
 
@@ -168,7 +173,6 @@ class SocketImpl(
 
             }
             addStateEventListener(callback)
-            return@suspendCoroutine
         }
     }
 
@@ -208,7 +212,9 @@ class SocketImpl(
 
     override fun onNetworkActive() {
         isNetworkActive = true
-        connect()
+        if (messageListeners.isNotEmpty()) {
+            connect()
+        }
     }
 
     override fun onNetworkInActive() {

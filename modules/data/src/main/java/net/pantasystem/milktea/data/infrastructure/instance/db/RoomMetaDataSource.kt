@@ -8,7 +8,6 @@ import net.pantasystem.milktea.model.instance.MetaDataSource
 
 class RoomMetaDataSource(
     private val metaDAO: MetaDAO,
-    private val emojiAliasDAO: EmojiAliasDAO,
     val database: DataBase
 ) : MetaDataSource {
 
@@ -22,26 +21,7 @@ class RoomMetaDataSource(
                 metaDAO.insert(MetaDTO(meta))
             }
 
-            val emojiDTOList = meta.emojis?.map{
-                EmojiDTO(it, meta.uri)
-            }
-            if(emojiDTOList != null){
-                metaDAO.deleteEmojisBy(meta.uri)
-                metaDAO.insertAll(emojiDTOList)
-            }
-            meta.emojis?.map { emoji ->
-                emoji.aliases?.filter {
-                    it.isNotBlank()
-                }?.map { alias ->
-                    EmojiAlias(
-                        alias,
-                        emoji.name,
-                        meta.uri
-                    )
-                }?: emptyList()
-            }?.forEach { list ->
-                emojiAliasDAO.insertAll(list)
-            }
+
             meta
         }
     }

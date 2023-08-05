@@ -5,33 +5,19 @@ import android.os.Looper
 import android.util.Log
 import androidx.hilt.work.HiltWorkerFactory
 import androidx.work.Configuration
-import androidx.work.ExistingPeriodicWorkPolicy
-import androidx.work.WorkManager
-import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import dagger.hilt.android.HiltAndroidApp
+import jp.panta.misskeyandroidclient.setup.AppStateController
+import jp.panta.misskeyandroidclient.worker.WorkerJobInitializer
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import net.pantasystem.milktea.app_store.account.AccountStore
-import net.pantasystem.milktea.app_store.setting.SettingStore
 import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.common_android.platform.activeNetworkFlow
 import net.pantasystem.milktea.data.infrastructure.MemoryCacheCleaner
 import net.pantasystem.milktea.data.infrastructure.streaming.ChannelAPIMainEventDispatcherAdapter
 import net.pantasystem.milktea.data.infrastructure.streaming.MediatorMainEventDispatcher
 import net.pantasystem.milktea.data.streaming.SocketWithAccountProvider
-import net.pantasystem.milktea.model.account.AccountRepository
-import net.pantasystem.milktea.model.account.ClientIdRepository
-import net.pantasystem.milktea.model.notes.NoteDataSource
-import net.pantasystem.milktea.worker.SyncAccountInfoWorker
-import net.pantasystem.milktea.worker.SyncNodeInfoCacheWorker
-import net.pantasystem.milktea.worker.drive.CleanupUnusedDriveCacheWorker
-import net.pantasystem.milktea.worker.emoji.cache.CacheCustomEmojiImageWorker
-import net.pantasystem.milktea.worker.filter.SyncMastodonFilterWorker
-import net.pantasystem.milktea.worker.meta.SyncMetaWorker
-import net.pantasystem.milktea.worker.sw.RegisterAllSubscriptionRegistration
-import net.pantasystem.milktea.worker.user.SyncLoggedInUserInfoWorker
-import net.pantasystem.milktea.worker.user.renote.mute.SyncRenoteMutesWorker
 import javax.inject.Inject
 
 //基本的な情報はここを返して扱われる
@@ -39,15 +25,7 @@ import javax.inject.Inject
 class MiApplication : Application(), Configuration.Provider {
 
     @Inject
-    internal lateinit var mAccountRepository: AccountRepository
-
-    @Inject
-    internal lateinit var mSettingStore: SettingStore
-
-
-    @Inject
     internal lateinit var mAccountStore: AccountStore
-
 
     @Inject
     internal lateinit var mSocketWithAccountProvider: SocketWithAccountProvider
@@ -71,17 +49,16 @@ class MiApplication : Application(), Configuration.Provider {
 
 
     @Inject
-    internal lateinit var clientIdRepository: ClientIdRepository
-
-
-    @Inject
     lateinit var workerFactory: HiltWorkerFactory
 
     @Inject
     internal lateinit var memoryCacheCleaner: MemoryCacheCleaner
 
     @Inject
-    internal lateinit var noteDataSource: NoteDataSource
+    internal lateinit var initWorkerJobs: WorkerJobInitializer
+
+    @Inject
+    internal lateinit var appStateController: AppStateController
 
     @OptIn(ExperimentalCoroutinesApi::class)
     override fun onCreate() {
@@ -101,11 +78,7 @@ class MiApplication : Application(), Configuration.Provider {
         channelAPIMainEventDispatcherAdapter(mainEventDispatcher)
 
         applicationScope.launch {
-            try {
-                mAccountStore.initialize()
-            } catch (e: Exception) {
-                logger.error("load account error", e = e)
-            }
+            appStateController.initializeSettings()
         }
 
         activeNetworkFlow().distinctUntilChanged().onEach {
@@ -124,30 +97,6 @@ class MiApplication : Application(), Configuration.Provider {
 
         enqueueWorkManagers()
 
-        applicationScope.launch {
-            mSettingStore.configState.map {
-                it.isCrashlyticsCollectionEnabled
-            }.distinctUntilChanged().collect {
-                FirebaseCrashlytics.getInstance()
-                    .setCrashlyticsCollectionEnabled(it.isEnable)
-            }
-        }
-
-        applicationScope.launch {
-            mSettingStore.configState.map {
-                it.isAnalyticsCollectionEnabled
-            }.distinctUntilChanged().collect {
-                FirebaseAnalytics.getInstance(applicationContext)
-                    .setAnalyticsCollectionEnabled(it.isEnabled)
-            }
-        }
-
-        FirebaseAnalytics.getInstance(this).setUserId(
-            clientIdRepository.getOrCreate().clientId
-        )
-        FirebaseCrashlytics.getInstance().setUserId(
-            clientIdRepository.getOrCreate().clientId
-        )
     }
 
     override fun getWorkManagerConfiguration(): Configuration {
@@ -174,54 +123,6 @@ class MiApplication : Application(), Configuration.Provider {
     }
 
     private fun enqueueWorkManagers() {
-        WorkManager.getInstance(this).apply {
-            enqueue(RegisterAllSubscriptionRegistration.createWorkRequest())
-            enqueue(CleanupUnusedDriveCacheWorker.createOneTimeRequest())
-            enqueueUniquePeriodicWork(
-                "syncMeta",
-                ExistingPeriodicWorkPolicy.REPLACE,
-                SyncMetaWorker.createPeriodicWorkRequest()
-            )
-            enqueueUniquePeriodicWork(
-                "syncNodeInfos",
-                ExistingPeriodicWorkPolicy.REPLACE,
-                SyncNodeInfoCacheWorker.createPeriodicWorkRequest()
-            )
-            enqueueUniquePeriodicWork(
-                "syncLoggedInUsers",
-                ExistingPeriodicWorkPolicy.REPLACE,
-                SyncLoggedInUserInfoWorker.createPeriodicWorkRequest(),
-            )
-            enqueueUniquePeriodicWork(
-                "syncAccountInfo",
-                ExistingPeriodicWorkPolicy.REPLACE,
-                SyncAccountInfoWorker.createPeriodicWorkRequest(),
-            )
-//            enqueueUniquePeriodicWork(
-//                "scheduleAuthInstancePostWorker",
-//                ExistingPeriodicWorkPolicy.REPLACE,
-//                ScheduleAuthInstancesPostWorker.createPeriodicWorkRequest(),
-//            )
-//            enqueueUniquePeriodicWork(
-//                "syncInstanceInfoWorker",
-//                ExistingPeriodicWorkPolicy.REPLACE,
-//                SyncInstanceInfoWorker.createPeriodicWorkRequest(),
-//            )
-            enqueueUniquePeriodicWork(
-                "syncMastodonWordFilter",
-                ExistingPeriodicWorkPolicy.REPLACE,
-                SyncMastodonFilterWorker.createPeriodicWorkerRequest(),
-            )
-            enqueueUniquePeriodicWork(
-                "cacheEmojiImages",
-                ExistingPeriodicWorkPolicy.REPLACE,
-                CacheCustomEmojiImageWorker.createPeriodicWorkRequest(),
-            )
-
-            enqueue(
-                SyncRenoteMutesWorker.createOneTimeWorkRequest()
-            )
-        }
-
+        initWorkerJobs()
     }
 }

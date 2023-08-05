@@ -6,8 +6,5 @@ interface MetaRepository {
     suspend fun sync(instanceDomain: String): Result<Unit>
 
     fun observe(instanceDomain: String): Flow<Meta?>
-
-    fun get(instanceDomain: String): Meta?
-
     suspend fun find(instanceDomain: String): Result<Meta>
 }

@@ -19,7 +19,7 @@ import net.pantasystem.milktea.model.setting.LocalConfigRepository
 import net.pantasystem.milktea.model.user.FollowRequestRepository
 import net.pantasystem.milktea.model.user.User
 import net.pantasystem.milktea.model.user.UserDataSource
-import net.pantasystem.milktea.model.user.follow_requests.FollowRequestPagingStore
+import net.pantasystem.milktea.model.user.follow.requests.FollowRequestPagingStore
 import javax.inject.Inject
 
 @HiltViewModel

@@ -46,16 +46,16 @@ val urlPattern: Pattern = Pattern.compile("""(https?)(://)([-_.!~*'()\[\]a-zA-Z0
 class AuthStateHelper @Inject constructor(
     private val mastodonAPIProvider: MastodonAPIProvider,
     private val misskeyAPIProvider: MisskeyAPIProvider,
-    val metaRepository: MetaRepository,
+    private val metaRepository: MetaRepository,
     private val customAuthStore: CustomAuthStore,
     private val misskeyAPIServiceBuilder: MisskeyAPIServiceBuilder,
-    val accountRepository: AccountRepository,
-    val accountStore: AccountStore,
-    val subscriptionRegistration: SubscriptionRegistration,
-    val userDataSource: UserDataSource,
-    val nodeInfoRepository: NodeInfoRepository,
-    val mastodonInstanceInfoRepository: MastodonInstanceInfoRepository,
-    val userDTOEntityConverter: UserDTOEntityConverter
+    private val accountRepository: AccountRepository,
+    private val accountStore: AccountStore,
+    private val subscriptionRegistration: SubscriptionRegistration,
+    private val userDataSource: UserDataSource,
+    private val nodeInfoRepository: NodeInfoRepository,
+    private val mastodonInstanceInfoRepository: MastodonInstanceInfoRepository,
+    private val userDTOEntityConverter: UserDTOEntityConverter
 ) {
 
 
@@ -146,7 +146,7 @@ class AuthStateHelper @Inject constructor(
             }
             is InstanceType.Misskey -> {
                 val version = instanceType.instance.getVersion()
-                val misskeyAPI = misskeyAPIProvider.get(url, version)
+                val misskeyAPI = misskeyAPIProvider.get(url)
                 val app = misskeyAPI.createApp(
                     net.pantasystem.milktea.api.misskey.app.CreateApp(
                         null,
@@ -161,8 +161,7 @@ class AuthStateHelper @Inject constructor(
                 return AppType.fromDTO(app)
             }
             is InstanceType.Firefish -> {
-                val version = instanceType.instance.getVersion()
-                val misskeyAPI = misskeyAPIProvider.get(url, version)
+                val misskeyAPI = misskeyAPIProvider.get(url)
                 val app = misskeyAPI.createApp(
                     net.pantasystem.milktea.api.misskey.app.CreateApp(
                         null,

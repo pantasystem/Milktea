@@ -5,7 +5,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import net.pantasystem.milktea.common.*
@@ -19,7 +18,6 @@ import net.pantasystem.milktea.model.search.SearchHistory
 import net.pantasystem.milktea.model.search.SearchHistoryRepository
 import net.pantasystem.milktea.model.user.Acct
 import net.pantasystem.milktea.model.user.User
-import net.pantasystem.milktea.model.user.UserDataSource
 import net.pantasystem.milktea.model.user.UserRepository
 import javax.inject.Inject
 
@@ -28,7 +26,6 @@ class SearchViewModel @Inject constructor(
     loggerFactory: Logger.Factory,
     accountRepository: AccountRepository,
     private val userRepository: UserRepository,
-    private val userDataSource: UserDataSource,
     private val hashtagRepository: HashtagRepository,
     private val searchHistoryRepository: SearchHistoryRepository,
     private val apResolverRepository: ApResolverRepository,
@@ -86,10 +83,10 @@ class SearchViewModel @Inject constructor(
         (it.content as? StateContent.Exist)?.rawContent ?: emptyList()
     }.flatMapLatest { users ->
         val ids = users.map { it.id.id }
-        userDataSource.observeIn(currentAccountWatcher.getAccount().accountId, ids)
+        userRepository.observeIn(currentAccountWatcher.getAccount().accountId, ids)
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
 
-    @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
+    @OptIn(ExperimentalCoroutinesApi::class)
     private val searchHistories = suspend {
         currentAccountWatcher.getAccount()
     }.asFlow().flatMapLatest {
@@ -136,15 +133,7 @@ class SearchViewModel @Inject constructor(
     }.stateIn(
         viewModelScope,
         SharingStarted.WhileSubscribed(5_000),
-        SearchUiState(
-            keyword.value,
-            emptyList(),
-            emptyList(),
-            emptyList(),
-            searchUserResult.value,
-            hashtagResult.value,
-            null
-        )
+        SearchUiState(keyword.value,)
     )
 
     fun onInputKeyword(word: String) {
@@ -188,13 +177,13 @@ class SearchViewModel @Inject constructor(
 }
 
 data class SearchUiState(
-    val keyword: String,
-    val hashtags: List<String>,
-    val users: List<User>,
-    val history: List<SearchHistory>,
-    val searchUserState: ResultState<List<User>>,
-    val hashtagsState: ResultState<List<String>>,
-    val accountHost: String?,
+    val keyword: String = "",
+    val hashtags: List<String> = emptyList(),
+    val users: List<User> = emptyList(),
+    val history: List<SearchHistory> = emptyList(),
+    val searchUserState: ResultState<List<User>> = ResultState.initialState(),
+    val hashtagsState: ResultState<List<String>> = ResultState.initialState(),
+    val accountHost: String? = null,
 )
 
 private data class States(

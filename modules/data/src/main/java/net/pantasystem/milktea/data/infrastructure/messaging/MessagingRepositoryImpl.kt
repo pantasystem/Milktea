@@ -12,7 +12,7 @@ import net.pantasystem.milktea.model.account.GetAccount
 import net.pantasystem.milktea.model.group.GroupDataSource
 import net.pantasystem.milktea.model.messaging.MessageRelation
 import net.pantasystem.milktea.model.messaging.MessagingRepository
-import net.pantasystem.milktea.model.messaging.RequestMessageHistory
+import net.pantasystem.milktea.api.misskey.messaging.RequestMessageHistory
 import net.pantasystem.milktea.model.user.UserDataSource
 import javax.inject.Inject
 

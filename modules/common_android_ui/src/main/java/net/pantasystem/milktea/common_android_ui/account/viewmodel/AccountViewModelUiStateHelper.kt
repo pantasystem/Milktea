@@ -8,12 +8,12 @@ import net.pantasystem.milktea.app_store.account.AccountStore
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.instance.InstanceInfoService
 import net.pantasystem.milktea.model.user.User
-import net.pantasystem.milktea.model.user.UserDataSource
+import net.pantasystem.milktea.model.user.UserRepository
 
 class AccountViewModelUiStateHelper(
     currentAccountFlow: Flow<Account?>,
     accountStore: AccountStore,
-    private val userDataSource: UserDataSource,
+    private val userRepository: UserRepository,
     private val instanceInfoService: InstanceInfoService,
     viewModelScope: CoroutineScope,
 ) {
@@ -21,7 +21,7 @@ class AccountViewModelUiStateHelper(
     @OptIn(ExperimentalCoroutinesApi::class)
     private val users = accountStore.observeAccounts.flatMapLatest { accounts ->
         val flows = accounts.map {
-            userDataSource.observe(User.Id(it.accountId, it.remoteId)).flowOn(Dispatchers.IO)
+            userRepository.observe(User.Id(it.accountId, it.remoteId)).flowOn(Dispatchers.IO)
         }
         combine(flows) {
             it.toList()

@@ -21,6 +21,10 @@ class SocketImplTest {
         val wssURL = "wss://misskey.io/streaming"
         val logger = TestLogger.Factory()
         val socket = SocketImpl(wssURL, {false} ,logger, DefaultOkHttpClientProvider())
+
+        socket.addMessageEventListener(false) {
+            false
+        }
         runBlocking {
             socket.blockingConnect()
             assertEquals(socket.state(), Socket.State.Connected)
@@ -54,7 +58,7 @@ class SocketImplTest {
     fun testRemoveMessageListener() {
         val wssURL = "wss://misskey.io/streaming"
         val logger = TestLogger.Factory()
-        val socket =
+        val socket: Socket =
             SocketImpl(wssURL, {false}, logger, DefaultOkHttpClientProvider())
 
         runBlocking {
@@ -62,7 +66,7 @@ class SocketImplTest {
             val listener: (StreamingEvent)-> Boolean = {
                 false
             }
-            socket.addMessageEventListener(listener)
+            socket.addMessageEventListener(true, listener)
             val res: Socket.State = socket.stateEvent().first {
                 it == Socket.State.Connected
             }

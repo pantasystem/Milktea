@@ -12,7 +12,7 @@ import net.pantasystem.milktea.app_store.account.AccountStore
 import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.common_navigation.ChangedDiffResult
 import net.pantasystem.milktea.model.user.User
-import net.pantasystem.milktea.model.user.UserDataSource
+import net.pantasystem.milktea.model.user.UserRepository
 
 data class SelectedUserUiState(
     val selectedUserIds: Set<User.Id>
@@ -33,7 +33,7 @@ data class SelectedUserUiState(
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class SelectedUserViewModel @AssistedInject constructor(
-    val userDataSource: UserDataSource,
+    val userRepository: UserRepository,
     val loggerFactory: Logger.Factory,
     val accountStore: AccountStore,
     @Assisted val exSelectedUserIds: List<User.Id>,
@@ -66,7 +66,7 @@ class SelectedUserViewModel @AssistedInject constructor(
     val selectedUserList = selectedUserIds.flatMapLatest { ids ->
         val accountId = ids.map { it.accountId }.distinct().firstOrNull()
             ?: accountStore.currentAccountId!!
-        userDataSource.observeIn(accountId, ids.toList().map { it.id })
+        userRepository.observeIn(accountId, ids.toList().map { it.id })
     }.catch {
         loggerFactory.create("SelectedUserVM").error("failed observe selected user list", it)
     }.stateIn(viewModelScope, SharingStarted.Lazily, emptyList())

@@ -17,7 +17,7 @@ class APIErrorTest {
 
     @Test
     fun testClientError() {
-        Assertions.assertThrows(APIError.ForbiddenException::class.java) {
+        Assertions.assertThrows(APIError.AuthenticationException::class.java) {
             runBlocking {
                 misskeyAPI.create(CreateNote("", text = null)).throwIfHasError()
             }

@@ -48,10 +48,10 @@ import net.pantasystem.milktea.model.channel.Channel
 import net.pantasystem.milktea.model.confirm.ConfirmCommand
 import net.pantasystem.milktea.model.confirm.ResultType
 import net.pantasystem.milktea.model.drive.FileProperty
+import net.pantasystem.milktea.model.emoji.CustomEmojiRepository
 import net.pantasystem.milktea.model.emoji.Emoji
 import net.pantasystem.milktea.model.file.toAppFile
 import net.pantasystem.milktea.model.instance.FeatureType
-import net.pantasystem.milktea.model.instance.MetaRepository
 import net.pantasystem.milktea.model.notes.Note
 import net.pantasystem.milktea.model.setting.LocalConfigRepository
 import net.pantasystem.milktea.model.user.User
@@ -73,6 +73,7 @@ import net.pantasystem.milktea.note.emojis.viewmodel.EmojiSelection
 import net.pantasystem.milktea.note.emojis.viewmodel.EmojiSelectionViewModel
 import javax.inject.Inject
 
+@Suppress("DEPRECATION")
 @AndroidEntryPoint
 class NoteEditorFragment : Fragment(R.layout.fragment_note_editor), EmojiSelection {
 
@@ -141,10 +142,6 @@ class NoteEditorFragment : Fragment(R.layout.fragment_note_editor), EmojiSelecti
     internal lateinit var accountStore: AccountStore
 
     @Inject
-    internal lateinit var metaRepository: MetaRepository
-
-
-    @Inject
     internal lateinit var settingStore: SettingStore
 
     @Inject
@@ -170,6 +167,9 @@ class NoteEditorFragment : Fragment(R.layout.fragment_note_editor), EmojiSelecti
 
     @Inject
     internal lateinit var configRepository: LocalConfigRepository
+
+    @Inject
+    internal lateinit var customEmojiRepository: CustomEmojiRepository
 
 
     val logger by lazy {
@@ -286,9 +286,7 @@ class NoteEditorFragment : Fragment(R.layout.fragment_note_editor), EmojiSelecti
 
 
         accountViewModel.currentAccount.filterNotNull().flatMapLatest {
-            metaRepository.observe(it.normalizedInstanceUri)
-        }.mapNotNull {
-            it?.emojis
+            customEmojiRepository.observeBy(it.getHost())
         }.distinctUntilChanged().onEach { emojis ->
             binding.inputMain.setAdapter(
                 CustomEmojiCompleteAdapter(
@@ -430,12 +428,13 @@ class NoteEditorFragment : Fragment(R.layout.fragment_note_editor), EmojiSelecti
             noteEditorViewModel.setText((e?.toString() ?: ""))
         }
 
-        noteEditorViewModel.isPost.observe(viewLifecycleOwner) {
+        noteEditorViewModel.isPost.onEach {
             if (it) {
                 noteEditorToolbar.postButton.isEnabled = false
                 requireActivity().finish()
             }
-        }
+        }.flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.RESUMED)
+            .launchIn(viewLifecycleOwner.lifecycleScope)
 
 
         lifecycleScope.launch {
@@ -446,13 +445,15 @@ class NoteEditorFragment : Fragment(R.layout.fragment_note_editor), EmojiSelecti
             }
         }
 
-        noteEditorViewModel.showPollTimePicker.observe(viewLifecycleOwner) {
+        noteEditorViewModel.showPollTimePicker.onEach {
             PollTimePickerDialog().show(childFragmentManager, "TimePicker")
-        }
+        }.flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.RESUMED)
+            .launchIn(viewLifecycleOwner.lifecycleScope)
 
-        noteEditorViewModel.showPollDatePicker.observe(viewLifecycleOwner) {
+        noteEditorViewModel.showPollDatePicker.onEach {
             PollDatePickerDialog().show(childFragmentManager, "DatePicker")
-        }
+        }.flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.RESUMED)
+            .launchIn(viewLifecycleOwner.lifecycleScope)
 
         emojiSelectionViewModel.selectedEmoji.observe(viewLifecycleOwner) {
             onSelect(it)
@@ -522,7 +523,7 @@ class NoteEditorFragment : Fragment(R.layout.fragment_note_editor), EmojiSelecti
         ).launchIn(viewLifecycleOwner.lifecycleScope)
 
 
-        noteEditorViewModel.isSaveNoteAsDraft.observe(viewLifecycleOwner) {
+        noteEditorViewModel.isSaveNoteAsDraft.onEach {
             Handler(Looper.getMainLooper()).post {
                 if (it == null) {
                     Toast.makeText(requireContext(), "下書きに失敗しました", Toast.LENGTH_LONG).show()
@@ -530,7 +531,9 @@ class NoteEditorFragment : Fragment(R.layout.fragment_note_editor), EmojiSelecti
                     upTo()
                 }
             }
-        }
+        }.flowWithLifecycle(
+            viewLifecycleOwner.lifecycle, Lifecycle.State.RESUMED
+        ).launchIn(viewLifecycleOwner.lifecycleScope)
 
         viewLifecycleOwner.lifecycleScope.launch {
             noteEditorViewModel.textCursorPos.collect {

@@ -24,7 +24,6 @@ object MetaModule {
         return MediatorMetaDataSource(
             RoomMetaDataSource(
                 db.metaDAO(),
-                db.emojiAliasDAO(),
                 db,
             ),
             InMemoryMetaDataSource()

@@ -65,7 +65,7 @@ object ReactionViewHelper {
             context.applicationContext,
             BindingProvider::class.java
         )
-        val cache = entryPoint.metaRepository()
+        val cache = entryPoint.customEmojiRepository()
         val accountStore = entryPoint.accountStore()
 
 
@@ -73,7 +73,7 @@ object ReactionViewHelper {
         if (reaction.startsWith(":") && reaction.endsWith(":")) {
             val account = accountStore.currentAccount
             val emojis = if (account?.normalizedInstanceUri != null) {
-                cache.get(account.normalizedInstanceUri)?.emojis ?: emptyList()
+                cache.get(account.normalizedInstanceUri) ?: emptyList()
             } else {
                 emptyList()
             }

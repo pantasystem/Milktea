@@ -1,4 +1,4 @@
-package net.pantasystem.milktea.model.notes.poll
+package net.pantasystem.milktea.api.misskey.notes
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable

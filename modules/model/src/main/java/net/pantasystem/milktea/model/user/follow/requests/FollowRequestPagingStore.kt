@@ -1,4 +1,4 @@
-package net.pantasystem.milktea.model.user.follow_requests
+package net.pantasystem.milktea.model.user.follow.requests
 
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow

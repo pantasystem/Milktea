@@ -1,4 +1,4 @@
-package net.pantasystem.milktea.model.messaging
+package net.pantasystem.milktea.api.misskey.messaging
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable

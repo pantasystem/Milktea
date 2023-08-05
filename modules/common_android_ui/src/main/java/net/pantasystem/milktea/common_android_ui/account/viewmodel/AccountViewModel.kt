@@ -19,7 +19,6 @@ import net.pantasystem.milktea.model.instance.SyncMetaExecutor
 import net.pantasystem.milktea.model.setting.DefaultConfig
 import net.pantasystem.milktea.model.setting.LocalConfigRepository
 import net.pantasystem.milktea.model.user.User
-import net.pantasystem.milktea.model.user.UserDataSource
 import net.pantasystem.milktea.model.user.UserRepository
 import javax.inject.Inject
 
@@ -29,7 +28,6 @@ class AccountViewModel @Inject constructor(
     loggerFactory: Logger.Factory,
     instanceInfoService: InstanceInfoService,
     private val accountStore: AccountStore,
-    private val userDataSource: UserDataSource,
     private val userRepository: UserRepository,
     private val signOutUseCase: SignOutUseCase,
     private val syncMetaExecutor: SyncMetaExecutor,
@@ -42,7 +40,7 @@ class AccountViewModel @Inject constructor(
     private val uiStateHelper = AccountViewModelUiStateHelper(
         accountStore.observeCurrentAccount,
         accountStore,
-        userDataSource,
+        userRepository,
         instanceInfoService,
         viewModelScope
     )
@@ -53,7 +51,7 @@ class AccountViewModel @Inject constructor(
         accountStore.observeCurrentAccount.stateIn(viewModelScope, SharingStarted.Lazily, null)
 
     val user = currentAccount.filterNotNull().flatMapLatest { account ->
-        userDataSource.observe(User.Id(account.accountId, account.remoteId)).map {
+        userRepository.observe(User.Id(account.accountId, account.remoteId)).map {
             it as? User.Detail
         }
     }.flowOn(Dispatchers.IO).stateIn(

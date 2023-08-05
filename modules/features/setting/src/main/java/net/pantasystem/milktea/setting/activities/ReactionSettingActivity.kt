@@ -23,7 +23,7 @@ import net.pantasystem.milktea.common.ui.ApplyTheme
 import net.pantasystem.milktea.common_android.ui.text.CustomEmojiDecorator
 import net.pantasystem.milktea.common_android_ui.reaction.ReactionAutoCompleteArrayAdapter
 import net.pantasystem.milktea.common_android_ui.reaction.ReactionChoicesAdapter
-import net.pantasystem.milktea.model.instance.MetaRepository
+import net.pantasystem.milktea.model.emoji.CustomEmojiRepository
 import net.pantasystem.milktea.model.setting.ReactionPickerType
 import net.pantasystem.milktea.setting.R
 import net.pantasystem.milktea.setting.databinding.ActivityReactionSettingBinding
@@ -39,13 +39,13 @@ class ReactionSettingActivity : AppCompatActivity() {
     val mReactionPickerSettingViewModel: ReactionPickerSettingViewModel by viewModels()
 
     @Inject
-    lateinit var metaRepository: MetaRepository
-
-    @Inject
     lateinit var accountStore: AccountStore
 
     @Inject
     lateinit var applyTheme: ApplyTheme
+
+    @Inject
+    internal lateinit var customEmojiRepository: CustomEmojiRepository
 
     @OptIn(ExperimentalCoroutinesApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -89,10 +89,8 @@ class ReactionSettingActivity : AppCompatActivity() {
 
 
         accountStore.observeCurrentAccount.filterNotNull().flatMapLatest {
-            metaRepository.observe(it.normalizedInstanceUri)
-        }.distinctUntilChanged().mapNotNull {
-            it?.emojis
-        }.onEach { emojis ->
+            customEmojiRepository.observeBy(it.getHost())
+        }.distinctUntilChanged().onEach { emojis ->
             val reactionAutoCompleteArrayAdapter = ReactionAutoCompleteArrayAdapter(
                 emojis,
                 this

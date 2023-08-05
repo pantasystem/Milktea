@@ -281,6 +281,9 @@ dependencies {
     debugImplementation 'com.squareup.leakcanary:leakcanary-android:2.10'
 
     implementation libs.objectbox.kotlin
+
+    testImplementation "org.mockito.kotlin:mockito-kotlin:4.0.0"
+
 }
 
 kapt {

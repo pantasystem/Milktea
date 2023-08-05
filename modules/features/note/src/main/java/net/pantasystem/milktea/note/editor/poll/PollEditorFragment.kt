@@ -61,12 +61,8 @@ class PollEditorFragment : Fragment() {
                                         }
                                     }
                                 },
-                                onExpireAtChangeDateButtonClicked = {
-                                    viewModel.showPollDatePicker.event = Unit
-                                },
-                                onExpireAtChangeTimeButtonClicked = {
-                                    viewModel.showPollTimePicker.event = Unit
-                                },
+                                onExpireAtChangeDateButtonClicked = viewModel::onExpireAtChangeDateButtonClicked,
+                                onExpireAtChangeTimeButtonClicked = viewModel::onExpireAtChangeTimeButtonClicked,
                                 onMultipleAnswerTypeChanged = {
                                     viewModel.togglePollMultiple()
                                 }

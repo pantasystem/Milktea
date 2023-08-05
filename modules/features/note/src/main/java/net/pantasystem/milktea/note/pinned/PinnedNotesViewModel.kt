@@ -5,10 +5,19 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.FlowPreview
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.asFlow
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import net.pantasystem.milktea.common.*
+import net.pantasystem.milktea.common.Logger
+import net.pantasystem.milktea.common.ResultState
+import net.pantasystem.milktea.common.StateContent
+import net.pantasystem.milktea.common.asLoadingStateFlow
+import net.pantasystem.milktea.common.mapCancellableCatching
+import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.common_navigation.EXTRA_ACCOUNT_ID
 import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.account.CurrentAccountWatcher
@@ -66,11 +75,11 @@ class PinnedNotesViewModel @Inject constructor(
 
     private val cache = planeNoteViewDataCacheFactory.create(accountWatcher::getAccount, viewModelScope)
 
-    @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
+    @OptIn(ExperimentalCoroutinesApi::class)
     val notes = suspend {
         getUserId()
     }.asFlow().flatMapLatest {
-        userDataSource.observe(it).distinctUntilChanged()
+        userRepository.observe(it).distinctUntilChanged()
     }.flatMapLatest {
         suspend {
             findPinnedNoteUseCase.invoke(getUserId()).getOrThrow()

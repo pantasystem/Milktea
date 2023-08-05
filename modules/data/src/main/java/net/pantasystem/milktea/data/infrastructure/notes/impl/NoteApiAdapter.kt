@@ -26,7 +26,7 @@ import net.pantasystem.milktea.model.notes.CreateNote
 import net.pantasystem.milktea.model.notes.Note
 import net.pantasystem.milktea.model.notes.NoteState
 import net.pantasystem.milktea.model.notes.poll.Poll
-import net.pantasystem.milktea.model.notes.poll.Vote
+import net.pantasystem.milktea.api.misskey.notes.Vote
 import net.pantasystem.milktea.model.notes.type4Mastodon
 import javax.inject.Inject
 

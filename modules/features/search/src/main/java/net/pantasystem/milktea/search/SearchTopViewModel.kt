@@ -13,7 +13,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class SearchTopViewModel @Inject constructor(
-    val accountStore: AccountStore,
+    accountStore: AccountStore,
+    private val searchTopTabsFactory: SearchTopTabsFactory,
 ) : ViewModel() {
     private val currentAccount = accountStore.observeCurrentAccount.stateIn(
         viewModelScope,
@@ -24,49 +25,7 @@ class SearchTopViewModel @Inject constructor(
     val uiState = currentAccount.map {
         SearchTopUiState(
             currentAccount = it,
-            tabItems = when(it?.instanceType) {
-                Account.InstanceType.MISSKEY, Account.InstanceType.FIREFISH -> {
-                    listOf(
-                        SearchTopTabItem(
-                            StringSource(R.string.title_featured),
-                            SearchTopTabItem.TabType.MisskeyFeatured,
-                        ),
-                        SearchTopTabItem(
-                            StringSource(R.string.explore),
-                            SearchTopTabItem.TabType.MisskeyExploreUsers,
-                        ),
-                        SearchTopTabItem(
-                            StringSource(R.string.explore_fediverse),
-                            SearchTopTabItem.TabType.MisskeyExploreFediverseUsers,
-                        ),
-                        SearchTopTabItem(
-                            StringSource(R.string.suggestion_users),
-                            SearchTopTabItem.TabType.UserSuggestionByReaction,
-                        ),
-                        SearchTopTabItem(
-                            StringSource(R.string.trending_tag),
-                            SearchTopTabItem.TabType.HashtagTrend,
-                        )
-                    )
-                }
-                Account.InstanceType.MASTODON, Account.InstanceType.PLEROMA -> {
-                    listOf(
-                        SearchTopTabItem(
-                            StringSource(R.string.title_featured),
-                            SearchTopTabItem.TabType.MastodonTrends,
-                        ),
-                        SearchTopTabItem(
-                            StringSource(R.string.suggestion_users),
-                            SearchTopTabItem.TabType.MastodonUserSuggestions,
-                        ),
-                        SearchTopTabItem(
-                            StringSource(R.string.trending_tag),
-                            SearchTopTabItem.TabType.HashtagTrend,
-                        )
-                    )
-                }
-                null -> emptyList()
-            }
+            tabItems = searchTopTabsFactory.create(it)
         )
     }
 

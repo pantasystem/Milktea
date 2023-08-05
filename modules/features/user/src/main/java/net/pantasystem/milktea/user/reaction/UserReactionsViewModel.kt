@@ -16,14 +16,14 @@ import net.pantasystem.milktea.model.account.CurrentAccountWatcher
 import net.pantasystem.milktea.model.setting.DefaultConfig
 import net.pantasystem.milktea.model.setting.LocalConfigRepository
 import net.pantasystem.milktea.model.user.User
-import net.pantasystem.milktea.model.user.UserDataSource
+import net.pantasystem.milktea.model.user.UserRepository
 import net.pantasystem.milktea.note.viewmodel.PlaneNoteViewDataCache
 import javax.inject.Inject
 
 @HiltViewModel
 class UserReactionsViewModel @Inject constructor(
     accountRepository: AccountRepository,
-    private val userDataSource: UserDataSource,
+    private val userRepository: UserRepository,
     storeFactory: UserReactionPagingStore.Factory,
     loggerFactory: Logger.Factory,
     planeNoteViewDataCacheFactory: PlaneNoteViewDataCache.Factory,
@@ -60,7 +60,7 @@ class UserReactionsViewModel @Inject constructor(
             list.map {
                 UserReactionBindingModel(
                     reaction = it.reaction,
-                    user = userDataSource.observe(it.user.id)
+                    user = userRepository.observe(it.user.id)
                         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), it.user),
                     note = cache.get(it.note),
                     config = config,

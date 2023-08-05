@@ -76,7 +76,7 @@ interface Socket {
 
     fun removeStateEventListener(listener: SocketStateEventListener)
 
-    fun addMessageEventListener(listener: SocketMessageEventListener)
+    fun addMessageEventListener(autoConnect: Boolean = true, listener: SocketMessageEventListener)
 
     fun removeMessageEventListener(listener: SocketMessageEventListener)
 

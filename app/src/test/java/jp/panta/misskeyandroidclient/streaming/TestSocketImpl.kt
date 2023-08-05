@@ -32,7 +32,7 @@ class TestSocketImpl : Socket {
 
     }
 
-    override fun addMessageEventListener(listener: SocketMessageEventListener) {
+    override fun addMessageEventListener(autoConnect: Boolean, listener: SocketMessageEventListener) {
         messageListeners.add(listener)
     }
 

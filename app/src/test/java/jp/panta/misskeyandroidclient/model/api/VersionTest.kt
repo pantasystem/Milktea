@@ -30,4 +30,9 @@ class VersionTest{
     }
 
 
+    @Test
+    fun calendarVersionTest() {
+        val version = Version("2023.8.0")
+        assert(version > Version("13.14.2"))
+    }
 }
