@@ -15,7 +15,9 @@ plugins {
 play {
     track = "internal"
     enabled = (System.getenv("ANDROID_PUBLISHER_CREDENTIALS_FILE") != null)
-    serviceAccountCredentials.set(file(System.getenv("ANDROID_PUBLISHER_CREDENTIALS_FILE")))
+    if (System.getenv("ANDROID_PUBLISHER_CREDENTIALS_FILE") != null && exists(System.getenv("ANDROID_PUBLISHER_CREDENTIALS_FILE"))) {
+        serviceAccountCredentials.set(file(System.getenv("ANDROID_PUBLISHER_CREDENTIALS_FILE")))
+    }
 }
 
 android {
