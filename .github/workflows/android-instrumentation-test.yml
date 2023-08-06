@@ -21,6 +21,8 @@ jobs:
           java-version: '17'
           distribution: zulu
           cache: gradle
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v1
 
       - name: Generate secret.properties
         env:
