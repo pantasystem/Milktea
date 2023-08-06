@@ -1,0 +1,59 @@
+name: Android CI
+on:
+  push:
+    branches-ignore:
+      - '**'
+    tags:
+      - 'v*'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: zulu
+          cache: gradle
+      - name: Decode Keystore
+        run: |
+          echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > app/keystore.jks
+          echo "KEYSTORE_PATH=$(pwd)/app/keystore.jks" >> $GITHUB_ENV
+      - name: Generate secret.properties
+        env:
+          PUSH_TO_FCM_AUTH: ${{ secrets.PUSH_TO_FCM_AUTH }}
+          PUSH_TO_FCM_PUBLIC_KEY: ${{ secrets.PUSH_TO_FCM_PUBLIC_KEY }}
+          PUSH_TO_FCM_SERVER_BASE_URL: ${{ secrets.PUSH_TO_FCM_SERVER_BASE_URL }}
+        run: |
+          echo "push_to_fcm.server_base_url=${PUSH_TO_FCM_SERVER_BASE_URL}" >> ./secret.properties
+          echo "push_to_fcm.public_key=${PUSH_TO_FCM_PUBLIC_KEY}" >> ./secret.properties
+          echo "push_to_fcm.auth=${PUSH_TO_FCM_AUTH}" >> ./secret.properties
+      - name: Get the version tag
+        run: echo "ORG_GRADLE_PROJECT_VERSION_NAME=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+      - name: Restore publish json key and write to ANDROID_PUBLISHER_CREDENTIALS
+        run: |
+          JSON_CONTENT="$(echo "${{ secrets.ANDROID_PUBLISHER_CREDENTIALS_BASE64 }}" | base64 --decode)"
+          echo "ANDROID_PUBLISHER_CREDENTIALS=$JSON_CONTENT" >> $GITHUB_ENV
+      - name: Assemble release build and publish
+        env:
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+          ALIAS: ${{ secrets.ALIAS }}
+          ORG_GRADLE_PROJECT_VERSION_CODE: ${{ github.run_number + 2000}}
+        run: |
+          ./gradlew publishBundle \
+          -Pandroid.injected.signing.store.file=$KEYSTORE_PATH \
+          -Pandroid.injected.signing.store.password=$KEYSTORE_PASSWORD \
+          -Pandroid.injected.signing.key.alias=$ALIAS \
+          -Pandroid.injected.signing.key.password=$KEY_PASSWORD
+          
+
+
+
+
+
