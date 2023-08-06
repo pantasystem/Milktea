@@ -1,4 +1,4 @@
-name: Android CI
+name: Release Android to Google Play Store
 on:
   push:
     branches-ignore:
