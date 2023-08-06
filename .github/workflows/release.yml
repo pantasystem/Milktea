@@ -37,8 +37,11 @@ jobs:
         run: chmod +x gradlew
       - name: Restore publish json key and write to ANDROID_PUBLISHER_CREDENTIALS
         run: |
-          JSON_CONTENT="$(echo "${{ secrets.ANDROID_PUBLISHER_CREDENTIALS_BASE64 }}" | base64 --decode)"
-          echo "ANDROID_PUBLISHER_CREDENTIALS=$JSON_CONTENT" >> $GITHUB_ENV
+            echo "${{ secrets.ANDROID_PUBLISHER_CREDENTIALS_BASE64 }}" | base64 --decode > app/google-play-publisher.json
+            echo "ANDROID_PUBLISHER_CREDENTIALS_FILE=$(pwd)/app/google-play-publisher.json" >> $GITHUB_ENV
+#        run: |
+#          JSON_CONTENT="$(echo "${{ secrets.ANDROID_PUBLISHER_CREDENTIALS_BASE64 }}" | base64 --decode)"
+#          echo "ANDROID_PUBLISHER_CREDENTIALS=$JSON_CONTENT" >> $GITHUB_ENV
 
       - name: Calculate version code
         run: echo "ORG_GRADLE_PROJECT_VERSION_CODE=$((${{ github.run_number }} + 2709))" >> $GITHUB_ENV
