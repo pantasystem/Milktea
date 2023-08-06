@@ -44,7 +44,7 @@ jobs:
           KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
           KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
           ALIAS: ${{ secrets.ALIAS }}
-          ORG_GRADLE_PROJECT_VERSION_CODE: ${{ github.run_number + 2000}}
+          ORG_GRADLE_PROJECT_VERSION_CODE: ${{ github.run_number + 2709}}
         run: |
           ./gradlew publishBundle \
           -Pandroid.injected.signing.store.file=$KEYSTORE_PATH \
