@@ -39,12 +39,14 @@ jobs:
         run: |
           JSON_CONTENT="$(echo "${{ secrets.ANDROID_PUBLISHER_CREDENTIALS_BASE64 }}" | base64 --decode)"
           echo "ANDROID_PUBLISHER_CREDENTIALS=$JSON_CONTENT" >> $GITHUB_ENV
+
+      - name: Calculate version code
+        run: echo "ORG_GRADLE_PROJECT_VERSION_CODE=$((${{ github.run_number }} + 2709))" >> $GITHUB_ENV
       - name: Assemble release build and publish
         env:
           KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
           KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
           ALIAS: ${{ secrets.ALIAS }}
-          ORG_GRADLE_PROJECT_VERSION_CODE: ${{ github.run_number + 2709}}
         run: |
           ./gradlew publishBundle \
           -Pandroid.injected.signing.store.file=$KEYSTORE_PATH \
