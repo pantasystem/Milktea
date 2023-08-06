@@ -44,7 +44,7 @@ jobs:
 #          echo "ANDROID_PUBLISHER_CREDENTIALS=$JSON_CONTENT" >> $GITHUB_ENV
 
       - name: Calculate version code
-        run: echo "ORG_GRADLE_PROJECT_VERSION_CODE=$((${{ github.run_number }} + 2709))" >> $GITHUB_ENV
+        run: echo "ORG_GRADLE_PROJECT_VERSION_CODE=$((${{ github.run_number }} + 3000))" >> $GITHUB_ENV
       - name: Assemble release build and publish
         env:
           KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
