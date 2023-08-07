@@ -2,7 +2,6 @@ package net.pantasystem.milktea.notification.viewmodel
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -92,7 +91,12 @@ class NotificationViewModel @Inject constructor(
 
     val isLoading = notificationPageableState.map {
         it is PageableState.Loading
-    }.asLiveData()
+    }.stateIn(
+        viewModelScope,
+        SharingStarted.WhileSubscribed(5_000),
+        false
+    )
+
     private val _error = MutableSharedFlow<Throwable>(
         onBufferOverflow = BufferOverflow.DROP_LATEST,
         extraBufferCapacity = 100

@@ -1,7 +1,6 @@
 package net.pantasystem.milktea.messaging.viewmodel
 
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -117,7 +116,11 @@ class MessageHistoryViewModel @Inject constructor(
 
     val isRefreshing = combine(fetchUserMsgHistories, fetchGroupMsgHistories) { users, groups ->
         users is ResultState.Loading || groups is ResultState.Loading
-    }.asLiveData()
+    }.stateIn(
+        viewModelScope,
+        SharingStarted.WhileSubscribed(),
+        false
+    )
 
 
     init {
