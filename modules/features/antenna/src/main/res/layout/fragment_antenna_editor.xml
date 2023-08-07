@@ -139,6 +139,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content">
                     <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/keywordsToExcludeEditText"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:hint="@string/keywords_to_exclude"
@@ -151,18 +152,21 @@
                         android:text="@string/keyword_input_method"
                         android:layout_marginBottom="8dp"/>
                 <androidx.appcompat.widget.SwitchCompat
+                        android:id="@+id/caseSensitiveSwitch"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:text="@string/case_sensitive"
                         android:checked="@{ SafeUnbox.unbox(antennaEditorViewModel.caseSensitive) }"/>
 
                 <androidx.appcompat.widget.SwitchCompat
+                        android:id="@+id/withFilesSwitch"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:text="@string/with_files"
                         android:checked="@{ SafeUnbox.unbox(antennaEditorViewModel.withFile) }"/>
 
                 <androidx.appcompat.widget.SwitchCompat
+                        android:id="@+id/notifySwitch"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:text="@string/notify_notes"
