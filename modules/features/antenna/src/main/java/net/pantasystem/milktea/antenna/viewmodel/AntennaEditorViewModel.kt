@@ -240,14 +240,14 @@ class AntennaEditorViewModel @Inject constructor(
 
     }
 
-    val antennaRemovedEvent = EventBus<Unit>()
+    val antennaRemovedEvent = MutableSharedFlow<Unit>(extraBufferCapacity = 10)
 
     fun removeRemote(){
         val antennaId = _antennaId.value ?: return
         viewModelScope.launch {
             antennaRepository.delete(antennaId).onSuccess {
                 withContext(Dispatchers.Main) {
-                    antennaRemovedEvent.event = Unit
+                    antennaRemovedEvent.tryEmit(Unit)
                 }
             }
         }

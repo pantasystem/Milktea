@@ -82,11 +82,11 @@ class AntennaEditorActivity : AppCompatActivity() {
         viewModel.name.onEach {
             supportActionBar?.title = it
         }.flowWithLifecycle(lifecycle).launchIn(lifecycleScope)
-        viewModel.antennaRemovedEvent.observe(this) {
+        viewModel.antennaRemovedEvent.onEach {
             Toast.makeText(this, getString(R.string.remove), Toast.LENGTH_SHORT).show()
             setResult(RESULT_OK)
             finish()
-        }
+        }.flowWithLifecycle(lifecycle).launchIn(lifecycleScope)
 
         viewModel.antennaAddedStateEvent.onEach {
             if (it) {
