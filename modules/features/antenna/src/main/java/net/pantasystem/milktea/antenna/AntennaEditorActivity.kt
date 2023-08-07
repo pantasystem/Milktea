@@ -11,9 +11,13 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
+import androidx.lifecycle.flowWithLifecycle
+import androidx.lifecycle.lifecycleScope
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import net.pantasystem.milktea.antenna.databinding.ActivityAntennaEditorBinding
 import net.pantasystem.milktea.antenna.viewmodel.AntennaEditorViewModel
 import net.pantasystem.milktea.common.ui.ApplyTheme
@@ -74,9 +78,9 @@ class AntennaEditorActivity : AppCompatActivity() {
         viewModel.selectUserEvent.observe(this) {
             showSearchAndSelectUserActivity(it)
         }
-        viewModel.name.observe(this) {
+        viewModel.name.onEach {
             supportActionBar?.title = it
-        }
+        }.flowWithLifecycle(lifecycle).launchIn(lifecycleScope)
         viewModel.antennaRemovedEvent.observe(this) {
             Toast.makeText(this, getString(R.string.remove), Toast.LENGTH_SHORT).show()
             setResult(RESULT_OK)
