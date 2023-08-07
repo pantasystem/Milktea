@@ -8,13 +8,11 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.rememberNestedScrollInteropConnection
-import androidx.lifecycle.asLiveData
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
@@ -41,12 +39,7 @@ fun RenoteUsersScreen(
     val account by renotesViewModel.account.collectAsState()
     val config by renotesViewModel.config.collectAsState()
 
-    val renotes: PageableState<List<RenoteItemType>> by renotesViewModel.renotes.asLiveData()
-        .observeAsState(
-            initial = PageableState.Fixed(
-                StateContent.NotExist()
-            )
-        )
+    val renotes: PageableState<List<RenoteItemType>> by renotesViewModel.renotes.collectAsState()
 
     LaunchedEffect(true) {
         renotesViewModel.refresh()

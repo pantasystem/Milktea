@@ -1,7 +1,5 @@
 package net.pantasystem.milktea.common_viewmodel
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.asLiveData
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -116,9 +114,13 @@ class UserViewData private constructor(
         null,
     )
 
-    val account: LiveData<Account?> = suspend {
+    val account: StateFlow<Account?> = suspend {
         accountRepository.get(accountId).getOrNull()
-    }.asFlow().asLiveData()
+    }.asFlow().stateIn(
+        coroutineScope,
+        SharingStarted.WhileSubscribed(5_000),
+        null,
+    )
 
     private constructor(
         user: User,

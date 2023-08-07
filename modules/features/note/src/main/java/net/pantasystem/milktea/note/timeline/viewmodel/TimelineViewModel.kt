@@ -105,7 +105,11 @@ class TimelineViewModel @AssistedInject constructor(
 
     val isLoading = timelineStore.timelineState.map {
         it is PageableState.Loading
-    }.asLiveData()
+    }.stateIn(
+        viewModelScope,
+        SharingStarted.WhileSubscribed(5_000),
+        false
+    )
 
 
     private val logger = loggerFactory.create("TimelineViewModel")

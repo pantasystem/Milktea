@@ -8,14 +8,12 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.asLiveData
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import net.pantasystem.milktea.common_compose.HorizontalFilePreviewList
 import net.pantasystem.milktea.common_compose.SwitchTile
@@ -33,17 +31,17 @@ fun NoteFilePreview(
     onEditFileCaptionSelectionClicked: (FilePreviewSource) -> Unit,
 ) {
     val uiState by noteEditorViewModel.uiState.collectAsState()
-    val maxFileCount by noteEditorViewModel.maxFileCount.asLiveData().observeAsState()
+    val maxFileCount by noteEditorViewModel.maxFileCount.collectAsState()
 //    val instanceInfo by noteEditorViewModel.instanceInfo.collectAsState()
     val instanceInfoType by noteEditorViewModel.instanceInfoType.collectAsState()
     val isSensitive by noteEditorViewModel.isSensitiveMedia.collectAsState()
 
     Column {
-        if (uiState.files.size > (maxFileCount ?: 0)) {
+        if (uiState.files.size > maxFileCount) {
             Text(
                 stringResource(
                     id = R.string.note_editor_file_max_size_validation_error_message,
-                    maxFileCount ?: 0
+                    maxFileCount
                 ),
                 color = MaterialTheme.colors.error,
                 modifier = Modifier.padding(horizontal = 4.dp),
@@ -71,7 +69,7 @@ fun NoteFilePreview(
             if (uiState.files.isNotEmpty())
                 Text(
                     "${uiState.files.size}/${maxFileCount}",
-                    color = if (uiState.files.size > (maxFileCount ?: 0)) {
+                    color = if (uiState.files.size > maxFileCount) {
                         MaterialTheme.colors.error
                     } else {
                         Color.Unspecified
