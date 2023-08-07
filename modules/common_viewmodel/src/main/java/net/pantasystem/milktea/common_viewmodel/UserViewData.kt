@@ -2,15 +2,19 @@ package net.pantasystem.milktea.common_viewmodel
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.asLiveData
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.common.runCancellableCatching
+import net.pantasystem.milktea.common_android.hilt.IODispatcher
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.user.User
@@ -19,7 +23,7 @@ import net.pantasystem.milktea.model.user.UserRepository
 import javax.inject.Inject
 import javax.inject.Singleton
 
-open class UserViewData(
+class UserViewData private constructor(
     val userId: User.Id?,
     val userName: String? = null,
     val host: String? = null,
@@ -38,6 +42,7 @@ open class UserViewData(
         val userDataSource: UserDataSource,
         val accountRepository: AccountRepository,
         val logger: Logger.Factory,
+        @IODispatcher val defaultDispatcher: CoroutineDispatcher,
     ) {
 
 
@@ -46,7 +51,7 @@ open class UserViewData(
         fun create(
             userId: User.Id,
             coroutineScope: CoroutineScope,
-            dispatcher: CoroutineDispatcher = Dispatchers.IO
+            dispatcher: CoroutineDispatcher = defaultDispatcher
         ): UserViewData {
             return UserViewData(
                 userId,
@@ -65,7 +70,7 @@ open class UserViewData(
             host: String?,
             accountId: Long,
             coroutineScope: CoroutineScope,
-            dispatcher: CoroutineDispatcher = Dispatchers.IO
+            dispatcher: CoroutineDispatcher = defaultDispatcher
         ): UserViewData {
             return UserViewData(
                 userName,
@@ -83,7 +88,7 @@ open class UserViewData(
         fun create(
             user: User,
             coroutineScope: CoroutineScope,
-            dispatcher: CoroutineDispatcher = Dispatchers.IO
+            dispatcher: CoroutineDispatcher = defaultDispatcher
         ): UserViewData {
             return UserViewData(
                 user,
@@ -111,12 +116,11 @@ open class UserViewData(
         null,
     )
 
-    @OptIn(FlowPreview::class)
     val account: LiveData<Account?> = suspend {
         accountRepository.get(accountId).getOrNull()
     }.asFlow().asLiveData()
 
-    constructor(
+    private constructor(
         user: User,
         userDataSource: UserDataSource,
         userRepository: UserRepository,
@@ -134,7 +138,7 @@ open class UserViewData(
         dispatcher = dispatcher
     )
 
-    constructor(
+    private constructor(
         userName: String,
         host: String?,
         accountId: Long,
@@ -157,7 +161,7 @@ open class UserViewData(
         dispatcher
     )
 
-    constructor(
+    private constructor(
         userId: User.Id,
         userDataSource: UserDataSource,
         userRepository: UserRepository,
