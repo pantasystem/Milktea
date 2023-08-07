@@ -141,9 +141,12 @@ class NotificationFragment : Fragment(R.layout.fragment_notification) {
         ).launchIn(viewLifecycleOwner.lifecycleScope)
 
 
-        mViewModel.isLoading.observe(viewLifecycleOwner) {
+        mViewModel.isLoading.onEach {
             mBinding.notificationSwipeRefresh.isRefreshing = it
-        }
+        }.flowWithLifecycle(
+            viewLifecycleOwner.lifecycle,
+            Lifecycle.State.RESUMED
+        ).launchIn(viewLifecycleOwner.lifecycleScope)
 
         mBinding.notificationSwipeRefresh.setOnRefreshListener {
             mViewModel.loadInit()

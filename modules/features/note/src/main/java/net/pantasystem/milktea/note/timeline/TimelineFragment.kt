@@ -187,11 +187,14 @@ class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view)
             mViewModel.loadNew()
         }
 
-        mViewModel.isLoading.observe(viewLifecycleOwner, Observer {
-            if (it != null && !it) {
+        mViewModel.isLoading.onEach {
+            if (!it) {
                 mBinding.refresh.isRefreshing = false
             }
-        })
+        }.flowWithLifecycle(
+            viewLifecycleOwner.lifecycle,
+            Lifecycle.State.RESUMED
+        ).launchIn(viewLifecycleOwner.lifecycleScope)
 
 
         mBinding.listView.adapter = adapter
