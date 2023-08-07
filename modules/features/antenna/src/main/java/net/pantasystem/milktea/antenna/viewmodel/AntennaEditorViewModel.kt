@@ -88,19 +88,34 @@ class AntennaEditorViewModel @Inject constructor(
 
     val isList = source.map {
         it is AntennaSource.List
-    }
+    }.stateIn(
+        viewModelScope,
+        SharingStarted.WhileSubscribed(5_000),
+        false,
+    )
+
 
     val isUsers = source.map {
         it is AntennaSource.Users
-    }
+    }.stateIn(
+        viewModelScope,
+        SharingStarted.WhileSubscribed(5_000),
+        false,
+    )
+
 
     val isGroup = source.map {
         it is AntennaSource.Users
-    }
+    }.stateIn(
+        viewModelScope,
+        SharingStarted.WhileSubscribed(5_000),
+        false,
+    )
 
-    val keywords = MediatorLiveData<String>()
+    val keywords = savedStateHandle.getStateFlow<String?>(STATE_KEYWORDS, null)
 
-    val excludeKeywords = MediatorLiveData<String>()
+    val excludeKeywords = savedStateHandle.getStateFlow<String?>(STATE_EXCLUDE_KEYWORDS, null)
+
 
     private val userNames = MutableStateFlow<List<String>>(emptyList())
 
@@ -234,12 +249,50 @@ class AntennaEditorViewModel @Inject constructor(
             }
         }
     }
+
+
     val selectUserEvent = EventBus<List<User.Id>>()
     @ExperimentalCoroutinesApi
     fun selectUser(){
         selectUserEvent.event = users.value.mapNotNull {
             it.user.value?.id
         }
+    }
+
+    fun onSourceChanged(source: AntennaSource){
+        savedStateHandle[STATE_SOURCE] = source.str()
+    }
+
+    fun onUserListSelected(userList: UserList?){
+        savedStateHandle[STATE_LIST_ID] = userList?.id
+    }
+
+    fun onNameValueChanged(name: String){
+        savedStateHandle[STATE_NAME] = name
+    }
+
+    fun onKeywordsValueChanged(keywords: String){
+        savedStateHandle[STATE_KEYWORDS] = keywords
+    }
+
+    fun onExcludeKeywordsValueChanged(keywords: String){
+        savedStateHandle[STATE_EXCLUDE_KEYWORDS] = keywords
+    }
+
+    fun onCaseSensitiveChanged(caseSensitive: Boolean){
+        savedStateHandle[CASE_SENSITIVE] = caseSensitive
+    }
+
+    fun onWithFileChanged(withFile: Boolean){
+        savedStateHandle[STATE_WITH_FILE] = withFile
+    }
+
+    fun onWithRepliesChanged(withReplies: Boolean){
+        savedStateHandle[STATE_WITH_REPLIES] = withReplies
+    }
+
+    fun onNotifyChanged(notify: Boolean){
+        savedStateHandle[STATE_NOTIFY] = notify
     }
 
     
