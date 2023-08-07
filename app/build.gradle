@@ -14,7 +14,10 @@ plugins {
 
 play {
     track = "internal"
-    enabled = (System.getenv("ANDROID_PUBLISHER_CREDENTIALS") != null)
+    enabled = (System.getenv("ANDROID_PUBLISHER_CREDENTIALS_FILE") != null)
+    if (System.getenv("ANDROID_PUBLISHER_CREDENTIALS_FILE") != null) {
+        serviceAccountCredentials.set(file(System.getenv("ANDROID_PUBLISHER_CREDENTIALS_FILE")))
+    }
 }
 
 android {
@@ -283,7 +286,7 @@ dependencies {
 
     implementation libs.objectbox.kotlin
 
-    testImplementation "org.mockito.kotlin:mockito-kotlin:4.0.0"
+    testImplementation "org.mockito.kotlin:mockito-kotlin:4.1.0"
 
 }
 

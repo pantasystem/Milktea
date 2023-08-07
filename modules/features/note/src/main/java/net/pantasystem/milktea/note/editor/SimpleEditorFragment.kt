@@ -33,7 +33,6 @@ import net.pantasystem.milktea.model.drive.DriveFileRepository
 import net.pantasystem.milktea.model.drive.FileProperty
 import net.pantasystem.milktea.model.drive.FilePropertyDataSource
 import net.pantasystem.milktea.model.emoji.CustomEmojiRepository
-import net.pantasystem.milktea.model.emoji.Emoji
 import net.pantasystem.milktea.model.file.toAppFile
 import net.pantasystem.milktea.model.notes.draft.DraftNoteService
 import net.pantasystem.milktea.model.setting.LocalConfigRepository
@@ -50,7 +49,6 @@ import net.pantasystem.milktea.note.editor.viewmodel.NoteEditorViewModel
 import net.pantasystem.milktea.note.editor.viewmodel.toCreateNote
 import net.pantasystem.milktea.note.editor.visibility.VisibilitySelectionDialogV2
 import net.pantasystem.milktea.note.emojis.CustomEmojiPickerDialog
-import net.pantasystem.milktea.note.emojis.viewmodel.EmojiSelectionViewModel
 import javax.inject.Inject
 
 
@@ -261,11 +259,6 @@ class SimpleEditorFragment : Fragment(R.layout.fragment_simple_editor), SimpleEd
             viewModel.post()
         }
 
-        val emojiSelectionViewModel =
-            ViewModelProvider(requireActivity())[EmojiSelectionViewModel::class.java]
-        emojiSelectionViewModel.selectedEmojiName.observe(viewLifecycleOwner, (::onSelect))
-        emojiSelectionViewModel.selectedEmoji.observe(viewLifecycleOwner, (::onSelect))
-
 
         viewLifecycleOwner.lifecycleScope.launch {
             accountViewModel.currentAccount.collect {
@@ -284,23 +277,6 @@ class SimpleEditorFragment : Fragment(R.layout.fragment_simple_editor), SimpleEd
         }
     }
 
-
-    private fun onSelect(emoji: Emoji) {
-        val pos = mBinding.inputMainText.selectionEnd
-        mViewModel.addEmoji(emoji, pos).let { newPos ->
-            mBinding.inputMainText.setText(mViewModel.text.value ?: "")
-            mBinding.inputMainText.setSelection(newPos)
-            Log.d("NoteEditorActivity", "入力されたデータ:${mBinding.inputMainText.text}")
-        }
-    }
-
-    private fun onSelect(emoji: String) {
-        val pos = mBinding.inputMainText.selectionEnd
-        mViewModel.addEmoji(emoji, pos).let { newPos ->
-            mBinding.inputMainText.setText(mViewModel.text.value ?: "")
-            mBinding.inputMainText.setSelection(newPos)
-        }
-    }
 
     private fun setPollFragment() {
         val ft = childFragmentManager.beginTransaction()

@@ -9,7 +9,6 @@ import dagger.hilt.android.AndroidEntryPoint
 import net.pantasystem.milktea.app_store.account.AccountStore
 import net.pantasystem.milktea.note.R
 import net.pantasystem.milktea.note.emojis.viewmodel.EmojiSelection
-import net.pantasystem.milktea.note.emojis.viewmodel.EmojiSelectionViewModel
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -25,7 +24,6 @@ class CustomEmojiPickerDialog : BottomSheetDialogFragment(), EmojiPickerFragment
         }
     }
 
-    private var mSelectionViewModel: EmojiSelectionViewModel? = null
 
     @Inject
     lateinit var accountStore: AccountStore
@@ -62,9 +60,6 @@ class CustomEmojiPickerDialog : BottomSheetDialogFragment(), EmojiPickerFragment
             activity.onSelect(emoji)
         } else if (parentFr is EmojiSelection) {
             parentFr.onSelect(emoji)
-
-        }else{
-            mSelectionViewModel?.onSelect(emoji)
         }
     }
 
