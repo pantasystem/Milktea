@@ -29,6 +29,7 @@ import net.pantasystem.milktea.model.antenna.Antenna
 import net.pantasystem.milktea.model.user.User
 import javax.inject.Inject
 
+@Suppress("DEPRECATION")
 @ExperimentalCoroutinesApi
 @FlowPreview
 @AndroidEntryPoint
@@ -87,13 +88,13 @@ class AntennaEditorActivity : AppCompatActivity() {
             finish()
         }
 
-        viewModel.antennaAddedStateEvent.observe(this) {
+        viewModel.antennaAddedStateEvent.onEach {
             if (it) {
                 Toast.makeText(this, getString(R.string.success), Toast.LENGTH_LONG).show()
             } else {
                 Toast.makeText(this, getString(R.string.failure), Toast.LENGTH_LONG).show()
             }
-        }
+        }.flowWithLifecycle(lifecycle).launchIn(lifecycleScope)
 
         onBackPressedDispatcher.addCallback {
             setResult(RESULT_OK)

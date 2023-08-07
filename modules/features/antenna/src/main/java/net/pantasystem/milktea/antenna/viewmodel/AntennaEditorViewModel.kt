@@ -7,7 +7,9 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
@@ -191,7 +193,8 @@ class AntennaEditorViewModel @Inject constructor(
      */
     val withReplies = savedStateHandle.getStateFlow(STATE_WITH_REPLIES, false)
 
-    val antennaAddedStateEvent = EventBus<Boolean>()
+    private val _antennaAddedStateEvent = MutableSharedFlow<Boolean>(extraBufferCapacity = 10)
+    val antennaAddedStateEvent: SharedFlow<Boolean> = _antennaAddedStateEvent
     
     fun createOrUpdate(){
 
@@ -226,11 +229,11 @@ class AntennaEditorViewModel @Inject constructor(
             }.onSuccess {
                 setAntennaId(it.id)
                 withContext(Dispatchers.Main) {
-                    antennaAddedStateEvent.event = true
+                    _antennaAddedStateEvent.tryEmit(true)
                 }
             }.onFailure {
                 withContext(Dispatchers.Main) {
-                    antennaAddedStateEvent.event = false
+                    _antennaAddedStateEvent.tryEmit(false)
                 }
             }
         }
