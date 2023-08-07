@@ -70,7 +70,6 @@ import net.pantasystem.milktea.note.editor.viewmodel.NoteEditorViewModel
 import net.pantasystem.milktea.note.editor.visibility.VisibilitySelectionDialogV2
 import net.pantasystem.milktea.note.emojis.CustomEmojiPickerDialog
 import net.pantasystem.milktea.note.emojis.viewmodel.EmojiSelection
-import net.pantasystem.milktea.note.emojis.viewmodel.EmojiSelectionViewModel
 import javax.inject.Inject
 
 @Suppress("DEPRECATION")
@@ -136,7 +135,6 @@ class NoteEditorFragment : Fragment(R.layout.fragment_note_editor), EmojiSelecti
 
     private val noteEditorViewModel: NoteEditorViewModel by activityViewModels()
     private val accountViewModel: AccountViewModel by activityViewModels()
-    private val emojiSelectionViewModel: EmojiSelectionViewModel by activityViewModels()
 
     @Inject
     internal lateinit var accountStore: AccountStore
@@ -454,14 +452,6 @@ class NoteEditorFragment : Fragment(R.layout.fragment_note_editor), EmojiSelecti
             PollDatePickerDialog().show(childFragmentManager, "DatePicker")
         }.flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.RESUMED)
             .launchIn(viewLifecycleOwner.lifecycleScope)
-
-        emojiSelectionViewModel.selectedEmoji.observe(viewLifecycleOwner) {
-            onSelect(it)
-        }
-
-        emojiSelectionViewModel.selectedEmojiName.observe(viewLifecycleOwner) {
-            onSelect(it)
-        }
 
         noteEditorViewModel.setAccountId(specifiedAccountId)
 

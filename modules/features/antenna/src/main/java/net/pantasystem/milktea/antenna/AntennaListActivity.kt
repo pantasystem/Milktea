@@ -8,10 +8,14 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
+import androidx.lifecycle.flowWithLifecycle
+import androidx.lifecycle.lifecycleScope
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import net.pantasystem.milktea.antenna.databinding.ActivityAntennaListBinding
 import net.pantasystem.milktea.antenna.viewmodel.AntennaListViewModel
 import net.pantasystem.milktea.common.ui.ApplyTheme
@@ -41,13 +45,13 @@ class AntennaListActivity : AppCompatActivity() {
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
 
-        mAntennaListViewModel.confirmDeletionAntennaEvent.observe(this) {
+        mAntennaListViewModel.confirmDeletionAntennaEvent.onEach {
             confirmDeleteAntenna(it)
-        }
-        mAntennaListViewModel.editAntennaEvent.observe( this) {
+        }.flowWithLifecycle(lifecycle).launchIn(lifecycleScope)
+        mAntennaListViewModel.editAntennaEvent.onEach {
             val intent = AntennaEditorActivity.newIntent(this, it.id)
             requestEditAntennaResult.launch(intent)
-        }
+        }.flowWithLifecycle(lifecycle).launchIn(lifecycleScope)
 
         mBinding.addAntennaFab.setOnClickListener {
             requestEditAntennaResult.launch(Intent(this, AntennaEditorActivity::class.java))

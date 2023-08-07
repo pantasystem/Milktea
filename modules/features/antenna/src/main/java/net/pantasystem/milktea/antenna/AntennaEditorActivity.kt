@@ -11,9 +11,13 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
+import androidx.lifecycle.flowWithLifecycle
+import androidx.lifecycle.lifecycleScope
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import net.pantasystem.milktea.antenna.databinding.ActivityAntennaEditorBinding
 import net.pantasystem.milktea.antenna.viewmodel.AntennaEditorViewModel
 import net.pantasystem.milktea.common.ui.ApplyTheme
@@ -25,6 +29,7 @@ import net.pantasystem.milktea.model.antenna.Antenna
 import net.pantasystem.milktea.model.user.User
 import javax.inject.Inject
 
+@Suppress("DEPRECATION")
 @ExperimentalCoroutinesApi
 @FlowPreview
 @AndroidEntryPoint
@@ -71,25 +76,25 @@ class AntennaEditorActivity : AppCompatActivity() {
         }
 
         this.mViewModel = viewModel
-        viewModel.selectUserEvent.observe(this) {
+        viewModel.selectUserEvent.onEach {
             showSearchAndSelectUserActivity(it)
-        }
-        viewModel.name.observe(this) {
+        }.flowWithLifecycle(lifecycle).launchIn(lifecycleScope)
+        viewModel.name.onEach {
             supportActionBar?.title = it
-        }
-        viewModel.antennaRemovedEvent.observe(this) {
+        }.flowWithLifecycle(lifecycle).launchIn(lifecycleScope)
+        viewModel.antennaRemovedEvent.onEach {
             Toast.makeText(this, getString(R.string.remove), Toast.LENGTH_SHORT).show()
             setResult(RESULT_OK)
             finish()
-        }
+        }.flowWithLifecycle(lifecycle).launchIn(lifecycleScope)
 
-        viewModel.antennaAddedStateEvent.observe(this) {
+        viewModel.antennaAddedStateEvent.onEach {
             if (it) {
                 Toast.makeText(this, getString(R.string.success), Toast.LENGTH_LONG).show()
             } else {
                 Toast.makeText(this, getString(R.string.failure), Toast.LENGTH_LONG).show()
             }
-        }
+        }.flowWithLifecycle(lifecycle).launchIn(lifecycleScope)
 
         onBackPressedDispatcher.addCallback {
             setResult(RESULT_OK)

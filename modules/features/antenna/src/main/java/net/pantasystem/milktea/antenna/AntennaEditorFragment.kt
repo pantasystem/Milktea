@@ -5,14 +5,17 @@ import android.util.Log
 import android.view.View
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
+import androidx.core.widget.addTextChangedListener
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import net.pantasystem.milktea.antenna.databinding.FragmentAntennaEditorBinding
 import net.pantasystem.milktea.antenna.viewmodel.AntennaEditorViewModel
 import net.pantasystem.milktea.common_android.ui.listview.applyFlexBoxLayout
@@ -71,21 +74,20 @@ class AntennaEditorFragment : Fragment(R.layout.fragment_antenna_editor){
                 id: Long
             ) {
                 resourceStringToSource(receivedSourceStringArray[position])?.let{
-                    viewModel.source.value = it
+                    viewModel.onSourceChanged(it)
                 }
             }
 
             override fun onNothingSelected(parent: AdapterView<*>?) = Unit
         }
 
-        viewModel.source.observe(viewLifecycleOwner) {
-
+        viewModel.source.onEach {
             val srcIndex = receivedSourceStringArray.indexOf(sourceToResourceString(it))
             Log.d("AntennaEditorViewModel", "srcIndex:$srcIndex, type:$it")
             binding.receivingSourceSpinner.setSelection(srcIndex)
 
+        }.flowWithLifecycle(viewLifecycleOwner.lifecycle).launchIn(viewLifecycleOwner.lifecycleScope)
 
-        }
 
 
         viewModel.userListList.observe(viewLifecycleOwner) { list ->
@@ -104,14 +106,14 @@ class AntennaEditorFragment : Fragment(R.layout.fragment_antenna_editor){
                         position: Int,
                         id: Long
                     ) {
-                        viewModel.userList.value = list[position]
+                        viewModel.onUserListSelected(list[position])
                     }
 
                     override fun onNothingSelected(parent: AdapterView<*>?) = Unit
                 }
 
         }
-        viewModel.userList.observe(viewLifecycleOwner) {
+        viewModel.userList.onEach {
             it?.let { ul ->
                 val index = viewModel.userListList.value?.indexOfFirst { list ->
                     ul.id == list.id
@@ -123,57 +125,83 @@ class AntennaEditorFragment : Fragment(R.layout.fragment_antenna_editor){
                 binding.userListListSpinner.setSelection(index)
             }
 
+        }.flowWithLifecycle(viewLifecycleOwner.lifecycle).launchIn(viewLifecycleOwner.lifecycleScope)
+
+//
+//        viewModel.groupList.observe( viewLifecycleOwner) {
+//            it?.let { groups ->
+//                val groupsAdapter = ArrayAdapter(
+//                    view.context,
+//                    android.R.layout.simple_spinner_dropdown_item,
+//                    groups.map { group ->
+//                        group.name
+//                    })
+//                binding.groupListSpinner.adapter = groupsAdapter
+//                binding.groupListSpinner.onItemSelectedListener =
+//                    object : AdapterView.OnItemSelectedListener {
+//                        override fun onItemSelected(
+//                            parent: AdapterView<*>?,
+//                            view: View?,
+//                            position: Int,
+//                            id: Long
+//                        ) {
+//                            viewModel.group.value = groups[position]
+//                        }
+//
+//                        override fun onNothingSelected(parent: AdapterView<*>?) = Unit
+//
+//                    }
+//
+//            }
+//        }
+
+//        viewModel.group.observe( viewLifecycleOwner) { g ->
+//            g?.let {
+//                val index = viewModel.groupList.value?.indexOfFirst { inG ->
+//                    g.id == inG.id
+//                } ?: 0
+//                binding.groupListSpinner.setSelection(index)
+//            }
+//
+//        }
+//
+
+        binding.antennaNameEditText.addTextChangedListener {
+            viewModel.onNameValueChanged(it.toString())
+        }
+        binding.keywordsToReceiveEditText.addTextChangedListener {
+            viewModel.onKeywordsValueChanged(it.toString())
         }
 
-
-        viewModel.groupList.observe( viewLifecycleOwner) {
-            it?.let { groups ->
-                val groupsAdapter = ArrayAdapter(
-                    view.context,
-                    android.R.layout.simple_spinner_dropdown_item,
-                    groups.map { group ->
-                        group.name
-                    })
-                binding.groupListSpinner.adapter = groupsAdapter
-                binding.groupListSpinner.onItemSelectedListener =
-                    object : AdapterView.OnItemSelectedListener {
-                        override fun onItemSelected(
-                            parent: AdapterView<*>?,
-                            view: View?,
-                            position: Int,
-                            id: Long
-                        ) {
-                            viewModel.group.value = groups[position]
-                        }
-
-                        override fun onNothingSelected(parent: AdapterView<*>?) = Unit
-
-                    }
-
-            }
+        binding.keywordsToExcludeEditText.addTextChangedListener {
+            viewModel.onExcludeKeywordsValueChanged(it.toString())
         }
 
-        viewModel.group.observe( viewLifecycleOwner) { g ->
-            g?.let {
-                val index = viewModel.groupList.value?.indexOfFirst { inG ->
-                    g.id == inG.id
-                } ?: 0
-                binding.groupListSpinner.setSelection(index)
-            }
-
+        binding.caseSensitiveSwitch.setOnCheckedChangeListener { _, isChecked ->
+            viewModel.onCaseSensitiveChanged(isChecked)
         }
 
+        binding.withFilesSwitch.setOnCheckedChangeListener { _, isChecked ->
+            viewModel.onWithFileChanged(isChecked)
+        }
+
+        binding.notifySwitch.setOnCheckedChangeListener { _, isChecked ->
+            viewModel.onNotifyChanged(isChecked)
+        }
+
+        binding.includeRepliesSwitch.setOnCheckedChangeListener { _, isChecked ->
+            viewModel.onWithRepliesChanged(isChecked)
+        }
 
         val userChipAdapter = UserChipListAdapter(viewLifecycleOwner)
         binding.specifiedUserListView.adapter = userChipAdapter
         binding.specifiedUserListView.applyFlexBoxLayout(requireContext())
 
-        viewLifecycleOwner.lifecycleScope.launch {
-            viewModel.users.collect {
-                userChipAdapter.submitList(it)
-            }
-        }
+        viewModel.users.onEach {
+            userChipAdapter.submitList(it)
+        }.flowWithLifecycle(viewLifecycleOwner.lifecycle).launchIn(viewLifecycleOwner.lifecycleScope)
 
+        binding.lifecycleOwner = viewLifecycleOwner
 
     }
 

@@ -10,7 +10,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.plus
 import net.pantasystem.milktea.app_store.account.AccountStore
 import net.pantasystem.milktea.common.*
-import net.pantasystem.milktea.common_android.eventbus.EventBus
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.page.Pageable
 import net.pantasystem.milktea.model.antenna.Antenna
@@ -95,11 +94,13 @@ class AntennaListViewModel @Inject constructor(
         )
     }
 
-    val editAntennaEvent = EventBus<Antenna>()
+    private val _editAntennaEvent = MutableSharedFlow<Antenna>(extraBufferCapacity = 10)
+    val editAntennaEvent: SharedFlow<Antenna> = _editAntennaEvent
 
-    val confirmDeletionAntennaEvent = EventBus<Antenna>()
+    private val _confirmDeletionAntennaEvent = MutableSharedFlow<Antenna>(extraBufferCapacity = 10)
+    val confirmDeletionAntennaEvent: SharedFlow<Antenna> = _confirmDeletionAntennaEvent
 
-    private val openAntennasTimelineEvent = EventBus<Antenna>()
+    private val openAntennasTimelineEvent = MutableSharedFlow<Antenna>(extraBufferCapacity = 10)
 
 
     private val mPagedAntennaIds = MutableLiveData<Set<Antenna.Id>>()
@@ -127,7 +128,7 @@ class AntennaListViewModel @Inject constructor(
 
     }
 
-    private val deleteResultEvent = EventBus<Boolean>()
+    private val deleteResultEvent = MutableSharedFlow<Boolean>(extraBufferCapacity = 10)
 
     fun loadInit() {
         refreshAntennasEvents.tryEmit(Date().time)
@@ -144,16 +145,17 @@ class AntennaListViewModel @Inject constructor(
 
     fun confirmDeletionAntenna(antenna: Antenna?) {
         antenna ?: return
-        confirmDeletionAntennaEvent.event = antenna
+        _confirmDeletionAntennaEvent.tryEmit(antenna)
     }
 
     fun editAntenna(antenna: Antenna?) {
         antenna ?: return
-        editAntennaEvent.event = antenna
+        _editAntennaEvent.tryEmit(antenna)
     }
 
     fun openAntennasTimeline(antenna: Antenna?) {
-        openAntennasTimelineEvent.event = antenna
+        antenna ?: return
+        openAntennasTimelineEvent.tryEmit(antenna)
     }
 
     fun deleteAntenna(antenna: Antenna) {
@@ -161,7 +163,7 @@ class AntennaListViewModel @Inject constructor(
             antennaRepository.delete(antenna.id).onSuccess {
                 loadInit()
             }.onFailure {
-                deleteResultEvent.event = false
+                deleteResultEvent.tryEmit(false)
             }
         }
     }
