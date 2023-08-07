@@ -8,7 +8,6 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -119,7 +118,10 @@ class AntennaEditorViewModel @Inject constructor(
     val excludeKeywords = savedStateHandle.getStateFlow<String?>(STATE_EXCLUDE_KEYWORDS, null)
 
 
-    private val userNames = MutableStateFlow<List<String>>(emptyList())
+    private val userNames = savedStateHandle.getStateFlow<List<String>>(
+        STATE_USERNAME_LIST,
+        emptyList()
+    )
 
     @ExperimentalCoroutinesApi
     private val mUsers = userNames.map { list ->
@@ -323,7 +325,7 @@ class AntennaEditorViewModel @Inject constructor(
 
     fun setUserNames(userNames: List<String>){
         logger.debug { "setUserNames: $userNames" }
-        this.userNames.value = userNames
+        savedStateHandle[STATE_USERNAME_LIST] = userNames
     }
 
     fun setAntennaId(antennaId: Antenna.Id) {
