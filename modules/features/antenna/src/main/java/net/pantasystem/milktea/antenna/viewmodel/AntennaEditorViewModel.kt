@@ -19,7 +19,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.common.runCancellableCatching
-import net.pantasystem.milktea.common_android.eventbus.EventBus
 import net.pantasystem.milktea.common_viewmodel.UserViewData
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.AccountRepository
@@ -152,7 +151,7 @@ class AntennaEditorViewModel @Inject constructor(
         }
     }
 
-    val userListId = savedStateHandle.getStateFlow<UserList.Id?>(STATE_LIST_ID, null)
+    private val userListId = savedStateHandle.getStateFlow<UserList.Id?>(STATE_LIST_ID, null)
 
     val userList = userListId.map {
         if (it == null) null else userListRepository.findOne(it)
@@ -256,12 +255,12 @@ class AntennaEditorViewModel @Inject constructor(
     }
 
 
-    val selectUserEvent = EventBus<List<User.Id>>()
+    val selectUserEvent = MutableSharedFlow<List<User.Id>>(extraBufferCapacity = 10)
     @ExperimentalCoroutinesApi
     fun selectUser(){
-        selectUserEvent.event = users.value.mapNotNull {
+        selectUserEvent.tryEmit(users.value.mapNotNull {
             it.user.value?.id
-        }
+        })
     }
 
     fun onSourceChanged(source: AntennaSource){

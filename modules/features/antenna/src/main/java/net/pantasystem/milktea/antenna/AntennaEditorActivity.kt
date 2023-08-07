@@ -76,9 +76,9 @@ class AntennaEditorActivity : AppCompatActivity() {
         }
 
         this.mViewModel = viewModel
-        viewModel.selectUserEvent.observe(this) {
+        viewModel.selectUserEvent.onEach {
             showSearchAndSelectUserActivity(it)
-        }
+        }.flowWithLifecycle(lifecycle).launchIn(lifecycleScope)
         viewModel.name.onEach {
             supportActionBar?.title = it
         }.flowWithLifecycle(lifecycle).launchIn(lifecycleScope)
