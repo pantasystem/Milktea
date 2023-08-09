@@ -10,6 +10,7 @@ import android.widget.ArrayAdapter
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
+import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
@@ -81,9 +82,9 @@ class ReactionSettingActivity : AppCompatActivity() {
             })
         }
 
-        mReactionPickerSettingViewModel.reactionSelectEvent.observe(this) { rus ->
+        mReactionPickerSettingViewModel.reactionSelectEvent.onEach { rus ->
             showConfirmDeleteReactionDialog(rus.reaction)
-        }
+        }.flowWithLifecycle(lifecycle).launchIn(lifecycleScope)
 
         binding.reactionPickerType.setSelection(mReactionPickerSettingViewModel.reactionPickerType.ordinal)
 

@@ -6,13 +6,14 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import net.pantasystem.milktea.app_store.account.AccountStore
 import net.pantasystem.milktea.app_store.setting.SettingStore
-import net.pantasystem.milktea.common_android.eventbus.EventBus
 import net.pantasystem.milktea.data.infrastructure.notes.reaction.impl.usercustom.ReactionUserSetting
 import net.pantasystem.milktea.data.infrastructure.notes.reaction.impl.usercustom.ReactionUserSettingDao
 import net.pantasystem.milktea.model.account.Account
@@ -37,7 +38,9 @@ class ReactionPickerSettingViewModel @Inject constructor(
     var reactionPickerType = settingStore.reactionPickerType
         private set
     val reactionSettingsList = MutableLiveData<List<ReactionUserSetting>>()
-    val reactionSelectEvent = EventBus<ReactionUserSetting>()
+
+    private val _reactionSelectEvent = MutableSharedFlow<ReactionUserSetting>(extraBufferCapacity = 10)
+    val reactionSelectEvent = _reactionSelectEvent.asSharedFlow()
 
     private var mExistingSettingList: List<ReactionUserSetting>? = null
     private val mReactionSettingReactionNameMap = LinkedHashMap<String, ReactionUserSetting>()
@@ -112,7 +115,7 @@ class ReactionPickerSettingViewModel @Inject constructor(
     // delete reaction
     override fun selectReaction(reaction: String) {
         mReactionSettingReactionNameMap[reaction]?.let {
-            reactionSelectEvent.event = it
+            _reactionSelectEvent.tryEmit(it)
         }
     }
 
