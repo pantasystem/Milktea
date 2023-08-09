@@ -9,13 +9,25 @@ import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.activityViewModels
 import dagger.hilt.android.AndroidEntryPoint
 import net.pantasystem.milktea.model.account.page.CanOnlyMedia
+import net.pantasystem.milktea.model.account.page.Page
 import net.pantasystem.milktea.model.account.page.Pageable
 import net.pantasystem.milktea.model.account.page.UntilPaginate
 import net.pantasystem.milktea.setting.databinding.DialogEditTabNameBinding
 import net.pantasystem.milktea.setting.viewmodel.page.PageSettingViewModel
 
+@Suppress("DEPRECATION")
 @AndroidEntryPoint
 class EditTabSettingDialog : AppCompatDialogFragment(){
+
+    companion object {
+        fun newInstance(page: Page): EditTabSettingDialog {
+            return EditTabSettingDialog().apply {
+                arguments = Bundle().apply {
+                    putSerializable("page", page)
+                }
+            }
+        }
+    }
 
     private val pageSettingViewModel: PageSettingViewModel by activityViewModels()
 
@@ -26,7 +38,7 @@ class EditTabSettingDialog : AppCompatDialogFragment(){
         requireNotNull(binding)
         dialog.setContentView(view)
 
-        val page = pageSettingViewModel.pageOnUpdateEvent.event
+        val page = requireArguments().getSerializable("page") as? Page
         if(page == null){
             dismiss()
             return dialog

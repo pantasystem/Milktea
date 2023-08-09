@@ -7,11 +7,24 @@ import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.activityViewModels
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import dagger.hilt.android.AndroidEntryPoint
+import net.pantasystem.milktea.model.account.page.Page
 import net.pantasystem.milktea.setting.databinding.DialogPageSettingActionBinding
 import net.pantasystem.milktea.setting.viewmodel.page.PageSettingViewModel
 
+@Suppress("DEPRECATION")
 @AndroidEntryPoint
 class PageSettingActionDialog : BottomSheetDialogFragment(){
+
+    companion object {
+        private const val PAGE = "PageSettingActionDialog.page"
+        fun newInstance(page: Page): PageSettingActionDialog {
+            return PageSettingActionDialog().apply {
+                arguments = Bundle().apply {
+                    putSerializable(PAGE, page)
+                }
+            }
+        }
+    }
 
     private val viewModel: PageSettingViewModel by activityViewModels()
 
@@ -22,7 +35,7 @@ class PageSettingActionDialog : BottomSheetDialogFragment(){
         val binding = DataBindingUtil.bind<DialogPageSettingActionBinding>(view)
 
 
-        val targetPage = viewModel.pageOnActionEvent.event
+        val targetPage = requireArguments().getSerializable(PAGE) as? Page
         binding?.deletePage?.setOnClickListener {
             if(targetPage != null){
                 viewModel.removePage(targetPage)
@@ -30,7 +43,9 @@ class PageSettingActionDialog : BottomSheetDialogFragment(){
             dismiss()
         }
         binding?.editPage?.setOnClickListener {
-            viewModel.pageOnUpdateEvent.event = targetPage
+            if (targetPage != null) {
+                viewModel.onEditButtonClicked(targetPage)
+            }
             dismiss()
         }
         return dialog

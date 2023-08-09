@@ -6,19 +6,24 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import net.pantasystem.milktea.app_store.account.AccountStore
 import net.pantasystem.milktea.app_store.setting.SettingStore
 import net.pantasystem.milktea.common.runCancellableCatching
-import net.pantasystem.milktea.common_android.eventbus.EventBus
 import net.pantasystem.milktea.common_android.resource.StringSource
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.AccountRepository
-import net.pantasystem.milktea.model.account.page.*
+import net.pantasystem.milktea.model.account.page.Page
+import net.pantasystem.milktea.model.account.page.PageType
+import net.pantasystem.milktea.model.account.page.Pageable
+import net.pantasystem.milktea.model.account.page.PageableTemplate
+import net.pantasystem.milktea.model.account.page.newPage
 import net.pantasystem.milktea.model.user.User
 import net.pantasystem.milktea.model.user.UserRepository
 import net.pantasystem.milktea.setting.PageTypeNameMap
@@ -39,11 +44,15 @@ class PageSettingViewModel @Inject constructor(
     val account =
         accountStore.observeCurrentAccount.stateIn(viewModelScope, SharingStarted.Eagerly, null)
 
-    val pageAddedEvent = EventBus<PageCandidate>()
+    private val _pageAddedEvent = MutableSharedFlow<PageCandidate>(extraBufferCapacity = 10)
+    val pageAddedEvent = _pageAddedEvent.asSharedFlow()
 
-    val pageOnActionEvent = EventBus<Page>()
+    private val _pageOnActionEvent = MutableSharedFlow<Page>(extraBufferCapacity = 10)
+    val pageOnActionEvent = _pageOnActionEvent.asSharedFlow()
 
-    val pageOnUpdateEvent = EventBus<Page>()
+
+    private val _pageOnUpdateEvent = MutableSharedFlow<Page>(extraBufferCapacity = 10)
+    val pageOnUpdateEvent = _pageOnUpdateEvent.asSharedFlow()
 
     val pageTypesGroupedByAccount = combine(
         accountStore.observeCurrentAccount,
@@ -185,7 +194,7 @@ class PageSettingViewModel @Inject constructor(
 
 
     override fun add(type: PageCandidate) {
-        pageAddedEvent.event = type
+        _pageAddedEvent.tryEmit(type)
         val name = pageTypeNameMap.get(type.type)
         when (type.type) {
             PageType.GLOBAL -> {
@@ -286,7 +295,15 @@ class PageSettingViewModel @Inject constructor(
 
     override fun action(page: Page?) {
         page ?: return
-        pageOnActionEvent.event = page
+        _pageOnActionEvent.tryEmit(page)
+    }
+
+    fun onOptionButtonClicked(page: Page) {
+        _pageOnActionEvent.tryEmit(page)
+    }
+
+    fun onEditButtonClicked(page: Page) {
+        _pageOnUpdateEvent.tryEmit(page)
     }
 
 }
