@@ -9,31 +9,21 @@ import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
-import net.pantasystem.milktea.app_store.notes.NoteTranslationStore
 import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.account.CurrentAccountWatcher
 import net.pantasystem.milktea.model.account.page.Pageable
-import net.pantasystem.milktea.model.emoji.CustomEmojiRepository
-import net.pantasystem.milktea.model.filter.WordFilterService
 import net.pantasystem.milktea.model.notes.*
-import net.pantasystem.milktea.model.setting.LocalConfigRepository
-import net.pantasystem.milktea.note.viewmodel.PlaneNoteViewData
 import net.pantasystem.milktea.note.viewmodel.PlaneNoteViewDataCache
 
 class NoteDetailViewModel @AssistedInject constructor(
     accountRepository: AccountRepository,
-    private val noteCaptureAdapter: NoteCaptureAPIAdapter,
-    private val noteRelationGetter: NoteRelationGetter,
     private val noteRepository: NoteRepository,
-    private val noteTranslationStore: NoteTranslationStore,
     private val noteDataSource: NoteDataSource,
-    private val configRepository: LocalConfigRepository,
-    private val emojiRepository: CustomEmojiRepository,
-    private val noteWordFilterService: WordFilterService,
     planeNoteViewDataCacheFactory: PlaneNoteViewDataCache.Factory,
     private val loggerFactory: Logger.Factory,
     private val noteReplyStreaming: ReplyStreaming,
+    noteDetailNotesBuilderFactory: NoteDetailNotesFlowBuilder.Factory,
     @Assisted val show: Pageable.Show,
     @Assisted val accountId: Long? = null,
 ) : ViewModel() {
@@ -72,74 +62,15 @@ class NoteDetailViewModel @AssistedInject constructor(
         logger.error("ThreadContextの取得に失敗", it)
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), NoteThreadContext(emptyList(), emptyList()))
 
-    val notes = combine(note, threadContext) { note, thread ->
-        val relatedConversation = noteRelationGetter.getIn(thread.ancestors.map { it.id }).filterNot {
-            noteWordFilterService.isShouldFilterNote(show, it)
-        }.map {
-            NoteType.Conversation(it)
-        }
-        val repliesMap = thread.descendants.groupBy {
-            it.replyId
-        }
-        val relatedChildren = noteRelationGetter.getIn((repliesMap[note?.id] ?: emptyList()).map {
-            it.id
-        }).filterNot {
-            noteWordFilterService.isShouldFilterNote(show, it)
-        }.map { childNote ->
-            NoteType.Children(childNote,
-                noteRelationGetter.getIn(repliesMap[childNote.note.id]?.map { it.id }
-                    ?: emptyList())
-            )
-        }
-        val relatedNote =
-            noteRelationGetter.getIn(if (note == null) emptyList() else listOf(note.id)).filterNot {
-                noteWordFilterService.isShouldFilterNote(show, it)
-            }.map {
-                NoteType.Detail(it)
-            }
-        relatedConversation + relatedNote + relatedChildren
-    }.map { notes ->
-        notes.map { note ->
-            when (note) {
-                is NoteType.Children -> {
-                    NoteConversationViewData(
-                        note.note,
-                        currentAccountWatcher.getAccount(),
-                        noteTranslationStore,
-                        viewModelScope,
-                        noteDataSource,
-                        emojiRepository,
-                        configRepository,
-                    ).also {
-                        it.capture()
-                        cache.put(it)
-                    }.apply {
-                        this.hasConversation.postValue(false)
-                        this.conversation.postValue(note.getReplies().map {
-                            cache.get(it)
-                        })
-                    }
-                }
-                is NoteType.Conversation -> {
-                    cache.get(note.note)
-                }
-                is NoteType.Detail -> {
-                    NoteDetailViewData(
-                        note.note,
-                        currentAccountWatcher.getAccount(),
-                        noteTranslationStore,
-                        noteDataSource,
-                        configRepository,
-                        emojiRepository,
-                        viewModelScope,
-                    ).also {
-                        it.capture()
-                        cache.put(it)
-                    }
-                }
-            }
-        }
-    }.flowOn(Dispatchers.IO)
+    val notes = noteDetailNotesBuilderFactory.create(
+        cache,
+        currentAccountWatcher,
+        viewModelScope,
+    ).build(
+        show,
+        note,
+        threadContext,
+    ).flowOn(Dispatchers.IO)
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
 
 
@@ -188,14 +119,6 @@ class NoteDetailViewModel @AssistedInject constructor(
         return "${account.normalizedInstanceUri}/notes/${show.noteId}"
     }
 
-
-    private fun <T : PlaneNoteViewData> T.capture(): T {
-        val self = this
-        self.capture(noteCaptureAdapter) {
-            it.launchIn(viewModelScope + Dispatchers.IO)
-        }
-        return this
-    }
 
 }
 
