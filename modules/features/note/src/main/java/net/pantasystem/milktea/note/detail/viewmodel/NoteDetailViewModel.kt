@@ -1,12 +1,10 @@
 package net.pantasystem.milktea.note.detail.viewmodel
 
 import android.util.Log
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import dagger.assisted.Assisted
-import dagger.assisted.AssistedFactory
-import dagger.assisted.AssistedInject
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import net.pantasystem.milktea.common.Logger
@@ -15,8 +13,10 @@ import net.pantasystem.milktea.model.account.CurrentAccountWatcher
 import net.pantasystem.milktea.model.account.page.Pageable
 import net.pantasystem.milktea.model.notes.*
 import net.pantasystem.milktea.note.viewmodel.PlaneNoteViewDataCache
+import javax.inject.Inject
 
-class NoteDetailViewModel @AssistedInject constructor(
+@HiltViewModel
+class NoteDetailViewModel @Inject constructor(
     accountRepository: AccountRepository,
     private val noteRepository: NoteRepository,
     private val noteDataSource: NoteDataSource,
@@ -24,23 +24,34 @@ class NoteDetailViewModel @AssistedInject constructor(
     private val loggerFactory: Logger.Factory,
     private val noteReplyStreaming: ReplyStreaming,
     noteDetailNotesBuilderFactory: NoteDetailNotesFlowBuilder.Factory,
-    @Assisted val show: Pageable.Show,
-    @Assisted val accountId: Long? = null,
+    private val savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
 
-    @AssistedFactory
-    interface ViewModelAssistedFactory {
-        fun create(show: Pageable.Show, accountId: Long?): NoteDetailViewModel
+    companion object {
+        const val EXTRA_NOTE_ID =
+            "jp.panta.misskeyandroidclinet.view.notes.detail.EXTRA_NOTE_ID"
+        const val EXTRA_ACCOUNT_ID =
+            "jp.panta.misskeyandroidclient.view.notes.detail.EXTRA_ACCOUNT_ID"
     }
+
+    val pageable by lazy {
+        Pageable.Show(
+            requireNotNull(savedStateHandle[EXTRA_NOTE_ID]),
+        )
+    }
+
+    val accountId: Long? by lazy {
+        savedStateHandle[EXTRA_ACCOUNT_ID]
+    }
+
 
     private val logger by lazy {
         loggerFactory.create("NoteDetailVM")
     }
 
-    companion object;
 
     private val currentAccountWatcher: CurrentAccountWatcher =
-        CurrentAccountWatcher(accountId, accountRepository)
+        CurrentAccountWatcher(savedStateHandle[EXTRA_ACCOUNT_ID], accountRepository)
 
     private val cache =
         planeNoteViewDataCacheFactory.create(currentAccountWatcher::getAccount, viewModelScope)
@@ -49,7 +60,7 @@ class NoteDetailViewModel @AssistedInject constructor(
     private val note = suspend {
         currentAccountWatcher.getAccount()
     }.asFlow().flatMapLatest {
-        noteDataSource.observeOne(Note.Id(it.accountId, show.noteId))
+        noteRepository.observeOne(Note.Id(it.accountId, pageable.noteId))
     }.onStart {
         emit(null)
     }
@@ -67,7 +78,7 @@ class NoteDetailViewModel @AssistedInject constructor(
         currentAccountWatcher,
         viewModelScope,
     ).build(
-        show,
+        Pageable.Show(requireNotNull(savedStateHandle[EXTRA_NOTE_ID])),
         note,
         threadContext,
     ).flowOn(Dispatchers.IO)
@@ -78,7 +89,7 @@ class NoteDetailViewModel @AssistedInject constructor(
         viewModelScope.launch {
             try {
                 val account = currentAccountWatcher.getAccount()
-                val note = noteRepository.find(Note.Id(account.accountId, show.noteId))
+                val note = noteRepository.find(Note.Id(account.accountId, pageable.noteId))
                     .getOrThrow()
 //                noteRepository.syncConversation(note.id).getOrThrow()
                 noteRepository.syncThreadContext(note.id).getOrThrow()
@@ -95,7 +106,7 @@ class NoteDetailViewModel @AssistedInject constructor(
                     "reply:${reply.id}"
                 }
                 val account = currentAccountWatcher.getAccount()
-                val note = noteRepository.find(Note.Id(account.accountId, show.noteId))
+                val note = noteRepository.find(Note.Id(account.accountId, pageable.noteId))
                     .getOrThrow()
                 val context = noteDataSource.findNoteThreadContext(note.id).getOrThrow()
                 val isRelatedReply = context.descendants.any {
@@ -116,21 +127,10 @@ class NoteDetailViewModel @AssistedInject constructor(
 
     suspend fun getUrl(): String {
         val account = currentAccountWatcher.getAccount()
-        return "${account.normalizedInstanceUri}/notes/${show.noteId}"
+        return "${account.normalizedInstanceUri}/notes/${pageable.noteId}"
     }
 
 
-}
-
-@Suppress("UNCHECKED_CAST")
-fun NoteDetailViewModel.Companion.provideFactory(
-    factory: NoteDetailViewModel.ViewModelAssistedFactory,
-    show: Pageable.Show,
-    accountId: Long? = null,
-) = object : ViewModelProvider.Factory {
-    override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        return factory.create(show, accountId) as T
-    }
 }
 
 sealed interface NoteType {
