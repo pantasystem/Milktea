@@ -7,6 +7,8 @@ import android.content.ContentValues
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Build
 import android.provider.MediaStore
@@ -21,6 +23,7 @@ import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.common_android.notification.NotificationUtil
 import java.io.IOException
 import java.io.InputStream
@@ -32,8 +35,12 @@ class RemoteFileDownloadWorkManager @AssistedInject constructor(
     @Assisted context: Context,
     @Assisted val params: WorkerParameters,
     private val notificationUtil: NotificationUtil,
+    private val loggerFactory: Logger.Factory,
 ) : CoroutineWorker(context, params) {
 
+    val logger by lazy {
+        loggerFactory.create("RemoteFileDownloadWM")
+    }
 
     companion object {
         const val EXTRA_DOWNLOAD_URL = "RemoteFileDownloadWorkManager.EXTRA_DOWNLOAD_URL"
@@ -98,17 +105,29 @@ class RemoteFileDownloadWorkManager @AssistedInject constructor(
             val contentDetail = ContentValues().apply {
                 when (type) {
                     DownloadContentType.Video -> put(MediaStore.Video.Media.DISPLAY_NAME, fileName)
-                    DownloadContentType.Image -> put(MediaStore.Images.Media.DISPLAY_NAME, fileName)
+                    DownloadContentType.Image -> put(MediaStore.Images.Media.DISPLAY_NAME, "$fileName.png")
                     DownloadContentType.Audio -> put(MediaStore.Audio.Media.DISPLAY_NAME, fileName)
                 }
             }
 
             val uri = context.contentResolver.insert(mediaCollection, contentDetail)
 
+
             withContext(Dispatchers.IO) {
                 URL(params.inputData.getString(EXTRA_DOWNLOAD_URL)).openConnection()
                     .getInputStream().use { inputStream ->
                         context.contentResolver.openOutputStream(uri!!).use { outputStream ->
+                            // if image convert to bitmap
+                            if (type == DownloadContentType.Image) {
+                                val bitmap = BitmapFactory.decodeStream(inputStream)
+                                    ?: throw IOException("Failed to decode bitmap")
+                                if (bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream)) {
+                                    outputStream?.close()
+                                    bitmap.recycle()
+                                }
+                            } else {
+                                inputStream.transferToOutputStream(outputStream!!)
+                            }
                             inputStream.transferToOutputStream(outputStream!!)
                         }
                     }
@@ -140,6 +159,7 @@ class RemoteFileDownloadWorkManager @AssistedInject constructor(
             Result.success()
         } catch (e: Exception) {
             Log.e("RemoteFileDownloadWM", "download error", e)
+            logger.error("download error", e)
             withContext(Dispatchers.Main) {
                 Toast.makeText(
                     context,
