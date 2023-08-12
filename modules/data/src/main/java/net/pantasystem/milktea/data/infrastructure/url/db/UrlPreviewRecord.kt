@@ -3,12 +3,10 @@ package net.pantasystem.milktea.data.infrastructure.url.db
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
 import net.pantasystem.milktea.model.url.UrlPreview
+import java.util.Date
 
 @Entity(tableName = "url_preview")
-@Serializable
 data class UrlPreviewRecord(
     @PrimaryKey(autoGenerate = false)
     @ColumnInfo(name = "url")
@@ -26,10 +24,11 @@ data class UrlPreviewRecord(
     @ColumnInfo(name = "thumbnail")
     val thumbnail: String?,
 
-    @SerialName("sitename")
-    val siteName: String?
-    //val sensitive: Boolean
-    //val player,
+    @ColumnInfo(name = "siteName")
+    val siteName: String?, //val sensitive: Boolean
+
+    @ColumnInfo(name = "createdAt")
+    val createdAt: Date? = null,
 ) {
     companion object {
         fun from(model: UrlPreview): UrlPreviewRecord {
@@ -39,7 +38,8 @@ data class UrlPreviewRecord(
                 icon = model.icon,
                 description = model.description,
                 thumbnail = model.thumbnail,
-                siteName = model.siteName
+                siteName = model.siteName,
+
             )
         }
     }
