@@ -10,7 +10,7 @@ import net.pantasystem.milktea.note.NoteDetailActivity
 import net.pantasystem.milktea.worker.note.CreateNoteWorker
 import net.pantasystem.milktea.worker.note.CreateNoteWorkerExecutor
 
-internal class ShowNoteCreationResultSnackBar(
+internal class NoteCreateResultHandler(
     private val activity: AppCompatActivity,
     private val view: View,
     private val createNoteWorkerExecutor: CreateNoteWorkerExecutor,
@@ -39,14 +39,24 @@ internal class ShowNoteCreationResultSnackBar(
                 )
                 createNoteWorkerExecutor.onHandled(workInfo.id)
             }
+
             WorkInfo.State.FAILED -> {
                 val draftNoteId =
                     workInfo.outputData.getLong(CreateNoteWorker.EXTRA_DRAFT_NOTE_ID, -1).takeIf {
                         it != -1L
                     } ?: return
                 if (activity.supportFragmentManager.findFragmentByTag("NotePostFailedDialogFragment") == null) {
-                    NotePostFailedDialogFragment.newInstance(draftNoteId)
-                        .show(activity.supportFragmentManager, "NotePostFailedDialogFragment")
+                    val reasonType =
+                        workInfo.outputData.getString(CreateNoteWorker.EXTRA_FAILED_REASON)
+                    NotePostFailedDialogFragment.newInstance(
+                        draftNoteId,
+                        reasonType?.let {
+                            CreateNoteWorker.ErrorReasonType.values().find {
+                                it.name == reasonType
+                            }
+                        } ?: CreateNoteWorker.ErrorReasonType.UnknownError,
+                        workInfo.outputData.getString(CreateNoteWorker.EXTRA_FAILED_STACKTRACE),
+                    ).show(activity.supportFragmentManager, "NotePostFailedDialogFragment")
                 }
                 createNoteWorkerExecutor.onHandled(workInfo.id)
             }
