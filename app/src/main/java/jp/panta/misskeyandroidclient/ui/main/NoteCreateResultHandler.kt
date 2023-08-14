@@ -1,7 +1,7 @@
 package jp.panta.misskeyandroidclient.ui.main
 
-import android.app.Activity
 import android.view.View
+import androidx.appcompat.app.AppCompatActivity
 import androidx.work.WorkInfo
 import com.google.android.material.snackbar.Snackbar
 import jp.panta.misskeyandroidclient.R
@@ -10,8 +10,8 @@ import net.pantasystem.milktea.note.NoteDetailActivity
 import net.pantasystem.milktea.worker.note.CreateNoteWorker
 import net.pantasystem.milktea.worker.note.CreateNoteWorkerExecutor
 
-internal class ShowNoteCreationResultSnackBar(
-    private val activity: Activity,
+internal class NoteCreateResultHandler(
+    private val activity: AppCompatActivity,
     private val view: View,
     private val createNoteWorkerExecutor: CreateNoteWorkerExecutor,
 ) {
@@ -39,16 +39,25 @@ internal class ShowNoteCreationResultSnackBar(
                 )
                 createNoteWorkerExecutor.onHandled(workInfo.id)
             }
+
             WorkInfo.State.FAILED -> {
                 val draftNoteId =
                     workInfo.outputData.getLong(CreateNoteWorker.EXTRA_DRAFT_NOTE_ID, -1).takeIf {
                         it != -1L
                     } ?: return
-                activity.getString(R.string.note_creation_failure).showSnackBar(
-                    activity.getString(R.string.retry) to ({
-                        createNoteWorkerExecutor.enqueue(draftNoteId)
-                    })
-                )
+                if (activity.supportFragmentManager.findFragmentByTag("NotePostFailedDialogFragment") == null) {
+                    val reasonType =
+                        workInfo.outputData.getString(CreateNoteWorker.EXTRA_FAILED_REASON)
+                    NotePostFailedDialogFragment.newInstance(
+                        draftNoteId,
+                        reasonType?.let {
+                            CreateNoteWorker.ErrorReasonType.values().find {
+                                it.name == reasonType
+                            }
+                        } ?: CreateNoteWorker.ErrorReasonType.UnknownError,
+                        workInfo.outputData.getString(CreateNoteWorker.EXTRA_FAILED_STACKTRACE),
+                    ).show(activity.supportFragmentManager, "NotePostFailedDialogFragment")
+                }
                 createNoteWorkerExecutor.onHandled(workInfo.id)
             }
             WorkInfo.State.BLOCKED -> Unit

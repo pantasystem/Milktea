@@ -619,6 +619,7 @@
     <string name="reaction_acceptance">リアクションの受け入れ</string>
     <string name="media_display_mode_default">デフォルト</string>
     <string name="media_display_mode_always">常にメディアを非表示</string>
+    <string name="misskey_role_drive_no_free_space_error_message">ドライブの空き容量がないため、ファイルをアップロードできません。</string>
     <!-- User -->
 
 

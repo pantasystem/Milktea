@@ -34,6 +34,7 @@ import net.pantasystem.milktea.notification.notificationMessageScope
 import net.pantasystem.milktea.user.ReportStateHandler
 import net.pantasystem.milktea.worker.note.CreateNoteWorkerExecutor
 
+@Suppress("DEPRECATION")
 internal class MainActivityEventHandler(
     val activity: MainActivity,
     val binding: ActivityMainBinding,
@@ -257,7 +258,7 @@ internal class MainActivityEventHandler(
     }
 
     private fun showCreateNoteTaskStatusSnackBar(state: WorkInfo) {
-        ShowNoteCreationResultSnackBar(
+        NoteCreateResultHandler(
             activity,
             binding.appBarMain.simpleNotification,
             createNoteWorkerExecutor,
