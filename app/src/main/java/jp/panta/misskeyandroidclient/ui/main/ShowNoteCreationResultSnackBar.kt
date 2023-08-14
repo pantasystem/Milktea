@@ -1,7 +1,7 @@
 package jp.panta.misskeyandroidclient.ui.main
 
-import android.app.Activity
 import android.view.View
+import androidx.appcompat.app.AppCompatActivity
 import androidx.work.WorkInfo
 import com.google.android.material.snackbar.Snackbar
 import jp.panta.misskeyandroidclient.R
@@ -11,7 +11,7 @@ import net.pantasystem.milktea.worker.note.CreateNoteWorker
 import net.pantasystem.milktea.worker.note.CreateNoteWorkerExecutor
 
 internal class ShowNoteCreationResultSnackBar(
-    private val activity: Activity,
+    private val activity: AppCompatActivity,
     private val view: View,
     private val createNoteWorkerExecutor: CreateNoteWorkerExecutor,
 ) {
@@ -44,11 +44,10 @@ internal class ShowNoteCreationResultSnackBar(
                     workInfo.outputData.getLong(CreateNoteWorker.EXTRA_DRAFT_NOTE_ID, -1).takeIf {
                         it != -1L
                     } ?: return
-                activity.getString(R.string.note_creation_failure).showSnackBar(
-                    activity.getString(R.string.retry) to ({
-                        createNoteWorkerExecutor.enqueue(draftNoteId)
-                    })
-                )
+                if (activity.supportFragmentManager.findFragmentByTag("NotePostFailedDialogFragment") == null) {
+                    NotePostFailedDialogFragment.newInstance(draftNoteId)
+                        .show(activity.supportFragmentManager, "NotePostFailedDialogFragment")
+                }
                 createNoteWorkerExecutor.onHandled(workInfo.id)
             }
             WorkInfo.State.BLOCKED -> Unit
