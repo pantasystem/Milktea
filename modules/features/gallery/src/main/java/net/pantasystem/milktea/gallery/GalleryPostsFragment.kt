@@ -17,6 +17,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import net.pantasystem.milktea.common.APIError
 import net.pantasystem.milktea.common.ErrorType
+import net.pantasystem.milktea.common.MisskeyErrorCodes
 import net.pantasystem.milktea.common_compose.MilkteaStyleConfigApplyAndTheme
 import net.pantasystem.milktea.common_navigation.*
 import net.pantasystem.milktea.common_viewmodel.CurrentPageableTimelineViewModel
@@ -139,7 +140,7 @@ class GalleryPostsFragment : Fragment() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.RESUMED) {
                 viewModel.error.collect {
-                    if (it is APIError.ClientException && (it.error as? ErrorType.Misskey)?.error?.error?.code == "PERMISSION_DENIED") {
+                    if (it is APIError.ClientException && (it.error as? ErrorType.Misskey)?.errorCodeeType == MisskeyErrorCodes.PermissionDenied) {
                         Toast.makeText(requireContext(), "再認証が必要です。", Toast.LENGTH_LONG).show()
                         // 再認証をする
                         startActivity(authorizationNavigation.newIntent(AuthorizationArgs.New))
