@@ -31,7 +31,6 @@ import net.pantasystem.milktea.note.databinding.ItemHasReplyToNoteBinding
 import net.pantasystem.milktea.note.databinding.ItemNoteBinding
 import net.pantasystem.milktea.note.databinding.ItemTimelineEmptyBinding
 import net.pantasystem.milktea.note.databinding.ItemTimelineErrorBinding
-import net.pantasystem.milktea.note.reaction.ReactionCountAdapter
 import net.pantasystem.milktea.note.reaction.ReactionViewData
 import net.pantasystem.milktea.note.timeline.viewmodel.TimelineListItem
 import net.pantasystem.milktea.note.view.NoteCardAction
@@ -124,25 +123,9 @@ class TimelineListAdapter(
         }
 
         private fun bindReactionCounter() {
-            val reactionCountAdapter = ReactionCountAdapter {
-                noteCardActionListenerAdapter.onReactionCountAction(it)
-            }
             val note = mCurrentNote!!
-            reactionCountAdapter.note = note
-
-            val reactionList = note.reactionCountsViewData.value
-//            reactionCountsView.itemAnimator = null
-//            reactionCountsView.layoutManager = getLayoutManager()
-//            reactionCountsView.adapter = reactionCountAdapter
-//            reactionCountsView.isNestedScrollingEnabled = false
-
-            reactionCountAdapter.submitList(reactionList)
             job = note.reactionCountsViewData.onEach { counts ->
-                if (reactionCountAdapter.note?.id == mCurrentNote?.id) {
-//                    reactionCountsView.itemAnimator?.endAnimations()
-                    bindReactionCountVisibility(counts)
-                    reactionCountAdapter.submitList(counts)
-                }
+                bindReactionCountVisibility(counts)
             }.flowWithLifecycle(lifecycleOwner.lifecycle).launchIn(lifecycleOwner.lifecycleScope)
         }
 

@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.flexbox.AlignItems
 import com.google.android.flexbox.FlexDirection
 import com.google.android.flexbox.FlexWrap
+import com.google.android.flexbox.FlexboxLayout
 import com.google.android.flexbox.FlexboxLayoutManager
 import com.google.android.flexbox.JustifyContent
 import kotlinx.coroutines.Job
@@ -22,6 +23,8 @@ import net.pantasystem.milktea.model.setting.DefaultConfig
 import net.pantasystem.milktea.model.setting.LocalConfigRepository
 import net.pantasystem.milktea.note.reaction.ReactionCountAdapter
 import net.pantasystem.milktea.note.timeline.NoteFontSizeBinder
+import net.pantasystem.milktea.note.timeline.ReactionCountItemsFlexboxLayoutBinder
+import net.pantasystem.milktea.note.timeline.ViewRecycler
 import net.pantasystem.milktea.note.view.NoteCardAction
 import net.pantasystem.milktea.note.view.NoteCardActionListenerAdapter
 import net.pantasystem.milktea.note.viewmodel.PlaneNoteViewData
@@ -45,6 +48,11 @@ class NotificationListAdapter constructor(
 
 
     private val noteCardActionListenerAdapter = NoteCardActionListenerAdapter(onNoteCardAction)
+    private val binder = ReactionCountItemsFlexboxLayoutBinder(
+        ViewRecycler()
+    ) {
+        noteCardActionListenerAdapter.onReactionCountAction(it)
+    }
 
     override fun getItemViewType(position: Int): Int {
         return when (getItem(position)) {
@@ -119,7 +127,8 @@ class NotificationListAdapter constructor(
                     ),
                     lifecycleOwner,
                     notificationViewModel,
-                    noteCardActionListenerAdapter
+                    noteCardActionListenerAdapter,
+                    binder,
                 ).also {
                     val config = configRepository.get().getOrElse {
                         DefaultConfig.config
@@ -145,6 +154,7 @@ class NotificationViewHolder(
     private val lifecycleOwner: LifecycleOwner,
     private val notificationViewModel: NotificationViewModel,
     private val noteCardActionListenerAdapter: NoteCardActionListenerAdapter,
+    private val binder: ReactionCountItemsFlexboxLayoutBinder,
 ) : NotificationBaseViewHolder(binding.root) {
     fun onBind(item: NotificationListItem.Notification) {
         binding.notification = item.notificationViewData
@@ -154,38 +164,25 @@ class NotificationViewHolder(
         val note = item.notificationViewData.noteViewData
         note ?: return
 
-//        setReactionCounter(note, binding.simpleNote.reactionView)
+        setReactionCounter(note, binding.simpleNote.reactionView)
         binding.lifecycleOwner = lifecycleOwner
         binding.executePendingBindings()
     }
 
     private var job: Job? = null
 
-    private fun setReactionCounter(note: PlaneNoteViewData, reactionView: RecyclerView) {
+    private fun setReactionCounter(note: PlaneNoteViewData, reactionView: FlexboxLayout) {
 
         val reactionList = note.reactionCountsViewData.value
-        val adapter = ReactionCountAdapter {
-            noteCardActionListenerAdapter.onReactionCountAction(it)
-        }
-        adapter.note = note
-        reactionView.adapter = adapter
 
-        adapter.submitList(reactionList)
+
 
         job?.cancel()
         job = note.reactionCountsViewData.onEach {
-            adapter.submitList(it)
+
+            binder.bindReactionCounts(reactionView, note, it)
         }.flowWithLifecycle(lifecycleOwner.lifecycle).launchIn(lifecycleOwner.lifecycleScope)
 
-        val exLayoutManager = reactionView.layoutManager
-        if (exLayoutManager !is FlexboxLayoutManager) {
-            val flexBoxLayoutManager = FlexboxLayoutManager(reactionView.context)
-            flexBoxLayoutManager.flexDirection = FlexDirection.ROW
-            flexBoxLayoutManager.flexWrap = FlexWrap.WRAP
-            flexBoxLayoutManager.justifyContent = JustifyContent.FLEX_START
-            flexBoxLayoutManager.alignItems = AlignItems.STRETCH
-            reactionView.layoutManager = flexBoxLayoutManager
-        }
 
         if (reactionList.isNotEmpty()) {
             reactionView.visibility = View.VISIBLE

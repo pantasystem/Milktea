@@ -16,6 +16,8 @@ import net.pantasystem.milktea.model.setting.DefaultConfig
 import net.pantasystem.milktea.model.setting.LocalConfigRepository
 import net.pantasystem.milktea.note.reaction.ReactionCountAdapter
 import net.pantasystem.milktea.note.timeline.NoteFontSizeBinder
+import net.pantasystem.milktea.note.timeline.ReactionCountItemsFlexboxLayoutBinder
+import net.pantasystem.milktea.note.timeline.ViewRecycler
 import net.pantasystem.milktea.note.view.NoteCardActionListenerAdapter
 import net.pantasystem.milktea.user.R
 import net.pantasystem.milktea.user.databinding.ItemUserReactionBinding
@@ -41,6 +43,9 @@ class UserReactionsListAdapter(
         }
     }
 ) {
+    val binder = ReactionCountItemsFlexboxLayoutBinder(ViewRecycler()) {
+        noteCardActionHandler.onReactionCountAction(it)
+    }
     override fun onBindViewHolder(holder: UserReactionViewHolder, position: Int) {
         holder.bind(getItem(position))
     }
@@ -59,7 +64,7 @@ class UserReactionsListAdapter(
             headerFontSize = config.noteHeaderFontSize,
             contentFontSize = config.noteContentFontSize
         )
-        return UserReactionViewHolder(lifecycleOwner, binding, noteCardActionHandler)
+        return UserReactionViewHolder(lifecycleOwner, binding, noteCardActionHandler, binder)
     }
 }
 
@@ -67,23 +72,21 @@ class UserReactionViewHolder(
     val lifecycleOwner: LifecycleOwner,
     val binding: ItemUserReactionBinding,
     val noteCardActionListenerAdapter: NoteCardActionListenerAdapter,
+    val binder: ReactionCountItemsFlexboxLayoutBinder,
 ) : RecyclerView.ViewHolder(binding.root) {
 
     private var job: Job? = null
     fun bind(item: UserReactionBindingModel) {
         val listView = binding.simpleNote.reactionView
 //        listView.layoutManager = FlexboxLayoutManager(binding.root.context)
-        val adapter = ReactionCountAdapter {
-            noteCardActionListenerAdapter.onReactionCountAction(it)
-        }
-        adapter.note = item.note
+
 //        listView.adapter = adapter
         binding.noteCardActionListener = noteCardActionListenerAdapter
         binding.bindingModel = item
 
         job?.cancel()
         job = item.note.reactionCountsViewData.onEach {
-            adapter.submitList(it)
+            binder.bindReactionCounts(listView, item.note, it)
         }.flowWithLifecycle(lifecycleOwner.lifecycle).launchIn(lifecycleOwner.lifecycleScope)
 
         binding.lifecycleOwner = lifecycleOwner
