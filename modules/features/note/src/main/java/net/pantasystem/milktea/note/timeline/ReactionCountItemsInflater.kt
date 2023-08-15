@@ -2,6 +2,7 @@ package net.pantasystem.milktea.note.timeline
 
 import android.view.LayoutInflater
 import android.view.View
+import com.bumptech.glide.Glide
 import com.google.android.flexbox.FlexboxLayout
 import net.pantasystem.milktea.common_android.ui.FontSizeHelper.setMemoFontSpSize
 import net.pantasystem.milktea.note.databinding.ItemReactionBinding
@@ -26,6 +27,7 @@ class ReactionCountItemsFlexboxLayoutBinder(
 
             val child = flexboxLayout.getChildAt(flexboxLayout.childCount - 1)
             flexboxLayout.removeViewAt(flexboxLayout.childCount - 1)
+            Glide.with(child).clear(ItemReactionBinding.bind(child).reactionImage)
             viewRecycler.recycleView(child)
         }
 
@@ -115,10 +117,4 @@ class ViewRecycler<T> where T : View {
         }
     }
 
-    /**
-     * 現在リサイクル待ちのビューの数を取得する。
-     */
-    fun recycledViewCount(): Int {
-        return recycledViews.size
-    }
 }
