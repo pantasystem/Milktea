@@ -19,7 +19,11 @@ data class Error(
 }
 
 sealed interface ErrorType {
-    data class Misskey(val error: Error) : ErrorType
+    data class Misskey(val error: Error) : ErrorType {
+        val errorCodeeType: MisskeyErrorCodes? by lazy {
+            MisskeyErrorCodes.values().find { it.code == error.error.code }
+        }
+    }
     data class Raw(val body: String) : ErrorType
 }
 
