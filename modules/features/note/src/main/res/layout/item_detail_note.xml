@@ -378,7 +378,7 @@
                     android:textStyle="bold"
                     android:layout_alignParentEnd="true" />
 
-            <androidx.recyclerview.widget.RecyclerView
+            <com.google.android.flexbox.FlexboxLayout
                     android:id="@+id/reaction_view"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
