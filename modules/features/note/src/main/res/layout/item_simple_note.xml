@@ -237,7 +237,7 @@
                         tools:layout_height="20dp" />
 
 
-                    <androidx.recyclerview.widget.RecyclerView
+                    <LinearLayout
                         android:id="@+id/poll"
                         memoVisibility="@{note.currentNote.poll == null ? View.GONE : View.VISIBLE}"
                         noteCardActionListenerAdapter="@{noteCardActionListener}"
@@ -247,7 +247,9 @@
 
                         android:layout_height="wrap_content"
                         tools:itemCount="2"
-                        tools:listitem="@layout/item_choice" />
+                        tools:listitem="@layout/item_choice"
+                        android:orientation="vertical"
+                        />
 
                     <androidx.recyclerview.widget.RecyclerView
                         android:id="@+id/url_preview_list"

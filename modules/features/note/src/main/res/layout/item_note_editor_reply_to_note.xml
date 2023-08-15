@@ -232,7 +232,7 @@
                             previewAbleList="@{note.media.files}" />
 
 
-                    <androidx.recyclerview.widget.RecyclerView
+                    <LinearLayout
                             android:id="@+id/poll"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
@@ -243,6 +243,7 @@
                             noteId="@{note.toShowNote.note.id}"
                             poll="@{note.currentNote.poll}"
                             noteCardActionListenerAdapter="@{null}"
+                            android:orientation="vertical"
                             />
 
                     <androidx.recyclerview.widget.RecyclerView
