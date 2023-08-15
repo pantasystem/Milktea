@@ -10,7 +10,11 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.google.android.flexbox.*
+import com.google.android.flexbox.AlignItems
+import com.google.android.flexbox.FlexDirection
+import com.google.android.flexbox.FlexWrap
+import com.google.android.flexbox.FlexboxLayoutManager
+import com.google.android.flexbox.JustifyContent
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -150,7 +154,7 @@ class NotificationViewHolder(
         val note = item.notificationViewData.noteViewData
         note ?: return
 
-        setReactionCounter(note, binding.simpleNote.reactionView)
+//        setReactionCounter(note, binding.simpleNote.reactionView)
         binding.lifecycleOwner = lifecycleOwner
         binding.executePendingBindings()
     }

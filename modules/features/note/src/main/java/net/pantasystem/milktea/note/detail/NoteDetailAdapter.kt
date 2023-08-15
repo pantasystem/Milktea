@@ -12,7 +12,11 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.google.android.flexbox.*
+import com.google.android.flexbox.AlignItems
+import com.google.android.flexbox.FlexDirection
+import com.google.android.flexbox.FlexWrap
+import com.google.android.flexbox.FlexboxLayoutManager
+import com.google.android.flexbox.JustifyContent
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -144,7 +148,7 @@ class NoteDetailAdapter(
         when (holder) {
             is NoteHolder -> {
                 holder.binding.note = note
-                setReactionCounter(note, holder.binding.simpleNote.reactionView)
+//                setReactionCounter(note, holder.binding.simpleNote.reactionView)
 
                 holder.binding.lifecycleOwner = viewLifecycleOwner
                 holder.binding.noteCardActionListener = noteCardActionListenerAdapter
@@ -153,7 +157,7 @@ class NoteDetailAdapter(
             is DetailNoteHolder -> {
                 holder.binding.note = note as NoteDetailViewData
                 holder.binding.noteCardActionListener = noteCardActionListenerAdapter
-                setReactionCounter(note, holder.binding.reactionView)
+//                setReactionCounter(note, holder.binding.reactionView)
                 holder.binding.lifecycleOwner = viewLifecycleOwner
                 holder.binding.executePendingBindings()
             }
@@ -163,7 +167,7 @@ class NoteDetailAdapter(
                     "conversation: ${(note as NoteConversationViewData).conversation.value?.size}"
                 )
                 holder.binding.childrenViewData = note
-                setReactionCounter(note, holder.binding.childNote.reactionView)
+//                setReactionCounter(note, holder.binding.childNote.reactionView)
 
                 holder.binding.noteDetailViewModel = noteDetailViewModel
                 val adapter = NoteChildConversationAdapter(configRepository, viewLifecycleOwner, onAction)

@@ -10,7 +10,11 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.google.android.flexbox.*
+import com.google.android.flexbox.AlignItems
+import com.google.android.flexbox.FlexDirection
+import com.google.android.flexbox.FlexWrap
+import com.google.android.flexbox.FlexboxLayoutManager
+import com.google.android.flexbox.JustifyContent
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -48,7 +52,7 @@ class NoteChildConversationAdapter(
     override fun onBindViewHolder(holder: SimpleNoteHolder, position: Int) {
         holder.binding.note = getItem(position)
         holder.binding.noteCardActionListener = actionAdapter
-        setReactionCounter(getItem(position), holder.binding.reactionView)
+//        setReactionCounter(getItem(position), holder.binding.reactionView)
         holder.binding.executePendingBindings()
     }
 

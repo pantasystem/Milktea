@@ -9,7 +9,6 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.google.android.flexbox.FlexboxLayoutManager
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -73,12 +72,12 @@ class UserReactionViewHolder(
     private var job: Job? = null
     fun bind(item: UserReactionBindingModel) {
         val listView = binding.simpleNote.reactionView
-        listView.layoutManager = FlexboxLayoutManager(binding.root.context)
+//        listView.layoutManager = FlexboxLayoutManager(binding.root.context)
         val adapter = ReactionCountAdapter {
             noteCardActionListenerAdapter.onReactionCountAction(it)
         }
         adapter.note = item.note
-        listView.adapter = adapter
+//        listView.adapter = adapter
         binding.noteCardActionListener = noteCardActionListenerAdapter
         binding.bindingModel = item
 
