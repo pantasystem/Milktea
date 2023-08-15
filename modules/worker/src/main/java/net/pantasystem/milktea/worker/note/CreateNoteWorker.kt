@@ -12,6 +12,7 @@ import dagger.assisted.AssistedInject
 import net.pantasystem.milktea.common.APIError
 import net.pantasystem.milktea.common.ErrorType
 import net.pantasystem.milktea.common.Logger
+import net.pantasystem.milktea.common.MisskeyErrorCodes
 import net.pantasystem.milktea.common.mapCancellableCatching
 import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.notes.CreateNoteUseCase
@@ -107,8 +108,8 @@ class CreateNoteWorker @AssistedInject constructor(
                     is APIError.ClientException -> {
                         when(val errorType = type.error) {
                             is ErrorType.Misskey -> {
-                                when(errorType.error.error.code) {
-                                    "NO_FREE_SPACE" -> ErrorReasonType.FileUploadDriveNoFreeSpaceError
+                                when(errorType.errorCodeeType) {
+                                    MisskeyErrorCodes.NoFreeSpace -> ErrorReasonType.FileUploadDriveNoFreeSpaceError
                                     else -> ErrorReasonType.ClientError
                                 }
                             }

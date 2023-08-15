@@ -119,5 +119,10 @@ enum class MisskeyErrorCodes(
     NoSuchApp("NO_SUCH_APP"),
     YourPage("YOUR_PAGE"),
     YourFlash("YOUR_FLASH"),
-
+    NoFreeSpace("NO_FREE_SPACE"),
+    RolePermissionDenied("ROLE_PERMISSION_DENIED"),
+    YourAccountMoved("YOUR_ACCOUNT_MOVED"),
+    YourAccountSuspended("YOUR_ACCOUNT_SUSPENDED"),
+    CredentialRequired("CREDENTIAL_REQUIRED"),
+    PermissionDenied("PERMISSION_DENIED"),
 }
