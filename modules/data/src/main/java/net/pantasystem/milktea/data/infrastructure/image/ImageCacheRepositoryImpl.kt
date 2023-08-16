@@ -13,8 +13,6 @@ import kotlinx.datetime.Clock
 import net.pantasystem.milktea.api.misskey.OkHttpClientProvider
 import net.pantasystem.milktea.common.Hash
 import net.pantasystem.milktea.common_android.hilt.IODispatcher
-import net.pantasystem.milktea.model.emoji.CustomEmojiAspectRatio
-import net.pantasystem.milktea.model.emoji.CustomEmojiAspectRatioDataSource
 import net.pantasystem.milktea.model.image.ImageCache
 import net.pantasystem.milktea.model.image.ImageCacheRepository
 import okhttp3.Request
@@ -26,7 +24,6 @@ import kotlin.time.Duration.Companion.days
 class ImageCacheRepositoryImpl @Inject constructor(
     private val boxStore: BoxStore,
     private val okHttpClientProvider: OkHttpClientProvider,
-    private val customEmojiAspectRatioDataSource: CustomEmojiAspectRatioDataSource,
     @ApplicationContext val context: Context,
     @IODispatcher val coroutineDispatcher: CoroutineDispatcher,
 ) : ImageCacheRepository {
@@ -58,12 +55,14 @@ class ImageCacheRepositoryImpl @Inject constructor(
                 }
             }.resolve(fileName)
 
-            downloadAndSaveFile(url, file)
+            val (width, height) = downloadAndSaveFile(url, file)
 
             val cache = ImageCache(
                 sourceUrl = url,
                 cachePath = File(context.filesDir, cacheDir).resolve(fileName).absolutePath,
-                cachedAt = Clock.System.now()
+                cachedAt = Clock.System.now(),
+                width = width,
+                height = height,
             )
             upInsert(cache)
             return@withContext cache
@@ -156,8 +155,8 @@ class ImageCacheRepositoryImpl @Inject constructor(
         }
     }
 
-    private suspend fun downloadAndSaveFile(url: String, file: File) {
-        file.outputStream().use { out ->
+    private fun downloadAndSaveFile(url: String, file: File): Pair<Int?, Int?> {
+        return file.outputStream().use { out ->
             val req = Request.Builder().url(url).build()
             val response = okHttpClientProvider.get().newCall(req).execute()
             val contentLength = response.header("Content-Length")?.toLongOrNull()
@@ -170,19 +169,10 @@ class ImageCacheRepositoryImpl @Inject constructor(
                 }
             val options = BitmapFactory.Options()
             options.inJustDecodeBounds = true
-            val bitmap = BitmapFactory.decodeFile(
+            BitmapFactory.decodeFile(
                 file.absolutePath, options
-            )
-            if (bitmap != null) {
-                val aspectRatio = options.outWidth.toFloat() / options.outHeight.toFloat()
-                customEmojiAspectRatioDataSource.save(
-                    CustomEmojiAspectRatio(
-                        uri = url,
-                        aspectRatio = aspectRatio,
-                    )
-                )
-            }
-
+            ) ?: return@use null to null
+            options.outWidth to options.outHeight
         }
     }
 

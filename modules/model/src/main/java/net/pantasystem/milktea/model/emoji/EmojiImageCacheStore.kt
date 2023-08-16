@@ -4,15 +4,13 @@ import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.onEach
 import net.pantasystem.milktea.common.Logger
-import net.pantasystem.milktea.model.image.ImageCacheRepository
 import javax.inject.Inject
 
 class EmojiImageCacheStore @Inject constructor(
     coroutineScope: CoroutineScope,
-    private val imageCacheRepository: ImageCacheRepository,
+    private val saveCustomEmojiImageUseCase: SaveCustomEmojiImageUseCase,
     private val loggerFactory: Logger.Factory,
 ) {
 
@@ -23,11 +21,9 @@ class EmojiImageCacheStore @Inject constructor(
     private val queue = MutableSharedFlow<Emoji>(extraBufferCapacity = 100)
 
     init {
-        queue.mapNotNull { emoji ->
-            emoji.url ?: emoji.uri
-        }.onEach { url ->
+        queue.onEach { emoji ->
             try {
-                imageCacheRepository.save(url)
+                saveCustomEmojiImageUseCase(emoji).getOrThrow()
             } catch (e: CancellationException) {
                 throw e
             } catch (e: Exception) {
