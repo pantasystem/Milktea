@@ -51,6 +51,7 @@ class CacheCustomEmojiImageWorker @AssistedInject constructor(
             val hosts = accountRepository.findAll().getOrThrow().map {
                 it.getHost()
             }.distinct()
+            imageCacheRepository.deleteExpiredCaches()
             coroutineScope {
                 hosts.mapNotNull {
                     customEmojiRepository.findBy(it).getOrNull()

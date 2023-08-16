@@ -91,17 +91,30 @@ class ImageCacheRepositoryImpl @Inject constructor(
     override suspend fun deleteExpiredCaches() {
         withContext(coroutineDispatcher) {
             val now = Clock.System.now()
-            imageCacheStore.query().lessOrEqual(
+            val query = imageCacheStore.query().lessOrEqual(
                 ImageCacheRecord_.cachedAt,
-                now.toEpochMilliseconds()
-            ).build().remove()
+                (now - cacheExpireDuration).toEpochMilliseconds()
+            ).build()
+
+            val deleteCacheSize = query.count()
+            for (i in 0 until deleteCacheSize step 100) {
+                val list = query.find(i, 100)
+                list.forEach {
+                    val file = File(it.cachePath)
+                    if (file.exists()) {
+                        file.delete()
+                    }
+                }
+                imageCacheStore.remove(list)
+            }
+
         }
     }
 
     override suspend fun clear() {
         withContext(coroutineDispatcher) {
             imageCacheStore.removeAll()
-            File(context.cacheDir, cacheDir).deleteRecursively()
+            File(context.filesDir, cacheDir).deleteRecursively()
         }
     }
 
