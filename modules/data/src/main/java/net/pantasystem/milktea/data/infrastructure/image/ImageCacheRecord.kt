@@ -12,6 +12,8 @@ data class ImageCacheRecord(
     @Unique var sourceUrl: String = "",
     var cachePath: String = "",
     var cachedAt: Long = 0L,
+    var width: Int? = null,
+    var height: Int? = null,
 ) {
 
     companion object {
@@ -25,13 +27,17 @@ data class ImageCacheRecord(
         sourceUrl = model.sourceUrl
         cachePath = model.cachePath
         cachedAt = model.cachedAt.toEpochMilliseconds()
+        width = model.width
+        height = model.height
     }
 
     fun toModel(): ImageCache {
         return ImageCache(
             sourceUrl = sourceUrl,
             cachePath = cachePath,
-            cachedAt = Instant.fromEpochMilliseconds(cachedAt)
+            cachedAt = Instant.fromEpochMilliseconds(cachedAt),
+            width = width,
+            height = height,
         )
     }
 
