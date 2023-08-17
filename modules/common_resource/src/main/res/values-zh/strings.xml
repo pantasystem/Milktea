@@ -611,6 +611,7 @@
     <string name="media_display_mode_default">Default</string>
     <string name="media_display_mode_always">Always hide</string>
     <string name="misskey_role_drive_no_free_space_error_message">无法上传文件，因为硬盘没有可用空间</string>
+    <string name="qr_code">QR Code</string>
     <!-- User -->
 
 </resources>
