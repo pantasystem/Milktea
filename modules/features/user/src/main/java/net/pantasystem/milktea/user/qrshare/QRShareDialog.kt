@@ -41,6 +41,7 @@ import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.fragment.app.activityViewModels
@@ -184,7 +185,7 @@ fun QRShareDialogLayout(
                     horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
                     Icon(Icons.Default.Link, contentDescription = null)
-                    Text("コピー")
+                    Text(stringResource(id = R.string.copy))
                 }
 
                 Column(
@@ -197,7 +198,7 @@ fun QRShareDialogLayout(
                     horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
                     Icon(Icons.Default.Share, contentDescription = null)
-                    Text("共有")
+                    Text(stringResource(id = R.string.share))
                 }
 
                 Column(
@@ -208,7 +209,7 @@ fun QRShareDialogLayout(
                     horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
                     Icon(Icons.Default.Save, contentDescription = null)
-                    Text("保存")
+                    Text(stringResource(id = R.string.save))
                 }
             }
         }
