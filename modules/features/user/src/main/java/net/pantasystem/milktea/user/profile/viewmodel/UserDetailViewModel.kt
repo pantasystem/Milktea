@@ -54,6 +54,7 @@ class UserDetailViewModel @Inject constructor(
     private val savedStateHandle: SavedStateHandle,
     private val userDetailTabTypeFactory: UserDetailTabTypeFactory,
     private val toggleUserTimelineAddTabUseCase: ToggleUserTimelineAddTabUseCase,
+    private val userIdResolver: UserIdResolver,
     configRepository: LocalConfigRepository,
 ) : ViewModel() {
 
@@ -110,6 +111,13 @@ class UserDetailViewModel @Inject constructor(
     }.catch {
         logger.error("observe user error", it)
         _errors.tryEmit(it)
+    }.stateIn(viewModelScope, SharingStarted.Lazily, null)
+
+    val originProfileUrl = userState.filterNotNull().map {
+        val account = accountRepository.get(it.id.accountId).getOrThrow()
+        it.getRemoteProfileUrl(account)
+    }.catch {
+        logger.error("get profile url error", it)
     }.stateIn(viewModelScope, SharingStarted.Lazily, null)
 
     val isMine = combine(userState, currentAccount) { userState, account ->
@@ -316,38 +324,11 @@ class UserDetailViewModel @Inject constructor(
         val strUserId = savedStateHandle.get<String?>(UserDetailActivity.EXTRA_USER_ID)
         val specifiedAccountId = savedStateHandle.get<Long?>(UserDetailActivity.EXTRA_ACCOUNT_ID)
         val fqdnUserName = savedStateHandle.get<String?>(UserDetailActivity.EXTRA_USER_NAME)
-        val currentAccount = specifiedAccountId?.let {
-            accountRepository.get(it).getOrThrow()
-        } ?: accountRepository.getCurrentAccount().getOrThrow()
-        val argType = when {
-            strUserId != null -> {
-                UserProfileArgType.UserId(User.Id(currentAccount.accountId, strUserId))
-            }
-
-            fqdnUserName != null -> {
-                UserProfileArgType.FqdnUserName(fqdnUserName, currentAccount)
-            }
-
-            else -> {
-                UserProfileArgType.None
-            }
-        }
-
-        when (argType) {
-            is UserProfileArgType.FqdnUserName -> {
-                val (userName, host) = Acct(argType.fqdnUserName).let {
-                    it.userName to it.host
-                }
-                userRepository.findByUserName(currentAccount.accountId, userName, host).id
-            }
-
-            is UserProfileArgType.UserId -> {
-                argType.userId
-            }
-
-            UserProfileArgType.None -> throw IllegalStateException()
-        }
-
+        userIdResolver(
+            userId = strUserId,
+            acct = fqdnUserName,
+            specifiedAccountId = specifiedAccountId,
+        ).getOrThrow()
     }
 }
 

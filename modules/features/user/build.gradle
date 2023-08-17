@@ -118,4 +118,7 @@ dependencies {
 
     testImplementation libs.junit.jupiter.api
     testRuntimeOnly libs.junit.jupiter.engine
+
+    implementation 'com.github.kenglxn.QRGen:android:3.0.1'
+
 }

@@ -42,11 +42,12 @@ import net.pantasystem.milktea.note.NoteEditorActivity
 import net.pantasystem.milktea.note.view.ActionNoteHandler
 import net.pantasystem.milktea.note.viewmodel.NotesViewModel
 import net.pantasystem.milktea.user.R
-import net.pantasystem.milktea.user.followlist.FollowFollowerActivity
 import net.pantasystem.milktea.user.databinding.ActivityUserDetailBinding
+import net.pantasystem.milktea.user.followlist.FollowFollowerActivity
 import net.pantasystem.milktea.user.nickname.EditNicknameDialog
 import net.pantasystem.milktea.user.profile.mute.SpecifyMuteExpiredAtDialog
 import net.pantasystem.milktea.user.profile.viewmodel.UserDetailViewModel
+import net.pantasystem.milktea.user.qrshare.QRShareDialog
 import javax.inject.Inject
 
 class UserDetailNavigationImpl @Inject constructor(
@@ -400,6 +401,9 @@ class UserDetailActivity : AppCompatActivity() {
             }
             R.id.nav_switch_account -> {
                 ProfileAccountSwitchDialog().show(supportFragmentManager, "switchAccountDialog")
+            }
+            R.id.show_qr_code -> {
+                QRShareDialog().show(supportFragmentManager, "QRShareDialog")
             }
             else -> return false
 
