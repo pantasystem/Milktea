@@ -112,6 +112,13 @@ class UserDetailViewModel @Inject constructor(
         _errors.tryEmit(it)
     }.stateIn(viewModelScope, SharingStarted.Lazily, null)
 
+    val originProfileUrl = userState.filterNotNull().map {
+        val account = accountRepository.get(it.id.accountId).getOrThrow()
+        it.getRemoteProfileUrl(account)
+    }.catch {
+        logger.error("get profile url error", it)
+    }.stateIn(viewModelScope, SharingStarted.Lazily, null)
+
     val isMine = combine(userState, currentAccount) { userState, account ->
         userState?.id?.id == account?.remoteId
     }.stateIn(viewModelScope, SharingStarted.Lazily, false)
