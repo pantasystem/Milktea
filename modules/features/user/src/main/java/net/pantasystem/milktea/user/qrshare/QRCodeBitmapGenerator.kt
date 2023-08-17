@@ -1,8 +1,12 @@
 package net.pantasystem.milktea.user.qrshare
 
+import android.content.ContentValues
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.Canvas
+import android.net.Uri
+import android.os.Build
+import android.provider.MediaStore
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.FutureTarget
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -21,7 +25,7 @@ class QRCodeBitmapGenerator @Inject constructor(
     @ApplicationContext private val context: Context,
     private val accountRepository: AccountRepository,
 ) {
-    suspend operator fun invoke(
+    suspend fun generateBitmap(
         user: User,
         size: Int,
     ): Result<Bitmap?> = runCancellableCatching {
@@ -36,6 +40,34 @@ class QRCodeBitmapGenerator @Inject constructor(
             }
         }
         overlayBitmapsCentered(avatarIcon, qrCode)
+    }
+
+    suspend fun exportToFile(
+        user: User,
+        size: Int,
+    ): Result<Uri?> = runCancellableCatching {
+        val bitmap = generateBitmap(user, size).getOrThrow()
+            ?: return@runCancellableCatching null
+        val mediaCollection = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            MediaStore.Images.Media.getContentUri(
+                MediaStore.VOLUME_EXTERNAL_PRIMARY
+            )
+        } else {
+            MediaStore.Images.Media.EXTERNAL_CONTENT_URI
+        }
+        val contentDetail = ContentValues().apply {
+            put(MediaStore.Images.Media.DISPLAY_NAME, "qr-code-${user.displayUserName}.png")
+        }
+
+        val uri = context.contentResolver.insert(mediaCollection, contentDetail)
+            ?: return@runCancellableCatching null
+
+        withContext(Dispatchers.IO) {
+            context.contentResolver.openOutputStream(uri)?.use { outputStream ->
+                bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream)
+            }
+        }
+        uri
     }
 
 
