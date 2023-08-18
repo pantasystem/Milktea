@@ -11,7 +11,7 @@ import net.pantasystem.milktea.common.*
 import net.pantasystem.milktea.model.clip.Clip
 import net.pantasystem.milktea.model.clip.ClipId
 import net.pantasystem.milktea.model.clip.ClipRepository
-import net.pantasystem.milktea.model.notes.Note
+import net.pantasystem.milktea.model.note.Note
 import javax.inject.Inject
 
 @HiltViewModel

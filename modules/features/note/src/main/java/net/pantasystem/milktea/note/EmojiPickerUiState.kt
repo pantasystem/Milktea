@@ -14,10 +14,10 @@ import net.pantasystem.milktea.model.emoji.CustomEmojiRepository
 import net.pantasystem.milktea.model.emoji.Emoji
 import net.pantasystem.milktea.model.emoji.UserEmojiConfig
 import net.pantasystem.milktea.model.emoji.UserEmojiConfigRepository
-import net.pantasystem.milktea.model.notes.reaction.LegacyReaction
-import net.pantasystem.milktea.model.notes.reaction.history.ReactionHistory
-import net.pantasystem.milktea.model.notes.reaction.history.ReactionHistoryCount
-import net.pantasystem.milktea.model.notes.reaction.history.ReactionHistoryRepository
+import net.pantasystem.milktea.model.note.reaction.LegacyReaction
+import net.pantasystem.milktea.model.note.reaction.history.ReactionHistory
+import net.pantasystem.milktea.model.note.reaction.history.ReactionHistoryCount
+import net.pantasystem.milktea.model.note.reaction.history.ReactionHistoryRepository
 
 
 class EmojiPickerUiStateService(

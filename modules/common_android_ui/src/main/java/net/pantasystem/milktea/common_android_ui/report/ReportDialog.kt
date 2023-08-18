@@ -9,7 +9,7 @@ import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.activityViewModels
 import net.pantasystem.milktea.common_android_ui.R
 import net.pantasystem.milktea.common_android_ui.databinding.DialogReportBinding
-import net.pantasystem.milktea.model.notes.Note
+import net.pantasystem.milktea.model.note.Note
 import net.pantasystem.milktea.model.user.User
 
 class ReportDialog : AppCompatDialogFragment(){

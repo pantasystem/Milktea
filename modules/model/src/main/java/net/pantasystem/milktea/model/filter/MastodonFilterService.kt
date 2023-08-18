@@ -3,7 +3,7 @@ package net.pantasystem.milktea.model.filter
 import android.text.Spanned
 import androidx.core.text.parseAsHtml
 import net.pantasystem.milktea.model.account.page.Pageable
-import net.pantasystem.milktea.model.notes.Note
+import net.pantasystem.milktea.model.note.Note
 import java.util.regex.Pattern
 import javax.inject.Inject
 

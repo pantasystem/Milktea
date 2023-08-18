@@ -12,7 +12,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.wada811.databinding.dataBinding
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
-import net.pantasystem.milktea.model.notes.Note
+import net.pantasystem.milktea.model.note.Note
 import net.pantasystem.milktea.note.R
 import net.pantasystem.milktea.note.databinding.FragmentReactionHistoryListBinding
 import javax.inject.Inject

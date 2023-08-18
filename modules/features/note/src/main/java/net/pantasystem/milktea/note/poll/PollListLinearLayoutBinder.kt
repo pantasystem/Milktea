@@ -2,8 +2,8 @@ package net.pantasystem.milktea.note.poll
 
 import android.view.LayoutInflater
 import android.widget.LinearLayout
-import net.pantasystem.milktea.model.notes.Note
-import net.pantasystem.milktea.model.notes.poll.Poll
+import net.pantasystem.milktea.model.note.Note
+import net.pantasystem.milktea.model.note.poll.Poll
 import net.pantasystem.milktea.note.databinding.ItemChoiceBinding
 import net.pantasystem.milktea.note.view.NoteCardActionListenerAdapter
 

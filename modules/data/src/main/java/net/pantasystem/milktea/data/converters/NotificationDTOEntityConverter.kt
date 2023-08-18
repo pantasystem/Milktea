@@ -4,7 +4,7 @@ import net.pantasystem.milktea.api.misskey.notification.NotificationDTO
 import net.pantasystem.milktea.data.infrastructure.toGroup
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.group.InvitationId
-import net.pantasystem.milktea.model.notes.Note
+import net.pantasystem.milktea.model.note.Note
 import net.pantasystem.milktea.model.notification.*
 import net.pantasystem.milktea.model.user.User
 import javax.inject.Inject

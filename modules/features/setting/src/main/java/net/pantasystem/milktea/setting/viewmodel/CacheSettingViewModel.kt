@@ -10,7 +10,7 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.model.image.ImageCacheRepository
-import net.pantasystem.milktea.model.notes.NoteDataSource
+import net.pantasystem.milktea.model.note.NoteDataSource
 import javax.inject.Inject
 
 @HiltViewModel

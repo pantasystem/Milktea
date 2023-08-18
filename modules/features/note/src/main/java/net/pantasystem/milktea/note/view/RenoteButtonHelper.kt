@@ -4,7 +4,7 @@ import android.content.res.ColorStateList
 import android.util.TypedValue
 import android.widget.ImageButton
 import androidx.databinding.BindingAdapter
-import net.pantasystem.milktea.model.notes.Note
+import net.pantasystem.milktea.model.note.Note
 import net.pantasystem.milktea.note.R
 import net.pantasystem.milktea.note.viewmodel.PlaneNoteViewData
 

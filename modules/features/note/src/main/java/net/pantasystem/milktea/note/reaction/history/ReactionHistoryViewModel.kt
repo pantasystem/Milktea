@@ -14,9 +14,9 @@ import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.emoji.CustomEmojiRepository
 import net.pantasystem.milktea.model.emoji.Emoji
-import net.pantasystem.milktea.model.notes.Note
-import net.pantasystem.milktea.model.notes.NoteRepository
-import net.pantasystem.milktea.model.notes.reaction.*
+import net.pantasystem.milktea.model.note.Note
+import net.pantasystem.milktea.model.note.NoteRepository
+import net.pantasystem.milktea.model.note.reaction.*
 import net.pantasystem.milktea.model.user.User
 import net.pantasystem.milktea.model.user.UserRepository
 import net.pantasystem.milktea.note.EmojiType

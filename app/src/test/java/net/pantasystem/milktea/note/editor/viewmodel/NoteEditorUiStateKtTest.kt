@@ -1,9 +1,9 @@
 package net.pantasystem.milktea.note.editor.viewmodel
 
 import kotlinx.datetime.Clock
-import net.pantasystem.milktea.model.notes.draft.DraftNote
-import net.pantasystem.milktea.model.notes.draft.DraftPoll
-import net.pantasystem.milktea.model.notes.expiresAt
+import net.pantasystem.milktea.model.note.draft.DraftNote
+import net.pantasystem.milktea.model.note.draft.DraftPoll
+import net.pantasystem.milktea.model.note.expiresAt
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 import kotlin.time.Duration.Companion.days

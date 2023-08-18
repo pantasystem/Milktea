@@ -1,6 +1,6 @@
 package net.pantasystem.milktea.model.setting
 
-import net.pantasystem.milktea.model.notes.Visibility
+import net.pantasystem.milktea.model.note.Visibility
 
 
 

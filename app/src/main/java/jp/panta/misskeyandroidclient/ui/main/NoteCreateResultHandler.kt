@@ -5,7 +5,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.work.WorkInfo
 import com.google.android.material.snackbar.Snackbar
 import jp.panta.misskeyandroidclient.R
-import net.pantasystem.milktea.model.notes.Note
+import net.pantasystem.milktea.model.note.Note
 import net.pantasystem.milktea.note.NoteDetailActivity
 import net.pantasystem.milktea.worker.note.CreateNoteWorker
 import net.pantasystem.milktea.worker.note.CreateNoteWorkerExecutor

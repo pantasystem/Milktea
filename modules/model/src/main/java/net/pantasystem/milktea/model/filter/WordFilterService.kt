@@ -3,9 +3,9 @@ package net.pantasystem.milktea.model.filter
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.account.page.Pageable
-import net.pantasystem.milktea.model.notes.Note
-import net.pantasystem.milktea.model.notes.NoteRelation
-import net.pantasystem.milktea.model.notes.muteword.WordFilterConfigRepository
+import net.pantasystem.milktea.model.note.Note
+import net.pantasystem.milktea.model.note.NoteRelation
+import net.pantasystem.milktea.model.note.muteword.WordFilterConfigRepository
 import net.pantasystem.milktea.model.user.User
 import javax.inject.Inject
 import javax.inject.Singleton

@@ -6,16 +6,16 @@ import net.pantasystem.milktea.model.channel.Channel
 import net.pantasystem.milktea.model.file.AppFile
 import net.pantasystem.milktea.model.file.FilePreviewSource
 import net.pantasystem.milktea.model.file.from
-import net.pantasystem.milktea.model.notes.CreateNote
-import net.pantasystem.milktea.model.notes.Note
-import net.pantasystem.milktea.model.notes.PollChoiceState
-import net.pantasystem.milktea.model.notes.PollEditingState
-import net.pantasystem.milktea.model.notes.PollExpiresAt
-import net.pantasystem.milktea.model.notes.ReactionAcceptanceType
-import net.pantasystem.milktea.model.notes.Visibility
-import net.pantasystem.milktea.model.notes.draft.DraftNote
-import net.pantasystem.milktea.model.notes.draft.DraftNoteFile
-import net.pantasystem.milktea.model.notes.toCreatePoll
+import net.pantasystem.milktea.model.note.CreateNote
+import net.pantasystem.milktea.model.note.Note
+import net.pantasystem.milktea.model.note.PollChoiceState
+import net.pantasystem.milktea.model.note.PollEditingState
+import net.pantasystem.milktea.model.note.PollExpiresAt
+import net.pantasystem.milktea.model.note.ReactionAcceptanceType
+import net.pantasystem.milktea.model.note.Visibility
+import net.pantasystem.milktea.model.note.draft.DraftNote
+import net.pantasystem.milktea.model.note.draft.DraftNoteFile
+import net.pantasystem.milktea.model.note.toCreatePoll
 import net.pantasystem.milktea.model.user.User
 
 

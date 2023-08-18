@@ -5,14 +5,14 @@ import net.pantasystem.milktea.api.misskey.notification.NotificationDTO
 import net.pantasystem.milktea.data.converters.NotificationDTOEntityConverter
 import net.pantasystem.milktea.data.converters.TootDTOEntityConverter
 import net.pantasystem.milktea.data.converters.UserDTOEntityConverter
-import net.pantasystem.milktea.data.infrastructure.notes.NoteDataSourceAdder
+import net.pantasystem.milktea.data.infrastructure.note.NoteDataSourceAdder
 import net.pantasystem.milktea.data.infrastructure.toGroup
 import net.pantasystem.milktea.data.infrastructure.toModel
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.group.GroupDataSource
 import net.pantasystem.milktea.model.markers.MarkerRepository
 import net.pantasystem.milktea.model.markers.MarkerType
-import net.pantasystem.milktea.model.notes.NoteRelationGetter
+import net.pantasystem.milktea.model.note.NoteRelationGetter
 import net.pantasystem.milktea.model.notification.NotificationDataSource
 import net.pantasystem.milktea.model.notification.NotificationRelation
 import net.pantasystem.milktea.model.user.UserDataSource

@@ -15,9 +15,9 @@ import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.common.MisskeyErrorCodes
 import net.pantasystem.milktea.common.mapCancellableCatching
 import net.pantasystem.milktea.model.account.AccountRepository
-import net.pantasystem.milktea.model.notes.CreateNoteUseCase
-import net.pantasystem.milktea.model.notes.draft.DraftNoteRepository
-import net.pantasystem.milktea.model.notes.toCreateNote
+import net.pantasystem.milktea.model.note.CreateNoteUseCase
+import net.pantasystem.milktea.model.note.draft.DraftNoteRepository
+import net.pantasystem.milktea.model.note.toCreateNote
 import net.pantasystem.milktea.worker.WorkerTags
 import java.io.IOException
 

@@ -1,7 +1,7 @@
 package net.pantasystem.milktea.note.viewmodel
 
 import net.pantasystem.milktea.common_android.resource.StringSource
-import net.pantasystem.milktea.model.notes.NoteRelation
+import net.pantasystem.milktea.model.note.NoteRelation
 import net.pantasystem.milktea.note.R
 
 object NoteStatusMessageTextGenerator {
