@@ -277,17 +277,31 @@ class TimelineStoreImpl(
                 is StateContent.Exist -> content.rawContent
                 is StateContent.NotExist -> return@withLock
             }
-            val end = position + offset
+
+            // 末端の削除位置を求める
+            var end = position + offset
             if (end >= notes.size) {
-                return@withLock
+                end = notes.size
             }
-            val diffCount = notes.size - end
+            var diffCount = notes.size - end
+
+            // 先頭の削除位置を求める
+            var start = position - offset
+            if (start < 0) {
+                start = 0
+            }
+
+            diffCount += start
+
+            // 削除件数が20件未満の時は削除しない
             if (diffCount < 20) {
                 return@withLock
             }
+
+            // 削除し状態に反映する
             pageableStore.setState(
                 state.convert {
-                    notes.subList(0, end)
+                    notes.subList(start, end)
                 }
             )
         }
