@@ -104,21 +104,37 @@ class EmojiPickerUiStateService(
 
     val searchWord = MutableStateFlow("")
 
+    @OptIn(ExperimentalCoroutinesApi::class)
+    private val filteredEmojis = combine(searchWord, account.filterNotNull()) { word, ac ->
+        word to ac
+    }.flatMapLatest { (word, ac) ->
+        customEmojiRepository.observeWithSearch(host = ac.getHost(), keyword = word).map {
+            it.sortedBy { emoji ->
+                LevenshteinDistance(emoji.name, word)
+            }
+        }
+    }.stateIn(
+        coroutineScope,
+        SharingStarted.WhileSubscribed(5_000),
+        emptyList()
+    )
 
     // 検索時の候補
     val uiState: StateFlow<EmojiPickerUiState> = combine(
         searchWord,
+        filteredEmojis,
         baseInfo,
         reactions,
         recentlyUsedReactions
-    ) { word, (ac, emojis), (settings, counts), recentlyUsed ->
+    ) { word, filtered, (ac, emojis), (settings, counts), recentlyUsed ->
         EmojiPickerUiState(
             keyword = word,
             account = ac,
             customEmojis = emojis,
             reactionHistoryCounts = counts,
             userSettingReactions = settings,
-            recentlyUsedReactions = recentlyUsed
+            recentlyUsedReactions = recentlyUsed,
+            filteredEmojis = filtered,
         )
     }.stateIn(
         coroutineScope,
@@ -126,6 +142,7 @@ class EmojiPickerUiStateService(
         EmojiPickerUiState(
             "",
             null, emptyList(),
+            emptyList(),
             emptyList(),
             emptyList(),
             emptyList()
@@ -138,6 +155,7 @@ data class EmojiPickerUiState(
     val keyword: String,
     val account: Account?,
     val customEmojis: List<Emoji>,
+    val filteredEmojis: List<Emoji>,
     val reactionHistoryCounts: List<ReactionHistoryCount>,
     val userSettingReactions: List<UserEmojiConfig>,
     val recentlyUsedReactions: List<ReactionHistory>,
@@ -220,7 +238,7 @@ data class EmojiPickerUiState(
                 }
             }.flatten()
         } else {
-            customEmojis.filterEmojiBy(keyword).map {
+            filteredEmojis.map {
                 EmojiType.CustomEmoji(it)
             }.sortedBy {
                 LevenshteinDistance(it.emoji.name, keyword)
@@ -312,16 +330,6 @@ fun EmojiType.Companion.from(emojis: List<Emoji>?, reaction: String): EmojiType?
     }
 }
 
-fun List<Emoji>.filterEmojiBy(word: String): List<Emoji> {
-    val w = word.replace(":", "")
-    return filter { emoji ->
-        emoji.name.contains(w)
-                || emoji.aliases?.any { alias ->
-            alias.startsWith(w)
-        } ?: false
-    }
-}
-
 private data class Reactions(
     val userSettings: List<UserEmojiConfig>,
     val reactionHistoryCounts: List<ReactionHistoryCount>,
@@ -330,4 +338,5 @@ private data class Reactions(
 private data class BaseInfo(
     val account: Account?,
     val emojis: List<Emoji>,
+
 )
