@@ -36,6 +36,7 @@ object NoteReactionViewHelper {
 
         if (emoji == null) {
             reactionImageTypeView.setMemoVisibility(View.GONE)
+            reactionImageTypeView.setImageDrawable(null)
 
             reactionTextTypeView.setMemoVisibility(View.VISIBLE)
             reactionTextTypeView.text = textReaction
