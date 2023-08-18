@@ -13,7 +13,7 @@ import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.common.throwIfHasError
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
 import net.pantasystem.milktea.data.converters.UserDTOEntityConverter
-import net.pantasystem.milktea.data.infrastructure.notes.NoteDataSourceAdder
+import net.pantasystem.milktea.data.infrastructure.note.NoteDataSourceAdder
 import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.note.NoteRelationGetter
 import net.pantasystem.milktea.model.user.User

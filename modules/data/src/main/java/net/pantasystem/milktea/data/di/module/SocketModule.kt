@@ -9,10 +9,10 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.data.infrastructure.emoji.EmojiEventHandlerImpl
-import net.pantasystem.milktea.data.infrastructure.notes.NoteCaptureAPIAdapterImpl
-import net.pantasystem.milktea.data.infrastructure.notes.NoteCaptureAPIWithAccountProvider
-import net.pantasystem.milktea.data.infrastructure.notes.NoteCaptureAPIWithAccountProviderImpl
-import net.pantasystem.milktea.data.infrastructure.notes.NoteDataSourceAdder
+import net.pantasystem.milktea.data.infrastructure.note.NoteCaptureAPIAdapterImpl
+import net.pantasystem.milktea.data.infrastructure.note.NoteCaptureAPIWithAccountProvider
+import net.pantasystem.milktea.data.infrastructure.note.NoteCaptureAPIWithAccountProviderImpl
+import net.pantasystem.milktea.data.infrastructure.note.NoteDataSourceAdder
 import net.pantasystem.milktea.data.infrastructure.notification.impl.NotificationStreamingImpl
 import net.pantasystem.milktea.data.streaming.ChannelAPIWithAccountProvider
 import net.pantasystem.milktea.data.streaming.SocketWithAccountProvider

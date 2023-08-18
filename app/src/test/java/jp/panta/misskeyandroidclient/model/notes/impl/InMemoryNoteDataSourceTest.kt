@@ -5,7 +5,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.data.infrastructure.MemoryCacheCleaner
-import net.pantasystem.milktea.data.infrastructure.notes.impl.InMemoryNoteDataSource
+import net.pantasystem.milktea.data.infrastructure.note.impl.InMemoryNoteDataSource
 import net.pantasystem.milktea.model.AddResult
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.note.Note

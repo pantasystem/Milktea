@@ -5,8 +5,8 @@ import dagger.Module
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import net.pantasystem.milktea.data.infrastructure.emoji.UserEmojiConfigRepositoryImpl
-import net.pantasystem.milktea.data.infrastructure.notes.reaction.impl.ReactionUserRepositoryImpl
-import net.pantasystem.milktea.data.infrastructure.notes.reaction.impl.history.ReactionHistoryRepositoryImpl
+import net.pantasystem.milktea.data.infrastructure.note.reaction.impl.ReactionUserRepositoryImpl
+import net.pantasystem.milktea.data.infrastructure.note.reaction.impl.history.ReactionHistoryRepositoryImpl
 import net.pantasystem.milktea.model.emoji.UserEmojiConfigRepository
 import net.pantasystem.milktea.model.note.reaction.ReactionUserRepository
 import net.pantasystem.milktea.model.note.reaction.history.ReactionHistoryRepository

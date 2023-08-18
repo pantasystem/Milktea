@@ -10,8 +10,8 @@ import net.pantasystem.milktea.api_streaming.NoteCaptureAPIImpl
 import net.pantasystem.milktea.api_streaming.NoteUpdated
 import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.data.infrastructure.MemoryCacheCleaner
-import net.pantasystem.milktea.data.infrastructure.notes.NoteCaptureAPIWithAccountProviderImpl
-import net.pantasystem.milktea.data.infrastructure.notes.impl.InMemoryNoteDataSource
+import net.pantasystem.milktea.data.infrastructure.note.NoteCaptureAPIWithAccountProviderImpl
+import net.pantasystem.milktea.data.infrastructure.note.impl.InMemoryNoteDataSource
 import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.note.Note
 import net.pantasystem.milktea.model.note.NoteDataSource
