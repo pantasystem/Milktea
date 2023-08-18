@@ -387,6 +387,7 @@
                     android:layout_marginTop="4dp"
                     tools:layout_height="50dp"
                     tools:visibility="visible"
+                    app:flexWrap="wrap"
 
                     />
 
