@@ -78,11 +78,7 @@ class TimelineViewModel @AssistedInject constructor(
 
     private val timelineState = timelineStore.timelineState.map { pageableState ->
         pageableState.suspendConvert { list ->
-            cache.useByIds(list)
-        }
-    }.map {
-        it.suspendConvert { notes ->
-            notes.filterNot { note ->
+            cache.useByIds(list).filterNot { note ->
                 note.filterResult == PlaneNoteViewData.FilterResult.ShouldFilterNote
             }
         }
