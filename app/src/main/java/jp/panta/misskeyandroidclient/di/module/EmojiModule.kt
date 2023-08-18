@@ -7,7 +7,7 @@ import dagger.hilt.components.SingletonComponent
 import jp.panta.misskeyandroidclient.impl.CheckEmojiAndroidImpl
 import net.pantasystem.milktea.data.infrastructure.DataBase
 import net.pantasystem.milktea.data.infrastructure.emoji.Utf8EmojisDAO
-import net.pantasystem.milktea.model.notes.reaction.CheckEmoji
+import net.pantasystem.milktea.model.note.reaction.CheckEmoji
 import javax.inject.Singleton
 
 @Module

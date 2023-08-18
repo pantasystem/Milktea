@@ -22,8 +22,8 @@ import androidx.compose.material.icons.outlined.Star
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import net.pantasystem.milktea.model.notes.Note
-import net.pantasystem.milktea.model.notes.NoteRelation
+import net.pantasystem.milktea.model.note.Note
+import net.pantasystem.milktea.model.note.NoteRelation
 import net.pantasystem.milktea.note.R
 import net.pantasystem.milktea.note.view.NormalBottomSheetDialogSelectionLayout
 

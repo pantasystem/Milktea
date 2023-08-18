@@ -3,7 +3,7 @@ package net.pantasystem.milktea.data.infrastructure.notes.draft.db
 import androidx.room.*
 import kotlinx.coroutines.flow.Flow
 import net.pantasystem.milktea.data.infrastructure.drive.DriveFileRecord
-import net.pantasystem.milktea.model.notes.draft.DraftNote
+import net.pantasystem.milktea.model.note.draft.DraftNote
 
 @Dao
 abstract class DraftNoteDao {
@@ -98,10 +98,6 @@ abstract class DraftNoteDao {
 
     fun getDraftNote(accountId: Long, draftNoteId: Long): DraftNote?{
         return getDraftNoteRelation(accountId, draftNoteId)?.toDraftNote(accountId)
-    }
-
-    fun deleteDraftNote(draftNote: DraftNote){
-        deleteDraftNote(draftNote.accountId, draftNote.draftNoteId)
     }
 
     @Transaction

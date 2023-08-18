@@ -3,8 +3,8 @@ package net.pantasystem.milktea.app_store.notes
 import kotlinx.coroutines.flow.Flow
 import net.pantasystem.milktea.common.ResultState
 import net.pantasystem.milktea.common.StateContent
-import net.pantasystem.milktea.model.notes.Note
-import net.pantasystem.milktea.model.notes.Translation
+import net.pantasystem.milktea.model.note.Note
+import net.pantasystem.milktea.model.note.Translation
 
 data class NoteTranslationsState(
     val noteIdWithTranslation: Map<Note.Id, Translation>,

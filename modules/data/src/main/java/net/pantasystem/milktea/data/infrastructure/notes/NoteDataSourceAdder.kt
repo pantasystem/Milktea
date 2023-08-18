@@ -12,8 +12,8 @@ import net.pantasystem.milktea.data.infrastructure.toEntities
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.drive.FileProperty
 import net.pantasystem.milktea.model.drive.FilePropertyDataSource
-import net.pantasystem.milktea.model.notes.Note
-import net.pantasystem.milktea.model.notes.NoteDataSource
+import net.pantasystem.milktea.model.note.Note
+import net.pantasystem.milktea.model.note.NoteDataSource
 import net.pantasystem.milktea.model.user.User
 import net.pantasystem.milktea.model.user.UserDataSource
 import javax.inject.Inject

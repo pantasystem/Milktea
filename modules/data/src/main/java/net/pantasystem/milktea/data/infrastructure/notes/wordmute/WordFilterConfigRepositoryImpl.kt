@@ -8,9 +8,9 @@ import net.pantasystem.milktea.common.BuildConfig
 import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.common_android.hilt.IODispatcher
-import net.pantasystem.milktea.model.notes.muteword.FilterConditionType
-import net.pantasystem.milktea.model.notes.muteword.WordFilterConfig
-import net.pantasystem.milktea.model.notes.muteword.WordFilterConfigRepository
+import net.pantasystem.milktea.model.note.muteword.FilterConditionType
+import net.pantasystem.milktea.model.note.muteword.WordFilterConfig
+import net.pantasystem.milktea.model.note.muteword.WordFilterConfigRepository
 import javax.inject.Inject
 
 class WordFilterConfigRepositoryImpl @Inject constructor(

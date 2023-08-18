@@ -12,7 +12,7 @@ import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.drive.FileProperty
 import net.pantasystem.milktea.model.drive.FilePropertyDataSource
 import net.pantasystem.milktea.model.file.AppFile
-import net.pantasystem.milktea.model.notes.*
+import net.pantasystem.milktea.model.note.*
 import java.io.Serializable
 import net.pantasystem.milktea.api.misskey.notes.CreateNote as CreateNoteDTO
 import net.pantasystem.milktea.api.misskey.notes.ReactionAcceptanceType as RAT

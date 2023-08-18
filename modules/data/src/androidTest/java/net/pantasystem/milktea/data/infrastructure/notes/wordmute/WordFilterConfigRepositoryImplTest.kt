@@ -9,9 +9,9 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.runBlocking
 import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.data.infrastructure.DataBase
-import net.pantasystem.milktea.model.notes.muteword.FilterConditionType
-import net.pantasystem.milktea.model.notes.muteword.WordFilterConfig
-import net.pantasystem.milktea.model.notes.muteword.WordFilterConfigRepository
+import net.pantasystem.milktea.model.note.muteword.FilterConditionType
+import net.pantasystem.milktea.model.note.muteword.WordFilterConfig
+import net.pantasystem.milktea.model.note.muteword.WordFilterConfigRepository
 import org.junit.Assert
 import org.junit.Before
 import org.junit.Test

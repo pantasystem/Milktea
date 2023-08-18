@@ -6,7 +6,7 @@ import android.provider.MediaStore
 import android.provider.OpenableColumns
 import android.util.Log
 import net.pantasystem.milktea.model.drive.FileProperty
-import net.pantasystem.milktea.model.notes.draft.DraftNoteFile
+import net.pantasystem.milktea.model.note.draft.DraftNoteFile
 import java.io.Serializable as JSerializable
 
 sealed interface AppFile : JSerializable {

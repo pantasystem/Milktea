@@ -9,7 +9,7 @@ import net.pantasystem.milktea.api.mastodon.media.TootMediaAttachment
 import net.pantasystem.milktea.api.mastodon.poll.TootPollDTO
 import net.pantasystem.milktea.common.serializations.EnumIgnoreUnknownSerializer
 import net.pantasystem.milktea.model.emoji.Emoji
-import net.pantasystem.milktea.model.notes.Note
+import net.pantasystem.milktea.model.note.Note
 
 @kotlinx.serialization.Serializable
 data class TootStatusDTO(

@@ -22,9 +22,9 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import net.pantasystem.milktea.common_android_ui.tab.TabbedFlexboxListMediator
-import net.pantasystem.milktea.model.notes.reaction.LegacyReaction
-import net.pantasystem.milktea.model.notes.reaction.Reaction
-import net.pantasystem.milktea.model.notes.reaction.ReactionSelection
+import net.pantasystem.milktea.model.note.reaction.LegacyReaction
+import net.pantasystem.milktea.model.note.reaction.Reaction
+import net.pantasystem.milktea.model.note.reaction.ReactionSelection
 import net.pantasystem.milktea.model.setting.DefaultConfig
 import net.pantasystem.milktea.model.setting.LocalConfigRepository
 import net.pantasystem.milktea.note.EmojiListItemType

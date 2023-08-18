@@ -1,6 +1,6 @@
 package net.pantasystem.milktea.model.notification
 
-import net.pantasystem.milktea.model.notes.NoteRelation
+import net.pantasystem.milktea.model.note.NoteRelation
 import net.pantasystem.milktea.model.user.User
 
 data class NotificationRelation (

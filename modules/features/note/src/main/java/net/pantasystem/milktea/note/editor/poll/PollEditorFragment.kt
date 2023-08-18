@@ -12,7 +12,7 @@ import androidx.fragment.app.activityViewModels
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.datetime.Clock
 import net.pantasystem.milktea.common_compose.MilkteaStyleConfigApplyAndTheme
-import net.pantasystem.milktea.model.notes.PollExpiresAt
+import net.pantasystem.milktea.model.note.PollExpiresAt
 import net.pantasystem.milktea.model.setting.LocalConfigRepository
 import net.pantasystem.milktea.note.editor.viewmodel.NoteEditorViewModel
 import javax.inject.Inject

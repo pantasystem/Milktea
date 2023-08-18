@@ -2,10 +2,10 @@ package net.pantasystem.milktea.data.infrastructure.notes.impl
 
 import kotlinx.coroutines.runBlocking
 import net.pantasystem.milktea.data.infrastructure.MemoryCacheCleaner
-import net.pantasystem.milktea.model.notes.Note
-import net.pantasystem.milktea.model.notes.NoteDeletedException
-import net.pantasystem.milktea.model.notes.NoteNotFoundException
-import net.pantasystem.milktea.model.notes.make
+import net.pantasystem.milktea.model.note.Note
+import net.pantasystem.milktea.model.note.NoteDeletedException
+import net.pantasystem.milktea.model.note.NoteNotFoundException
+import net.pantasystem.milktea.model.note.make
 import net.pantasystem.milktea.model.user.User
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test

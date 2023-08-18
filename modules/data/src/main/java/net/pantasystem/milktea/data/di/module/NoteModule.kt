@@ -20,10 +20,10 @@ import net.pantasystem.milktea.data.infrastructure.notes.impl.ObjectBoxNoteDataS
 import net.pantasystem.milktea.data.infrastructure.notes.impl.ThreadContextApiAdapter
 import net.pantasystem.milktea.data.infrastructure.notes.impl.ThreadContextApiAdapterFactoryImpl
 import net.pantasystem.milktea.data.infrastructure.notes.renote.RenotesPagingServiceImpl
-import net.pantasystem.milktea.model.notes.*
-import net.pantasystem.milktea.model.notes.draft.DraftNoteRepository
-import net.pantasystem.milktea.model.notes.draft.DraftNoteService
-import net.pantasystem.milktea.model.notes.repost.RenotesPagingService
+import net.pantasystem.milktea.model.note.*
+import net.pantasystem.milktea.model.note.draft.DraftNoteRepository
+import net.pantasystem.milktea.model.note.draft.DraftNoteService
+import net.pantasystem.milktea.model.note.repost.RenotesPagingService
 import javax.inject.Singleton
 
 @Module

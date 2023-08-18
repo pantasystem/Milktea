@@ -12,7 +12,7 @@ import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.group.GroupDataSource
 import net.pantasystem.milktea.model.markers.MarkerRepository
 import net.pantasystem.milktea.model.markers.MarkerType
-import net.pantasystem.milktea.model.notes.NoteRelationGetter
+import net.pantasystem.milktea.model.note.NoteRelationGetter
 import net.pantasystem.milktea.model.notification.NotificationDataSource
 import net.pantasystem.milktea.model.notification.NotificationRelation
 import net.pantasystem.milktea.model.user.UserDataSource

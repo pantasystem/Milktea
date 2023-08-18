@@ -11,9 +11,9 @@ import net.pantasystem.milktea.common_android.hilt.IODispatcher
 import net.pantasystem.milktea.data.infrastructure.drive.DriveFileRecord
 import net.pantasystem.milktea.data.infrastructure.drive.from
 import net.pantasystem.milktea.data.infrastructure.notes.draft.db.*
-import net.pantasystem.milktea.model.notes.draft.DraftNote
-import net.pantasystem.milktea.model.notes.draft.DraftNoteFile
-import net.pantasystem.milktea.model.notes.draft.DraftNoteRepository
+import net.pantasystem.milktea.model.note.draft.DraftNote
+import net.pantasystem.milktea.model.note.draft.DraftNoteFile
+import net.pantasystem.milktea.model.note.draft.DraftNoteRepository
 import javax.inject.Inject
 
 class DraftNoteRepositoryImpl @Inject constructor(

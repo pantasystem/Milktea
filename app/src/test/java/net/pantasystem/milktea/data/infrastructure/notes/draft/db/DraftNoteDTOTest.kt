@@ -1,7 +1,7 @@
 import net.pantasystem.milktea.data.infrastructure.notes.draft.db.DraftNoteDTO
 import net.pantasystem.milktea.data.infrastructure.notes.draft.db.DraftPollDTO
 import net.pantasystem.milktea.model.channel.Channel
-import net.pantasystem.milktea.model.notes.draft.DraftNote
+import net.pantasystem.milktea.model.note.draft.DraftNote
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 

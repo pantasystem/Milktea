@@ -15,9 +15,9 @@ import kotlinx.datetime.Clock
 import net.pantasystem.milktea.common_compose.Spinner
 import net.pantasystem.milktea.common_compose.SwitchTile
 import net.pantasystem.milktea.common_resource.R
-import net.pantasystem.milktea.model.notes.PollChoiceState
-import net.pantasystem.milktea.model.notes.PollEditingState
-import net.pantasystem.milktea.model.notes.PollExpiresAt
+import net.pantasystem.milktea.model.note.PollChoiceState
+import net.pantasystem.milktea.model.note.PollEditingState
+import net.pantasystem.milktea.model.note.PollExpiresAt
 import java.util.*
 
 @Composable

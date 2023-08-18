@@ -12,12 +12,12 @@ import kotlinx.coroutines.sync.withLock
 import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.data.infrastructure.MemoryCacheCleaner
 import net.pantasystem.milktea.model.AddResult
-import net.pantasystem.milktea.model.notes.Note
-import net.pantasystem.milktea.model.notes.NoteDataSource
-import net.pantasystem.milktea.model.notes.NoteDeletedException
-import net.pantasystem.milktea.model.notes.NoteNotFoundException
-import net.pantasystem.milktea.model.notes.NoteResult
-import net.pantasystem.milktea.model.notes.NoteThreadContext
+import net.pantasystem.milktea.model.note.Note
+import net.pantasystem.milktea.model.note.NoteDataSource
+import net.pantasystem.milktea.model.note.NoteDeletedException
+import net.pantasystem.milktea.model.note.NoteNotFoundException
+import net.pantasystem.milktea.model.note.NoteResult
+import net.pantasystem.milktea.model.note.NoteThreadContext
 import net.pantasystem.milktea.model.user.User
 import javax.inject.Inject
 

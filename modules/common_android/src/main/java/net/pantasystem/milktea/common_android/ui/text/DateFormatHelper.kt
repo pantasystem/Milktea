@@ -9,7 +9,7 @@ import kotlinx.datetime.Instant
 import net.pantasystem.milktea.common.glide.GlideApp
 import net.pantasystem.milktea.common.ui.SimpleElapsedTime
 import net.pantasystem.milktea.common_android.R
-import net.pantasystem.milktea.model.notes.Visibility
+import net.pantasystem.milktea.model.note.Visibility
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.math.min

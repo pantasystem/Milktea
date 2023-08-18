@@ -8,7 +8,7 @@ import net.pantasystem.milktea.app_store.account.AccountStore
 import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.model.emoji.CustomEmojiRepository
 import net.pantasystem.milktea.model.emoji.UserEmojiConfigRepository
-import net.pantasystem.milktea.model.notes.reaction.history.ReactionHistoryRepository
+import net.pantasystem.milktea.model.note.reaction.history.ReactionHistoryRepository
 import net.pantasystem.milktea.note.EmojiPickerUiStateService
 import javax.inject.Inject
 

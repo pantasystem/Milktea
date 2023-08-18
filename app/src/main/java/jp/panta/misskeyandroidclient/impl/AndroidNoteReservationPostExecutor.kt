@@ -1,18 +1,20 @@
 package jp.panta.misskeyandroidclient.impl
 
+import android.annotation.SuppressLint
 import android.app.AlarmManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.os.Build
 import jp.panta.misskeyandroidclient.AlarmNotePostReceiver
-import net.pantasystem.milktea.model.notes.draft.DraftNote
-import net.pantasystem.milktea.model.notes.reservation.NoteReservationPostExecutor
+import net.pantasystem.milktea.model.note.draft.DraftNote
+import net.pantasystem.milktea.model.note.reservation.NoteReservationPostExecutor
 
 class AndroidNoteReservationPostExecutor(
     val context: Context
 ) : NoteReservationPostExecutor {
 
+    @SuppressLint("ScheduleExactAlarm")
     override fun register(draftNote: DraftNote) {
         val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
         val intent = Intent(context, AlarmNotePostReceiver::class.java)

@@ -1,7 +1,7 @@
 package net.pantasystem.milktea.data.infrastructure.notes.reaction.impl.history
 
 import androidx.room.ColumnInfo
-import net.pantasystem.milktea.model.notes.reaction.history.ReactionHistoryCount
+import net.pantasystem.milktea.model.note.reaction.history.ReactionHistoryCount
 
 data class ReactionHistoryCountRecord (
     val reaction: String,

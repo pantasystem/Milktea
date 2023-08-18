@@ -1,6 +1,6 @@
 package net.pantasystem.milktea.data.infrastructure.notes.wordmute
 
-import net.pantasystem.milktea.model.notes.muteword.WordFilterConfig
+import net.pantasystem.milktea.model.note.muteword.WordFilterConfig
 import javax.inject.Inject
 import javax.inject.Singleton
 

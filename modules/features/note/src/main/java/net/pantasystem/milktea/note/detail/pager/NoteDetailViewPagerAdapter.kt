@@ -5,7 +5,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import net.pantasystem.milktea.common_android_ui.PageableFragmentFactory
 import net.pantasystem.milktea.model.account.page.Pageable
-import net.pantasystem.milktea.model.notes.Note
+import net.pantasystem.milktea.model.note.Note
 
 class NoteDetailViewPagerAdapter(activity: Fragment, val factory: PageableFragmentFactory) : FragmentStateAdapter(activity) {
     private var _list: List<Note.Id> = emptyList()

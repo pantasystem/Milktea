@@ -1,8 +1,8 @@
 package net.pantasystem.milktea.data.infrastructure.notes.wordmute
 
 import androidx.room.*
-import net.pantasystem.milktea.model.notes.muteword.FilterConditionType
-import net.pantasystem.milktea.model.notes.muteword.WordFilterConfig
+import net.pantasystem.milktea.model.note.muteword.FilterConditionType
+import net.pantasystem.milktea.model.note.muteword.WordFilterConfig
 
 @Entity(
     tableName = "word_filter_condition"

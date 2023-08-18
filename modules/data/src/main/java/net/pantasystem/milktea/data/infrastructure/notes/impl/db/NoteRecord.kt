@@ -8,11 +8,11 @@ import kotlinx.datetime.toInstant
 import net.pantasystem.milktea.model.channel.Channel
 import net.pantasystem.milktea.model.drive.FileProperty
 import net.pantasystem.milktea.model.emoji.Emoji
-import net.pantasystem.milktea.model.notes.Note
-import net.pantasystem.milktea.model.notes.Visibility
-import net.pantasystem.milktea.model.notes.poll.Poll
-import net.pantasystem.milktea.model.notes.reaction.ReactionCount
-import net.pantasystem.milktea.model.notes.type
+import net.pantasystem.milktea.model.note.Note
+import net.pantasystem.milktea.model.note.Visibility
+import net.pantasystem.milktea.model.note.poll.Poll
+import net.pantasystem.milktea.model.note.reaction.ReactionCount
+import net.pantasystem.milktea.model.note.type
 import net.pantasystem.milktea.model.user.User
 
 @Entity

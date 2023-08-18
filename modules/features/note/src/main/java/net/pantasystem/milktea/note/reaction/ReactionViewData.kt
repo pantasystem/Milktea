@@ -1,10 +1,10 @@
 package net.pantasystem.milktea.note.reaction
 
 import net.pantasystem.milktea.model.emoji.Emoji
-import net.pantasystem.milktea.model.notes.Note
-import net.pantasystem.milktea.model.notes.reaction.LegacyReaction
-import net.pantasystem.milktea.model.notes.reaction.Reaction
-import net.pantasystem.milktea.model.notes.reaction.ReactionCount
+import net.pantasystem.milktea.model.note.Note
+import net.pantasystem.milktea.model.note.reaction.LegacyReaction
+import net.pantasystem.milktea.model.note.reaction.Reaction
+import net.pantasystem.milktea.model.note.reaction.ReactionCount
 
 data class ReactionViewData(
     val noteId: Note.Id,

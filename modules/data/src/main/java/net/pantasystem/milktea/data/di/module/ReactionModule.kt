@@ -8,8 +8,8 @@ import net.pantasystem.milktea.data.infrastructure.emoji.UserEmojiConfigReposito
 import net.pantasystem.milktea.data.infrastructure.notes.reaction.impl.ReactionUserRepositoryImpl
 import net.pantasystem.milktea.data.infrastructure.notes.reaction.impl.history.ReactionHistoryRepositoryImpl
 import net.pantasystem.milktea.model.emoji.UserEmojiConfigRepository
-import net.pantasystem.milktea.model.notes.reaction.ReactionUserRepository
-import net.pantasystem.milktea.model.notes.reaction.history.ReactionHistoryRepository
+import net.pantasystem.milktea.model.note.reaction.ReactionUserRepository
+import net.pantasystem.milktea.model.note.reaction.history.ReactionHistoryRepository
 import javax.inject.Singleton
 
 @Module

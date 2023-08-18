@@ -9,9 +9,9 @@ import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.ap.ApResolver
 import net.pantasystem.milktea.model.ap.ApResolverRepository
 import net.pantasystem.milktea.model.channel.Channel
-import net.pantasystem.milktea.model.notes.Note
-import net.pantasystem.milktea.model.notes.NoteRepository
-import net.pantasystem.milktea.model.notes.Visibility
+import net.pantasystem.milktea.model.note.Note
+import net.pantasystem.milktea.model.note.NoteRepository
+import net.pantasystem.milktea.model.note.Visibility
 import net.pantasystem.milktea.model.user.UserDataSource
 import net.pantasystem.milktea.model.user.UserRepository
 import javax.inject.Inject

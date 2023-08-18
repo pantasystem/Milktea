@@ -2,7 +2,7 @@ package net.pantasystem.milktea.note.reaction
 
 import android.widget.LinearLayout
 import androidx.core.content.ContextCompat
-import net.pantasystem.milktea.model.notes.reaction.Reaction
+import net.pantasystem.milktea.model.note.reaction.Reaction
 import net.pantasystem.milktea.note.R
 
 object ReactionHelper {

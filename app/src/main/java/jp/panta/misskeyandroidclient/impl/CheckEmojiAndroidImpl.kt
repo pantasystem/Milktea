@@ -1,6 +1,6 @@
 package jp.panta.misskeyandroidclient.impl
 
-import net.pantasystem.milktea.model.notes.reaction.CheckEmoji
+import net.pantasystem.milktea.model.note.reaction.CheckEmoji
 import javax.inject.Inject
 
 class CheckEmojiAndroidImpl @Inject constructor(

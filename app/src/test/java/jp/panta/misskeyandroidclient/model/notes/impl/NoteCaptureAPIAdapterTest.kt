@@ -13,9 +13,9 @@ import net.pantasystem.milktea.data.infrastructure.MemoryCacheCleaner
 import net.pantasystem.milktea.data.infrastructure.notes.NoteCaptureAPIWithAccountProviderImpl
 import net.pantasystem.milktea.data.infrastructure.notes.impl.InMemoryNoteDataSource
 import net.pantasystem.milktea.model.account.AccountRepository
-import net.pantasystem.milktea.model.notes.Note
-import net.pantasystem.milktea.model.notes.NoteDataSource
-import net.pantasystem.milktea.model.notes.make
+import net.pantasystem.milktea.model.note.Note
+import net.pantasystem.milktea.model.note.NoteDataSource
+import net.pantasystem.milktea.model.note.make
 import net.pantasystem.milktea.model.user.User
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach

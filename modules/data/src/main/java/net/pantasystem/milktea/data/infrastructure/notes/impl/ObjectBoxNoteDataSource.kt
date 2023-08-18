@@ -18,7 +18,7 @@ import net.pantasystem.milktea.data.infrastructure.notes.impl.db.NoteRecord
 import net.pantasystem.milktea.data.infrastructure.notes.impl.db.NoteRecord_
 import net.pantasystem.milktea.data.infrastructure.notes.impl.db.NoteThreadRecordDAO
 import net.pantasystem.milktea.model.AddResult
-import net.pantasystem.milktea.model.notes.*
+import net.pantasystem.milktea.model.note.*
 import net.pantasystem.milktea.model.user.User
 import java.util.*
 import javax.inject.Inject

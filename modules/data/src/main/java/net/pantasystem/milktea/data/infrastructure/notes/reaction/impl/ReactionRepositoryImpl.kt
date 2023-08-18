@@ -19,13 +19,13 @@ import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.GetAccount
 import net.pantasystem.milktea.model.nodeinfo.NodeInfo
 import net.pantasystem.milktea.model.nodeinfo.NodeInfoRepository
-import net.pantasystem.milktea.model.notes.Note
-import net.pantasystem.milktea.model.notes.NoteDataSource
-import net.pantasystem.milktea.model.notes.NoteRepository
-import net.pantasystem.milktea.model.notes.reaction.CreateReaction
-import net.pantasystem.milktea.model.notes.reaction.DeleteReaction
-import net.pantasystem.milktea.model.notes.reaction.Reaction
-import net.pantasystem.milktea.model.notes.reaction.ReactionRepository
+import net.pantasystem.milktea.model.note.Note
+import net.pantasystem.milktea.model.note.NoteDataSource
+import net.pantasystem.milktea.model.note.NoteRepository
+import net.pantasystem.milktea.model.note.reaction.CreateReaction
+import net.pantasystem.milktea.model.note.reaction.DeleteReaction
+import net.pantasystem.milktea.model.note.reaction.Reaction
+import net.pantasystem.milktea.model.note.reaction.ReactionRepository
 import javax.inject.Inject
 
 class ReactionRepositoryImpl @Inject constructor(

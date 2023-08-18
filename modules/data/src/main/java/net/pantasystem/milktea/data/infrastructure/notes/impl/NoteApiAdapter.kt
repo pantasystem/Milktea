@@ -22,12 +22,12 @@ import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.drive.FilePropertyDataSource
 import net.pantasystem.milktea.model.file.AppFile
-import net.pantasystem.milktea.model.notes.CreateNote
-import net.pantasystem.milktea.model.notes.Note
-import net.pantasystem.milktea.model.notes.NoteState
-import net.pantasystem.milktea.model.notes.poll.Poll
+import net.pantasystem.milktea.model.note.CreateNote
+import net.pantasystem.milktea.model.note.Note
+import net.pantasystem.milktea.model.note.NoteState
+import net.pantasystem.milktea.model.note.poll.Poll
 import net.pantasystem.milktea.api.misskey.notes.Vote
-import net.pantasystem.milktea.model.notes.type4Mastodon
+import net.pantasystem.milktea.model.note.type4Mastodon
 import javax.inject.Inject
 
 

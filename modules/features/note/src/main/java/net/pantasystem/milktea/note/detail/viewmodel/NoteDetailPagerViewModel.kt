@@ -25,7 +25,7 @@ import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.account.page.Pageable
 import net.pantasystem.milktea.model.ap.ApResolverService
 import net.pantasystem.milktea.model.instance.InstanceInfoService
-import net.pantasystem.milktea.model.notes.Note
+import net.pantasystem.milktea.model.note.Note
 import net.pantasystem.milktea.model.user.UserRepository
 import javax.inject.Inject
 

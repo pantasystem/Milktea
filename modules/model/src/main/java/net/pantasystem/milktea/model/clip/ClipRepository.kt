@@ -1,6 +1,6 @@
 package net.pantasystem.milktea.model.clip
 
-import net.pantasystem.milktea.model.notes.Note
+import net.pantasystem.milktea.model.note.Note
 import net.pantasystem.milktea.model.user.User
 
 interface ClipRepository {

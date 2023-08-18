@@ -13,7 +13,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import net.pantasystem.milktea.common.ui.ApplyTheme
 import net.pantasystem.milktea.model.channel.Channel
 import net.pantasystem.milktea.model.file.toAppFile
-import net.pantasystem.milktea.model.notes.Note
+import net.pantasystem.milktea.model.note.Note
 import net.pantasystem.milktea.note.databinding.ActivityNoteEditorBinding
 import net.pantasystem.milktea.note.editor.NoteEditorFragment
 import net.pantasystem.milktea.note.editor.viewmodel.NoteEditorSavedStateKey

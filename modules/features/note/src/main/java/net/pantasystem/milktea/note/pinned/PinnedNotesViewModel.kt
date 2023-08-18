@@ -21,9 +21,9 @@ import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.common_navigation.EXTRA_ACCOUNT_ID
 import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.account.CurrentAccountWatcher
-import net.pantasystem.milktea.model.notes.FindPinnedNoteUseCase
-import net.pantasystem.milktea.model.notes.NoteRelationGetter
-import net.pantasystem.milktea.model.notes.NoteRepository
+import net.pantasystem.milktea.model.note.FindPinnedNoteUseCase
+import net.pantasystem.milktea.model.note.NoteRelationGetter
+import net.pantasystem.milktea.model.note.NoteRepository
 import net.pantasystem.milktea.model.user.Acct
 import net.pantasystem.milktea.model.user.User
 import net.pantasystem.milktea.model.user.UserDataSource

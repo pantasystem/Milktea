@@ -4,9 +4,9 @@ import net.pantasystem.milktea.api_streaming.NoteUpdated
 import net.pantasystem.milktea.api_streaming.mastodon.EmojiReaction
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.emoji.Emoji
-import net.pantasystem.milktea.model.notes.Note
-import net.pantasystem.milktea.model.notes.make
-import net.pantasystem.milktea.model.notes.reaction.ReactionCount
+import net.pantasystem.milktea.model.note.Note
+import net.pantasystem.milktea.model.note.make
+import net.pantasystem.milktea.model.note.reaction.ReactionCount
 import net.pantasystem.milktea.model.user.User
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test

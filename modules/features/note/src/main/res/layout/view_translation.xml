@@ -3,13 +3,13 @@
     <data>
         <variable
                 name="translationState"
-                type="net.pantasystem.milktea.common.ResultState&lt;net.pantasystem.milktea.model.notes.Translation>" />
+                type="net.pantasystem.milktea.common.ResultState&lt;net.pantasystem.milktea.model.note.Translation>" />
         <variable
                 name="emojis"
                 type="List&lt;net.pantasystem.milktea.model.emoji.Emoji>" />
         <import type="android.view.View" />
         <import type="net.pantasystem.milktea.common.ResultState" />
-        <import type="net.pantasystem.milktea.model.notes.Translation" />
+        <import type="net.pantasystem.milktea.model.note.Translation" />
         <import type="net.pantasystem.milktea.common.StateContent"/>
         <import type="java.util.List" />
         <import type="net.pantasystem.milktea.model.emoji.Emoji" />

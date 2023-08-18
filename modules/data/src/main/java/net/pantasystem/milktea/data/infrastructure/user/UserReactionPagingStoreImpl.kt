@@ -15,7 +15,7 @@ import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
 import net.pantasystem.milktea.data.converters.UserDTOEntityConverter
 import net.pantasystem.milktea.data.infrastructure.notes.NoteDataSourceAdder
 import net.pantasystem.milktea.model.account.AccountRepository
-import net.pantasystem.milktea.model.notes.NoteRelationGetter
+import net.pantasystem.milktea.model.note.NoteRelationGetter
 import net.pantasystem.milktea.model.user.User
 import net.pantasystem.milktea.model.user.UserDataSource
 import net.pantasystem.milktea.model.user.reaction.UserReaction

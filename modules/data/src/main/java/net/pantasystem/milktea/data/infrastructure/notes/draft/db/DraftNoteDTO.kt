@@ -9,9 +9,9 @@ import androidx.room.Index
 import androidx.room.PrimaryKey
 import net.pantasystem.milktea.data.infrastructure.account.db.AccountRecord
 import net.pantasystem.milktea.model.channel.Channel
-import net.pantasystem.milktea.model.notes.ReactionAcceptanceType
-import net.pantasystem.milktea.model.notes.draft.DraftNote
-import net.pantasystem.milktea.model.notes.draft.DraftNoteFile
+import net.pantasystem.milktea.model.note.ReactionAcceptanceType
+import net.pantasystem.milktea.model.note.draft.DraftNote
+import net.pantasystem.milktea.model.note.draft.DraftNoteFile
 import java.util.Date
 
 @Entity(

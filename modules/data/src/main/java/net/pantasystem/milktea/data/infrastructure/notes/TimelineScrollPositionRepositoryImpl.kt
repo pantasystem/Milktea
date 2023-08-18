@@ -1,8 +1,8 @@
 package net.pantasystem.milktea.data.infrastructure.notes
 
 import android.content.SharedPreferences
-import net.pantasystem.milktea.model.notes.Note
-import net.pantasystem.milktea.model.notes.TimelineScrollPositionRepository
+import net.pantasystem.milktea.model.note.Note
+import net.pantasystem.milktea.model.note.TimelineScrollPositionRepository
 
 class TimelineScrollPositionRepositoryImpl(
     private val sharedPreferences: SharedPreferences

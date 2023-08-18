@@ -3,7 +3,7 @@ package net.pantasystem.milktea.data.infrastructure.notes.reaction.impl.history
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import net.pantasystem.milktea.model.notes.reaction.history.ReactionHistory
+import net.pantasystem.milktea.model.note.reaction.history.ReactionHistory
 
 @Entity(tableName = "reaction_history")
 data class ReactionHistoryRecord(

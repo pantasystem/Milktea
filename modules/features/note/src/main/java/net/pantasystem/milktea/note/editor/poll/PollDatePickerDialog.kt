@@ -11,8 +11,8 @@ import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
-import net.pantasystem.milktea.model.notes.PollExpiresAt
-import net.pantasystem.milktea.model.notes.expiresAt
+import net.pantasystem.milktea.model.note.PollExpiresAt
+import net.pantasystem.milktea.model.note.expiresAt
 import net.pantasystem.milktea.note.editor.viewmodel.NoteEditorViewModel
 import java.util.Calendar
 import java.util.Date

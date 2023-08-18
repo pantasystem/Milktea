@@ -7,8 +7,8 @@ import kotlinx.datetime.Instant
 import net.pantasystem.milktea.common.PageableState
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.page.Pageable
-import net.pantasystem.milktea.model.notes.Note
-import net.pantasystem.milktea.model.notes.NoteRelation
+import net.pantasystem.milktea.model.note.Note
+import net.pantasystem.milktea.model.note.NoteRelation
 
 interface TimelineStore {
     interface Factory {

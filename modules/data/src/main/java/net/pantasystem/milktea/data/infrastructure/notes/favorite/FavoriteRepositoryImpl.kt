@@ -6,8 +6,8 @@ import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.common_android.hilt.IODispatcher
 import net.pantasystem.milktea.data.infrastructure.notes.NoteDataSourceAdder
 import net.pantasystem.milktea.model.account.GetAccount
-import net.pantasystem.milktea.model.notes.Note
-import net.pantasystem.milktea.model.notes.favorite.FavoriteRepository
+import net.pantasystem.milktea.model.note.Note
+import net.pantasystem.milktea.model.note.favorite.FavoriteRepository
 import javax.inject.Inject
 
 class FavoriteRepositoryImpl @Inject constructor(

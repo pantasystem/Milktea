@@ -8,9 +8,9 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.common_android.hilt.IODispatcher
-import net.pantasystem.milktea.model.notes.reaction.history.ReactionHistory
-import net.pantasystem.milktea.model.notes.reaction.history.ReactionHistoryCount
-import net.pantasystem.milktea.model.notes.reaction.history.ReactionHistoryRepository
+import net.pantasystem.milktea.model.note.reaction.history.ReactionHistory
+import net.pantasystem.milktea.model.note.reaction.history.ReactionHistoryCount
+import net.pantasystem.milktea.model.note.reaction.history.ReactionHistoryRepository
 import javax.inject.Inject
 
 class ReactionHistoryRepositoryImpl @Inject constructor(

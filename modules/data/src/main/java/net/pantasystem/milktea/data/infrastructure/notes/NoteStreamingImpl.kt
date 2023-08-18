@@ -12,8 +12,8 @@ import net.pantasystem.milktea.data.streaming.StreamingAPIProvider
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.page.CanOnlyMedia
 import net.pantasystem.milktea.model.account.page.Pageable
-import net.pantasystem.milktea.model.notes.Note
-import net.pantasystem.milktea.model.notes.NoteStreaming
+import net.pantasystem.milktea.model.note.Note
+import net.pantasystem.milktea.model.note.NoteStreaming
 import javax.inject.Inject
 
 class NoteStreamingImpl @Inject constructor(

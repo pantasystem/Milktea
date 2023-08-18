@@ -2,8 +2,8 @@ package net.pantasystem.milktea.data.infrastructure.notes.draft.db
 
 import androidx.room.*
 import net.pantasystem.milktea.data.infrastructure.drive.DriveFileRecord
-import net.pantasystem.milktea.model.notes.draft.DraftNote
-import net.pantasystem.milktea.model.notes.draft.DraftNoteFile
+import net.pantasystem.milktea.model.note.draft.DraftNote
+import net.pantasystem.milktea.model.note.draft.DraftNoteFile
 
 @Entity
 class DraftNoteRelation {

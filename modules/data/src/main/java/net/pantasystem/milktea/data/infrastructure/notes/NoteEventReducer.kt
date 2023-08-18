@@ -5,8 +5,8 @@ import net.pantasystem.milktea.api_streaming.mastodon.EmojiReaction
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.emoji.CustomEmojiAspectRatio
 import net.pantasystem.milktea.model.image.ImageCache
-import net.pantasystem.milktea.model.notes.Note
-import net.pantasystem.milktea.model.notes.reaction.ReactionCount
+import net.pantasystem.milktea.model.note.Note
+import net.pantasystem.milktea.model.note.reaction.ReactionCount
 
 fun Note.onUnReacted(account: Account, e: NoteUpdated.Body.Unreacted): Note {
     val list = this.reactionCounts.toMutableList()

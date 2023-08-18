@@ -5,7 +5,7 @@ import dagger.Module
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import net.pantasystem.milktea.data.infrastructure.notes.wordmute.WordFilterConfigRepositoryImpl
-import net.pantasystem.milktea.model.notes.muteword.WordFilterConfigRepository
+import net.pantasystem.milktea.model.note.muteword.WordFilterConfigRepository
 import javax.inject.Singleton
 
 @Module

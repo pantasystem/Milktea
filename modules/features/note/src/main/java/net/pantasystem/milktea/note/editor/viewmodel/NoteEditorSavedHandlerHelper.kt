@@ -8,10 +8,10 @@ import net.pantasystem.milktea.model.channel.Channel
 import net.pantasystem.milktea.model.drive.DriveFileRepository
 import net.pantasystem.milktea.model.file.AppFile
 import net.pantasystem.milktea.model.file.FilePreviewSource
-import net.pantasystem.milktea.model.notes.Note
-import net.pantasystem.milktea.model.notes.PollEditingState
-import net.pantasystem.milktea.model.notes.ReactionAcceptanceType
-import net.pantasystem.milktea.model.notes.Visibility
+import net.pantasystem.milktea.model.note.Note
+import net.pantasystem.milktea.model.note.PollEditingState
+import net.pantasystem.milktea.model.note.ReactionAcceptanceType
+import net.pantasystem.milktea.model.note.Visibility
 import java.util.Date
 
 enum class NoteEditorSavedStateKey() {

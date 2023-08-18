@@ -10,8 +10,8 @@ import dagger.hilt.components.SingletonComponent
 import jp.panta.misskeyandroidclient.impl.AndroidNoteReservationPostExecutor
 import net.pantasystem.milktea.common_android_ui.UserPinnedNotesFragmentFactory
 import net.pantasystem.milktea.data.infrastructure.notes.reaction.impl.ReactionRepositoryImpl
-import net.pantasystem.milktea.model.notes.reaction.ReactionRepository
-import net.pantasystem.milktea.model.notes.reservation.NoteReservationPostExecutor
+import net.pantasystem.milktea.model.note.reaction.ReactionRepository
+import net.pantasystem.milktea.model.note.reservation.NoteReservationPostExecutor
 import net.pantasystem.milktea.note.pinned.UserPinnedNotesFragmentFactoryImpl
 import javax.inject.Singleton
 

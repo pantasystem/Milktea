@@ -13,9 +13,9 @@ import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.common.PageableState
 import net.pantasystem.milktea.common.StateContent
 import net.pantasystem.milktea.common.runCancellableCatching
-import net.pantasystem.milktea.model.notes.*
-import net.pantasystem.milktea.model.notes.repost.RenoteType
-import net.pantasystem.milktea.model.notes.repost.RenotesPagingService
+import net.pantasystem.milktea.model.note.*
+import net.pantasystem.milktea.model.note.repost.RenoteType
+import net.pantasystem.milktea.model.note.repost.RenotesPagingService
 import net.pantasystem.milktea.model.setting.DefaultConfig
 import net.pantasystem.milktea.model.setting.LocalConfigRepository
 import net.pantasystem.milktea.model.user.User

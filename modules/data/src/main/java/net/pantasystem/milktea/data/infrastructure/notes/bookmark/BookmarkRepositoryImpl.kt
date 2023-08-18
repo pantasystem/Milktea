@@ -9,9 +9,9 @@ import net.pantasystem.milktea.data.api.mastodon.MastodonAPIProvider
 import net.pantasystem.milktea.data.infrastructure.notes.NoteDataSourceAdder
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.AccountRepository
-import net.pantasystem.milktea.model.notes.Note
-import net.pantasystem.milktea.model.notes.bookmark.BookmarkRepository
-import net.pantasystem.milktea.model.notes.favorite.FavoriteRepository
+import net.pantasystem.milktea.model.note.Note
+import net.pantasystem.milktea.model.note.bookmark.BookmarkRepository
+import net.pantasystem.milktea.model.note.favorite.FavoriteRepository
 import javax.inject.Inject
 import javax.inject.Singleton
 

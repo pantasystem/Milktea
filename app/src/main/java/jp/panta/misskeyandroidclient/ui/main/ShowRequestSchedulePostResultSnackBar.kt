@@ -4,7 +4,7 @@ import android.app.Activity
 import android.view.View
 import com.google.android.material.snackbar.Snackbar
 import jp.panta.misskeyandroidclient.R
-import net.pantasystem.milktea.model.notes.draft.DraftNoteSavedEvent
+import net.pantasystem.milktea.model.note.draft.DraftNoteSavedEvent
 
 class ShowRequestSchedulePostResultSnackBar(
     private val activity: Activity,

@@ -8,8 +8,8 @@ import net.pantasystem.milktea.api_streaming.mastodon.Event
 import net.pantasystem.milktea.data.streaming.ChannelAPIWithAccountProvider
 import net.pantasystem.milktea.data.streaming.StreamingAPIProvider
 import net.pantasystem.milktea.model.account.Account
-import net.pantasystem.milktea.model.notes.Note
-import net.pantasystem.milktea.model.notes.ReplyStreaming
+import net.pantasystem.milktea.model.note.Note
+import net.pantasystem.milktea.model.note.ReplyStreaming
 import javax.inject.Inject
 
 class ReplyStreamingImpl @Inject constructor(

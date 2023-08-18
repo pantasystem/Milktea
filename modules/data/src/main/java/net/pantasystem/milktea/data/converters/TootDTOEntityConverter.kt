@@ -9,8 +9,8 @@ import net.pantasystem.milktea.model.image.ImageCacheRepository
 import net.pantasystem.milktea.model.instance.MastodonInstanceInfoRepository
 import net.pantasystem.milktea.model.nodeinfo.NodeInfo
 import net.pantasystem.milktea.model.nodeinfo.NodeInfoRepository
-import net.pantasystem.milktea.model.notes.Note
-import net.pantasystem.milktea.model.notes.reaction.ReactionCount
+import net.pantasystem.milktea.model.note.Note
+import net.pantasystem.milktea.model.note.reaction.ReactionCount
 import net.pantasystem.milktea.model.user.User
 import javax.inject.Inject
 import javax.inject.Singleton

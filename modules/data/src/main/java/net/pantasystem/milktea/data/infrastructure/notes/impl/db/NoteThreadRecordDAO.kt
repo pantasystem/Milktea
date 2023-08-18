@@ -8,7 +8,7 @@ import io.objectbox.kotlin.toFlow
 import io.objectbox.query.QueryBuilder
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
-import net.pantasystem.milktea.model.notes.Note
+import net.pantasystem.milktea.model.note.Note
 import javax.inject.Inject
 import javax.inject.Singleton
 

@@ -29,10 +29,10 @@ import net.pantasystem.milktea.common.StateContent
 import net.pantasystem.milktea.common_compose.MilkteaStyleConfigApplyAndTheme
 import net.pantasystem.milktea.model.channel.Channel
 import net.pantasystem.milktea.model.instance.FeatureType
-import net.pantasystem.milktea.model.notes.CanLocalOnly
-import net.pantasystem.milktea.model.notes.ReactionAcceptanceType
-import net.pantasystem.milktea.model.notes.Visibility
-import net.pantasystem.milktea.model.notes.isLocalOnly
+import net.pantasystem.milktea.model.note.CanLocalOnly
+import net.pantasystem.milktea.model.note.ReactionAcceptanceType
+import net.pantasystem.milktea.model.note.Visibility
+import net.pantasystem.milktea.model.note.isLocalOnly
 import net.pantasystem.milktea.model.setting.LocalConfigRepository
 import net.pantasystem.milktea.note.editor.viewmodel.NoteEditorViewModel
 import javax.inject.Inject

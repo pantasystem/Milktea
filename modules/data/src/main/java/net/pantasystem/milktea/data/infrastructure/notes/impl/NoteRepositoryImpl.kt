@@ -13,16 +13,16 @@ import net.pantasystem.milktea.common_android.hilt.IODispatcher
 import net.pantasystem.milktea.data.infrastructure.notes.NoteDataSourceAdder
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.GetAccount
-import net.pantasystem.milktea.model.notes.CreateNote
-import net.pantasystem.milktea.model.notes.Note
-import net.pantasystem.milktea.model.notes.NoteDataSource
-import net.pantasystem.milktea.model.notes.NoteDeletedException
-import net.pantasystem.milktea.model.notes.NoteNotFoundException
-import net.pantasystem.milktea.model.notes.NoteRepository
-import net.pantasystem.milktea.model.notes.NoteResult
-import net.pantasystem.milktea.model.notes.NoteState
-import net.pantasystem.milktea.model.notes.NoteThreadContext
-import net.pantasystem.milktea.model.notes.poll.Poll
+import net.pantasystem.milktea.model.note.CreateNote
+import net.pantasystem.milktea.model.note.Note
+import net.pantasystem.milktea.model.note.NoteDataSource
+import net.pantasystem.milktea.model.note.NoteDeletedException
+import net.pantasystem.milktea.model.note.NoteNotFoundException
+import net.pantasystem.milktea.model.note.NoteRepository
+import net.pantasystem.milktea.model.note.NoteResult
+import net.pantasystem.milktea.model.note.NoteState
+import net.pantasystem.milktea.model.note.NoteThreadContext
+import net.pantasystem.milktea.model.note.poll.Poll
 import javax.inject.Inject
 
 class NoteRepositoryImpl @Inject constructor(

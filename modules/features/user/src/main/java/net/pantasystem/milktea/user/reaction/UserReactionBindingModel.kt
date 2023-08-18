@@ -1,7 +1,7 @@
 package net.pantasystem.milktea.user.reaction
 
 import kotlinx.coroutines.flow.StateFlow
-import net.pantasystem.milktea.model.notes.reaction.Reaction
+import net.pantasystem.milktea.model.note.reaction.Reaction
 import net.pantasystem.milktea.model.setting.Config
 import net.pantasystem.milktea.model.user.User
 import net.pantasystem.milktea.model.user.reaction.UserReaction

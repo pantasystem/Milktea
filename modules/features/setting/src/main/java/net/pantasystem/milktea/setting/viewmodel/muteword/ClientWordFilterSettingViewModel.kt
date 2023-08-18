@@ -8,8 +8,8 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import net.pantasystem.milktea.common.mapCancellableCatching
-import net.pantasystem.milktea.model.notes.muteword.WordFilterConfigRepository
-import net.pantasystem.milktea.model.notes.muteword.WordFilterConfigTextParser
+import net.pantasystem.milktea.model.note.muteword.WordFilterConfigRepository
+import net.pantasystem.milktea.model.note.muteword.WordFilterConfigTextParser
 import javax.inject.Inject
 
 @HiltViewModel
