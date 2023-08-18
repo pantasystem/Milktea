@@ -13,6 +13,7 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.common.runCancellableCatching
+import net.pantasystem.milktea.common_android.hilt.DefaultDispatcher
 import net.pantasystem.milktea.common_android.hilt.IODispatcher
 import net.pantasystem.milktea.data.infrastructure.note.impl.db.NoteRecord
 import net.pantasystem.milktea.data.infrastructure.note.impl.db.NoteRecord_
@@ -26,7 +27,8 @@ import javax.inject.Inject
 class ObjectBoxNoteDataSource @Inject constructor(
     private val boxStore: BoxStore,
     private val noteThreadRecordDAO: NoteThreadRecordDAO,
-    @IODispatcher val coroutineDispatcher: CoroutineDispatcher,
+    @IODispatcher val ioDispatcher: CoroutineDispatcher,
+    @DefaultDispatcher val defaultDispatcher: CoroutineDispatcher,
     loggerFactory: Logger.Factory
 ) : NoteDataSource {
 
@@ -59,7 +61,7 @@ class ObjectBoxNoteDataSource @Inject constructor(
             if (noteIds.isEmpty()) {
                 return@runCancellableCatching emptyList()
             }
-            withContext(coroutineDispatcher) {
+            withContext(ioDispatcher) {
                 val ids = noteIds.map {
                     NoteRecord.generateAccountAndNoteId(it)
                 }
@@ -77,7 +79,7 @@ class ObjectBoxNoteDataSource @Inject constructor(
         if (deleteNoteIds.contains(noteId)) {
             throw NoteDeletedException(noteId)
         }
-        withContext(coroutineDispatcher) {
+        withContext(ioDispatcher) {
             noteBox.query().equal(
                 NoteRecord_.accountIdAndNoteId,
                 NoteRecord.generateAccountAndNoteId(noteId),
@@ -90,7 +92,7 @@ class ObjectBoxNoteDataSource @Inject constructor(
         if (deleteNoteIds.contains(noteId)) {
             return@runCancellableCatching NoteResult.Deleted
         }
-        val note = withContext(coroutineDispatcher) {
+        val note = withContext(ioDispatcher) {
             noteBox.query().equal(
                 NoteRecord_.accountIdAndNoteId,
                 NoteRecord.generateAccountAndNoteId(noteId),
@@ -104,7 +106,7 @@ class ObjectBoxNoteDataSource @Inject constructor(
     }
 
     override suspend fun findByReplyId(id: Note.Id): Result<List<Note>> = runCancellableCatching {
-        withContext(coroutineDispatcher) {
+        withContext(ioDispatcher) {
             noteBox.query().equal(
                 NoteRecord_.replyId,
                 id.noteId,
@@ -129,7 +131,7 @@ class ObjectBoxNoteDataSource @Inject constructor(
     }
 
     override suspend fun delete(noteId: Note.Id): Result<Boolean> = runCancellableCatching {
-        val isDeleted = withContext(coroutineDispatcher) {
+        val isDeleted = withContext(ioDispatcher) {
             boxStore.awaitCallInTx {
                 noteBox.query().equal(
                     NoteRecord_.accountIdAndNoteId,
@@ -151,7 +153,7 @@ class ObjectBoxNoteDataSource @Inject constructor(
 
 
     override suspend fun add(note: Note): Result<AddResult> = runCancellableCatching {
-        withContext(coroutineDispatcher) {
+        withContext(ioDispatcher) {
             (boxStore.awaitCallInTx {
                 val exists = noteBox.query().equal(
                     NoteRecord_.accountIdAndNoteId,
@@ -191,7 +193,7 @@ class ObjectBoxNoteDataSource @Inject constructor(
         }
 
     override suspend fun deleteByUserId(userId: User.Id): Result<Int> = runCancellableCatching {
-        withContext(coroutineDispatcher) {
+        withContext(ioDispatcher) {
             boxStore.awaitCallInTx {
                 noteBox.query()
                     .equal(NoteRecord_.userId, userId.id, QueryBuilder.StringOrder.CASE_SENSITIVE)
@@ -202,7 +204,7 @@ class ObjectBoxNoteDataSource @Inject constructor(
     }
 
     override suspend fun clear(): Result<Unit> = runCancellableCatching {
-        withContext(coroutineDispatcher) {
+        withContext(ioDispatcher) {
             noteBox.removeAll()
         }
     }
@@ -219,11 +221,11 @@ class ObjectBoxNoteDataSource @Inject constructor(
             NoteRecord_.accountIdAndNoteId,
             ids.toTypedArray(),
             QueryBuilder.StringOrder.CASE_SENSITIVE
-        ).build().subscribe().toFlow().map { list ->
+        ).build().subscribe().toFlow().flowOn(ioDispatcher).map { list ->
             list.mapNotNull {
                 it?.toModel()
             }
-        }.flowOn(coroutineDispatcher)
+        }.flowOn(defaultDispatcher)
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
@@ -232,9 +234,9 @@ class ObjectBoxNoteDataSource @Inject constructor(
             NoteRecord_.accountIdAndNoteId,
             NoteRecord.generateAccountAndNoteId(noteId),
             QueryBuilder.StringOrder.CASE_SENSITIVE
-        ).build().subscribe().toFlow().map {
+        ).build().subscribe().toFlow().flowOn(ioDispatcher).map {
             it.firstOrNull()?.toModel()
-        }.flowOn(coroutineDispatcher).catch {
+        }.flowOn(defaultDispatcher).catch {
             logger.error("Note observeエラー", it)
         }
     }
@@ -259,7 +261,7 @@ class ObjectBoxNoteDataSource @Inject constructor(
         noteId: Note.Id,
         context: NoteThreadContext
     ): Result<Unit> = runCancellableCatching {
-        withContext(coroutineDispatcher) {
+        withContext(ioDispatcher) {
             noteThreadRecordDAO.clearRelation(noteId)
             val record = noteThreadRecordDAO.appendBlank(noteId)
 
@@ -272,13 +274,13 @@ class ObjectBoxNoteDataSource @Inject constructor(
     }
 
     override suspend fun clearNoteThreadContext(noteId: Note.Id): Result<Unit> = runCancellableCatching{
-        withContext(coroutineDispatcher) {
+        withContext(ioDispatcher) {
             noteThreadRecordDAO.clearRelation(noteId)
         }
     }
 
     override suspend fun findNoteThreadContext(noteId: Note.Id): Result<NoteThreadContext> = runCancellableCatching {
-        withContext(coroutineDispatcher) {
+        withContext(ioDispatcher) {
             noteThreadRecordDAO.findBy(noteId)?.let { record ->
                 NoteThreadContext(
                     ancestors = record.ancestors.mapNotNull {
@@ -293,7 +295,7 @@ class ObjectBoxNoteDataSource @Inject constructor(
     }
 
     override suspend fun findLocalCount(): Result<Long> = runCancellableCatching {
-        withContext(coroutineDispatcher) {
+        withContext(ioDispatcher) {
             noteBox.count()
         }
     }

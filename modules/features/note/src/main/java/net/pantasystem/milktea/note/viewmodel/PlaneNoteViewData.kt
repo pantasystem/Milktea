@@ -4,6 +4,7 @@ package net.pantasystem.milktea.note.viewmodel
 import android.util.Log
 import androidx.lifecycle.*
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.*
@@ -147,7 +148,11 @@ open class PlaneNoteViewData(
                 emojiRepository.getAndConvertToMap(account.getHost())
             )
         }
-    }.stateIn(coroutineScope, SharingStarted.WhileSubscribed(5_000), emptyList())
+    }.flowOn(Dispatchers.Default).stateIn(
+        coroutineScope,
+        SharingStarted.WhileSubscribed(5_000),
+        emptyList()
+    )
 
     //reNote先
     val subNote: NoteRelation? = toShowNote.renote

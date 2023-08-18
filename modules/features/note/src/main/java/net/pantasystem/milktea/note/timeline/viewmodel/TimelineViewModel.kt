@@ -85,7 +85,7 @@ class TimelineViewModel @AssistedInject constructor(
             timelineFilterService.filterNotes(notes)
         }
     }.stateIn(
-        viewModelScope + Dispatchers.IO,
+        viewModelScope + Dispatchers.Default,
         SharingStarted.WhileSubscribed(5_000),
         PageableState.Loading.Init()
     )
@@ -93,7 +93,7 @@ class TimelineViewModel @AssistedInject constructor(
     val timelineListState: StateFlow<List<TimelineListItem>> = timelineState.map { state ->
         state.toList()
     }.stateIn(
-        viewModelScope + Dispatchers.IO,
+        viewModelScope + Dispatchers.Default,
         SharingStarted.Lazily,
         listOf(TimelineListItem.Loading)
     )
