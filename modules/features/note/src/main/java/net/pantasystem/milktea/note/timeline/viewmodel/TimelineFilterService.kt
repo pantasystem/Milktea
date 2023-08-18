@@ -21,33 +21,28 @@ class TimelineFilterService(
         }
     }
 
-    suspend fun filterNotes(notes: List<PlaneNoteViewData>): List<PlaneNoteViewData> {
-        return notes.mapNotNull { note ->
-            val newResult = when(val result = note.filterResult) {
-                PlaneNoteViewData.FilterResult.NotExecuted -> {
-                    if (wordFilterService.isShouldFilterNote(pageable, note.note)) {
+
+    suspend fun filterNote(note: PlaneNoteViewData): PlaneNoteViewData {
+        val newResult = when(val result = note.filterResult) {
+            PlaneNoteViewData.FilterResult.NotExecuted -> {
+                if (wordFilterService.isShouldFilterNote(pageable, note.note)) {
+                    PlaneNoteViewData.FilterResult.ShouldFilterNote
+                } else {
+                    if (note.note.note.isRenoteOnly()
+                        && renoteMuteRepository.exists(
+                            note.note.note.userId
+                        ).getOrElse { false }
+                    ) {
                         PlaneNoteViewData.FilterResult.ShouldFilterNote
                     } else {
-                        if (note.note.note.isRenoteOnly()
-                            && renoteMuteRepository.exists(
-                                note.note.note.userId
-                            ).getOrElse { false }
-                        ) {
-                            PlaneNoteViewData.FilterResult.ShouldFilterNote
-                        } else {
-                            PlaneNoteViewData.FilterResult.Pass
-                        }
+                        PlaneNoteViewData.FilterResult.Pass
                     }
                 }
-                PlaneNoteViewData.FilterResult.ShouldFilterNote -> result
-                PlaneNoteViewData.FilterResult.Pass -> result
             }
-            note.filterResult = newResult
-            if (newResult == PlaneNoteViewData.FilterResult.ShouldFilterNote) {
-                null
-            } else {
-                note
-            }
+            PlaneNoteViewData.FilterResult.ShouldFilterNote -> result
+            PlaneNoteViewData.FilterResult.Pass -> result
         }
+        note.filterResult = newResult
+        return note
     }
 }

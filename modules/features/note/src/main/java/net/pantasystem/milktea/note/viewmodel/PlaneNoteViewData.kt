@@ -246,8 +246,19 @@ open class PlaneNoteViewData(
     }
 
     enum class FilterResult {
+        /**
+         * フィルターが実行されていない
+         */
         NotExecuted,
+
+        /**
+         * フィルターに引っかかった投稿
+         */
         ShouldFilterNote,
+
+        /**
+         * フィルターに引っかからなかった投稿
+         */
         Pass,
     }
 }

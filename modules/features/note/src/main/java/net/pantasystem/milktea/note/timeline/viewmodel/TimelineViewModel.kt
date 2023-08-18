@@ -82,7 +82,9 @@ class TimelineViewModel @AssistedInject constructor(
         }
     }.map {
         it.suspendConvert { notes ->
-            timelineFilterService.filterNotes(notes)
+            notes.filterNot { note ->
+                note.filterResult == PlaneNoteViewData.FilterResult.ShouldFilterNote
+            }
         }
     }.stateIn(
         viewModelScope + Dispatchers.Default,
@@ -149,6 +151,12 @@ class TimelineViewModel @AssistedInject constructor(
         saveScrollPositionScrolledEvent.distinctUntilChanged().throttleLatest(500).onEach {
             saveNowScrollPosition()
         }.launchIn(viewModelScope)
+
+        cache.addFilter(object : PlaneNoteViewDataCache.ViewDataFilter {
+            override suspend fun check(viewData: PlaneNoteViewData): PlaneNoteViewData.FilterResult {
+                return timelineFilterService.filterNote(viewData).filterResult
+            }
+        })
     }
 
 
