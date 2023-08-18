@@ -19,6 +19,8 @@ interface CustomEmojiRepository {
 
     fun observeBy(host: String, withAliases: Boolean = false): Flow<List<Emoji>>
 
+    fun observeWithSearch(host: String, keyword: String): Flow<List<Emoji>>
+
     fun get(host: String): List<Emoji>?
 
     fun getAndConvertToMap(host: String): Map<String, Emoji>?

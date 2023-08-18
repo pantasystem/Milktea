@@ -1,15 +1,13 @@
 package net.pantasystem.milktea.data.infrastructure.emoji
 
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.asFlow
-import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.withContext
 import net.pantasystem.milktea.common.runCancellableCatching
+import net.pantasystem.milktea.common_android.hilt.DefaultDispatcher
 import net.pantasystem.milktea.common_android.hilt.IODispatcher
 import net.pantasystem.milktea.data.infrastructure.emoji.objectbox.CustomEmojiRecord
 import net.pantasystem.milktea.data.infrastructure.emoji.objectbox.ObjectBoxCustomEmojiRecordDAO
@@ -29,6 +27,7 @@ internal class CustomEmojiRepositoryImpl @Inject constructor(
     private val imageCacheRepository: ImageCacheRepository,
     private val objectBoxCustomEmojiDao: ObjectBoxCustomEmojiRecordDAO,
     @IODispatcher private val ioDispatcher: CoroutineDispatcher,
+    @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher
 ) : CustomEmojiRepository {
 
     override suspend fun findBy(host: String, withAliases: Boolean): Result<List<Emoji>> = runCancellableCatching {
@@ -128,33 +127,9 @@ internal class CustomEmojiRepositoryImpl @Inject constructor(
         }
     }
 
-
-    @OptIn(ExperimentalCoroutinesApi::class)
     override fun observeBy(host: String, withAliases: Boolean): Flow<List<Emoji>> {
-        return suspend {
-            nodeInfoRepository.find(host).getOrThrow()
-        }.asFlow().flatMapLatest {
-            objectBoxCustomEmojiDao.observeBy(host).map { list ->
-                val aspects = aspectRatioDataSource.findIn(
-                    list.mapNotNull {
-                        it.url ?: it.uri
-                    }
-                ).getOrElse { emptyList() }.associateBy {
-                    it.uri
-                }
-                val fileCaches = imageCacheRepository.findBySourceUrls(list.mapNotNull {
-                    it.url ?: it.uri
-                }).associateBy {
-                    it.sourceUrl
-                }
-                list.map {
-                    it.toModel(
-                        aspects[it.url ?: it.uri]?.aspectRatio,
-                        fileCaches[it.url ?: it.uri]?.cachePath,
-                        withAliases,
-                    )
-                }
-            }
+        return objectBoxCustomEmojiDao.observeBy(host).map { list ->
+            convertToModel(list)
         }.onEach {
             if (!withAliases) {
                 customEmojiCache.put(host, it)
@@ -194,5 +169,38 @@ internal class CustomEmojiRepositoryImpl @Inject constructor(
         return customEmojiCache.getMap(host)
     }
 
+    override fun observeWithSearch(host: String, keyword: String): Flow<List<Emoji>> {
+        return objectBoxCustomEmojiDao.observeBy(host).flowOn(ioDispatcher).map {
+            it.filter { emoji ->
+                emoji.name.contains(keyword, ignoreCase = true) || emoji.aliases.any { alias ->
+                    alias.contains(keyword, ignoreCase = true)
+                }
+            }
+        }.map { list ->
+            convertToModel(list)
+        }.flowOn(defaultDispatcher)
+    }
+
+
+    private suspend fun convertToModel(emojis: List<CustomEmojiRecord>): List<Emoji> {
+        val aspects = aspectRatioDataSource.findIn(
+            emojis.mapNotNull {
+                it.url ?: it.uri
+            }
+        ).getOrElse { emptyList() }.associateBy {
+            it.uri
+        }
+        val fileCaches = imageCacheRepository.findBySourceUrls(emojis.mapNotNull {
+            it.url ?: it.uri
+        }).associateBy {
+            it.sourceUrl
+        }
+        return emojis.map {
+            it.toModel(
+                aspects[it.url ?: it.uri]?.aspectRatio,
+                fileCaches[it.url ?: it.uri]?.cachePath,
+            )
+        }
+    }
 }
 
