@@ -284,7 +284,7 @@ class NoteEditorFragment : Fragment(R.layout.fragment_note_editor), EmojiSelecti
 
 
         accountViewModel.currentAccount.filterNotNull().flatMapLatest {
-            customEmojiRepository.observeBy(it.getHost())
+            customEmojiRepository.observeBy(it.getHost(), withAliases = true)
         }.distinctUntilChanged().onEach { emojis ->
             binding.inputMain.setAdapter(
                 CustomEmojiCompleteAdapter(

@@ -43,7 +43,7 @@ data class CustomEmojiRecord(
         aliases = model.aliases?.toMutableList() ?: mutableListOf()
     }
 
-    fun toModel(aspectRatio: Float? = null, cachePath: String? = null): Emoji {
+    fun toModel(aspectRatio: Float? = null, cachePath: String? = null, needAlias: Boolean = false): Emoji {
         return Emoji(
             id = serverId,
             name = name,
@@ -52,7 +52,7 @@ data class CustomEmojiRecord(
             uri = uri,
             type = type,
             category = category,
-            aliases = aliases,
+            aliases = if (needAlias) aliases else null,
             aspectRatio = aspectRatio,
             cachePath = cachePath,
         )

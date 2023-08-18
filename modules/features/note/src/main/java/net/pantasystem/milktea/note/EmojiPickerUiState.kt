@@ -50,7 +50,7 @@ class EmojiPickerUiStateService(
     private val emojis = account
         .filterNotNull()
         .flatMapLatest { ac ->
-            customEmojiRepository.observeBy(ac.getHost())
+            customEmojiRepository.observeBy(ac.getHost(), withAliases = true)
         }.catch {
             logger.error("絵文字の取得に失敗", it)
         }.flowOn(Dispatchers.IO)

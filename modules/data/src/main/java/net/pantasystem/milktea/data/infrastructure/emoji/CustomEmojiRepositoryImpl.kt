@@ -2,7 +2,6 @@ package net.pantasystem.milktea.data.infrastructure.emoji
 
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.flatMapLatest
@@ -32,7 +31,7 @@ internal class CustomEmojiRepositoryImpl @Inject constructor(
     @IODispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : CustomEmojiRepository {
 
-    override suspend fun findBy(host: String): Result<List<Emoji>> = runCancellableCatching {
+    override suspend fun findBy(host: String, withAliases: Boolean): Result<List<Emoji>> = runCancellableCatching {
         withContext(ioDispatcher) {
             var emojis = customEmojiCache.get(host)
             if (emojis != null) {
@@ -40,7 +39,7 @@ internal class CustomEmojiRepositoryImpl @Inject constructor(
             }
             val nodeInfo = nodeInfoRepository.find(host).getOrThrow()
             emojis = objectBoxCustomEmojiDao.findBy(host).map {
-                it.toModel()
+                it.toModel(needAlias = withAliases)
             }
 
             if (emojis.isEmpty()) {
@@ -67,7 +66,11 @@ internal class CustomEmojiRepositoryImpl @Inject constructor(
                     cachePath = fileCaches[it.url ?: it.uri]?.cachePath,
                 )
             }
-            customEmojiCache.put(host, emojis)
+
+            // NOTE: aliasの含む絵文字はメモリ上にキャッシュしない
+            if (!withAliases) {
+                customEmojiCache.put(host, emojis)
+            }
             emojis
         }
     }
@@ -118,7 +121,7 @@ internal class CustomEmojiRepositoryImpl @Inject constructor(
                 )
             }
 
-            customEmojiCache.put(host, emojis)
+            customEmojiCache.put(host, emojis.map { it.copy(aliases = null) })
             objectBoxCustomEmojiDao.replaceAll(host, emojis.map {
                 CustomEmojiRecord.from(it, nodeInfo.host)
             })
@@ -126,8 +129,8 @@ internal class CustomEmojiRepositoryImpl @Inject constructor(
     }
 
 
-    @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
-    override fun observeBy(host: String): Flow<List<Emoji>> {
+    @OptIn(ExperimentalCoroutinesApi::class)
+    override fun observeBy(host: String, withAliases: Boolean): Flow<List<Emoji>> {
         return suspend {
             nodeInfoRepository.find(host).getOrThrow()
         }.asFlow().flatMapLatest {
@@ -148,11 +151,14 @@ internal class CustomEmojiRepositoryImpl @Inject constructor(
                     it.toModel(
                         aspects[it.url ?: it.uri]?.aspectRatio,
                         fileCaches[it.url ?: it.uri]?.cachePath,
+                        withAliases,
                     )
                 }
             }
         }.onEach {
-            customEmojiCache.put(host, it)
+            if (!withAliases) {
+                customEmojiCache.put(host, it)
+            }
         }.flowOn(ioDispatcher)
     }
 
