@@ -41,7 +41,7 @@ class NoteCaptureAPIAdapterImpl(
     private val imageCacheRepository: ImageCacheRepository,
     loggerFactory: Logger.Factory,
     cs: CoroutineScope,
-    dispatcher: CoroutineDispatcher = Dispatchers.IO,
+    dispatcher: CoroutineDispatcher = Dispatchers.Default,
 ) : NoteDataSource.Listener, NoteCaptureAPIAdapter {
 
     private val logger = loggerFactory.create("NoteCaptureAPIAdapter")
