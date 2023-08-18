@@ -108,7 +108,7 @@ class EmojiPickerUiStateService(
     private val filteredEmojis = combine(searchWord, account.filterNotNull()) { word, ac ->
         word to ac
     }.flatMapLatest { (word, ac) ->
-        customEmojiRepository.observeWithSearch(host = ac.getHost(), keyword = word).map {
+        customEmojiRepository.observeWithSearch(host = ac.getHost(), keyword = word.replace(":", "")).map {
             it.sortedBy { emoji ->
                 LevenshteinDistance(emoji.name, word)
             }
