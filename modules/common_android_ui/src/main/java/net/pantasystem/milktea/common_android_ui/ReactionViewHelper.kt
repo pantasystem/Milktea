@@ -11,7 +11,7 @@ import dagger.hilt.android.EntryPointAccessors
 import net.pantasystem.milktea.common.glide.GlideApp
 import net.pantasystem.milktea.common_android.ui.VisibilityHelper.setMemoVisibility
 import net.pantasystem.milktea.model.emoji.Emoji
-import net.pantasystem.milktea.model.notes.reaction.LegacyReaction
+import net.pantasystem.milktea.model.note.reaction.LegacyReaction
 
 object ReactionViewHelper {
     @BindingAdapter("reactionImageView", "reactionStringView", "reaction")

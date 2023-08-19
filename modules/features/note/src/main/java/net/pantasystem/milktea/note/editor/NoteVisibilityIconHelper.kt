@@ -2,7 +2,7 @@ package net.pantasystem.milktea.note.editor
 
 import android.widget.ImageView
 import androidx.databinding.BindingAdapter
-import net.pantasystem.milktea.model.notes.Visibility
+import net.pantasystem.milktea.model.note.Visibility
 import net.pantasystem.milktea.note.R
 
 object NoteVisibilityIconHelper {

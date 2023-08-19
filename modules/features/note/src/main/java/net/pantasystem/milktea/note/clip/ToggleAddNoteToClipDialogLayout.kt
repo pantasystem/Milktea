@@ -19,7 +19,7 @@ import androidx.compose.ui.unit.sp
 import net.pantasystem.milktea.common.ResultState
 import net.pantasystem.milktea.common.StateContent
 import net.pantasystem.milktea.model.clip.Clip
-import net.pantasystem.milktea.model.notes.Note
+import net.pantasystem.milktea.model.note.Note
 import net.pantasystem.milktea.note.R
 
 @OptIn(ExperimentalComposeUiApi::class)

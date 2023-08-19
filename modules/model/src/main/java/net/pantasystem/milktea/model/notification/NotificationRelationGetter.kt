@@ -1,6 +1,6 @@
 package net.pantasystem.milktea.model.notification
 
-import net.pantasystem.milktea.model.notes.NoteRelationGetter
+import net.pantasystem.milktea.model.note.NoteRelationGetter
 import net.pantasystem.milktea.model.user.UserDataSource
 import javax.inject.Inject
 import javax.inject.Singleton

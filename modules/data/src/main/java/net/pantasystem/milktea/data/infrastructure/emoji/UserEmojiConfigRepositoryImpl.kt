@@ -5,8 +5,8 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.withContext
 import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.common_android.hilt.IODispatcher
-import net.pantasystem.milktea.data.infrastructure.notes.reaction.impl.usercustom.ReactionUserSetting
-import net.pantasystem.milktea.data.infrastructure.notes.reaction.impl.usercustom.ReactionUserSettingDao
+import net.pantasystem.milktea.data.infrastructure.note.reaction.impl.usercustom.ReactionUserSetting
+import net.pantasystem.milktea.data.infrastructure.note.reaction.impl.usercustom.ReactionUserSettingDao
 import net.pantasystem.milktea.model.emoji.UserEmojiConfig
 import net.pantasystem.milktea.model.emoji.UserEmojiConfigRepository
 import javax.inject.Inject

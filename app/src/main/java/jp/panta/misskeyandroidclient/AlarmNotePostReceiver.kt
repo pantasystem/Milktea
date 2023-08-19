@@ -14,12 +14,12 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.common_android.notification.NotificationUtil
-import net.pantasystem.milktea.data.infrastructure.notes.draft.db.DraftNoteDao
+import net.pantasystem.milktea.data.infrastructure.note.draft.db.DraftNoteDao
 import net.pantasystem.milktea.model.account.AccountRepository
-import net.pantasystem.milktea.model.notes.CreateNoteUseCase
-import net.pantasystem.milktea.model.notes.Note
-import net.pantasystem.milktea.model.notes.NoteRepository
-import net.pantasystem.milktea.model.notes.toCreateNote
+import net.pantasystem.milktea.model.note.CreateNoteUseCase
+import net.pantasystem.milktea.model.note.Note
+import net.pantasystem.milktea.model.note.NoteRepository
+import net.pantasystem.milktea.model.note.toCreateNote
 import net.pantasystem.milktea.note.NoteDetailActivity
 import net.pantasystem.milktea.note.NoteEditorActivity
 import javax.inject.Inject

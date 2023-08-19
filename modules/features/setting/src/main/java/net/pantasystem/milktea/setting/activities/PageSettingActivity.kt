@@ -9,13 +9,29 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.lifecycle.flowWithLifecycle
+import androidx.lifecycle.lifecycleScope
 import com.google.android.material.composethemeadapter.MdcTheme
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import net.pantasystem.milktea.common.ui.ApplyTheme
-import net.pantasystem.milktea.common_navigation.*
+import net.pantasystem.milktea.common_navigation.AntennaNavigation
+import net.pantasystem.milktea.common_navigation.AntennaNavigationArgs
+import net.pantasystem.milktea.common_navigation.ChangedDiffResult
+import net.pantasystem.milktea.common_navigation.ChannelNavigation
+import net.pantasystem.milktea.common_navigation.ChannelNavigationArgs
+import net.pantasystem.milktea.common_navigation.ClipListNavigation
+import net.pantasystem.milktea.common_navigation.ClipListNavigationArgs
+import net.pantasystem.milktea.common_navigation.SearchAndSelectUserNavigation
 import net.pantasystem.milktea.common_navigation.SearchAndSelectUserNavigation.Companion.EXTRA_SELECTED_USER_CHANGED_DIFF
+import net.pantasystem.milktea.common_navigation.SearchAndSelectUserNavigationArgs
+import net.pantasystem.milktea.common_navigation.SearchNavType
+import net.pantasystem.milktea.common_navigation.SearchNavigation
+import net.pantasystem.milktea.common_navigation.UserListArgs
+import net.pantasystem.milktea.common_navigation.UserListNavigation
 import net.pantasystem.milktea.model.account.page.PageType
 import net.pantasystem.milktea.setting.EditTabSettingDialog
 import net.pantasystem.milktea.setting.PageSettingActionDialog
@@ -24,6 +40,7 @@ import net.pantasystem.milktea.setting.compose.tab.rememberDragDropListState
 import net.pantasystem.milktea.setting.viewmodel.page.PageSettingViewModel
 import javax.inject.Inject
 
+@Suppress("DEPRECATION")
 @FlowPreview
 @ExperimentalCoroutinesApi
 @AndroidEntryPoint
@@ -57,15 +74,15 @@ class PageSettingActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         applyTheme()
 
-        mPageSettingViewModel.pageOnActionEvent.observe(this) {
-            PageSettingActionDialog().show(supportFragmentManager, "PSA")
-        }
+        mPageSettingViewModel.pageOnActionEvent.onEach {
+            PageSettingActionDialog.newInstance(it).show(supportFragmentManager, "PSA")
+        }.flowWithLifecycle(lifecycle).launchIn(lifecycleScope)
 
-        mPageSettingViewModel.pageOnUpdateEvent.observe(this) {
-            EditTabSettingDialog().show(supportFragmentManager, "ETD")
-        }
+        mPageSettingViewModel.pageOnUpdateEvent.onEach {
+            EditTabSettingDialog.newInstance(it).show(supportFragmentManager, "ETD")
+        }.flowWithLifecycle(lifecycle).launchIn(lifecycleScope)
 //
-        mPageSettingViewModel.pageAddedEvent.observe(this) { pt ->
+        mPageSettingViewModel.pageAddedEvent.onEach { pt ->
             when (pt.type) {
                 PageType.SEARCH, PageType.SEARCH_HASH, PageType.MASTODON_TAG_TIMELINE -> startActivity(
                     searchNavigation.newIntent(SearchNavType.SearchScreen())
@@ -122,7 +139,7 @@ class PageSettingActivity : AppCompatActivity() {
                     // auto add
                 }
             }
-        }
+        }.flowWithLifecycle(lifecycle).launchIn(lifecycleScope)
 
 
         setContent {
@@ -146,7 +163,7 @@ class PageSettingActivity : AppCompatActivity() {
                         mPageSettingViewModel.add(it)
                     },
                     onOptionButtonClicked = {
-                        mPageSettingViewModel.pageOnActionEvent.event = it
+                        mPageSettingViewModel.onOptionButtonClicked(it)
                     },
                     onNavigateUp = {
                         finish()

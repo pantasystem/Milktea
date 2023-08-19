@@ -12,7 +12,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.google.android.flexbox.*
+import com.google.android.flexbox.FlexboxLayout
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -25,8 +25,9 @@ import net.pantasystem.milktea.note.databinding.ItemNoteBinding
 import net.pantasystem.milktea.note.detail.viewmodel.NoteConversationViewData
 import net.pantasystem.milktea.note.detail.viewmodel.NoteDetailViewData
 import net.pantasystem.milktea.note.detail.viewmodel.NoteDetailViewModel
-import net.pantasystem.milktea.note.reaction.ReactionCountAdapter
 import net.pantasystem.milktea.note.timeline.NoteFontSizeBinder
+import net.pantasystem.milktea.note.timeline.ReactionCountItemsFlexboxLayoutBinder
+import net.pantasystem.milktea.note.timeline.ViewRecycler
 import net.pantasystem.milktea.note.view.NoteCardAction
 import net.pantasystem.milktea.note.view.NoteCardActionListenerAdapter
 import net.pantasystem.milktea.note.viewmodel.PlaneNoteViewData
@@ -66,6 +67,12 @@ class NoteDetailAdapter(
     class ConversationHolder(val binding: ItemConversationBinding) : ViewHolder(binding.root)
 
     val noteCardActionListenerAdapter = NoteCardActionListenerAdapter(onAction)
+
+    val binder = ReactionCountItemsFlexboxLayoutBinder(
+        ViewRecycler()
+    ) {
+        noteCardActionListenerAdapter.onReactionCountAction(it)
+    }
 
     override fun getItemViewType(position: Int): Int {
         return when (getItem(position)) {
@@ -185,32 +192,17 @@ class NoteDetailAdapter(
 
     private var job: Job? = null
 
-    private fun setReactionCounter(note: PlaneNoteViewData, reactionView: RecyclerView) {
+    private fun setReactionCounter(note: PlaneNoteViewData, reactionView: FlexboxLayout) {
 
         val reactionList = note.reactionCountsViewData.value
-        val adapter = ReactionCountAdapter {
-            noteCardActionListenerAdapter.onReactionCountAction(it)
-        }
-        adapter.note = note
-        reactionView.adapter = adapter
 
-        adapter.submitList(reactionList)
+
 
         job?.cancel()
         job = note.reactionCountsViewData.onEach {
-            adapter.submitList(it.toList())
+            binder.bindReactionCounts(reactionView, note,  it.toList())
         }.flowWithLifecycle(viewLifecycleOwner.lifecycle)
             .launchIn(viewLifecycleOwner.lifecycleScope)
-
-        val exLayoutManager = reactionView.layoutManager
-        if (exLayoutManager !is FlexboxLayoutManager) {
-            val flexBoxLayoutManager = FlexboxLayoutManager(reactionView.context)
-            flexBoxLayoutManager.flexDirection = FlexDirection.ROW
-            flexBoxLayoutManager.flexWrap = FlexWrap.WRAP
-            flexBoxLayoutManager.justifyContent = JustifyContent.FLEX_START
-            flexBoxLayoutManager.alignItems = AlignItems.STRETCH
-            reactionView.layoutManager = flexBoxLayoutManager
-        }
 
         if (reactionList.isNotEmpty()) {
             reactionView.visibility = View.VISIBLE

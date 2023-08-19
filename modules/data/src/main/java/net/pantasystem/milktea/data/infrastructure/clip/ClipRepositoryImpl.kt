@@ -11,7 +11,7 @@ import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
 import net.pantasystem.milktea.data.converters.ClipDTOEntityConverter
 import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.clip.*
-import net.pantasystem.milktea.model.notes.Note
+import net.pantasystem.milktea.model.note.Note
 import net.pantasystem.milktea.model.user.User
 import javax.inject.Inject
 

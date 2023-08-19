@@ -29,10 +29,10 @@ import net.pantasystem.milktea.model.instance.FeatureEnables
 import net.pantasystem.milktea.model.instance.FeatureType
 import net.pantasystem.milktea.model.instance.InstanceInfo
 import net.pantasystem.milktea.model.instance.InstanceInfoService
-import net.pantasystem.milktea.model.notes.*
-import net.pantasystem.milktea.model.notes.draft.DraftNoteRepository
-import net.pantasystem.milktea.model.notes.draft.DraftNoteService
-import net.pantasystem.milktea.model.notes.reservation.NoteReservationPostExecutor
+import net.pantasystem.milktea.model.note.*
+import net.pantasystem.milktea.model.note.draft.DraftNoteRepository
+import net.pantasystem.milktea.model.note.draft.DraftNoteService
+import net.pantasystem.milktea.model.note.reservation.NoteReservationPostExecutor
 import net.pantasystem.milktea.model.setting.LocalConfigRepository
 import net.pantasystem.milktea.model.user.User
 import net.pantasystem.milktea.model.user.UserRepository

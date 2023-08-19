@@ -14,7 +14,7 @@ import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.account.page.Pageable
 import net.pantasystem.milktea.model.instance.FeatureEnables
 import net.pantasystem.milktea.model.instance.FeatureType
-import net.pantasystem.milktea.model.notes.*
+import net.pantasystem.milktea.model.note.*
 import javax.inject.Inject
 
 @HiltViewModel

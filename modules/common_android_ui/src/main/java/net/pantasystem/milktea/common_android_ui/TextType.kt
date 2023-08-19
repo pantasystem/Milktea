@@ -6,8 +6,8 @@ import net.pantasystem.milktea.common_android.mfm.MFMParser
 import net.pantasystem.milktea.common_android.mfm.Root
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.emoji.Emoji
-import net.pantasystem.milktea.model.notes.Note
-import net.pantasystem.milktea.model.notes.NoteRelation
+import net.pantasystem.milktea.model.note.Note
+import net.pantasystem.milktea.model.note.NoteRelation
 
 sealed interface TextType {
     data class Misskey(val root: Root?, val lazyDecorateResult: LazyDecorateResult?) : TextType

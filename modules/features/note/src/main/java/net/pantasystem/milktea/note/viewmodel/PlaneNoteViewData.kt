@@ -4,6 +4,7 @@ package net.pantasystem.milktea.note.viewmodel
 import android.util.Log
 import androidx.lifecycle.*
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.*
@@ -17,7 +18,7 @@ import net.pantasystem.milktea.model.emoji.CustomEmojiRepository
 import net.pantasystem.milktea.model.file.AboutMediaType
 import net.pantasystem.milktea.model.file.AppFile
 import net.pantasystem.milktea.model.file.FilePreviewSource
-import net.pantasystem.milktea.model.notes.*
+import net.pantasystem.milktea.model.note.*
 import net.pantasystem.milktea.model.setting.DefaultConfig
 import net.pantasystem.milktea.model.setting.LocalConfigRepository
 import net.pantasystem.milktea.model.url.UrlPreview
@@ -147,7 +148,11 @@ open class PlaneNoteViewData(
                 emojiRepository.getAndConvertToMap(account.getHost())
             )
         }
-    }.stateIn(coroutineScope, SharingStarted.WhileSubscribed(5_000), emptyList())
+    }.flowOn(Dispatchers.Default).stateIn(
+        coroutineScope,
+        SharingStarted.WhileSubscribed(5_000),
+        emptyList()
+    )
 
     //reNote先
     val subNote: NoteRelation? = toShowNote.renote
@@ -241,8 +246,19 @@ open class PlaneNoteViewData(
     }
 
     enum class FilterResult {
+        /**
+         * フィルターが実行されていない
+         */
         NotExecuted,
+
+        /**
+         * フィルターに引っかかった投稿
+         */
         ShouldFilterNote,
+
+        /**
+         * フィルターに引っかからなかった投稿
+         */
         Pass,
     }
 }

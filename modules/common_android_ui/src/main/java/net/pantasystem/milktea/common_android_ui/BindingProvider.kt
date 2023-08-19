@@ -11,6 +11,7 @@ import net.pantasystem.milktea.common_navigation.SearchNavigation
 import net.pantasystem.milktea.common_navigation.UserDetailNavigation
 import net.pantasystem.milktea.model.emoji.CustomEmojiAspectRatioStore
 import net.pantasystem.milktea.model.emoji.CustomEmojiRepository
+import net.pantasystem.milktea.model.emoji.EmojiImageCacheStore
 import net.pantasystem.milktea.model.setting.ColorSettingStore
 import net.pantasystem.milktea.model.setting.LocalConfigRepository
 
@@ -36,4 +37,6 @@ interface BindingProvider {
     fun customEmojiAspectRatioStore(): CustomEmojiAspectRatioStore
 
     fun configRepository(): LocalConfigRepository
+
+    fun emojiImageCacheStore(): EmojiImageCacheStore
 }

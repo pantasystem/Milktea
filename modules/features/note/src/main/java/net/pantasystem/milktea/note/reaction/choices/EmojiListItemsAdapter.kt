@@ -11,7 +11,7 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import net.pantasystem.milktea.common.glide.GlideApp
 import net.pantasystem.milktea.common_android.ui.VisibilityHelper.setMemoVisibility
-import net.pantasystem.milktea.model.notes.reaction.LegacyReaction
+import net.pantasystem.milktea.model.note.reaction.LegacyReaction
 import net.pantasystem.milktea.note.EmojiListItemType
 import net.pantasystem.milktea.note.EmojiType
 import net.pantasystem.milktea.note.R

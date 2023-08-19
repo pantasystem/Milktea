@@ -21,11 +21,11 @@ play {
 }
 
 android {
-    compileSdk 33
+    compileSdk 34
     defaultConfig {
         applicationId "jp.panta.misskeyandroidclient"
         minSdkVersion 21
-        targetSdkVersion 33
+        targetSdkVersion 34
         multiDexEnabled true
         versionCode VERSION_CODE as int
         versionName VERSION_NAME
@@ -213,7 +213,7 @@ dependencies {
     implementation libs.wada811.databinding
 
     implementation libs.fragment.ktx
-    implementation platform('com.google.firebase:firebase-bom:31.2.0')
+    implementation platform('com.google.firebase:firebase-bom:32.2.2')
     implementation 'com.google.firebase:firebase-messaging'
     implementation 'com.google.firebase:firebase-crashlytics'
     implementation 'com.google.firebase:firebase-analytics-ktx'

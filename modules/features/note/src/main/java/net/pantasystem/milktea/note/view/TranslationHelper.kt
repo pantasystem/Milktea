@@ -11,7 +11,7 @@ import net.pantasystem.milktea.common_android.mfm.MFMParser
 import net.pantasystem.milktea.common_android_ui.LazyDecorateSkipElementsHolder
 import net.pantasystem.milktea.common_android_ui.MFMDecorator
 import net.pantasystem.milktea.model.emoji.Emoji
-import net.pantasystem.milktea.model.notes.Translation
+import net.pantasystem.milktea.model.note.Translation
 import net.pantasystem.milktea.note.R
 
 object TranslationHelper {

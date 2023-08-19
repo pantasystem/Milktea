@@ -8,7 +8,7 @@ import androidx.core.animation.doOnEnd
 import androidx.core.animation.doOnStart
 import androidx.core.view.isVisible
 import androidx.databinding.BindingAdapter
-import net.pantasystem.milktea.model.notes.Note
+import net.pantasystem.milktea.model.note.Note
 
 object CwAnimationHelper {
 

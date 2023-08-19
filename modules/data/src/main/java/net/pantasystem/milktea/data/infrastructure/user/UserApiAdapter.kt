@@ -12,7 +12,7 @@ import net.pantasystem.milktea.common.throwIfHasError
 import net.pantasystem.milktea.data.api.mastodon.MastodonAPIProvider
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
 import net.pantasystem.milktea.data.converters.UserDTOEntityConverter
-import net.pantasystem.milktea.data.infrastructure.notes.reaction.impl.history.ReactionHistoryDao
+import net.pantasystem.milktea.data.infrastructure.note.reaction.impl.history.ReactionHistoryDao
 import net.pantasystem.milktea.data.infrastructure.toUserRelated
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.AccountRepository

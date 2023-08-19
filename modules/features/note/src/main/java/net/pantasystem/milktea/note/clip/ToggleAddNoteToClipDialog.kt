@@ -11,7 +11,7 @@ import androidx.fragment.app.viewModels
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import dagger.hilt.android.AndroidEntryPoint
 import net.pantasystem.milktea.common_compose.MilkteaStyleConfigApplyAndTheme
-import net.pantasystem.milktea.model.notes.Note
+import net.pantasystem.milktea.model.note.Note
 import net.pantasystem.milktea.model.setting.LocalConfigRepository
 import javax.inject.Inject
 

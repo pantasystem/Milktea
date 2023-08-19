@@ -40,6 +40,8 @@ class SaveImageAspectRequestListener(
             emoji, imageAspectRatio
         )
         ImageAspectRatioCache.put(emoji.url ?: emoji.uri, imageAspectRatio)
+        navigationEntryPoint.emojiImageCacheStore().save(emoji)
+
 
         return false
     }

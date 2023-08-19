@@ -10,7 +10,7 @@ import kotlinx.coroutines.launch
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.emoji.UserEmojiConfigRepository
-import net.pantasystem.milktea.model.notes.reaction.LegacyReaction
+import net.pantasystem.milktea.model.note.reaction.LegacyReaction
 import javax.inject.Inject
 
 @HiltViewModel

@@ -7,7 +7,7 @@ import androidx.room.Query
 
 @Dao
 interface UrlPreviewDAO {
-    @Query("select * from url_preview where url = :url")
+    @Query("select * from url_preview where url = :url and createdAt > datetime('now', '-7 day')")
     fun findByUrl(url: String): UrlPreviewRecord?
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)

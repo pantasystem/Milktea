@@ -6,9 +6,9 @@ import androidx.core.content.edit
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.*
 import net.pantasystem.milktea.common.runCancellableCatching
-import net.pantasystem.milktea.model.notes.CanLocalOnly
-import net.pantasystem.milktea.model.notes.Visibility
-import net.pantasystem.milktea.model.notes.isLocalOnly
+import net.pantasystem.milktea.model.note.CanLocalOnly
+import net.pantasystem.milktea.model.note.Visibility
+import net.pantasystem.milktea.model.note.isLocalOnly
 import net.pantasystem.milktea.model.setting.*
 
 

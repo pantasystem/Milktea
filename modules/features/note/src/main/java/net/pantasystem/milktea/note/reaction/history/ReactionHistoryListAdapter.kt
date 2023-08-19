@@ -11,7 +11,7 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import net.pantasystem.milktea.common.glide.GlideApp
 import net.pantasystem.milktea.model.account.Account
-import net.pantasystem.milktea.model.notes.reaction.LegacyReaction
+import net.pantasystem.milktea.model.note.reaction.LegacyReaction
 import net.pantasystem.milktea.model.user.User
 import net.pantasystem.milktea.note.EmojiType
 import net.pantasystem.milktea.note.R

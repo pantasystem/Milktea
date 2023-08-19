@@ -6,7 +6,7 @@ import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.drive.FileProperty
 import net.pantasystem.milktea.model.group.Group
 import net.pantasystem.milktea.model.list.UserList
-import net.pantasystem.milktea.model.notes.Note
+import net.pantasystem.milktea.model.note.Note
 import net.pantasystem.milktea.model.user.User
 
 

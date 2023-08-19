@@ -15,10 +15,10 @@ import net.pantasystem.milktea.data.infrastructure.instance.db.InstanceInfoDao
 import net.pantasystem.milktea.data.infrastructure.instance.db.MastodonInstanceInfoDAO
 import net.pantasystem.milktea.data.infrastructure.list.UserListDao
 import net.pantasystem.milktea.data.infrastructure.nodeinfo.db.NodeInfoDao
-import net.pantasystem.milktea.data.infrastructure.notes.draft.db.DraftNoteDao
-import net.pantasystem.milktea.data.infrastructure.notes.reaction.impl.history.ReactionHistoryDao
-import net.pantasystem.milktea.data.infrastructure.notes.reaction.impl.usercustom.ReactionUserSettingDao
-import net.pantasystem.milktea.data.infrastructure.notes.wordmute.WordFilterConfigDao
+import net.pantasystem.milktea.data.infrastructure.note.draft.db.DraftNoteDao
+import net.pantasystem.milktea.data.infrastructure.note.reaction.impl.history.ReactionHistoryDao
+import net.pantasystem.milktea.data.infrastructure.note.reaction.impl.usercustom.ReactionUserSettingDao
+import net.pantasystem.milktea.data.infrastructure.note.wordmute.WordFilterConfigDao
 import net.pantasystem.milktea.data.infrastructure.notification.db.UnreadNotificationDAO
 import net.pantasystem.milktea.data.infrastructure.search.SearchHistoryDao
 import net.pantasystem.milktea.data.infrastructure.url.db.UrlPreviewDAO

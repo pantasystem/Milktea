@@ -28,12 +28,13 @@ import net.pantasystem.milktea.auth.JoinMilkteaActivity
 import net.pantasystem.milktea.common_android_ui.report.ReportViewModel
 import net.pantasystem.milktea.common_viewmodel.CurrentPageType
 import net.pantasystem.milktea.common_viewmodel.CurrentPageableTimelineViewModel
-import net.pantasystem.milktea.model.notes.draft.DraftNoteService
+import net.pantasystem.milktea.model.note.draft.DraftNoteService
 import net.pantasystem.milktea.model.user.report.ReportState
 import net.pantasystem.milktea.notification.notificationMessageScope
 import net.pantasystem.milktea.user.ReportStateHandler
 import net.pantasystem.milktea.worker.note.CreateNoteWorkerExecutor
 
+@Suppress("DEPRECATION")
 internal class MainActivityEventHandler(
     val activity: MainActivity,
     val binding: ActivityMainBinding,
@@ -257,7 +258,7 @@ internal class MainActivityEventHandler(
     }
 
     private fun showCreateNoteTaskStatusSnackBar(state: WorkInfo) {
-        ShowNoteCreationResultSnackBar(
+        NoteCreateResultHandler(
             activity,
             binding.appBarMain.simpleNotification,
             createNoteWorkerExecutor,

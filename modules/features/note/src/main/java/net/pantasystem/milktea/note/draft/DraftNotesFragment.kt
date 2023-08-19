@@ -16,7 +16,7 @@ import net.pantasystem.milktea.common_navigation.MediaNavigationArgs
 import net.pantasystem.milktea.model.file.AppFile
 import net.pantasystem.milktea.model.file.FilePreviewSource
 import net.pantasystem.milktea.model.file.from
-import net.pantasystem.milktea.model.notes.draft.DraftNoteFile
+import net.pantasystem.milktea.model.note.draft.DraftNoteFile
 import net.pantasystem.milktea.model.setting.LocalConfigRepository
 import net.pantasystem.milktea.note.DraftNotesActivity
 import net.pantasystem.milktea.note.NoteEditorActivity

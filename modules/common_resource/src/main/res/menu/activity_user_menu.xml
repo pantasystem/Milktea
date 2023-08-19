@@ -50,4 +50,9 @@
             android:id="@+id/nav_switch_account"
             android:title="@string/switch_account"
         />
+
+    <item
+        android:id="@+id/show_qr_code"
+        android:title="@string/qr_code"
+        />
 </menu>

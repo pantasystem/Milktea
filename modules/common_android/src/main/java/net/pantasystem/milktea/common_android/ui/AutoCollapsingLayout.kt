@@ -24,7 +24,7 @@ class AutoCollapsingLayout : FrameLayout {
 
 
     private var limitedMaxHeight = 300
-    private var expandedChangedListener: MutableList<(Boolean) -> Unit> = mutableListOf()
+//    private var expandedChangedListener: MutableList<(Boolean) -> Unit> = mutableListOf()
 
     var isExpanded = false
 
@@ -111,7 +111,7 @@ class AutoCollapsingLayout : FrameLayout {
 
         invalidate()
         requestLayout()
-        expandedChangedListener.forEach { it.invoke(isExpanded) }
+//        expandedChangedListener.forEach { it.invoke(isExpanded) }
     }
 
     fun getWidthAndHeightAndButton(

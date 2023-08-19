@@ -13,8 +13,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import net.pantasystem.milktea.common_compose.HorizontalFilePreviewList
-import net.pantasystem.milktea.model.notes.draft.DraftNote
-import net.pantasystem.milktea.model.notes.draft.DraftNoteFile
+import net.pantasystem.milktea.model.note.draft.DraftNote
+import net.pantasystem.milktea.model.note.draft.DraftNoteFile
 import net.pantasystem.milktea.note.R
 
 

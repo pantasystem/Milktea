@@ -12,10 +12,10 @@ import net.pantasystem.milktea.common.ResultState
 import net.pantasystem.milktea.common.StateContent
 import net.pantasystem.milktea.common.initialState
 import net.pantasystem.milktea.model.drive.DriveFileRepository
-import net.pantasystem.milktea.model.notes.draft.DraftNote
-import net.pantasystem.milktea.model.notes.draft.DraftNoteFile
-import net.pantasystem.milktea.model.notes.draft.DraftNoteRepository
-import net.pantasystem.milktea.model.notes.draft.DraftNoteService
+import net.pantasystem.milktea.model.note.draft.DraftNote
+import net.pantasystem.milktea.model.note.draft.DraftNoteFile
+import net.pantasystem.milktea.model.note.draft.DraftNoteRepository
+import net.pantasystem.milktea.model.note.draft.DraftNoteService
 import javax.inject.Inject
 
 @HiltViewModel

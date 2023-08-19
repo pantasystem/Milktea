@@ -4,7 +4,7 @@ import kotlinx.datetime.Instant
 import net.pantasystem.milktea.model.EntityId
 import net.pantasystem.milktea.model.group.Group
 import net.pantasystem.milktea.model.group.InvitationId
-import net.pantasystem.milktea.model.notes.Note
+import net.pantasystem.milktea.model.note.Note
 import net.pantasystem.milktea.model.user.User
 
 

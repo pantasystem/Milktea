@@ -19,7 +19,11 @@ data class Error(
 }
 
 sealed interface ErrorType {
-    data class Misskey(val error: Error) : ErrorType
+    data class Misskey(val error: Error) : ErrorType {
+        val errorCodeeType: MisskeyErrorCodes? by lazy {
+            MisskeyErrorCodes.values().find { it.code == error.error.code }
+        }
+    }
     data class Raw(val body: String) : ErrorType
 }
 
@@ -72,4 +76,53 @@ fun throwErrorFromStatusCode(code: Int, error: ErrorType? = null) {
             throw APIError.SomethingException(error, code)
         }
     }
+}
+
+enum class MisskeyErrorCodes(
+    val code: String
+) {
+
+    InternalError("INTERNAL_ERROR"),
+    UserIsDeleted("USER_IS_DELETED"),
+    FileRequired("FILE_REQUIRED"),
+    NoSuchList("NO_SUCH_LIST"),
+    YouHaveBeenBlocked("YOU_HAVE_BEEN_BLOCKED"),
+    AccessDenied("ACCESS_DENIED"),
+    FailedToResolveRemoteUser("FAILED_TO_RESOLVE_REMOTE_USER"),
+    YourPost("YOUR_POST"),
+    UnknownApiEndpoint("UNKNOWN_API_ENDPOINT"),
+    NoSuchChannel("NO_SUCH_CHANNEL"),
+    NoSuchPage("NO_SUCH_PAGE"),
+    NoSuchNote("NO_SUCH_NOTE"),
+    NoSuchUser("NO_SUCH_USER"),
+    NoSuchClip("NO_SUCH_CLIP"),
+    IncorrectPassword("INCORRECT_PASSWORD"),
+    NoSuchKey("NO_SUCH_KEY"),
+    TooManyAntennas("TOO_MANY_ANTENNAS"),
+    FollowRequestNotFound("FOLLOW_REQUEST_NOT_FOUND"),
+    LtlDisabled("LTL_DISABLED"),
+    NoSuchFile("NO_SUCH_FILE"),
+    NoSuchAntenna("NO_SUCH_ANTENNA"),
+    TooManyMutedWords("TOO_MANY_MUTED_WORDS"),
+    NoSuchRole("NO_SUCH_ROLE"),
+    NoSuchSession("NO_SUCH_SESSION"),
+    TooManyClips("TOO_MANY_CLIPS"),
+    ReactionsNotPublic("REACTIONS_NOT_PUBLIC"),
+    NoSuchFolder("NO_SUCH_FOLDER"),
+    NoSuchReplyTarget("NO_SUCH_REPLY_TARGET"),
+    NoSuchEmoji("NO_SUCH_EMOJI"),
+    Forbidden("FORBIDDEN"),
+    TooManyClipNotes("TOO_MANY_CLIP_NOTES"),
+    TooManyUsers("TOO_MANY_USERS"),
+    PinLimitExceeded("PIN_LIMIT_EXCEEDED"),
+    NoSuchUserList("NO_SUCH_USER_LIST"),
+    NoSuchApp("NO_SUCH_APP"),
+    YourPage("YOUR_PAGE"),
+    YourFlash("YOUR_FLASH"),
+    NoFreeSpace("NO_FREE_SPACE"),
+    RolePermissionDenied("ROLE_PERMISSION_DENIED"),
+    YourAccountMoved("YOUR_ACCOUNT_MOVED"),
+    YourAccountSuspended("YOUR_ACCOUNT_SUSPENDED"),
+    CredentialRequired("CREDENTIAL_REQUIRED"),
+    PermissionDenied("PERMISSION_DENIED"),
 }

@@ -11,7 +11,11 @@ import net.pantasystem.milktea.app_store.notes.NoteTranslationStore
 import net.pantasystem.milktea.common_android_ui.TextType
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.emoji.CustomEmojiRepository
-import net.pantasystem.milktea.model.notes.*
+import net.pantasystem.milktea.model.note.Note
+import net.pantasystem.milktea.model.note.NoteCaptureAPIAdapter
+import net.pantasystem.milktea.model.note.NoteDataSource
+import net.pantasystem.milktea.model.note.NoteRelation
+import net.pantasystem.milktea.model.note.NoteRelationGetter
 import net.pantasystem.milktea.model.setting.LocalConfigRepository
 import net.pantasystem.milktea.model.url.UrlPreviewLoadTask
 import net.pantasystem.milktea.model.url.UrlPreviewStore
@@ -31,6 +35,10 @@ class PlaneNoteViewDataCache(
     private val configRepository: LocalConfigRepository,
     private val emojiRepository: CustomEmojiRepository,
 ) {
+
+    interface ViewDataFilter {
+        suspend fun check(viewData: PlaneNoteViewData): PlaneNoteViewData.FilterResult
+    }
 
     @Singleton
     class Factory @Inject constructor(
@@ -64,6 +72,12 @@ class PlaneNoteViewDataCache(
 
     private val lock = Mutex()
     private val cache = mutableMapOf<Note.Id, PlaneNoteViewData>()
+
+    private val _filters = mutableListOf<ViewDataFilter>()
+
+    fun addFilter(filter: ViewDataFilter) {
+        _filters.add(filter)
+    }
 
     suspend fun get(relation: NoteRelation): PlaneNoteViewData {
         return lock.withLock {
@@ -183,6 +197,20 @@ class PlaneNoteViewDataCache(
         }.also {
             it.captureNotes()
             loadUrlPreview(it)
+            for (filter in _filters) {
+                when(val result = filter.check(it)) {
+                    PlaneNoteViewData.FilterResult.NotExecuted -> {
+                        it.filterResult = result
+                    }
+                    PlaneNoteViewData.FilterResult.ShouldFilterNote -> {
+                        it.filterResult = result
+                        break
+                    }
+                    PlaneNoteViewData.FilterResult.Pass -> {
+                        it.filterResult = result
+                    }
+                }
+            }
         }
     }
 

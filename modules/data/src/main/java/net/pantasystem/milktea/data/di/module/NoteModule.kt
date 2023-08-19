@@ -10,20 +10,20 @@ import dagger.hilt.components.SingletonComponent
 import net.pantasystem.milktea.app_store.notes.NoteTranslationStore
 import net.pantasystem.milktea.app_store.notes.TimelineStore
 import net.pantasystem.milktea.common.getPreferences
-import net.pantasystem.milktea.data.infrastructure.notes.*
-import net.pantasystem.milktea.data.infrastructure.notes.draft.DraftNoteRepositoryImpl
-import net.pantasystem.milktea.data.infrastructure.notes.impl.DraftNoteServiceImpl
-import net.pantasystem.milktea.data.infrastructure.notes.impl.NoteApiAdapter
-import net.pantasystem.milktea.data.infrastructure.notes.impl.NoteApiAdapterFactoryImpl
-import net.pantasystem.milktea.data.infrastructure.notes.impl.NoteRepositoryImpl
-import net.pantasystem.milktea.data.infrastructure.notes.impl.ObjectBoxNoteDataSource
-import net.pantasystem.milktea.data.infrastructure.notes.impl.ThreadContextApiAdapter
-import net.pantasystem.milktea.data.infrastructure.notes.impl.ThreadContextApiAdapterFactoryImpl
-import net.pantasystem.milktea.data.infrastructure.notes.renote.RenotesPagingServiceImpl
-import net.pantasystem.milktea.model.notes.*
-import net.pantasystem.milktea.model.notes.draft.DraftNoteRepository
-import net.pantasystem.milktea.model.notes.draft.DraftNoteService
-import net.pantasystem.milktea.model.notes.repost.RenotesPagingService
+import net.pantasystem.milktea.data.infrastructure.note.*
+import net.pantasystem.milktea.data.infrastructure.note.draft.DraftNoteRepositoryImpl
+import net.pantasystem.milktea.data.infrastructure.note.impl.DraftNoteServiceImpl
+import net.pantasystem.milktea.data.infrastructure.note.impl.NoteApiAdapter
+import net.pantasystem.milktea.data.infrastructure.note.impl.NoteApiAdapterFactoryImpl
+import net.pantasystem.milktea.data.infrastructure.note.impl.NoteRepositoryImpl
+import net.pantasystem.milktea.data.infrastructure.note.impl.ObjectBoxNoteDataSource
+import net.pantasystem.milktea.data.infrastructure.note.impl.ThreadContextApiAdapter
+import net.pantasystem.milktea.data.infrastructure.note.impl.ThreadContextApiAdapterFactoryImpl
+import net.pantasystem.milktea.data.infrastructure.note.renote.RenotesPagingServiceImpl
+import net.pantasystem.milktea.model.note.*
+import net.pantasystem.milktea.model.note.draft.DraftNoteRepository
+import net.pantasystem.milktea.model.note.draft.DraftNoteService
+import net.pantasystem.milktea.model.note.repost.RenotesPagingService
 import javax.inject.Singleton
 
 @Module

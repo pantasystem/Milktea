@@ -18,9 +18,9 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import net.pantasystem.milktea.common_android.ui.text.CustomEmojiDecorator
-import net.pantasystem.milktea.model.notes.Note
-import net.pantasystem.milktea.model.notes.reaction.Reaction
-import net.pantasystem.milktea.model.notes.reaction.ReactionHistoryRequest
+import net.pantasystem.milktea.model.note.Note
+import net.pantasystem.milktea.model.note.reaction.Reaction
+import net.pantasystem.milktea.model.note.reaction.ReactionHistoryRequest
 import net.pantasystem.milktea.note.R
 import net.pantasystem.milktea.note.databinding.DialogReactionHistoryPagerBinding
 import net.pantasystem.milktea.note.reaction.viewmodel.ReactionHistoryPagerUiState

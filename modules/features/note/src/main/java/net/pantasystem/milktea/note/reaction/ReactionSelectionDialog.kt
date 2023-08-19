@@ -9,8 +9,8 @@ import androidx.fragment.app.activityViewModels
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import dagger.hilt.android.AndroidEntryPoint
 import net.pantasystem.milktea.app_store.account.AccountStore
-import net.pantasystem.milktea.model.notes.Note
-import net.pantasystem.milktea.model.notes.reaction.ReactionSelection
+import net.pantasystem.milktea.model.note.Note
+import net.pantasystem.milktea.model.note.reaction.ReactionSelection
 import net.pantasystem.milktea.note.R
 import net.pantasystem.milktea.note.databinding.DialogSelectReactionBinding
 import net.pantasystem.milktea.note.emojis.EmojiPickerFragment

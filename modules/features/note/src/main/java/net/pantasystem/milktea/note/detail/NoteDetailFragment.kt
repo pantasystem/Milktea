@@ -22,12 +22,11 @@ import net.pantasystem.milktea.common_navigation.UserDetailNavigation
 import net.pantasystem.milktea.common_viewmodel.CurrentPageableTimelineViewModel
 import net.pantasystem.milktea.model.account.page.Page
 import net.pantasystem.milktea.model.account.page.Pageable
-import net.pantasystem.milktea.model.notes.Note
+import net.pantasystem.milktea.model.note.Note
 import net.pantasystem.milktea.model.setting.LocalConfigRepository
 import net.pantasystem.milktea.note.R
 import net.pantasystem.milktea.note.databinding.FragmentNoteDetailBinding
 import net.pantasystem.milktea.note.detail.viewmodel.NoteDetailViewModel
-import net.pantasystem.milktea.note.detail.viewmodel.provideFactory
 import net.pantasystem.milktea.note.view.NoteCardActionHandler
 import net.pantasystem.milktea.note.viewmodel.NotesViewModel
 import javax.inject.Inject
@@ -39,7 +38,6 @@ class NoteDetailFragment : Fragment(R.layout.fragment_note_detail) {
     companion object {
         private const val EXTRA_NOTE_ID =
             "jp.panta.misskeyandroidclinet.view.notes.detail.EXTRA_NOTE_ID"
-        private const val EXTRA_PAGE = "jp.panta.misskeyandroidclinet.view.notes.detail.EXTRA_PAGE"
         private const val EXTRA_ACCOUNT_ID =
             "jp.panta.misskeyandroidclient.view.notes.detail.EXTRA_ACCOUNT_ID"
 
@@ -56,12 +54,10 @@ class NoteDetailFragment : Fragment(R.layout.fragment_note_detail) {
             page: Page
         ): NoteDetailFragment {
             page.pageable() as? Pageable.Show ?: throw IllegalArgumentException("Not Pageable.Show")
-            return NoteDetailFragment().apply {
-                arguments = Bundle().apply {
-                    putSerializable(EXTRA_PAGE, page)
-                    putLong(EXTRA_ACCOUNT_ID, page.accountId)
-                }
-            }
+            return newInstance(
+                requireNotNull(page.pageParams.noteId),
+                page.accountId,
+            )
         }
 
         fun newInstance(noteId: Note.Id): NoteDetailFragment {
@@ -75,9 +71,6 @@ class NoteDetailFragment : Fragment(R.layout.fragment_note_detail) {
     private val currentPageableTimelineViewModel: CurrentPageableTimelineViewModel by activityViewModels()
 
     @Inject
-    lateinit var noteDetailViewModelAssistedFactory: NoteDetailViewModel.ViewModelAssistedFactory
-
-    @Inject
     internal lateinit var settingStore: SettingStore
 
     @Inject
@@ -89,24 +82,8 @@ class NoteDetailFragment : Fragment(R.layout.fragment_note_detail) {
     @Inject
     lateinit var configRepository: LocalConfigRepository
 
-    @Suppress("DEPRECATION")
-    val page: Pageable.Show by lazy {
-        (arguments?.getSerializable(EXTRA_PAGE) as? Page)?.pageable() as? Pageable.Show
-            ?: Pageable.Show(arguments?.getString(EXTRA_NOTE_ID)!!)
-    }
 
-    val accountId: Long? by lazy {
-        arguments?.getLong(EXTRA_ACCOUNT_ID, -1)?.takeIf {
-            it > 0
-        }
-    }
-    private val noteDetailViewModel: NoteDetailViewModel by viewModels {
-        NoteDetailViewModel.provideFactory(
-            noteDetailViewModelAssistedFactory,
-            page,
-            accountId
-        )
-    }
+    private val noteDetailViewModel: NoteDetailViewModel by viewModels()
 
     val binding: FragmentNoteDetailBinding by dataBinding()
 
@@ -152,7 +129,7 @@ class NoteDetailFragment : Fragment(R.layout.fragment_note_detail) {
     override fun onResume() {
         super.onResume()
 
-        currentPageableTimelineViewModel.setCurrentPageable(accountId, page)
+        currentPageableTimelineViewModel.setCurrentPageable(noteDetailViewModel.accountId, noteDetailViewModel.pageable)
     }
 
     @MainThread

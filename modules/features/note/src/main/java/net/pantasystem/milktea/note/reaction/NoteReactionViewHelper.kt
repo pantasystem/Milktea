@@ -10,8 +10,8 @@ import net.pantasystem.milktea.common.glide.GlideApp
 import net.pantasystem.milktea.common_android.ui.FontSizeHelper.setMemoFontPxSize
 import net.pantasystem.milktea.common_android.ui.VisibilityHelper.setMemoVisibility
 import net.pantasystem.milktea.common_android_ui.BindingProvider
-import net.pantasystem.milktea.model.notes.reaction.LegacyReaction
-import net.pantasystem.milktea.model.notes.reaction.Reaction
+import net.pantasystem.milktea.model.note.reaction.LegacyReaction
+import net.pantasystem.milktea.model.note.reaction.Reaction
 import net.pantasystem.milktea.note.reaction.CustomEmojiImageViewSizeHelper.applySizeByAspectRatio
 import net.pantasystem.milktea.note.reaction.CustomEmojiImageViewSizeHelper.calculateImageWidthAndHeightSize
 import net.pantasystem.milktea.note.viewmodel.PlaneNoteViewData
@@ -36,6 +36,7 @@ object NoteReactionViewHelper {
 
         if (emoji == null) {
             reactionImageTypeView.setMemoVisibility(View.GONE)
+            reactionImageTypeView.setImageDrawable(null)
 
             reactionTextTypeView.setMemoVisibility(View.VISIBLE)
             reactionTextTypeView.text = textReaction

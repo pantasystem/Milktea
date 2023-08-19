@@ -1,7 +1,7 @@
 package net.pantasystem.milktea.model.filter
 
-import net.pantasystem.milktea.model.notes.Note
-import net.pantasystem.milktea.model.notes.muteword.WordFilterConfig
+import net.pantasystem.milktea.model.note.Note
+import net.pantasystem.milktea.model.note.muteword.WordFilterConfig
 import javax.inject.Inject
 
 class ClientWordFilterService @Inject constructor() {

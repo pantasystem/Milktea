@@ -2,7 +2,7 @@ package net.pantasystem.milktea.common_android.emoji
 
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.emoji.Emoji
-import net.pantasystem.milktea.model.notes.reaction.Reaction
+import net.pantasystem.milktea.model.note.reaction.Reaction
 
 /**
  * V13でEmojiのURLの取得方法が変更されたので、特定のソースからURLを解決するためのクラス

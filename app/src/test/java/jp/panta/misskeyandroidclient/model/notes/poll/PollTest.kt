@@ -1,7 +1,7 @@
 package jp.panta.misskeyandroidclient.model.notes.poll
 
 import kotlinx.datetime.Clock
-import net.pantasystem.milktea.model.notes.poll.Poll
+import net.pantasystem.milktea.model.note.poll.Poll
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 

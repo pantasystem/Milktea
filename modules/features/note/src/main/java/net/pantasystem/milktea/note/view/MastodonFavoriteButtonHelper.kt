@@ -6,7 +6,7 @@ import android.view.View
 import android.widget.ImageButton
 import androidx.core.content.ContextCompat
 import androidx.databinding.BindingAdapter
-import net.pantasystem.milktea.model.notes.Note
+import net.pantasystem.milktea.model.note.Note
 import net.pantasystem.milktea.note.R
 
 object MastodonFavoriteButtonHelper {

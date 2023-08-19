@@ -14,9 +14,9 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import net.pantasystem.milktea.common.Logger
-import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.emoji.CustomEmojiRepository
+import net.pantasystem.milktea.model.emoji.SaveCustomEmojiImageUseCase
 import net.pantasystem.milktea.model.image.ImageCacheRepository
 import java.util.concurrent.TimeUnit
 
@@ -25,6 +25,7 @@ class CacheCustomEmojiImageWorker @AssistedInject constructor(
     private val accountRepository: AccountRepository,
     private val customEmojiRepository: CustomEmojiRepository,
     private val imageCacheRepository: ImageCacheRepository,
+    private val saveCustomEmojiImageUseCase: SaveCustomEmojiImageUseCase,
     private val loggerFactory: Logger.Factory,
     @Assisted context: Context,
     @Assisted params: WorkerParameters,
@@ -51,6 +52,7 @@ class CacheCustomEmojiImageWorker @AssistedInject constructor(
             val hosts = accountRepository.findAll().getOrThrow().map {
                 it.getHost()
             }.distinct()
+            imageCacheRepository.deleteExpiredCaches()
             coroutineScope {
                 hosts.mapNotNull {
                     customEmojiRepository.findBy(it).getOrNull()
@@ -59,9 +61,7 @@ class CacheCustomEmojiImageWorker @AssistedInject constructor(
                         emojis.chunked(if (emojis.isEmpty()) 0 else ( emojis.size / 4)).forEach { emojis ->
                             emojis.mapNotNull { emoji ->
                                 (emoji.url ?: emoji.uri)?.let {
-                                    runCancellableCatching {
-                                        imageCacheRepository.save(it)
-                                    }.onFailure {
+                                    saveCustomEmojiImageUseCase(emoji).onFailure {
                                         logger.error(
                                             "Failed to cache emoji image: ${emoji.url ?: emoji.uri}",
                                             it

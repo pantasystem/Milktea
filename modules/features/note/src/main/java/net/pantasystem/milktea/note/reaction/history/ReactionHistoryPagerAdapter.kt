@@ -5,8 +5,8 @@ package net.pantasystem.milktea.note.reaction.history
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentPagerAdapter
-import net.pantasystem.milktea.model.notes.Note
-import net.pantasystem.milktea.model.notes.reaction.ReactionHistoryRequest
+import net.pantasystem.milktea.model.note.Note
+import net.pantasystem.milktea.model.note.reaction.ReactionHistoryRequest
 
 class ReactionHistoryPagerAdapter(
     fragmentManager: FragmentManager,

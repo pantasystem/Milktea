@@ -177,27 +177,35 @@
                         app:translationState="@{note.translateState}"
                         android:layout_marginBottom="8dp" />
 
-                <include
+                <net.pantasystem.milktea.common_android_ui.MediaPreviewAspectLayout
+                    android:id="@+id/mediaPreviewAspectLayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:visibility="@{note.media.visibleMediaPreviewArea ? View.VISIBLE : View.GONE}"
+                    android:layout_below="@id/translationView"
+                    tools:visibility="gone">
+                    <include
                         android:id="@+id/mediaPreview"
                         layout="@layout/media_preview"
                         android:layout_width="match_parent"
-                        android:layout_height="250dp"
-                        android:layout_below="@id/translationView"
+                        android:layout_height="match_parent"
                         android:visibility="@{note.media.visibleMediaPreviewArea ? View.VISIBLE : View.GONE}"
                         app:media="@{note.media}"
                         tools:visibility="gone" />
+                </net.pantasystem.milktea.common_android_ui.MediaPreviewAspectLayout>
+
 
                 <androidx.recyclerview.widget.RecyclerView
                         android:id="@+id/manyFilePreviewListView"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_below="@+id/mediaPreview"
+                        android:layout_below="@+id/mediaPreviewAspectLayout"
                         tools:layout_height="20dp"
                         android:visibility="gone"
                         mediaViewData="@{note.media}"
                         previewAbleList="@{note.media.files}" />
 
-                <androidx.recyclerview.widget.RecyclerView
+                <LinearLayout
                         android:id="@+id/poll"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -208,6 +216,7 @@
                         noteId="@{note.toShowNote.note.id}"
                         poll="@{note.currentNote.poll}"
                         noteCardActionListenerAdapter="@{noteCardActionListener}"
+                        android:orientation="vertical"
 
                         />
 
@@ -370,7 +379,7 @@
                     android:textStyle="bold"
                     android:layout_alignParentEnd="true" />
 
-            <androidx.recyclerview.widget.RecyclerView
+            <com.google.android.flexbox.FlexboxLayout
                     android:id="@+id/reaction_view"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -378,6 +387,7 @@
                     android:layout_marginTop="4dp"
                     tools:layout_height="50dp"
                     tools:visibility="visible"
+                    app:flexWrap="wrap"
 
                     />
 

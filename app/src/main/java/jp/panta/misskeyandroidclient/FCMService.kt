@@ -19,7 +19,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import net.pantasystem.milktea.app_store.account.AccountStore
 import net.pantasystem.milktea.common.runCancellableCatching
-import net.pantasystem.milktea.model.notes.Note
+import net.pantasystem.milktea.model.note.Note
 import net.pantasystem.milktea.model.notification.PushNotification
 import net.pantasystem.milktea.model.notification.toPushNotification
 import net.pantasystem.milktea.model.sw.register.DeviceTokenRepository

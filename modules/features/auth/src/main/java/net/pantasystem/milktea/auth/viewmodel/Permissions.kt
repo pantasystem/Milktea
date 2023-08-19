@@ -85,6 +85,6 @@ object Permissions{
     }
 
     fun getPermission(softwareType: NodeInfo.SoftwareType.Firefish?): List<String> {
-        return defaultPermission
+        return V_12_75_0
     }
 }
