@@ -116,19 +116,19 @@ class RemoteFileDownloadWorkManager @AssistedInject constructor(
             withContext(Dispatchers.IO) {
                 URL(params.inputData.getString(EXTRA_DOWNLOAD_URL)).openConnection()
                     .getInputStream().use { inputStream ->
-                        context.contentResolver.openOutputStream(uri!!).use { outputStream ->
+                        context.contentResolver.openOutputStream(uri!!)?.use { outputStream ->
                             // if image convert to bitmap
                             if (type == DownloadContentType.Image) {
                                 val bitmap = BitmapFactory.decodeStream(inputStream)
                                     ?: throw IOException("Failed to decode bitmap")
                                 if (bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream)) {
-                                    outputStream?.close()
+                                    outputStream.close()
                                     bitmap.recycle()
                                 }
                             } else {
-                                inputStream.transferToOutputStream(outputStream!!)
+                                inputStream.transferToOutputStream(outputStream)
                             }
-                            inputStream.transferToOutputStream(outputStream!!)
+                            inputStream.transferToOutputStream(outputStream)
                         }
                     }
             }

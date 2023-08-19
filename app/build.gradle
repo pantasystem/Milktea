@@ -21,11 +21,11 @@ play {
 }
 
 android {
-    compileSdkVersion 33
+    compileSdk 34
     defaultConfig {
         applicationId "jp.panta.misskeyandroidclient"
         minSdkVersion 21
-        targetSdkVersion 33
+        targetSdkVersion 34
         multiDexEnabled true
         versionCode VERSION_CODE as int
         versionName VERSION_NAME

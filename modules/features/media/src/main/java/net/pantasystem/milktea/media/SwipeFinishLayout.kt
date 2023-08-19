@@ -67,14 +67,14 @@ class SwipeFinishLayout : FrameLayout {
     private val gestureDetector = GestureDetector(context, object : GestureDetector.SimpleOnGestureListener() {
 
         override fun onScroll(
-            e1: MotionEvent,
+            e1: MotionEvent?,
             e2: MotionEvent,
             distanceX: Float,
             distanceY: Float
         ): Boolean {
 
             // 縦スクロールの場合
-            if (abs(e2.y - startY) > abs(e2.x - e1.x)) {
+            if (abs(e2.y - startY) > abs(e2.x - (e1?.x ?: 0f))) {
                 if (isNotScaled()) {
                     totalTranslationY += e2.rawY - lastY
                     viewToMove()?.translationY = totalTranslationY
@@ -87,10 +87,10 @@ class SwipeFinishLayout : FrameLayout {
             return super.onScroll(e1, e2, distanceX, distanceY)
         }
 
-        override fun onFling(e1: MotionEvent, e2: MotionEvent, velocityX: Float, velocityY: Float): Boolean {
+        override fun onFling(e1: MotionEvent?, e2: MotionEvent, velocityX: Float, velocityY: Float): Boolean {
             var result = false
             try {
-                val diffY = e2.y.minus(e1.y)
+                val diffY = e2.y.minus(e1?.y ?: 0f)
                 if (abs(diffY) > SWIPE_THRESHOLD && abs(velocityY) > SWIPE_VELOCITY_THRESHOLD) {
                     if (abs(diffY) >= 0) {
                         onSwipeTop()
