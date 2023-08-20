@@ -44,6 +44,7 @@ object DbModule {
             .addMigrations(MIGRATION_7_8)
             .addMigrations(MIGRATION_8_10)
             .addMigrations(MIGRATION_10_11)
+            .addMigrations(MIGRATION_51_52)
             .build()
     }
 

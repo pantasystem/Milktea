@@ -15,10 +15,6 @@ import net.pantasystem.milktea.data.infrastructure.account.page.db.TimelinePageT
 import net.pantasystem.milktea.data.infrastructure.core.*
 import net.pantasystem.milktea.data.infrastructure.drive.DriveFileRecord
 import net.pantasystem.milktea.data.infrastructure.drive.DriveFileRecordDao
-import net.pantasystem.milktea.data.infrastructure.emoji.Utf8EmojiDTO
-import net.pantasystem.milktea.data.infrastructure.emoji.Utf8EmojisDAO
-import net.pantasystem.milktea.data.infrastructure.emoji.db.CustomEmojiAliasRecord
-import net.pantasystem.milktea.data.infrastructure.emoji.db.CustomEmojiRecord
 import net.pantasystem.milktea.data.infrastructure.filter.db.MastodonFilterDao
 import net.pantasystem.milktea.data.infrastructure.filter.db.MastodonWordFilterRecord
 import net.pantasystem.milktea.data.infrastructure.group.GroupDao
@@ -64,18 +60,16 @@ import net.pantasystem.milktea.data.infrastructure.user.renote.mute.db.RenoteMut
         Page::class,
         PollChoiceDTO::class,
         UserIdDTO::class,
-        DraftFileDTO::class,
         DraftNoteDTO::class,
 
         UrlPreviewRecord::class,
         AccountRecord::class,
         PageRecord::class,
         MetaDTO::class,
-        EmojiDTO::class,
-        EmojiAlias::class,
+//        EmojiDTO::class,
+//        EmojiAlias::class,
         UnreadNotification::class,
         UserNicknameDTO::class,
-        Utf8EmojiDTO::class,
         DriveFileRecord::class,
         DraftFileJunctionRef::class,
         DraftLocalFile::class,
@@ -103,8 +97,8 @@ import net.pantasystem.milktea.data.infrastructure.user.renote.mute.db.RenoteMut
 
         MastodonInstanceInfoRecord::class,
 
-        CustomEmojiRecord::class,
-        CustomEmojiAliasRecord::class,
+//        CustomEmojiRecord::class,
+//        CustomEmojiAliasRecord::class,
 
         NotificationJsonCacheRecord::class,
 
@@ -116,7 +110,7 @@ import net.pantasystem.milktea.data.infrastructure.user.renote.mute.db.RenoteMut
 
         PleromaMetadataFeatures::class,
     ],
-    version = 51,
+    version = 52,
     exportSchema = true,
     autoMigrations = [
         AutoMigration(from = 11, to = 12),
@@ -190,13 +184,12 @@ abstract class DataBase : RoomDatabase() {
     abstract fun pageDAO(): PageDAO
 
     abstract fun metaDAO(): MetaDAO
-    abstract fun emojiAliasDAO(): EmojiAliasDAO
+//    abstract fun emojiAliasDAO(): EmojiAliasDAO
 
     abstract fun unreadNotificationDAO(): UnreadNotificationDAO
 
     abstract fun userNicknameDAO(): UserNicknameDAO
 
-    abstract fun utf8EmojiDAO(): Utf8EmojisDAO
 
     abstract fun driveFileRecordDAO(): DriveFileRecordDao
 

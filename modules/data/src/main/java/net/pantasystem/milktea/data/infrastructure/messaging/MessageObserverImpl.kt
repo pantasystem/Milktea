@@ -23,11 +23,11 @@ class MessageObserverImpl @Inject constructor(
 ) : MessageObserver {
 
 
-    @OptIn(FlowPreview::class)
+    @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
     override fun observeAllAccountsMessages(): Flow<Message>{
         return suspend {
             accountRepository.findAll().getOrThrow()
-        }.asFlow().flatMapMerge {
+        }.asFlow().flatMapLatest {
             it.map{ ac ->
                 observeAccountMessages(ac)
             }.merge()

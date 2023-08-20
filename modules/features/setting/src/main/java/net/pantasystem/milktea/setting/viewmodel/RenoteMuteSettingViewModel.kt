@@ -63,7 +63,7 @@ class RenoteMuteSettingViewModel @Inject constructor(
         renoteMutes,
         relatedUsers,
         syncState,
-    ) { account, renoteMutes, users, syncState ->
+    ) { account, renoteMutes, users, _ ->
         RenoteMuteSettingUiState(
             currentAccount = account,
             renoteMutes = renoteMutes.map { renoteMute ->

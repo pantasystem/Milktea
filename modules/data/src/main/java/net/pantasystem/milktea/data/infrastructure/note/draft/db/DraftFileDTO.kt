@@ -1,6 +1,11 @@
 package net.pantasystem.milktea.data.infrastructure.note.draft.db
 
-import androidx.room.*
+import androidx.room.ColumnInfo
+import androidx.room.Entity
+import androidx.room.ForeignKey
+import androidx.room.Index
+import androidx.room.OnConflictStrategy
+import androidx.room.PrimaryKey
 import net.pantasystem.milktea.data.infrastructure.drive.DriveFileRecord
 import net.pantasystem.milktea.model.note.draft.DraftNoteFile
 
@@ -79,35 +84,4 @@ fun DraftLocalFile.Companion.from(draftNote: DraftNoteFile.Local): DraftLocalFil
         fileSize = draftNote.fileSize,
         comment = draftNote.comment
     )
-}
-
-@Suppress("DEPRECATION")
-@Entity(
-    tableName = "draft_file_table",
-    foreignKeys = [
-        ForeignKey(
-            childColumns = ["draft_note_id"],
-            parentColumns = ["draft_note_id"],
-            entity = DraftNoteDTO::class,
-            onDelete = ForeignKey.CASCADE,
-            onUpdate = ForeignKey.CASCADE
-        )
-    ],
-    indices = [Index("draft_note_id")]
-)
-@Deprecated("DraftFileDTOV2へ移行")
-data class DraftFileDTO(
-    @ColumnInfo(defaultValue = "name none") val name: String,
-    @ColumnInfo(name = "remote_file_id") val remoteFileId: String?,
-    @ColumnInfo(name = "file_path") val filePath: String?,
-    @ColumnInfo(name = "is_sensitive") val isSensitive: Boolean?,
-    @ColumnInfo(name = "type") val type: String?,
-    @ColumnInfo(name ="thumbnailUrl") val thumbnailUrl: String?,
-    @ColumnInfo(name = "draft_note_id") val draftNoteId: Long,
-    @ColumnInfo(name = "folder_id") val folderId: String?
-){
-    @PrimaryKey(autoGenerate = true)
-    @ColumnInfo(name = "file_id")
-    var fileId: Long? = null
-
 }
