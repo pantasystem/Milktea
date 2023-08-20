@@ -104,3 +104,14 @@ val MIGRATION_10_11 = object : Migration(10, 11) {
         database.execSQL("alter table 'account_table' add column 'instanceType' TEXT NOT NULL default 'misskey'")
     }
 }
+
+val MIGRATION_51_52 = object : Migration(51, 52) {
+    override fun migrate(database: SupportSQLiteDatabase) {
+        database.execSQL("DROP TABLE IF EXISTS  'draft_file_table'")
+        database.execSQL("DROP TABLE IF EXISTS 'utf8_emojis_by_amio'")
+        database.execSQL("DROP TABLE IF EXISTS 'custom_emoji_aliases'")
+        database.execSQL("DROP TABLE IF EXISTS 'custom_emojis'")
+        database.execSQL("DROP TABLE IF EXISTS 'emoji_alias_table'")
+        database.execSQL("DROP TABLE IF EXISTS 'emoji_table'")
+    }
+}

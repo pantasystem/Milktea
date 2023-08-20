@@ -261,4 +261,22 @@ class DatabaseMigrationTest {
         helper.runMigrationsAndValidate(testDb, 49, true)
 
     }
+
+    @Test
+    fun migrate49To50() {
+        helper.createDatabase(testDb, 49)
+        helper.runMigrationsAndValidate(testDb, 50, true)
+    }
+
+    @Test
+    fun migrate50To51() {
+        helper.createDatabase(testDb, 50)
+        helper.runMigrationsAndValidate(testDb, 51, true)
+    }
+
+    @Test
+    fun migrate51To52() {
+        helper.createDatabase(testDb, 51)
+        helper.runMigrationsAndValidate(testDb, 52, true, MIGRATION_51_52)
+    }
 }
