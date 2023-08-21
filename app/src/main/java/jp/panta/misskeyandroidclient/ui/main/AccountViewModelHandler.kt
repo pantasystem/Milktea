@@ -33,7 +33,7 @@ class AccountViewModelHandler(
         accountViewModel.switchAccountEvent.onEach {
             binding.drawerLayout.closeDrawer(GravityCompat.START)
             val dialog = AccountSwitchingDialog()
-            dialog.show(activity.supportFragmentManager, "mainActivity")
+            dialog.show(activity.supportFragmentManager, AccountSwitchingDialog.FRAGMENT_TAG)
         }.flowWithLifecycle(activity.lifecycle, Lifecycle.State.RESUMED).launchIn(activity.lifecycleScope)
 
         accountViewModel.showFollowersEvent.onEach {

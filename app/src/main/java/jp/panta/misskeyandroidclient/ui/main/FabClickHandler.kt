@@ -25,7 +25,7 @@ internal class FabClickHandler(
                 CurrentPageType.Account -> {
                     AccountSwitchingDialog().show(
                         activity.supportFragmentManager,
-                        "AccountSwitchingDialog"
+                        AccountSwitchingDialog.FRAGMENT_TAG
                     )
                 }
                 is CurrentPageType.Page -> {

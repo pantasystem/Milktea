@@ -127,7 +127,7 @@ class MainActivity : AppCompatActivity(), ToolbarSetter {
         binding.appBarMain.bottomNavigation.setLongPressListenerOnNavigationItem(
             R.id.navigation_message_list
         ) {
-            AccountSwitchingDialog().show(supportFragmentManager, "account_switching")
+            AccountSwitchingDialog().show(supportFragmentManager, AccountSwitchingDialog.FRAGMENT_TAG)
             true
         }
 
