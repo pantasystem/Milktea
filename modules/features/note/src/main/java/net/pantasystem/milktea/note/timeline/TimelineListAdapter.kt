@@ -378,7 +378,7 @@ class TimelineListAdapter(
 //        simpleNote.reactionView.itemAnimator?.endAnimations()
 
         imageViews.map {
-            Glide.with(simpleNote.avatarIcon).clear(it)
+            Glide.with(it).clear(it)
         }
 
         if (holder is NoteViewHolderBase<*>) {
