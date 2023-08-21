@@ -78,9 +78,9 @@ internal class MainActivityEventHandler(
 
     private fun collectCrashlyticsCollectionState() {
         lifecycleScope.launch {
-            lifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+            lifecycleOwner.repeatOnLifecycle(Lifecycle.State.RESUMED) {
                 mainViewModel.isShowFirebaseCrashlytics.collect {
-                    if (it) {
+                    if (it && activity.supportFragmentManager.findFragmentByTag("confirm_crashlytics_dialog") == null) {
                         ConfirmCrashlyticsDialog().show(
                             activity.supportFragmentManager,
                             "confirm_crashlytics_dialog"
@@ -93,9 +93,9 @@ internal class MainActivityEventHandler(
 
     private fun collectConfirmGoogleAnalyticsState() {
         lifecycleScope.launch {
-            lifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+            lifecycleOwner.repeatOnLifecycle(Lifecycle.State.RESUMED) {
                 mainViewModel.isShowGoogleAnalyticsDialog.collect {
-                    if (it) {
+                    if (it && activity.supportFragmentManager.findFragmentByTag("confirm_google_analytics_dialog") == null) {
                         ConfirmGoogleAnalyticsDialog().show(
                             activity.supportFragmentManager,
                             "confirm_google_analytics_dialog"
