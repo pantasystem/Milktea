@@ -51,10 +51,7 @@ class NoteDetailPagerViewModel @Inject constructor(
         loggerFactory.create("NoteDetailPagerViewModel")
     }
 
-    private val noteId = savedStateHandle.getStateFlow(
-        EXTRA_NOTE_ID,
-        requireNotNull(savedStateHandle.get<String>(EXTRA_NOTE_ID))
-    )
+    private val noteIdStr = savedStateHandle.getStateFlow<String?>(EXTRA_NOTE_ID, null)
 
 
     @OptIn(ExperimentalCoroutinesApi::class)
@@ -95,7 +92,7 @@ class NoteDetailPagerViewModel @Inject constructor(
     )
     val noteIds = combine(
         timelineState,
-        noteId,
+        noteIdStr.filterNotNull(),
         currentAccount.filterNotNull()
     ) { state, noteId, account ->
         when (val content = state.content) {
