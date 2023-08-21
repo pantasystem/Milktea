@@ -42,7 +42,7 @@ class NoteCardActionHandler(
             }
             is NoteCardAction.OnOptionButtonClicked -> {
                 NoteOptionDialog.newInstance(action.note.toShowNote.note.id, fromPageable = currentPageable)
-                    .show(activity.supportFragmentManager, "")
+                    .show(activity.supportFragmentManager, NoteOptionDialog.FRAGMENT_TAG)
             }
             is NoteCardAction.OnPollChoiceClicked -> {
                 notesViewModel.vote(
@@ -66,11 +66,11 @@ class NoteCardActionHandler(
                 when (settingStore.reactionPickerType) {
                     ReactionPickerType.LIST -> {
                         ReactionSelectionDialog.newInstance(action.note.toShowNote.note.id)
-                            .show(activity.supportFragmentManager, "MainActivity")
+                            .show(activity.supportFragmentManager, ReactionSelectionDialog.FRAGMENT_TAG)
                     }
                     ReactionPickerType.SIMPLE -> {
                         ReactionPickerDialog.newInstance(action.note.toShowNote.note.id)
-                            .show(activity.supportFragmentManager, "Activity")
+                            .show(activity.supportFragmentManager, ReactionPickerDialog.FRAGMENT_TAG)
                     }
                 }
             }
@@ -83,7 +83,7 @@ class NoteCardActionHandler(
                             accountId = action.note.id.accountId,
                             noteId = action.note.toShowNote.note.id.noteId,
                             reaction = action.reaction
-                        ).show(activity.supportFragmentManager, "")
+                        ).show(activity.supportFragmentManager, RemoteReactionEmojiSuggestionDialog.FRAGMENT_TAG)
                         return
                     }
                 }
@@ -94,17 +94,17 @@ class NoteCardActionHandler(
                 ReactionHistoryPagerDialog.newInstance(
                     action.note.toShowNote.note.id,
                     action.reaction
-                ).show(activity.supportFragmentManager, "")
+                ).show(activity.supportFragmentManager, ReactionHistoryPagerDialog.FRAGMENT_TAG)
             }
             is NoteCardAction.OnRenoteButtonClicked -> {
                 RenoteBottomSheetDialog.newInstance(
                     action.note.note.note.id,
                     action.note.isRenotedByMe
-                ).show(activity.supportFragmentManager, "")
+                ).show(activity.supportFragmentManager, RenoteBottomSheetDialog.FRAGMENT_TAG)
             }
             is NoteCardAction.OnRenoteButtonLongClicked -> {
                 RenotesBottomSheetDialog.newInstance(action.note.toShowNote.note.id)
-                    .show(activity.supportFragmentManager, "")
+                    .show(activity.supportFragmentManager, RenotesBottomSheetDialog.FRAGMENT_TAG)
             }
             is NoteCardAction.OnReplyButtonClicked -> {
                 activity.startActivity(

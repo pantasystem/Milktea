@@ -28,6 +28,7 @@ class RenotesBottomSheetDialog : BottomSheetDialogFragment(){
     lateinit var userDetailNavigation: UserDetailNavigation
 
     companion object {
+        const val FRAGMENT_TAG = "RenotesBottomSheetDialog"
         private const val EXTRA_ACCOUNT_ID = "ACCOUNT_ID"
         private const val EXTRA_NOTE_ID = "NOTE_ID"
 

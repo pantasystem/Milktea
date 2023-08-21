@@ -22,6 +22,7 @@ class ReactionSelectionDialog : BottomSheetDialogFragment(),
     ReactionSelection, EmojiPickerFragment.OnEmojiSelectedListener {
 
     companion object {
+        const val FRAGMENT_TAG = "ReactionSelectionDialog"
         fun newInstance(noteId: Note.Id): ReactionSelectionDialog {
             return ReactionSelectionDialog().apply {
                 arguments = Bundle().apply {

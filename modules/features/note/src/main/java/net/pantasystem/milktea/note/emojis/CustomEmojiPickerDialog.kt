@@ -15,6 +15,7 @@ import javax.inject.Inject
 class CustomEmojiPickerDialog : BottomSheetDialogFragment(), EmojiPickerFragment.OnEmojiSelectedListener{
 
     companion object {
+        const val FRAGMENT_TAG = "CustomEmojiPickerDialog"
         fun newInstance(accountId: Long?): CustomEmojiPickerDialog {
             return CustomEmojiPickerDialog().apply {
                 arguments = Bundle().apply {

@@ -31,6 +31,7 @@ import javax.inject.Inject
 class ReactionPickerDialog : AppCompatDialogFragment(){
 
     companion object {
+        const val FRAGMENT_TAG = "ReactionPickerDialog"
         fun newInstance(noteId: Note.Id): ReactionPickerDialog {
             return ReactionPickerDialog().apply {
                 arguments = Bundle().apply {

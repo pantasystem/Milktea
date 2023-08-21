@@ -359,10 +359,9 @@ class NoteEditorFragment : Fragment(R.layout.fragment_note_editor), EmojiSelecti
                         startMentionToSearchAndSelectUser()
                     },
                     onSelectEmojiButtonClicked = {
-                        binding.cw.isFocused
                         CustomEmojiPickerDialog.newInstance(
                             uiState.currentAccount?.accountId
-                        ).show(childFragmentManager, "Editor")
+                        ).show(childFragmentManager, CustomEmojiPickerDialog.FRAGMENT_TAG)
                     },
                     onToggleCwButtonClicked = {
                         noteEditorViewModel.changeCwEnabled()
@@ -775,7 +774,7 @@ class NoteEditorFragment : Fragment(R.layout.fragment_note_editor), EmojiSelecti
         logger.debug("result:${ids}")
         val size = noteEditorViewModel.fileTotal()
 
-        if (ids != null && ids.isNotEmpty() && size + ids.size <= noteEditorViewModel.maxFileCount.value) {
+        if (!ids.isNullOrEmpty() && size + ids.size <= noteEditorViewModel.maxFileCount.value) {
             noteEditorViewModel.addFilePropertyFromIds(ids)
         }
     }

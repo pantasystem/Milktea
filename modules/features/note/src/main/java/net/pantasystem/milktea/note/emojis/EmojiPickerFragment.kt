@@ -8,7 +8,11 @@ import android.widget.EditText
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.*
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.flowWithLifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.flexbox.AlignItems
 import com.google.android.flexbox.FlexboxLayoutManager
@@ -150,6 +154,7 @@ class EmojiSelectionBinder(
         recyclerView.layoutManager = layoutManager
 
         recyclerView.adapter = adapter
+        recyclerView.itemAnimator = null
 
 
         scope.launch {

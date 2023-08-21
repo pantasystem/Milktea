@@ -30,6 +30,7 @@ import net.pantasystem.milktea.note.reaction.viewmodel.ReactionHistoryPagerViewM
 class ReactionHistoryPagerDialog : BottomSheetDialogFragment() {
 
     companion object {
+        const val FRAGMENT_TAG = "ReactionHistoryPagerDialog"
         private const val EXTRA_NOTE_ID = "EXTRA_NOTE_ID"
         private const val EXTRA_ACCOUNT_ID = "EXTRA_ACCOUNT_ID"
         private const val EXTRA_SHOW_REACTION_TYPE = "EXTRA_SHOW_REACTION_TYPE"

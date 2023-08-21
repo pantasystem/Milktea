@@ -21,6 +21,7 @@ import javax.inject.Inject
 class RenoteBottomSheetDialog : BottomSheetDialogFragment() {
 
     companion object {
+        const val FRAGMENT_TAG = "RenoteBottomSheetDialog"
         fun newInstance(noteId: Note.Id, isRenotedByMe: Boolean): RenoteBottomSheetDialog {
             return RenoteBottomSheetDialog().apply {
                 arguments = Bundle().apply {

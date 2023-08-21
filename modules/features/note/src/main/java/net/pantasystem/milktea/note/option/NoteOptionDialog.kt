@@ -30,6 +30,7 @@ import javax.inject.Inject
 class NoteOptionDialog : BottomSheetDialogFragment() {
 
     companion object {
+        const val FRAGMENT_TAG = "NoteOptionDialog"
         fun newInstance(noteId: Note.Id, fromPageable: Pageable? = null): NoteOptionDialog {
             return NoteOptionDialog().apply {
                 arguments = Bundle().apply {

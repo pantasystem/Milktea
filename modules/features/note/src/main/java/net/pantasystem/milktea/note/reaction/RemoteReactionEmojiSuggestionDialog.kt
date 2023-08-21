@@ -28,6 +28,7 @@ private const val EXTRA_NOTE_ID = "EXTRA_NOTE_ID"
 class RemoteReactionEmojiSuggestionDialog : AppCompatDialogFragment() {
 
     companion object {
+        const val FRAGMENT_TAG = "RemoteReactionEmojiSuggestionDialog"
         fun newInstance(accountId: Long, noteId: String, reaction: String): RemoteReactionEmojiSuggestionDialog {
             return RemoteReactionEmojiSuggestionDialog().also { fragment ->
                 fragment.arguments = Bundle().also { bundle ->
