@@ -16,6 +16,8 @@ interface Logger {
 
     fun warning(msg: String, tag: String = defaultTag, e: Throwable? = null)
 
+    fun log(msg: String) = Unit
+
     interface Factory {
         fun create(tag: String = "MisskeyApp"): Logger
     }

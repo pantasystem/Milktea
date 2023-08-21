@@ -20,6 +20,7 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import net.pantasystem.milktea.app_store.account.AccountStore
+import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.common.ui.AvatarIconView.Companion.setShape
 import net.pantasystem.milktea.common.ui.ToolbarSetter
 import net.pantasystem.milktea.common_android_ui.PageableFragmentFactory
@@ -44,6 +45,9 @@ class TabFragment : Fragment(R.layout.fragment_tab) {
     @Inject
     lateinit var pageableFragmentFactory: PageableFragmentFactory
 
+    @Inject
+    lateinit var loggerFactory: Logger.Factory
+
     private val mTabViewModel by viewModels<TabViewModel>()
 
     private var mPages: List<Page>? = null
@@ -66,7 +70,8 @@ class TabFragment : Fragment(R.layout.fragment_tab) {
         mPagerAdapter = TimelinePagerAdapter(
             this.childFragmentManager,
             pageableFragmentFactory,
-            mPages ?: emptyList()
+            mPages ?: emptyList(),
+            loggerFactory,
         )
 
         return super.onCreateView(inflater, container, savedInstanceState)

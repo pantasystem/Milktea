@@ -2,10 +2,12 @@
 package jp.panta.misskeyandroidclient.ui.tab
 
 import android.os.Bundle
+import android.os.Parcelable
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentStatePagerAdapter
 import androidx.viewpager.widget.PagerAdapter
+import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.common_android_ui.PageableFragmentFactory
 import net.pantasystem.milktea.model.account.page.Page
 import java.util.UUID
@@ -15,7 +17,12 @@ internal class TimelinePagerAdapter(
     fragmentManager: FragmentManager,
     private val pageableFragmentFactory: PageableFragmentFactory,
     list: List<Page>,
+    loggerFactory: Logger.Factory
 ) : FragmentStatePagerAdapter(fragmentManager, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT) {
+
+    private val logger by lazy {
+        loggerFactory.create("TimelinePagerAdapter")
+    }
 
     companion object {
         const val FRAGMENT_TAG = "TimelinePagerAdapter.FRAGMENT_TAG"
@@ -64,6 +71,16 @@ internal class TimelinePagerAdapter(
         }
 
         return PagerAdapter.POSITION_NONE
+    }
+
+    override fun restoreState(state: Parcelable?, loader: ClassLoader?) {
+        logger.log("restoreState")
+        try {
+            super.restoreState(state, loader)
+        } catch (e: Exception) {
+            logger.error("restoreState error", e)
+            e.printStackTrace()
+        }
     }
 
     fun setList(list: List<Page>) {

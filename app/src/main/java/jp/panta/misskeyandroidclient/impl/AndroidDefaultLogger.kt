@@ -33,6 +33,10 @@ class AndroidDefaultLogger(
         }
     }
 
+    override fun log(msg: String) {
+        FirebaseCrashlytics.getInstance().log(msg)
+    }
+
     override fun info(msg: String, tag: String, e: Throwable?) {
         Log.i(tag, msg, e)
     }
