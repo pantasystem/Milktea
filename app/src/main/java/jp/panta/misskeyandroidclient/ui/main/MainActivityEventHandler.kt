@@ -123,7 +123,7 @@ internal class MainActivityEventHandler(
     private fun collectCreateNoteState() {
         // NOTE: ノート作成処理の状態をSnackBarで表示する
         lifecycleScope.launch {
-            lifecycleOwner.repeatOnLifecycle(Lifecycle.State.CREATED) {
+            lifecycleOwner.repeatOnLifecycle(Lifecycle.State.RESUMED) {
                 createNoteWorkerExecutor.getCreateNoteWorkInfosInAppActives()
                     .collect { workInfoList ->
                         Log.d("collectCreateNoteState", "workInfoList:$workInfoList")
