@@ -24,6 +24,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import net.pantasystem.milktea.common.glide.GlideApp
+import net.pantasystem.milktea.common.glide.GlideUtils
 import net.pantasystem.milktea.model.setting.DefaultConfig
 import net.pantasystem.milktea.model.setting.LocalConfigRepository
 import net.pantasystem.milktea.note.R
@@ -378,7 +379,9 @@ class TimelineListAdapter(
 //        simpleNote.reactionView.itemAnimator?.endAnimations()
 
         imageViews.map {
-            Glide.with(it).clear(it)
+            if (GlideUtils.isAvailableContextForGlide(it.context)) {
+                Glide.with(it).clear(it)
+            }
         }
 
         if (holder is NoteViewHolderBase<*>) {
