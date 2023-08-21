@@ -48,6 +48,7 @@ fun ChannelDetailScreen(
                 id = R.id.container
             }
         }, update = {
+            it.id = R.id.container
             onUpdateFragment(R.id.container, it, channelId)
         })
     }
