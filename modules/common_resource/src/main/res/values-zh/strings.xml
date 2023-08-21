@@ -613,6 +613,7 @@
     <string name="misskey_role_drive_no_free_space_error_message">无法上传文件，因为硬盘没有可用空间</string>
     <string name="qr_code">QR Code</string>
     <string name="copy">Copy</string>
+    <string name="no_app_available_to_open_this_file">没有应用可打开此文件</string>
     <!-- User -->
 
 </resources>

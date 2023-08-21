@@ -2,11 +2,13 @@ package net.pantasystem.milktea.note.url
 
 import android.annotation.SuppressLint
 import android.app.Activity
+import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.net.Uri
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -15,6 +17,7 @@ import dagger.hilt.android.internal.managers.FragmentComponentManager
 import net.pantasystem.milktea.common_android.ui.CircleOutlineHelper.setCircleOutline
 import net.pantasystem.milktea.common_android_ui.NavigationEntryPointForBinding
 import net.pantasystem.milktea.common_navigation.MediaNavigationArgs
+import net.pantasystem.milktea.common_resource.R
 import net.pantasystem.milktea.note.databinding.ItemFilePreviewBinding
 import net.pantasystem.milktea.note.databinding.ItemUrlPreviewBinding
 import net.pantasystem.milktea.note.url.UrlPreviewHelper.setSiteIcon
@@ -74,12 +77,17 @@ class PreviewListAdapter : ListAdapter<Preview, RecyclerView.ViewHolder>(ItemCal
                     }
 
                 }else{
-                    context?.startActivity(
-                        Intent().apply{
-                            data = Uri.parse(preview.file.path)
-                            type = preview.file.type
-                        }
-                    )
+                    try {
+                        context?.startActivity(
+                            Intent().apply{
+                                data = Uri.parse(preview.file.path)
+                                type = preview.file.type
+                            }
+                        )
+                    } catch (e: ActivityNotFoundException) {
+                        Toast.makeText(context, context.getString(R.string.no_app_available_to_open_this_file), Toast.LENGTH_SHORT).show()
+                    }
+
                 }
 
             }
