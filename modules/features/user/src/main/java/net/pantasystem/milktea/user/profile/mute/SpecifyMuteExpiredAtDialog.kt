@@ -39,11 +39,11 @@ class SpecifyMuteExpiredAtDialog : AppCompatDialogFragment() {
                                     }
                                     SpecifyMuteUserAction.OnDateChangeButtonClicked -> {
                                         UserMuteExpiredDatePickerDialog()
-                                            .show(childFragmentManager, "UserMuteExpiredDatePickerDialog")
+                                            .show(childFragmentManager, UserMuteExpiredDatePickerDialog.FRAGMENT_TAG)
                                     }
                                     SpecifyMuteUserAction.OnTimeChangeButtonClicked -> {
                                         UserMuteExpiredTimePickerDialog()
-                                            .show(childFragmentManager, "UserMuteExpiredTimePickerDialog")
+                                            .show(childFragmentManager, UserMuteExpiredTimePickerDialog.FRAGMENT_TAG)
                                     }
                                 }
                             }
@@ -73,6 +73,10 @@ class SpecifyMuteExpiredAtDialog : AppCompatDialogFragment() {
 @AndroidEntryPoint
 class UserMuteExpiredDatePickerDialog : AppCompatDialogFragment(), DatePickerDialog.OnDateSetListener {
 
+    companion object {
+        const val FRAGMENT_TAG = "UserMuteExpiredDatePickerDialog"
+    }
+
     val viewModel: MuteUserViewModel by activityViewModels()
 
 
@@ -88,6 +92,9 @@ class UserMuteExpiredDatePickerDialog : AppCompatDialogFragment(), DatePickerDia
 
 @AndroidEntryPoint
 class UserMuteExpiredTimePickerDialog : AppCompatDialogFragment(), TimePickerDialog.OnTimeSetListener {
+    companion object {
+        const val FRAGMENT_TAG = "UserMuteExpiredTimePickerDialog"
+    }
     val viewModel: MuteUserViewModel by activityViewModels()
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
