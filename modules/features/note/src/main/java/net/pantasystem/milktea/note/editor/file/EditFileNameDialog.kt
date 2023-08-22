@@ -22,6 +22,7 @@ import javax.inject.Inject
 class EditFileNameDialog : AppCompatDialogFragment() {
 
     companion object {
+        const val FRAGMENT_TAG = "EditFileNameDialog"
         fun newInstance(appFile: AppFile, name: String?): EditFileNameDialog {
             return EditFileNameDialog().apply {
                 arguments = Bundle().apply {

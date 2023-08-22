@@ -102,7 +102,7 @@ class DriveActivity : AppCompatActivity() {
 
 
     private fun createDirectoryDialog() {
-        CreateFolderDialog().show(supportFragmentManager, "CreateFolder")
+        CreateFolderDialog().show(supportFragmentManager, CreateFolderDialog.FRAGMENT_TAG)
     }
 
     private fun showFileManager() {

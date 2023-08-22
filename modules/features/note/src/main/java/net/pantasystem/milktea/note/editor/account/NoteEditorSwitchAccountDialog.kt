@@ -21,6 +21,11 @@ import javax.inject.Inject
 
 @AndroidEntryPoint
 class NoteEditorSwitchAccountDialog : BottomSheetDialogFragment() {
+
+    companion object {
+        const val FRAGMENT_TAG = "NoteEditorSwitchAccountDialog"
+    }
+
     @Inject
     lateinit var authorizationNavigation: AuthorizationNavigation
 

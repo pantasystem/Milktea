@@ -12,6 +12,10 @@ import jp.panta.misskeyandroidclient.ui.main.viewmodel.MainViewModel
 @AndroidEntryPoint
 class ConfirmCrashlyticsDialog : AppCompatDialogFragment() {
 
+    companion object {
+        const val FRAGMENT_TAG = "ConfirmCrashlyticsDialog"
+    }
+
     private val mainViewModel by activityViewModels<MainViewModel>()
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {

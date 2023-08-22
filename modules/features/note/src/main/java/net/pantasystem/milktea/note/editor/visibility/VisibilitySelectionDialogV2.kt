@@ -40,6 +40,10 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class VisibilitySelectionDialogV2 : BottomSheetDialogFragment() {
 
+    companion object {
+        const val FRAGMENT_TAG = "VisibilitySelectionDialogV2"
+    }
+
     @Inject
     internal lateinit var configRepository: LocalConfigRepository
 

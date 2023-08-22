@@ -11,6 +11,9 @@ import jp.panta.misskeyandroidclient.ui.main.viewmodel.MainViewModel
 
 @AndroidEntryPoint
 class ConfirmGoogleAnalyticsDialog : DialogFragment() {
+    companion object {
+        const val FRAGMENT_TAG = "ConfirmGoogleAnalyticsDialog"
+    }
 
     private val mainViewModel: MainViewModel by activityViewModels()
 

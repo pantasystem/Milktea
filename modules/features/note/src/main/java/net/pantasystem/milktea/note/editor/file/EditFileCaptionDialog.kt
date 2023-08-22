@@ -22,6 +22,7 @@ import javax.inject.Inject
 class EditFileCaptionDialog : AppCompatDialogFragment() {
 
     companion object {
+        const val FRAGMENT_TAG = "EditFileCaptionDialog"
         fun newInstance(appFile: AppFile, comment: String?): EditFileCaptionDialog {
             return EditFileCaptionDialog().apply {
                 arguments = Bundle().apply {

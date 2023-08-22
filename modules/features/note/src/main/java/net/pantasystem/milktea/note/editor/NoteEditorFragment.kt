@@ -248,7 +248,7 @@ class NoteEditorFragment : Fragment(R.layout.fragment_note_editor), EmojiSelecti
         noteEditorToolbar.noteVisibility.setOnClickListener {
             logger.debug("公開範囲を設定しようとしています")
             val dialog = VisibilitySelectionDialogV2()
-            dialog.show(childFragmentManager, "NoteEditor")
+            dialog.show(childFragmentManager, VisibilitySelectionDialogV2.FRAGMENT_TAG)
         }
 
 
@@ -265,7 +265,7 @@ class NoteEditorFragment : Fragment(R.layout.fragment_note_editor), EmojiSelecti
         noteEditorToolbar.viewModel = noteEditorViewModel
 
         accountViewModel.switchAccountEvent.onEach {
-            NoteEditorSwitchAccountDialog().show(childFragmentManager, "tag")
+            NoteEditorSwitchAccountDialog().show(childFragmentManager, NoteEditorSwitchAccountDialog.FRAGMENT_TAG)
         }.flowWithLifecycle(
             viewLifecycleOwner.lifecycle, Lifecycle.State.RESUMED
         ).launchIn(viewLifecycleOwner.lifecycleScope)
@@ -326,10 +326,10 @@ class NoteEditorFragment : Fragment(R.layout.fragment_note_editor), EmojiSelecti
                         requireActivity().startActivity(intent)
                     }, onEditFileCaptionSelectionClicked = {
                         EditFileCaptionDialog.newInstance(it.file, it.comment ?: "")
-                            .show(childFragmentManager, "editCaption")
+                            .show(childFragmentManager, EditFileCaptionDialog.FRAGMENT_TAG)
                     }, onEditFileNameSelectionClicked = {
                         EditFileNameDialog.newInstance(it.file, it.name)
-                            .show(childFragmentManager, "editFileName")
+                            .show(childFragmentManager, EditFileNameDialog.FRAGMENT_TAG)
                     })
                 }
 

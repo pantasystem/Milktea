@@ -9,6 +9,9 @@ import net.pantasystem.milktea.drive.databinding.DialogCreateFolderBinding
 import net.pantasystem.milktea.drive.viewmodel.DriveViewModel
 
 class CreateFolderDialog : AppCompatDialogFragment(){
+    companion object {
+        const val FRAGMENT_TAG = "CreateFolderDialog"
+    }
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val dialog =  super.onCreateDialog(savedInstanceState)
         val view = View.inflate(dialog.context, R.layout.dialog_create_folder, null)
