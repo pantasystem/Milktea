@@ -169,10 +169,10 @@ class SimpleEditorFragment : Fragment(R.layout.fragment_simple_editor), SimpleEd
                             requireActivity().startActivity(intent)
                         },
                         onEditFileCaptionSelectionClicked = {
-                            EditFileCaptionDialog.newInstance(it.file, it.comment).show(childFragmentManager, "editFileName")
+                            EditFileCaptionDialog.newInstance(it.file, it.comment).show(childFragmentManager, EditFileCaptionDialog.FRAGMENT_TAG)
                         },
                         onEditFileNameSelectionClicked = {
-                            EditFileNameDialog.newInstance(it.file, it.name).show(childFragmentManager, "showEditComment")
+                            EditFileNameDialog.newInstance(it.file, it.name).show(childFragmentManager, EditFileNameDialog.FRAGMENT_TAG)
                         }
                     )
                 }
@@ -201,7 +201,7 @@ class SimpleEditorFragment : Fragment(R.layout.fragment_simple_editor), SimpleEd
 
         mBinding.noteVisibility.setOnClickListener {
             val dialog = VisibilitySelectionDialogV2()
-            dialog.show(childFragmentManager, "NoteEditor")
+            dialog.show(childFragmentManager, VisibilitySelectionDialogV2.FRAGMENT_TAG)
         }
 
         lifecycleScope.launch {
@@ -213,12 +213,12 @@ class SimpleEditorFragment : Fragment(R.layout.fragment_simple_editor), SimpleEd
         }
 
         viewModel.showPollDatePicker.onEach {
-            PollTimePickerDialog().show(childFragmentManager, "TimePicker")
+            PollTimePickerDialog().show(childFragmentManager, PollTimePickerDialog.FRAGMENT_TAG)
         }.flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.RESUMED)
             .launchIn(viewLifecycleOwner.lifecycleScope)
 
         viewModel.showPollDatePicker.onEach {
-            PollDatePickerDialog().show(childFragmentManager, "DatePicker")
+            PollDatePickerDialog().show(childFragmentManager, PollDatePickerDialog.FRAGMENT_TAG)
         }.flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.RESUMED)
             .launchIn(viewLifecycleOwner.lifecycleScope)
 
@@ -251,7 +251,7 @@ class SimpleEditorFragment : Fragment(R.layout.fragment_simple_editor), SimpleEd
         }
 
         mBinding.showEmojisButton.setOnClickListener {
-            CustomEmojiPickerDialog.newInstance(null).show(childFragmentManager, "Editor")
+            CustomEmojiPickerDialog.newInstance(null).show(childFragmentManager, CustomEmojiPickerDialog.FRAGMENT_TAG)
         }
 
 

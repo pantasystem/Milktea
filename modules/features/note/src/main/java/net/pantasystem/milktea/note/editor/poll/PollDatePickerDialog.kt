@@ -20,6 +20,10 @@ import java.util.Date
 @AndroidEntryPoint
 class PollDatePickerDialog : AppCompatDialogFragment(), DatePickerDialog.OnDateSetListener{
 
+    companion object {
+        const val FRAGMENT_TAG = "PollDatePickerDialog"
+    }
+
     private val mViewModel: NoteEditorViewModel by activityViewModels()
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {

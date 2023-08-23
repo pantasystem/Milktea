@@ -248,7 +248,7 @@ class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view)
                         return true
                     }
                     R.id.set_time_machine -> {
-                        TimeMachineDialog().show(childFragmentManager, "")
+                        TimeMachineDialog().show(childFragmentManager, TimeMachineDialog.FRAGMENT_TAG)
                         return true
                     }
                 }

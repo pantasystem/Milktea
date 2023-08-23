@@ -20,6 +20,9 @@ import net.pantasystem.milktea.note.timeline.viewmodel.TimeMachineEventViewModel
 
 @AndroidEntryPoint
 class TimeMachineDialog : AppCompatDialogFragment() {
+    companion object {
+        const val FRAGMENT_TAG = "TimeMachineDialog"
+    }
 
     val viewModel by activityViewModels<TimeMachineDialogViewModel>()
     private val timeMachineEventViewModel by activityViewModels<TimeMachineEventViewModel>()

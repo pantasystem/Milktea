@@ -18,6 +18,10 @@ import java.util.Date
 
 class PollTimePickerDialog : AppCompatDialogFragment(), TimePickerDialog.OnTimeSetListener {
 
+    companion object {
+        const val FRAGMENT_TAG = "PollTimePickerDialog"
+    }
+
     private val mViewModel: NoteEditorViewModel by activityViewModels()
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val viewModel = mViewModel
