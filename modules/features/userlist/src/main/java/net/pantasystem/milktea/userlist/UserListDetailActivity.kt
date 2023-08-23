@@ -179,7 +179,7 @@ class UserListDetailActivity : AppCompatActivity(), UserListEditorDialog.OnSubmi
             mUserListDetailViewModel.getUserListId().userListId,
             mUserListDetailViewModel.userList.value?.userList?.name ?: ""
         )
-        dialog.show(supportFragmentManager, "")
+        dialog.show(supportFragmentManager, UserListEditorDialog.FRAGMENT_TAG)
     }
 
 

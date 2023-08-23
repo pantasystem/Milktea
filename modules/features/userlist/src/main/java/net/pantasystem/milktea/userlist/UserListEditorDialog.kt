@@ -12,6 +12,8 @@ import net.pantasystem.milktea.userlist.databinding.DialogUserListEditorBinding
 class UserListEditorDialog : AppCompatDialogFragment(){
 
     companion object{
+        const val FRAGMENT_TAG = "UserListEditorDialog"
+
         private const val EXTRA_MODE = "jp.panta.misskeyandroidclient.viewmodel.list.EXTRA_MODE"
         private const val EXTRA_LIST_ID = "jp.panta.misskeyandroidclient.viewmodel.list.EXTRA_LIST_ID"
         private const val EXTRA_LIST_NAME = "jp.panta.misskeyandroidclient.viewmodel.list.EXTRA_LIST_NAME"

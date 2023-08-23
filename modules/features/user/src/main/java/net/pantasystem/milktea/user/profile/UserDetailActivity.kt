@@ -292,7 +292,7 @@ class UserDetailActivity : AppCompatActivity() {
 
 
         binding.editNicknameButton.setOnClickListener {
-            EditNicknameDialog().show(supportFragmentManager, "editNicknameDialog")
+            EditNicknameDialog().show(supportFragmentManager, EditNicknameDialog.FRAGMENT_TAG)
         }
 
 

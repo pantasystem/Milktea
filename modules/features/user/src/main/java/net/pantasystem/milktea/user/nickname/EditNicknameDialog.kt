@@ -13,6 +13,9 @@ import net.pantasystem.milktea.user.profile.viewmodel.UserDetailViewModel
 @AndroidEntryPoint
 class EditNicknameDialog : AppCompatDialogFragment() {
 
+    companion object {
+        const val FRAGMENT_TAG = "EditNicknameDialog"
+    }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val dialog = super.onCreateDialog(savedInstanceState)
