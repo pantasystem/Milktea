@@ -34,11 +34,11 @@ class TimeMachineDialog : AppCompatDialogFragment() {
         binding.viewModel = viewModel
 
         binding.pickTime.setOnClickListener {
-            TimeMachineTimePickerDialog().show(childFragmentManager, "timeMachineTimePickerDialog")
+            TimeMachineTimePickerDialog().show(childFragmentManager, TimeMachineTimePickerDialog.FRAGMENT_TAG)
         }
 
         binding.pickDate.setOnClickListener {
-            TimeMachineDatePickerDialog().show(childFragmentManager, "timeMachineDatePickerDialog")
+            TimeMachineDatePickerDialog().show(childFragmentManager, TimeMachineDatePickerDialog.FRAGMENT_TAG)
         }
 
         return MaterialAlertDialogBuilder(requireContext())
@@ -56,6 +56,10 @@ class TimeMachineDialog : AppCompatDialogFragment() {
 @AndroidEntryPoint
 class TimeMachineDatePickerDialog : AppCompatDialogFragment(), DatePickerDialog.OnDateSetListener {
 
+    companion object {
+        const val FRAGMENT_TAG = "TimeMachineDatePickerDialog"
+    }
+
     val viewModel: TimeMachineDialogViewModel by activityViewModels()
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
@@ -69,6 +73,10 @@ class TimeMachineDatePickerDialog : AppCompatDialogFragment(), DatePickerDialog.
 }
 
 class TimeMachineTimePickerDialog : AppCompatDialogFragment(), TimePickerDialog.OnTimeSetListener {
+    companion object {
+        const val FRAGMENT_TAG = "TimeMachineTimePickerDialog"
+    }
+
     val viewModel: TimeMachineDialogViewModel by activityViewModels()
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {

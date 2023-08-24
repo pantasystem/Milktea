@@ -15,6 +15,7 @@ import net.pantasystem.milktea.model.user.User
 class ReportDialog : AppCompatDialogFragment(){
 
     companion object {
+        const val FRAGMENT_TAG = "ReportDialog"
         private const val EXTRA_USER_ID = "USER_ID"
         private const val EXTRA_ACCOUNT_ID = "ACCOUNT_ID"
         private const val EXTRA_TEXT = "TEXT"

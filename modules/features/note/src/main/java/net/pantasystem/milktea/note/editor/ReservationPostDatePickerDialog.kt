@@ -11,9 +11,14 @@ import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import net.pantasystem.milktea.note.editor.viewmodel.NoteEditorViewModel
-import java.util.*
+import java.util.Calendar
+import java.util.Date
 
 class ReservationPostDatePickerDialog : AppCompatDialogFragment(), DatePickerDialog.OnDateSetListener {
+    companion object {
+        const val FRAGMENT_TAG = "ReservationPostDatePickerDialog"
+    }
+
     private var mViewModel: NoteEditorViewModel? = null
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {

@@ -134,7 +134,7 @@ class NoteDetailActivity : AppCompatActivity() {
                 addToTab()
             }
             R.id.nav_switch_account -> {
-                NoteDetailAccountSwitchDialog().show(supportFragmentManager, "switch_account")
+                NoteDetailAccountSwitchDialog().show(supportFragmentManager, NoteDetailAccountSwitchDialog.FRAGMENT_TAG)
             }
         }
         return super.onOptionsItemSelected(item)

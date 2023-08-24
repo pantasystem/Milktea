@@ -141,11 +141,11 @@ class NoteOptionDialog : BottomSheetDialogFragment() {
                         },
                         onShowReactionHistoryButtonClicked = {
                             dismiss()
-                            ReactionHistoryPagerDialog.newInstance(it).show(parentFragmentManager, "ReactionHistoryPagerDialog")
+                            ReactionHistoryPagerDialog.newInstance(it).show(parentFragmentManager, ReactionHistoryPagerDialog.FRAGMENT_TAG)
                         },
                         onToggleAddNoteToClipButtonClicked = {
                             dismiss()
-                            ToggleAddNoteToClipDialog.newInstance(it).show(parentFragmentManager, "ToggleAddNoteToClipDialog")
+                            ToggleAddNoteToClipDialog.newInstance(it).show(parentFragmentManager, ToggleAddNoteToClipDialog.FRAGMENT_TAG)
                         }
                     )
                 }

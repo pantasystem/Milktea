@@ -75,11 +75,11 @@ class PageSettingActivity : AppCompatActivity() {
         applyTheme()
 
         mPageSettingViewModel.pageOnActionEvent.onEach {
-            PageSettingActionDialog.newInstance(it).show(supportFragmentManager, "PSA")
+            PageSettingActionDialog.newInstance(it).show(supportFragmentManager, PageSettingActionDialog.FRAGMENT_TAG)
         }.flowWithLifecycle(lifecycle).launchIn(lifecycleScope)
 
         mPageSettingViewModel.pageOnUpdateEvent.onEach {
-            EditTabSettingDialog.newInstance(it).show(supportFragmentManager, "ETD")
+            EditTabSettingDialog.newInstance(it).show(supportFragmentManager, EditTabSettingDialog.FRAGMENT_TAG)
         }.flowWithLifecycle(lifecycle).launchIn(lifecycleScope)
 //
         mPageSettingViewModel.pageAddedEvent.onEach { pt ->

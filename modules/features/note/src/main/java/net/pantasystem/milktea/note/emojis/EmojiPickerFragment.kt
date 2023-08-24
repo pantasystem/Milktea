@@ -132,7 +132,7 @@ class EmojiSelectionBinder(
                 val exists = emojiPickerViewModel.uiState.value.isExistsConfig(emojiType)
                 if (!exists) {
                     AddEmojiToUserConfigDialog.newInstance(emojiType)
-                        .show(fragmentManager, "AddEmojiToUserConfigDialog")
+                        .show(fragmentManager, AddEmojiToUserConfigDialog.FRAGMENT_TAG)
                     true
                 } else {
                     false

@@ -16,6 +16,7 @@ import net.pantasystem.milktea.setting.viewmodel.page.PageSettingViewModel
 class PageSettingActionDialog : BottomSheetDialogFragment(){
 
     companion object {
+        const val FRAGMENT_TAG = "PageSettingActionDialog"
         private const val PAGE = "PageSettingActionDialog.page"
         fun newInstance(page: Page): PageSettingActionDialog {
             return PageSettingActionDialog().apply {

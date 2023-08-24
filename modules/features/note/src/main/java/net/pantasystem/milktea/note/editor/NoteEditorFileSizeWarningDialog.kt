@@ -18,6 +18,7 @@ class NoteEditorFileSizeWarningDialog : AppCompatDialogFragment() {
     private val noteEditorViewModel: NoteEditorViewModel by activityViewModels()
 
     companion object {
+        const val FRAGMENT_TAG = "NoteEditorFileSizeWarningDialog"
         private const val EXTRA_APP_FILE_LOCAL = "NoteEditorFileSizeWarningDialog.EXTRA_APP_FILE_LOCAL"
         private const val EXTRA_HOST = "NoteEditorFileSizeWarningDialog.EXTRA_HOST"
         private const val EXTRA_ALLOW_MAX_SIZE = "NoteEditorFileSizeWarningDialog.EXTRA_ALLOW_MAX_SIZE"

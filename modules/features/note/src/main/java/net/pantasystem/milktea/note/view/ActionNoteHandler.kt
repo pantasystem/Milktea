@@ -80,13 +80,13 @@ class ActionNoteHandler(
         mNotesViewModel.confirmReportEvent.onEach { report ->
             report?.let {
                 ReportDialog.newInstance(report.userId, report.comment, report.noteIds)
-                    .show(activity.supportFragmentManager, "")
+                    .show(activity.supportFragmentManager, ReportDialog.FRAGMENT_TAG)
             }
         }.flowWithLifecycle(activity.lifecycle, Lifecycle.State.RESUMED)
             .launchIn(activity.lifecycleScope)
 
         confirmViewModel.confirmEvent.onEach {
-            ConfirmDialog.newInstance(it).show(activity.supportFragmentManager, "")
+            ConfirmDialog.newInstance(it).show(activity.supportFragmentManager, ConfirmDialog.FRAGMENT_TAG)
         }.flowWithLifecycle(activity.lifecycle, Lifecycle.State.RESUMED)
             .launchIn(activity.lifecycleScope)
 

@@ -443,12 +443,12 @@ class NoteEditorFragment : Fragment(R.layout.fragment_note_editor), EmojiSelecti
         }
 
         noteEditorViewModel.showPollTimePicker.onEach {
-            PollTimePickerDialog().show(childFragmentManager, "TimePicker")
+            PollTimePickerDialog().show(childFragmentManager, PollTimePickerDialog.FRAGMENT_TAG)
         }.flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.RESUMED)
             .launchIn(viewLifecycleOwner.lifecycleScope)
 
         noteEditorViewModel.showPollDatePicker.onEach {
-            PollDatePickerDialog().show(childFragmentManager, "DatePicker")
+            PollDatePickerDialog().show(childFragmentManager, PollDatePickerDialog.FRAGMENT_TAG)
         }.flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.RESUMED)
             .launchIn(viewLifecycleOwner.lifecycleScope)
 
@@ -459,11 +459,11 @@ class NoteEditorFragment : Fragment(R.layout.fragment_note_editor), EmojiSelecti
         }
 
         binding.reservationAtPickDateButton.setOnClickListener {
-            ReservationPostDatePickerDialog().show(childFragmentManager, "Pick date")
+            ReservationPostDatePickerDialog().show(childFragmentManager, ReservationPostDatePickerDialog.FRAGMENT_TAG)
         }
 
         binding.reservationAtPickTimeButton.setOnClickListener {
-            ReservationPostTimePickerDialog().show(childFragmentManager, "Pick time")
+            ReservationPostTimePickerDialog().show(childFragmentManager, ReservationPostTimePickerDialog.FRAGMENT_TAG)
         }
 
         binding.cw.setOnFocusChangeListener { _, hasFocus ->
@@ -506,7 +506,7 @@ class NoteEditorFragment : Fragment(R.layout.fragment_note_editor), EmojiSelecti
         ).launchIn(viewLifecycleOwner.lifecycleScope)
 
         confirmViewModel.confirmEvent.onEach {
-            ConfirmDialog.newInstance(it).show(childFragmentManager, "confirm")
+            ConfirmDialog.newInstance(it).show(childFragmentManager, ConfirmDialog.FRAGMENT_TAG)
         }.flowWithLifecycle(
             viewLifecycleOwner.lifecycle, Lifecycle.State.RESUMED
         ).launchIn(viewLifecycleOwner.lifecycleScope)
@@ -542,7 +542,7 @@ class NoteEditorFragment : Fragment(R.layout.fragment_note_editor), EmojiSelecti
                 whenStarted {
                     NoteEditorFileSizeWarningDialog.newInstance(
                         it.account.getHost(), it.instanceInfo.clientMaxBodyByteSize ?: 0, it.file
-                    ).show(childFragmentManager, "fileSizeInvalidDialog")
+                    ).show(childFragmentManager, NoteEditorFileSizeWarningDialog.FRAGMENT_TAG)
                 }
             }
         }

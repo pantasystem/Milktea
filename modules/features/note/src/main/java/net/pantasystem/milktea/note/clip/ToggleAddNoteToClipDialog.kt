@@ -19,6 +19,7 @@ import javax.inject.Inject
 class ToggleAddNoteToClipDialog : BottomSheetDialogFragment() {
 
     companion object {
+        const val FRAGMENT_TAG = "ToggleAddNoteToClipDialog"
         fun newInstance(noteId: Note.Id): ToggleAddNoteToClipDialog {
             return ToggleAddNoteToClipDialog().apply {
                 arguments = Bundle().apply {

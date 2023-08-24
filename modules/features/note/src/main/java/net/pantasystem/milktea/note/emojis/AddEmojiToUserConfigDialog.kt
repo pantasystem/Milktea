@@ -17,6 +17,7 @@ import net.pantasystem.milktea.note.toTextReaction
 class AddEmojiToUserConfigDialog : AppCompatDialogFragment() {
 
     companion object {
+        const val FRAGMENT_TAG = "AddEmojiToUserConfigDialog"
 
 
         fun newInstance(emojiType: EmojiType): DialogFragment {

@@ -14,6 +14,8 @@ import net.pantasystem.milktea.model.confirm.ResultType
 class ConfirmDialog : AppCompatDialogFragment(){
 
     companion object {
+        const val FRAGMENT_TAG = "ConfirmDialog"
+
         fun newInstance(command: ConfirmCommand): ConfirmDialog {
             return ConfirmDialog().apply {
                 arguments = Bundle().apply {

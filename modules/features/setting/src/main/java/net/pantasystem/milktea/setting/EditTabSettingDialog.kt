@@ -20,6 +20,7 @@ import net.pantasystem.milktea.setting.viewmodel.page.PageSettingViewModel
 class EditTabSettingDialog : AppCompatDialogFragment(){
 
     companion object {
+        const val FRAGMENT_TAG = "EditTabSettingDialog"
         fun newInstance(page: Page): EditTabSettingDialog {
             return EditTabSettingDialog().apply {
                 arguments = Bundle().apply {
