@@ -12,6 +12,10 @@ import net.pantasystem.milktea.user.profile.viewmodel.UserDetailViewModel
 @AndroidEntryPoint
 class ConfirmUserBlockDialog : AppCompatDialogFragment() {
 
+    companion object {
+        const val FRAGMENT_TAG = "ConfirmUserBlockDialog"
+    }
+
     val viewModel: UserDetailViewModel by activityViewModels()
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {

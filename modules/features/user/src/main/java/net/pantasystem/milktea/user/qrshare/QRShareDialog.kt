@@ -57,6 +57,9 @@ import javax.inject.Inject
 
 @AndroidEntryPoint
 class QRShareDialog : AppCompatDialogFragment() {
+    companion object {
+        const val FRAGMENT_TAG = "QRShareDialog"
+    }
 
     @Inject
     internal lateinit var configRepository: LocalConfigRepository

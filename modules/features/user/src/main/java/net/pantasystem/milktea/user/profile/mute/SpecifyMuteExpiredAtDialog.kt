@@ -20,6 +20,10 @@ import net.pantasystem.milktea.user.profile.viewmodel.UserDetailViewModel
 @AndroidEntryPoint
 class SpecifyMuteExpiredAtDialog : AppCompatDialogFragment() {
 
+    companion object {
+        const val FRAGMENT_TAG = "SpecifyMuteExpiredAtDialog"
+    }
+
     val userDetailViewModel by activityViewModels<UserDetailViewModel>()
     val viewModel by activityViewModels<MuteUserViewModel>()
 

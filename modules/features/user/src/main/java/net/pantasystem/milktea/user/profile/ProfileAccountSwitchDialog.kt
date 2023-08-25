@@ -21,6 +21,10 @@ import javax.inject.Inject
 
 @AndroidEntryPoint
 class ProfileAccountSwitchDialog : BottomSheetDialogFragment() {
+    companion object {
+        const val FRAGMENT_TAG = "ProfileAccountSwitchDialog"
+    }
+
     @Inject
     lateinit var authorizationNavigation: AuthorizationNavigation
 

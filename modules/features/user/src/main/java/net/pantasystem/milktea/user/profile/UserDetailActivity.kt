@@ -344,11 +344,11 @@ class UserDetailActivity : AppCompatActivity() {
                 return true
             }
             R.id.block -> {
-                ConfirmUserBlockDialog().show(supportFragmentManager, "ConfirmUserBlockDialog")
+                ConfirmUserBlockDialog().show(supportFragmentManager, ConfirmUserBlockDialog.FRAGMENT_TAG)
             }
             R.id.mute -> {
                 SpecifyMuteExpiredAtDialog()
-                    .show(supportFragmentManager, "SpecifyMuteExpiredAtDialog")
+                    .show(supportFragmentManager, SpecifyMuteExpiredAtDialog.FRAGMENT_TAG)
             }
             R.id.unblock -> {
                 mViewModel.unblock()
@@ -366,7 +366,7 @@ class UserDetailActivity : AppCompatActivity() {
             }
             R.id.report_user -> {
                 mUserId?.let {
-                    ReportDialog.newInstance(it).show(supportFragmentManager, "")
+                    ReportDialog.newInstance(it).show(supportFragmentManager, ReportDialog.FRAGMENT_TAG)
                 }
             }
             R.id.share -> {
@@ -400,10 +400,10 @@ class UserDetailActivity : AppCompatActivity() {
                 )
             }
             R.id.nav_switch_account -> {
-                ProfileAccountSwitchDialog().show(supportFragmentManager, "switchAccountDialog")
+                ProfileAccountSwitchDialog().show(supportFragmentManager, ProfileAccountSwitchDialog.FRAGMENT_TAG)
             }
             R.id.show_qr_code -> {
-                QRShareDialog().show(supportFragmentManager, "QRShareDialog")
+                QRShareDialog().show(supportFragmentManager, QRShareDialog.FRAGMENT_TAG)
             }
             else -> return false
 
