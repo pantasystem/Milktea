@@ -18,7 +18,6 @@ import net.pantasystem.milktea.common_navigation.UserDetailNavigationArgs
 import net.pantasystem.milktea.model.note.Note
 import net.pantasystem.milktea.model.note.NoteCaptureAPIAdapter
 import net.pantasystem.milktea.model.setting.LocalConfigRepository
-import net.pantasystem.milktea.note.view.RenoteUsersScreen
 import javax.inject.Inject
 
 @AndroidEntryPoint

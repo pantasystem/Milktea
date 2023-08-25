@@ -1,4 +1,4 @@
-package net.pantasystem.milktea.note.view
+package net.pantasystem.milktea.note.renote
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -21,10 +21,6 @@ import kotlinx.coroutines.flow.mapNotNull
 import net.pantasystem.milktea.common.PageableState
 import net.pantasystem.milktea.common.StateContent
 import net.pantasystem.milktea.model.user.User
-import net.pantasystem.milktea.note.renote.ItemRenoteAction
-import net.pantasystem.milktea.note.renote.ItemRenoteUser
-import net.pantasystem.milktea.note.renote.RenoteItemType
-import net.pantasystem.milktea.note.renote.RenotesViewModel
 
 
 @ExperimentalCoroutinesApi
