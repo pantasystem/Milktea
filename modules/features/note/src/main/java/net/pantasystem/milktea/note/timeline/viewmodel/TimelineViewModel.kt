@@ -255,7 +255,12 @@ class TimelineViewModel @AssistedInject constructor(
             timelineStore.suspendStreaming()
         }
         viewModelScope.launch {
-            timelineStore.releaseUnusedPages(firstVisiblePosition)
+            try {
+                timelineStore.releaseUnusedPages(firstVisiblePosition)
+            } catch (e: IllegalArgumentException) {
+                logger.log("release unused pages failed")
+                logger.error("release unused pages failed", e)
+            }
         }
         saveScrollPositionScrolledEvent.tryEmit(firstVisiblePosition)
     }
