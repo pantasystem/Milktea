@@ -17,7 +17,11 @@ data class WordFilterConfig(
                     }
                 }
                 is FilterConditionType.Regex -> {
-                    type.regex.matches(text)
+                    try {
+                        type.regex.matches(text)
+                    } catch (e: Exception) {
+                        false
+                    }
                 }
             }
         }
