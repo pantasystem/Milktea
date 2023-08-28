@@ -125,12 +125,8 @@ internal class TimelinePagingStoreImpl(
                 is Pageable.Mention -> api::mentions
                 is Pageable.CalckeyRecommendedTimeline -> api::getCalckeyRecommendedTimeline
                 is Pageable.ClipNotes -> api::getClipNotes
-                is Pageable.Antenna -> {
-                    (api)::antennasNotes
-                }
-                is Pageable.ChannelTimeline -> {
-                    (api)::channelTimeline
-                }
+                is Pageable.Antenna -> (api)::antennasNotes
+                is Pageable.ChannelTimeline -> api::channelTimeline
                 else -> throw IllegalArgumentException("unknown class:${pageableTimeline.javaClass}")
             }
 
