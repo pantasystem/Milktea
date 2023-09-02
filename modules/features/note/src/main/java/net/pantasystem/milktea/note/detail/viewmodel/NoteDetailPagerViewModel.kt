@@ -10,7 +10,6 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import net.pantasystem.milktea.app_store.account.AccountStore
@@ -59,11 +58,7 @@ class NoteDetailPagerViewModel @Inject constructor(
         EXTRA_ACCOUNT_ID,
         null
     ).flatMapLatest { accountId ->
-        accountStore.state.map { state ->
-            accountId?.let {
-                state.get(it)
-            } ?: state.currentAccount
-        }
+        accountStore.getOrCurrent(accountId)
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
 
 

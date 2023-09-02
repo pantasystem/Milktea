@@ -42,11 +42,7 @@ class SearchResultViewModel @Inject constructor(
     val account = savedStateHandle.getStateFlow(EXTRA_ACCOUNT_ID, - 1L).map {
         it.takeIf { it > 0 }
     }.flatMapLatest { acId ->
-        accountStore.state.map { state ->
-            acId?.let {
-                state.get(it)
-            } ?: state.currentAccount
-        }
+        accountStore.getOrCurrent(acId)
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
 
     private val keyword = savedStateHandle.getStateFlow(EXTRA_KEYWORD, "")

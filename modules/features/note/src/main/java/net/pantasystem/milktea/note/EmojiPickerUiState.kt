@@ -39,11 +39,7 @@ class EmojiPickerUiStateService(
             it > 0
         }
     }.flatMapLatest { specifiedId ->
-        accountStore.state.map { state ->
-            specifiedId?.let {
-                state.get(it)
-            } ?: state.currentAccount
-        }
+        accountStore.getOrCurrent(specifiedId)
     }.stateIn(coroutineScope, SharingStarted.WhileSubscribed(5_000), null)
 
     @OptIn(ExperimentalCoroutinesApi::class)

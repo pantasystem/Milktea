@@ -70,11 +70,7 @@ class UserDetailViewModel @Inject constructor(
 
     @OptIn(ExperimentalCoroutinesApi::class)
     val currentAccount = specifiedAccountId.flatMapLatest { accountId ->
-        accountStore.state.map { state ->
-            accountId?.let {
-                state.get(it)
-            } ?: state.currentAccount
-        }
+        accountStore.getOrCurrent(accountId)
     }.stateIn(
         viewModelScope,
         SharingStarted.WhileSubscribed(5_000),

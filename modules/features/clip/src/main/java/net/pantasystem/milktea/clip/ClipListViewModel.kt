@@ -51,22 +51,14 @@ class ClipListViewModel @Inject constructor(
 
     @OptIn(ExperimentalCoroutinesApi::class)
     private val currentAccount = accountId.flatMapLatest { accountId ->
-        accountStore.state.map { state ->
-            accountId?.let {
-                state.get(it)
-            } ?: state.currentAccount
-        }
+        accountStore.getOrCurrent(accountId)
     }.catch {
         logger.error("currentAccount failed: $it", it)
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
 
     @OptIn(ExperimentalCoroutinesApi::class)
     private val addTabToAccount = addTabToAccountId.flatMapLatest {
-        accountStore.state.map { state ->
-            it?.let {
-                state.get(it)
-            } ?: state.currentAccount
-        }
+        accountStore.getOrCurrent(it)
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
 
     @OptIn(ExperimentalCoroutinesApi::class)

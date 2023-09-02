@@ -40,11 +40,7 @@ class UserListDetailViewModel @Inject constructor(
 
     @OptIn(ExperimentalCoroutinesApi::class)
     val account = listIdFlow.flatMapLatest { listId ->
-        accountStore.state.map {  state ->
-            listId?.let {
-                state.get(it.accountId)
-            } ?: state.currentAccount
-        }
+        accountStore.getOrCurrent(listId?.accountId)
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
 
     @OptIn(ExperimentalCoroutinesApi::class)
