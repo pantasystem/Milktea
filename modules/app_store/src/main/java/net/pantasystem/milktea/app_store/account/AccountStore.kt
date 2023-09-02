@@ -42,13 +42,23 @@ class AccountStore @Inject constructor(
                 is AccountRepository.Event.Created -> {
                     _state.value = state.value.add(it.account)
                 }
+
                 is AccountRepository.Event.Deleted -> {
                     _state.value = state.value.delete(it.accountId)
                 }
+
                 is AccountRepository.Event.Updated -> {
                     _state.value = state.value.add(it.account)
                 }
             }
+        }
+    }
+
+    fun getOrCurrent(specifiedAccount: Long?): Flow<Account?> {
+        return state.map { state ->
+            specifiedAccount?.let { id ->
+                state.get(id)
+            } ?: state.currentAccount
         }
     }
 
