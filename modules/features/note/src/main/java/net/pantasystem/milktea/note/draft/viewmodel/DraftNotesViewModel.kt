@@ -20,11 +20,11 @@ import javax.inject.Inject
 
 @HiltViewModel
 class DraftNotesViewModel @Inject constructor(
-    val accountStore: AccountStore,
-    val loggerFactory: Logger.Factory,
-    val draftNoteRepository: DraftNoteRepository,
-    val driveFileRepository: DriveFileRepository,
-    val draftNoteService: DraftNoteService,
+    accountStore: AccountStore,
+    loggerFactory: Logger.Factory,
+    private val draftNoteRepository: DraftNoteRepository,
+    private val driveFileRepository: DriveFileRepository,
+    private val draftNoteService: DraftNoteService,
 ) : ViewModel() {
 
 
