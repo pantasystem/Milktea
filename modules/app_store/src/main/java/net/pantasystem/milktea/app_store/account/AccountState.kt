@@ -21,7 +21,7 @@ data class AccountState(
         return accounts.any { it.accountId == account.accountId }
     }
 
-    fun get(accountId: Long): Account? {
+    operator fun get(accountId: Long): Account? {
         return accounts.firstOrNull { it.accountId == accountId }
     }
 

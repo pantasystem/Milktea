@@ -81,7 +81,7 @@ class AccountStore @Inject constructor(
     }
 
     suspend fun addPage(page: Page): Boolean {
-        val account = _state.value.get(page.accountId)
+        val account = _state.value[page.accountId]
             ?: _state.value.currentAccount
             ?: throw IllegalArgumentException()
         val updated = account.copy(pages = account.pages.toMutableList().also { list ->

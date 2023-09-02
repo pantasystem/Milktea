@@ -49,11 +49,7 @@ class AntennaListViewModel @Inject constructor(
         EXTRA_ADD_TAB_TO_ACCOUNT_ID,
         null
     ).flatMapLatest { accountId ->
-        accountStore.state.map { state ->
-            accountId?.let { accountId ->
-                state.get(accountId)
-            } ?: state.currentAccount
-        }
+        accountStore.getOrCurrent(accountId)
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
 
     private val refreshAntennasEvents = MutableStateFlow(Date().time)
