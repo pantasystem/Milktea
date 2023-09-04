@@ -113,14 +113,14 @@ class ChannelActivity : AppCompatActivity() {
                                     )
                                 )
                             },
-                            onUpdateFragment = { id, layout, channelId ->
-                                val fragment = pageableFragmentFactory.create(
-                                    channelId.accountId,
-                                    Pageable.ChannelTimeline(channelId.channelId)
+                            fragmentManagerProvider = {
+                                supportFragmentManager
+                            },
+                            timelineFragmentProvider = {
+                                pageableFragmentFactory.create(
+                                    viewModel.channelId.accountId,
+                                    Pageable.ChannelTimeline(viewModel.channelId.channelId)
                                 )
-                                val ft = supportFragmentManager.beginTransaction()
-                                ft.replace(id, fragment)
-                                ft.commit()
                             }
                         )
                     }
