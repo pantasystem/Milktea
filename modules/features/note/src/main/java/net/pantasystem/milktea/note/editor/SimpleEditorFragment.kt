@@ -82,25 +82,25 @@ class SimpleEditorFragment : Fragment(R.layout.fragment_simple_editor), SimpleEd
 
 
     @Inject
-    lateinit var filePropertyDataSource: FilePropertyDataSource
+    internal lateinit var filePropertyDataSource: FilePropertyDataSource
 
     @Inject
-    lateinit var fileRepository: DriveFileRepository
+    internal lateinit var fileRepository: DriveFileRepository
 
     @Inject
-    lateinit var draftNoteService: DraftNoteService
+    internal lateinit var draftNoteService: DraftNoteService
 
     @Inject
-    lateinit var driveNavigation: DriveNavigation
+    internal lateinit var driveNavigation: DriveNavigation
 
     @Inject
-    lateinit var mediaNavigation: MediaNavigation
+    internal lateinit var mediaNavigation: MediaNavigation
 
     @Inject
-    lateinit var userDetailNavigation: UserDetailNavigation
+    internal lateinit var userDetailNavigation: UserDetailNavigation
 
     @Inject
-    lateinit var searchAndSelectUserNavigation: SearchAndSelectUserNavigation
+    internal lateinit var searchAndSelectUserNavigation: SearchAndSelectUserNavigation
 
     @Inject
     internal lateinit var configRepository: LocalConfigRepository

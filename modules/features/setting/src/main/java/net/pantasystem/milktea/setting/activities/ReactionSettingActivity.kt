@@ -40,10 +40,10 @@ class ReactionSettingActivity : AppCompatActivity() {
     val mReactionPickerSettingViewModel: ReactionPickerSettingViewModel by viewModels()
 
     @Inject
-    lateinit var accountStore: AccountStore
+    internal lateinit var accountStore: AccountStore
 
     @Inject
-    lateinit var applyTheme: ApplyTheme
+    internal lateinit var applyTheme: ApplyTheme
 
     @Inject
     internal lateinit var customEmojiRepository: CustomEmojiRepository

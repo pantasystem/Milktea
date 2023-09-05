@@ -74,14 +74,13 @@ class NoteDetailFragment : Fragment(R.layout.fragment_note_detail) {
     internal lateinit var settingStore: SettingStore
 
     @Inject
-    lateinit var userDetailNavigation: UserDetailNavigation
+    internal lateinit var userDetailNavigation: UserDetailNavigation
 
     @Inject
-    lateinit var channelDetailNavigation: ChannelDetailNavigation
+    internal lateinit var channelDetailNavigation: ChannelDetailNavigation
 
     @Inject
-    lateinit var configRepository: LocalConfigRepository
-
+    internal lateinit var configRepository: LocalConfigRepository
 
     private val noteDetailViewModel: NoteDetailViewModel by viewModels()
 

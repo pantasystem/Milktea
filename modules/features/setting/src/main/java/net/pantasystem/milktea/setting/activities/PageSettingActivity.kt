@@ -48,25 +48,25 @@ class PageSettingActivity : AppCompatActivity() {
 
 
     @Inject
-    lateinit var applyTheme: ApplyTheme
+    internal lateinit var applyTheme: ApplyTheme
 
     @Inject
-    lateinit var searchAndSelectUserNavigation: SearchAndSelectUserNavigation
+    internal lateinit var searchAndSelectUserNavigation: SearchAndSelectUserNavigation
 
     @Inject
-    lateinit var searchNavigation: SearchNavigation
+    internal lateinit var searchNavigation: SearchNavigation
 
     @Inject
-    lateinit var antennaNavigation: AntennaNavigation
+    internal lateinit var antennaNavigation: AntennaNavigation
 
     @Inject
-    lateinit var channelNavigation: ChannelNavigation
+    internal lateinit var channelNavigation: ChannelNavigation
 
     @Inject
-    lateinit var userListNavigation: UserListNavigation
+    internal lateinit var userListNavigation: UserListNavigation
 
     @Inject
-    lateinit var clipListNavigation: ClipListNavigation
+    internal lateinit var clipListNavigation: ClipListNavigation
 
     private val mPageSettingViewModel: PageSettingViewModel by viewModels()
 

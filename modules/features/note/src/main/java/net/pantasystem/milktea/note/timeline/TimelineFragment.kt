@@ -95,25 +95,25 @@ class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view)
     private val scrollToTopViewModel by activityViewModels<ScrollToTopViewModel>()
 
     @Inject
-    lateinit var settingStore: SettingStore
+    internal lateinit var settingStore: SettingStore
 
     @Inject
-    lateinit var userDetailNavigation: UserDetailNavigation
+    internal lateinit var userDetailNavigation: UserDetailNavigation
 
     @Inject
-    lateinit var setMenuTint: ApplyMenuTint
+    internal lateinit var setMenuTint: ApplyMenuTint
 
     @Inject
-    lateinit var authorizationNavigation: AuthorizationNavigation
+    internal lateinit var authorizationNavigation: AuthorizationNavigation
 
     @Inject
-    lateinit var accountStore: AccountStore
+    internal lateinit var accountStore: AccountStore
 
     @Inject
-    lateinit var channelDetailNavigation: ChannelDetailNavigation
+    internal lateinit var channelDetailNavigation: ChannelDetailNavigation
 
     @Inject
-    lateinit var configRepository: LocalConfigRepository
+    internal lateinit var configRepository: LocalConfigRepository
 
 
     private val mBinding: FragmentSwipeRefreshRecyclerViewBinding by dataBinding()

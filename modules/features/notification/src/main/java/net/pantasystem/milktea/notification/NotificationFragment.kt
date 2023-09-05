@@ -71,22 +71,22 @@ class NotificationFragment : Fragment(R.layout.fragment_notification) {
     internal lateinit var settingStore: SettingStore
 
     @Inject
-    lateinit var userDetailNavigation: UserDetailNavigation
+    internal lateinit var userDetailNavigation: UserDetailNavigation
 
     @Inject
-    lateinit var channelDetailNavigation: ChannelDetailNavigation
+    internal lateinit var channelDetailNavigation: ChannelDetailNavigation
 
     @Inject
-    lateinit var authorizationNavigation: AuthorizationNavigation
+    internal lateinit var authorizationNavigation: AuthorizationNavigation
 
     @Inject
-    lateinit var accountStore: AccountStore
+    internal lateinit var accountStore: AccountStore
 
     @Inject
-    lateinit var applyMenuTint: ApplyMenuTint
+    internal lateinit var applyMenuTint: ApplyMenuTint
 
     @Inject
-    lateinit var configRepository: LocalConfigRepository
+    internal lateinit var configRepository: LocalConfigRepository
 
     private val mBinding: FragmentNotificationBinding by dataBinding()
 

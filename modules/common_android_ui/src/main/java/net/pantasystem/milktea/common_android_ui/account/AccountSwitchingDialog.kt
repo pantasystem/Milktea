@@ -26,16 +26,16 @@ class AccountSwitchingDialog : BottomSheetDialogFragment() {
     }
 
     @Inject
-    lateinit var authorizationNavigation: AuthorizationNavigation
+    internal lateinit var authorizationNavigation: AuthorizationNavigation
 
     @Inject
-    lateinit var userDetailNavigation: UserDetailNavigation
+    internal lateinit var userDetailNavigation: UserDetailNavigation
 
     @Inject
-    lateinit var accountSettingNavigation: AccountSettingNavigation
+    internal lateinit var accountSettingNavigation: AccountSettingNavigation
 
     @Inject
-    lateinit var configRepository: LocalConfigRepository
+    internal lateinit var configRepository: LocalConfigRepository
 
     val viewModel: AccountViewModel by activityViewModels()
 
