@@ -97,13 +97,13 @@ class UserDetailActivity : AppCompatActivity() {
 
 
     @Inject
-    lateinit var accountStore: AccountStore
+    internal lateinit var accountStore: AccountStore
 
     @Inject
-    lateinit var pageableFragmentFactory: PageableFragmentFactory
+    internal lateinit var pageableFragmentFactory: PageableFragmentFactory
 
     @Inject
-    lateinit var searchNavigation: SearchNavigation
+    internal lateinit var searchNavigation: SearchNavigation
 
 
 //    @ExperimentalCoroutinesApi

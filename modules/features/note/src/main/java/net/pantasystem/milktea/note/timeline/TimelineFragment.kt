@@ -74,7 +74,7 @@ class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view)
         get() = requireNotNull(_linearLayoutManager)
 
     @Inject
-    lateinit var timelineViewModelFactory: TimelineViewModel.ViewModelAssistedFactory
+    internal lateinit var timelineViewModelFactory: TimelineViewModel.ViewModelAssistedFactory
 
     private val mViewModel: TimelineViewModel by viewModels<TimelineViewModel> {
         TimelineViewModel.provideViewModel(

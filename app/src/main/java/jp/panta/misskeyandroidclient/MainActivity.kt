@@ -68,28 +68,28 @@ class MainActivity : AppCompatActivity(), ToolbarSetter {
     private val binding: ActivityMainBinding by dataBinding()
 
     @Inject
-    lateinit var accountStore: AccountStore
+    internal lateinit var accountStore: AccountStore
 
     @Inject
-    lateinit var settingStore: SettingStore
+    internal lateinit var settingStore: SettingStore
 
     @Inject
-    lateinit var createNoteWorkerExecutor: CreateNoteWorkerExecutor
+    internal lateinit var createNoteWorkerExecutor: CreateNoteWorkerExecutor
 
     @Inject
-    lateinit var authorizationNavigation: AuthorizationNavigation
+    internal lateinit var authorizationNavigation: AuthorizationNavigation
 
     @Inject
-    lateinit var setTheme: ApplyTheme
+    internal lateinit var setTheme: ApplyTheme
 
     @Inject
-    lateinit var userDetailNavigation: UserDetailNavigation
+    internal lateinit var userDetailNavigation: UserDetailNavigation
 
     @Inject
-    lateinit var draftNoteService: DraftNoteService
+    internal lateinit var draftNoteService: DraftNoteService
 
     @Inject
-    lateinit var featureEnables: FeatureEnables
+    internal lateinit var featureEnables: FeatureEnables
 
     private val mainViewModel: MainViewModel by viewModels()
 
