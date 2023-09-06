@@ -7,7 +7,9 @@ inline fun <T, R> T.runCancellableCatching(block: T.() -> R): Result<R> {
         Result.success(block())
     } catch (e: CancellationException) {
         throw e
-    } catch (e: Throwable) {
+    } catch (e: OutOfMemoryError) {
+        throw e
+    } catch (e: Exception) {
         Result.failure(e)
     }
 }
@@ -17,7 +19,9 @@ inline fun <R> runCancellableCatching(block: () -> R): Result<R> {
         Result.success(block())
     } catch (e: CancellationException) {
         throw e
-    } catch (e: Throwable) {
+    } catch (e: OutOfMemoryError) {
+        throw e
+    } catch (e: Exception) {
         Result.failure(e)
     }
 }
