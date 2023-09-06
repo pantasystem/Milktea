@@ -168,7 +168,7 @@ class NoteEditorActivity : AppCompatActivity() {
     private fun handleSendImages(intent: Intent) {
         intent.getParcelableArrayListExtra<Parcelable>(Intent.EXTRA_STREAM)?.mapNotNull {
                 it as? Uri
-            }?.map(::addFileFromUri)
+            }?.distinct()?.map(::addFileFromUri)
     }
 
     private fun addFileFromUri(uri: Uri) {
