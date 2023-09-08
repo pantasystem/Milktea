@@ -30,7 +30,6 @@ object MisskeyOkHttpDriveFileUploaderConstants {
     const val comment = "comment"
 }
 
-@Suppress("BlockingMethodInNonBlockingContext")
 class MisskeyOkHttpDriveFileUploader(
     val context: Context,
     val account: Account,
