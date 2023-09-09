@@ -233,6 +233,16 @@ class NoteEditorViewModel @Inject constructor(
             )
         }.stateIn(viewModelScope, SharingStarted.Eagerly, null)
 
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val user = currentAccount.filterNotNull().flatMapLatest { account ->
+        userRepository.observe(User.Id(account.accountId, account.remoteId)).map {
+            it.castAndPartiallyFill()
+        }
+    }.stateIn(
+        viewModelScope,
+        SharingStarted.WhileSubscribed(5_000),
+        null,
+    )
 
     private val draftNoteId =
         savedStateHandle.getStateFlow<Long?>(NoteEditorSavedStateKey.DraftNoteId.name, null)
