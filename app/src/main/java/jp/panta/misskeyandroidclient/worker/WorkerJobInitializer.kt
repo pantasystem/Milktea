@@ -51,7 +51,7 @@ class WorkerJobInitializer @Inject constructor(
             )
             enqueueUniquePeriodicWork(
                 CacheCustomEmojiImageWorker.WORKER_NAME,
-                ExistingPeriodicWorkPolicy.REPLACE,
+                ExistingPeriodicWorkPolicy.KEEP,
                 CacheCustomEmojiImageWorker.createPeriodicWorkRequest(),
             )
 
