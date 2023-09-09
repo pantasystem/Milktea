@@ -273,6 +273,7 @@ class NoteEditorFragment : Fragment(R.layout.fragment_note_editor), EmojiSelecti
                                             .setNegativeButton(android.R.string.cancel) { _, _ ->
                                                 // do nothing
                                             }
+                                            .show()
                                         return@NoteEditorToolbar
                                     }
                                 }
