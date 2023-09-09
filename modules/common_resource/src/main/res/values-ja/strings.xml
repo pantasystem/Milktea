@@ -623,6 +623,7 @@
     <string name="qr_code">QRコード</string>
     <string name="copy">コピー</string>
     <string name="no_app_available_to_open_this_file">このファイルを開くアプリがありません</string>
+    <string name="notification_sync_download_custom_emoji_title">カスタム絵文字ダウンロード中</string>
     <!-- User -->
 
 

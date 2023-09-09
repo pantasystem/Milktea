@@ -622,6 +622,7 @@
     <string name="qr_code">QR Code</string>
     <string name="copy">Copy</string>
     <string name="no_app_available_to_open_this_file">No app available to open this file</string>
+    <string name="notification_sync_download_custom_emoji_title">Downloading custom emoji</string>
     <!-- reaction-acceptance -->
 
 </resources>

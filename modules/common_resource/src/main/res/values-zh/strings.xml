@@ -614,6 +614,7 @@
     <string name="qr_code">QR Code</string>
     <string name="copy">Copy</string>
     <string name="no_app_available_to_open_this_file">没有应用可打开此文件</string>
+    <string name="notification_sync_download_custom_emoji_title">下载自定义表情符号</string>
     <!-- User -->
 
 </resources>
