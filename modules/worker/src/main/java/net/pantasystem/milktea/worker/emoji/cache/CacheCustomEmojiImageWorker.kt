@@ -5,6 +5,7 @@ import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.content.pm.ServiceInfo
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
@@ -127,7 +128,11 @@ class CacheCustomEmojiImageWorker @AssistedInject constructor(
             .addAction(android.R.drawable.ic_delete, applicationContext.getString(android.R.string.cancel), cancelPendingIntent)
             .build()
 
-        return ForegroundInfo(7, notification)
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            ForegroundInfo(7, notification, ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC)
+        } else {
+            ForegroundInfo(7, notification)
+        }
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
