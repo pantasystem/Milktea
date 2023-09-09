@@ -50,7 +50,6 @@ import net.pantasystem.milktea.model.confirm.ResultType
 import net.pantasystem.milktea.model.drive.FileProperty
 import net.pantasystem.milktea.model.emoji.CustomEmojiRepository
 import net.pantasystem.milktea.model.emoji.Emoji
-import net.pantasystem.milktea.model.file.toAppFile
 import net.pantasystem.milktea.model.instance.FeatureType
 import net.pantasystem.milktea.model.note.Note
 import net.pantasystem.milktea.model.setting.LocalConfigRepository
@@ -865,9 +864,9 @@ class NoteEditorFragment : Fragment(R.layout.fragment_note_editor), EmojiSelecti
         // NOTE: 選択したファイルに対して永続的なアクセス権を得るようにしている
         val takeFlags = Intent.FLAG_GRANT_READ_URI_PERMISSION
         requireContext().contentResolver.takePersistableUriPermission(uri, takeFlags)
-
-
-        val file = uri.toAppFile(requireContext())
-        noteEditorViewModel.add(file)
+//
+//
+//        val file = uri.toAppFile(requireContext())
+        noteEditorViewModel.addFile(uri)
     }
 }

@@ -12,7 +12,6 @@ import com.wada811.databinding.dataBinding
 import dagger.hilt.android.AndroidEntryPoint
 import net.pantasystem.milktea.common.ui.ApplyTheme
 import net.pantasystem.milktea.model.channel.Channel
-import net.pantasystem.milktea.model.file.toAppFile
 import net.pantasystem.milktea.model.note.Note
 import net.pantasystem.milktea.note.databinding.ActivityNoteEditorBinding
 import net.pantasystem.milktea.note.editor.NoteEditorFragment
@@ -176,7 +175,7 @@ class NoteEditorActivity : AppCompatActivity() {
         if (size > mViewModel.maxFileCount.value) {
             Log.d("NoteEditorActivity", "失敗しました")
         } else {
-            mViewModel.add(uri.toAppFile(this))
+            mViewModel.addFile(uri)
         }
     }
 

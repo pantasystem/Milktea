@@ -1,6 +1,7 @@
 package net.pantasystem.milktea.note.editor.viewmodel
 
 //import net.pantasystem.milktea.model.instance.InstanceInfoRepository
+import android.net.Uri
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -24,6 +25,7 @@ import net.pantasystem.milktea.model.channel.ChannelRepository
 import net.pantasystem.milktea.model.drive.*
 import net.pantasystem.milktea.model.emoji.Emoji
 import net.pantasystem.milktea.model.file.AppFile
+import net.pantasystem.milktea.model.file.CopyFileToAppDirUseCase
 import net.pantasystem.milktea.model.file.UpdateAppFileSensitiveUseCase
 import net.pantasystem.milktea.model.instance.FeatureEnables
 import net.pantasystem.milktea.model.instance.FeatureType
@@ -66,6 +68,7 @@ class NoteEditorViewModel @Inject constructor(
     private val updateSensitiveUseCase: UpdateAppFileSensitiveUseCase,
     private val apResolverRepository: ApResolverRepository,
     userRepository: UserRepository,
+    private val copyFileToAppDirUseCase: CopyFileToAppDirUseCase,
     private val savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
 
@@ -524,24 +527,16 @@ class NoteEditorViewModel @Inject constructor(
         }
     }
 
-    fun add(file: AppFile) = viewModelScope.launch {
-        val files = files.value.toMutableList()
-        files.add(
-            file
-        )
-        savedStateHandle.setFiles(files)
-//        val account = _currentAccount.value ?: return@launch
-//        val localFile = when (file) {
-//            is AppFile.Local -> file
-//            is AppFile.Remote -> return@launch
-//        }
-//        val instanceInfo =
-//            instanceInfoRepository.findByHost(account.getHost()).getOrNull() ?: return@launch
-//        val maxFileSize = instanceInfo.clientMaxBodyByteSize ?: return@launch
-//
-//        if (maxFileSize < (localFile.fileSize ?: 0)) {
-//            _fileSizeInvalidEvent.tryEmit(FileSizeInvalidEvent(file, instanceInfo, account))
-//        }
+    fun addFile(uri: Uri) = viewModelScope.launch {
+        copyFileToAppDirUseCase(uri).onSuccess { file ->
+            val files = files.value.toMutableList()
+            files.add(
+                file
+            )
+            savedStateHandle.setFiles(files)
+        }.onFailure {
+            logger.error("ファイルのコピーに失敗しました", it)
+        }
     }
 
 

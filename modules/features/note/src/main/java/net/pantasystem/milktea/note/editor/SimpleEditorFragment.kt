@@ -33,7 +33,6 @@ import net.pantasystem.milktea.model.drive.DriveFileRepository
 import net.pantasystem.milktea.model.drive.FileProperty
 import net.pantasystem.milktea.model.drive.FilePropertyDataSource
 import net.pantasystem.milktea.model.emoji.CustomEmojiRepository
-import net.pantasystem.milktea.model.file.toAppFile
 import net.pantasystem.milktea.model.note.draft.DraftNoteService
 import net.pantasystem.milktea.model.setting.LocalConfigRepository
 import net.pantasystem.milktea.model.user.User
@@ -393,7 +392,7 @@ class SimpleEditorFragment : Fragment(R.layout.fragment_simple_editor), SimpleEd
 
             val uri = result?.data?.data
             if (uri != null) {
-                mViewModel.add(uri.toAppFile(requireContext()))
+                mViewModel.addFile(uri)
                 Log.d("NoteEditorActivity", "成功しました")
 
             }
