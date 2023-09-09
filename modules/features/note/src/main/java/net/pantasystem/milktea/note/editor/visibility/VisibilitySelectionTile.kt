@@ -16,7 +16,6 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import net.pantasystem.milktea.model.note.Visibility
@@ -30,26 +29,8 @@ internal fun VisibilitySelectionTile(
     onClick: (item: Visibility) -> Unit,
 ) {
 
-    val title = when (item) {
-        is Visibility.Followers -> stringResource(id = R.string.visibility_follower)
-        is Visibility.Home -> stringResource(id = R.string.visibility_home)
-        is Visibility.Public -> stringResource(id = R.string.visibility_public)
-        is Visibility.Specified -> stringResource(id = R.string.visibility_specified)
-        is Visibility.Limited -> stringResource(id = R.string.visibility_limited)
-        Visibility.Mutual -> stringResource(id = R.string.visibility_mutual)
-        Visibility.Personal -> stringResource(id = R.string.visibility_personal)
-    }
-
-    val iconDrawable = when (item) {
-        is Visibility.Followers -> R.drawable.ic_lock_black_24dp
-        is Visibility.Home -> R.drawable.ic_home_black_24dp
-        is Visibility.Public -> R.drawable.ic_language_black_24dp
-        is Visibility.Specified -> R.drawable.ic_email_black_24dp
-        is Visibility.Limited -> net.pantasystem.milktea.common_android.R.drawable.ic_groups
-        Visibility.Mutual -> net.pantasystem.milktea.common_android.R.drawable.ic_sync_alt_24px
-        Visibility.Personal -> net.pantasystem.milktea.common_android.R.drawable.ic_person_black_24dp
-    }
-
+    val title = stringVisibilityText(visibility = item)
+    val iconDrawable = painterVisibilityIconResource(visibility = item)
     Surface(
         Modifier.clickable {
             onClick(item)
@@ -62,7 +43,7 @@ internal fun VisibilitySelectionTile(
                 .padding(horizontal = 16.dp, vertical = 16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Icon(painterResource(iconDrawable), contentDescription = null)
+            Icon(iconDrawable, contentDescription = null)
             Spacer(modifier = Modifier.width(4.dp))
             Text(title)
         }
