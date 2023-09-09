@@ -49,7 +49,7 @@ class CacheCustomEmojiImageWorker @AssistedInject constructor(
                 .setRequiredNetworkType(NetworkType.UNMETERED) // Wi-Fi (or Ethernet etc) required
                 .build()
 
-            return PeriodicWorkRequestBuilder<CacheCustomEmojiImageWorker>(15, TimeUnit.MINUTES)
+            return PeriodicWorkRequestBuilder<CacheCustomEmojiImageWorker>(1, TimeUnit.DAYS)
                 .setConstraints(constraints)
                 .build()
         }
