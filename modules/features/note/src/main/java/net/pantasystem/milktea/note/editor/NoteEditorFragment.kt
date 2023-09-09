@@ -1,6 +1,7 @@
 package net.pantasystem.milktea.note.editor
 
 import android.Manifest
+import android.app.AlarmManager
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
@@ -8,6 +9,7 @@ import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.provider.Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM
 import android.view.View
 import android.widget.Toast
 import androidx.activity.addCallback
@@ -26,7 +28,6 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.wada811.databinding.dataBinding
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import net.pantasystem.milktea.app_store.account.AccountStore
@@ -171,7 +172,7 @@ class NoteEditorFragment : Fragment(R.layout.fragment_note_editor), EmojiSelecti
         loggerFactory.create("NoteEditorFragment")
     }
 
-    internal lateinit var confirmViewModel: ConfirmViewModel
+    private val confirmViewModel: ConfirmViewModel by activityViewModels()
 
     private val accountId: Long? by lazy(LazyThreadSafetyMode.NONE) {
         if (requireArguments().getLong(
@@ -224,24 +225,25 @@ class NoteEditorFragment : Fragment(R.layout.fragment_note_editor), EmojiSelecti
         }
     }
 
-    @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
+    @OptIn(ExperimentalCoroutinesApi::class)
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         bindViewModels()
 
         val toolbarBase = getToolbarBase()
+        val alarmManager: AlarmManager = requireContext().getSystemService(Context.ALARM_SERVICE) as AlarmManager
 
         toolbarBase.apply {
             setContent {
                 MilkteaStyleConfigApplyAndTheme(configRepository = configRepository) {
                     val currentUser by noteEditorViewModel.user.collectAsState()
-                    val visibility by noteEditorViewModel.uiState.collectAsState()
+                    val uiState by noteEditorViewModel.uiState.collectAsState()
                     val isPostAvailable by noteEditorViewModel.isPostAvailable.collectAsState()
                     NoteEditorToolbar(
                         currentUser = currentUser,
-                        visibility = visibility.sendToState.visibility,
+                        visibility = uiState.sendToState.visibility,
                         validInputs = isPostAvailable,
-                        textCount = visibility.formState.text?.let {
+                        textCount = uiState.formState.text?.let {
                             it.codePointCount(0, it.length)
                         } ?: 0,
                         onNavigateUpButtonClicked = {
@@ -258,6 +260,23 @@ class NoteEditorFragment : Fragment(R.layout.fragment_note_editor), EmojiSelecti
                             )
                         },
                         onScheduleButtonClicked = {
+                            if (uiState.sendToState.schedulePostAt == null) {
+                                // check alarm permission
+                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                                    if (!alarmManager.canScheduleExactAlarms()) {
+                                        MaterialAlertDialogBuilder(requireContext())
+                                            .setTitle(R.string.alarm_permission_description_title)
+                                            .setMessage(R.string.alarm_permission_description_message)
+                                            .setPositiveButton(android.R.string.ok) { _, _ ->
+                                                startActivity(Intent(ACTION_REQUEST_SCHEDULE_EXACT_ALARM))
+                                            }
+                                            .setNegativeButton(android.R.string.cancel) { _, _ ->
+                                                // do nothing
+                                            }
+                                        return@NoteEditorToolbar
+                                    }
+                                }
+                            }
                             noteEditorViewModel.toggleReservationAt()
                         },
                         onPostButtonClicked = {
@@ -267,10 +286,6 @@ class NoteEditorFragment : Fragment(R.layout.fragment_note_editor), EmojiSelecti
                 }
             }
         }
-
-
-
-        confirmViewModel = ViewModelProvider(requireActivity())[ConfirmViewModel::class.java]
 
         val userChipAdapter =
             net.pantasystem.milktea.common_android_ui.user.UserChipListAdapter(viewLifecycleOwner)
