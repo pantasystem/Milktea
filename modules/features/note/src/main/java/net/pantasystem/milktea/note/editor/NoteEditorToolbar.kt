@@ -72,8 +72,13 @@ fun NoteEditorToolbar(
         Row(
             verticalAlignment = Alignment.CenterVertically
         ) {
-            IconButton(onClick = onNavigateUpButtonClicked, Modifier.size(40.dp)) {
-                Icon(Icons.Default.ArrowBack, contentDescription = null, tint = color)
+            IconButton(onClick = onNavigateUpButtonClicked) {
+                Icon(
+                    Icons.Default.ArrowBack,
+                    contentDescription = null,
+                    Modifier.size(24.dp),
+                    tint = color,
+                )
             }
 
             AvatarIcon(
@@ -94,22 +99,26 @@ fun NoteEditorToolbar(
 
             IconButton(
                 onClick = onVisibilityButtonClicked,
-                Modifier.size(40.dp),
             ) {
-                Icon(painterResource(id = iconDrawable), contentDescription = title, tint = color)
+                Icon(
+                    painterResource(id = iconDrawable),
+                    contentDescription = title,
+                    Modifier.size(24.dp),
+                    tint = color,
+                )
             }
 
             Spacer(modifier = Modifier.width(4.dp))
 
             IconButton(
                 onClick = onScheduleButtonClicked,
-                Modifier.size(40.dp)
             ) {
                 // schedule icon
                 Icon(
                     painterResource(id = R.drawable.ic_baseline_edit_calendar_24),
                     contentDescription = null,
-                    tint = color
+                    Modifier.size(24.dp),
+                    tint = color,
                 )
             }
             Spacer(modifier = Modifier.width(4.dp))
