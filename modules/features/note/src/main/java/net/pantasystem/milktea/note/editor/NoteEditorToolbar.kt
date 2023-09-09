@@ -60,6 +60,7 @@ fun NoteEditorToolbar(
         Visibility.Mutual -> net.pantasystem.milktea.common_android.R.drawable.ic_sync_alt_24px
         Visibility.Personal -> net.pantasystem.milktea.common_android.R.drawable.ic_person_black_24dp
     }
+    val color = getColor(color = R.attr.normalIconTint)
 
     Row(
         Modifier
@@ -72,7 +73,7 @@ fun NoteEditorToolbar(
             verticalAlignment = Alignment.CenterVertically
         ) {
             IconButton(onClick = onNavigateUpButtonClicked, Modifier.size(40.dp)) {
-                Icon(Icons.Default.ArrowBack, contentDescription = null)
+                Icon(Icons.Default.ArrowBack, contentDescription = null, tint = color)
             }
 
             AvatarIcon(
@@ -80,7 +81,7 @@ fun NoteEditorToolbar(
                 onAvatarClick = onAvatarIconClicked,
                 borderStrokeWidth = 1.dp,
                 borderStrokeColor = Color.Gray,
-                size = 40.dp
+                size = 30.dp
             )
         }
 
@@ -95,7 +96,7 @@ fun NoteEditorToolbar(
                 onClick = onVisibilityButtonClicked,
                 Modifier.size(40.dp),
             ) {
-                Icon(painterResource(id = iconDrawable), contentDescription = title)
+                Icon(painterResource(id = iconDrawable), contentDescription = title, tint = color)
             }
 
             Spacer(modifier = Modifier.width(4.dp))
@@ -107,7 +108,8 @@ fun NoteEditorToolbar(
                 // schedule icon
                 Icon(
                     painterResource(id = R.drawable.ic_baseline_edit_calendar_24),
-                    contentDescription = null
+                    contentDescription = null,
+                    tint = color
                 )
             }
             Spacer(modifier = Modifier.width(4.dp))
