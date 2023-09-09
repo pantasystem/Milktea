@@ -2,7 +2,9 @@ package net.pantasystem.milktea.worker.emoji.cache
 
 import android.app.NotificationChannel
 import android.app.NotificationManager
+import android.app.PendingIntent
 import android.content.Context
+import android.content.Intent
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
@@ -40,13 +42,14 @@ class CacheCustomEmojiImageWorker @AssistedInject constructor(
 
     companion object {
         const val NOTIFICATION_CHANNEL_ID = "CACHE_CUSTOM_EMOJI_IMAGE_WORKER"
+        const val WORKER_NAME = "cacheEmojiImages"
 
         fun createPeriodicWorkRequest(): PeriodicWorkRequest {
             val constraints = Constraints.Builder()
                 .setRequiredNetworkType(NetworkType.UNMETERED) // Wi-Fi (or Ethernet etc) required
                 .build()
 
-            return PeriodicWorkRequestBuilder<CacheCustomEmojiImageWorker>(1, TimeUnit.DAYS)
+            return PeriodicWorkRequestBuilder<CacheCustomEmojiImageWorker>(15, TimeUnit.MINUTES)
                 .setConstraints(constraints)
                 .build()
         }
@@ -101,12 +104,27 @@ class CacheCustomEmojiImageWorker @AssistedInject constructor(
             createChannel()
         }
 
+        val cancelPendingIntent = Intent(applicationContext, CancelCacheCustomEmojiImageWorkerReceiver::class.java).let { intent ->
+            val flag = when {
+                Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
+                    PendingIntent.FLAG_MUTABLE
+                        .or(PendingIntent.FLAG_UPDATE_CURRENT)
+
+                }
+                Build.VERSION.SDK_INT >= Build.VERSION_CODES.M -> {
+                    PendingIntent.FLAG_UPDATE_CURRENT
+                }
+                else -> PendingIntent.FLAG_UPDATE_CURRENT
+            }
+            PendingIntent.getBroadcast(applicationContext, 8, intent, flag)
+        }
+
         val notification = NotificationCompat.Builder(applicationContext, NOTIFICATION_CHANNEL_ID)
             .setContentTitle(title)
             .setTicker(title)
             .setSmallIcon(android.R.drawable.stat_sys_download)
             .setOngoing(true)
-            .addAction(android.R.drawable.ic_delete, applicationContext.getString(android.R.string.cancel), null)
+            .addAction(android.R.drawable.ic_delete, applicationContext.getString(android.R.string.cancel), cancelPendingIntent)
             .build()
 
         return ForegroundInfo(7, notification)

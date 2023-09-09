@@ -50,7 +50,7 @@ class WorkerJobInitializer @Inject constructor(
                 SyncMastodonFilterWorker.createPeriodicWorkerRequest(),
             )
             enqueueUniquePeriodicWork(
-                "cacheEmojiImages",
+                CacheCustomEmojiImageWorker.WORKER_NAME,
                 ExistingPeriodicWorkPolicy.REPLACE,
                 CacheCustomEmojiImageWorker.createPeriodicWorkRequest(),
             )
