@@ -57,6 +57,7 @@
                             android:id="@+id/replyToViewBase"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
+                            tools:layout_height="200dp"
                             android:visibility="@{ viewModel.replyTo == null ? View.GONE : View.VISIBLE }"
                             >
                         <include
