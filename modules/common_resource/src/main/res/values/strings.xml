@@ -623,6 +623,8 @@
     <string name="copy">Copy</string>
     <string name="no_app_available_to_open_this_file">No app available to open this file</string>
     <string name="notification_sync_download_custom_emoji_title">Downloading custom emoji</string>
+    <string name="alarm_permission_description_title">Requires alarm permission</string>
+    <string name="alarm_permission_description_message">Scheduled posting uses the mechanism of the alarm function, so it is necessary to grant alarm permission to Milktea from the settings.</string>
     <!-- reaction-acceptance -->
 
 </resources>

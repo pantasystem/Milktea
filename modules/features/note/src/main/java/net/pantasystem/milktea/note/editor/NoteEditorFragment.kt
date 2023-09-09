@@ -1,6 +1,7 @@
 package net.pantasystem.milktea.note.editor
 
 import android.Manifest
+import android.app.AlarmManager
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
@@ -8,9 +9,8 @@ import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import android.view.LayoutInflater
+import android.provider.Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM
 import android.view.View
-import android.view.ViewGroup
 import android.widget.Toast
 import androidx.activity.addCallback
 import androidx.activity.result.PickVisualMediaRequest
@@ -18,9 +18,9 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.platform.ComposeView
 import androidx.core.app.TaskStackBuilder
 import androidx.core.widget.addTextChangedListener
-import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.*
@@ -57,7 +57,6 @@ import net.pantasystem.milktea.model.user.User
 import net.pantasystem.milktea.note.DraftNotesActivity
 import net.pantasystem.milktea.note.R
 import net.pantasystem.milktea.note.databinding.FragmentNoteEditorBinding
-import net.pantasystem.milktea.note.databinding.ViewNoteEditorToolbarBinding
 import net.pantasystem.milktea.note.editor.account.NoteEditorSwitchAccountDialog
 import net.pantasystem.milktea.note.editor.file.EditFileCaptionDialog
 import net.pantasystem.milktea.note.editor.file.EditFileNameDialog
@@ -173,7 +172,7 @@ class NoteEditorFragment : Fragment(R.layout.fragment_note_editor), EmojiSelecti
         loggerFactory.create("NoteEditorFragment")
     }
 
-    internal lateinit var confirmViewModel: ConfirmViewModel
+    private val confirmViewModel: ConfirmViewModel by activityViewModels()
 
     private val accountId: Long? by lazy(LazyThreadSafetyMode.NONE) {
         if (requireArguments().getLong(
@@ -232,39 +231,73 @@ class NoteEditorFragment : Fragment(R.layout.fragment_note_editor), EmojiSelecti
         bindViewModels()
 
         val toolbarBase = getToolbarBase()
-        val noteEditorToolbar = DataBindingUtil.inflate<ViewNoteEditorToolbarBinding>(
-            LayoutInflater.from(requireContext()),
-            R.layout.view_note_editor_toolbar,
-            toolbarBase,
-            true
-        )
-        (requireActivity() as AppCompatActivity).setSupportActionBar(binding.noteEditorToolbar)
+        val alarmManager: AlarmManager = requireContext().getSystemService(Context.ALARM_SERVICE) as AlarmManager
 
-        noteEditorToolbar.actionUpButton.setOnClickListener {
-            finishOrConfirmSaveAsDraftOrDelete()
+        toolbarBase.apply {
+            setContent {
+                MilkteaStyleConfigApplyAndTheme(configRepository = configRepository) {
+                    val currentUser by noteEditorViewModel.user.collectAsState()
+                    val uiState by noteEditorViewModel.uiState.collectAsState()
+                    val isPostAvailable by noteEditorViewModel.isPostAvailable.collectAsState()
+                    NoteEditorToolbar(
+                        currentUser = currentUser,
+                        visibility = uiState.sendToState.visibility,
+                        validInputs = isPostAvailable,
+                        textCount = uiState.formState.text?.let {
+                            it.codePointCount(0, it.length)
+                        } ?: 0,
+                        onNavigateUpButtonClicked = {
+                            finishOrConfirmSaveAsDraftOrDelete()
+                        },
+                        onAvatarIconClicked = {
+                            accountViewModel.showSwitchDialog()
+                        },
+                        onVisibilityButtonClicked = {
+                            val dialog = VisibilitySelectionDialogV2()
+                            dialog.show(
+                                childFragmentManager,
+                                VisibilitySelectionDialogV2.FRAGMENT_TAG
+                            )
+                        },
+                        onScheduleButtonClicked = {
+                            if (uiState.sendToState.schedulePostAt == null) {
+                                // check alarm permission
+                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                                    if (!alarmManager.canScheduleExactAlarms()) {
+                                        MaterialAlertDialogBuilder(requireContext())
+                                            .setTitle(R.string.alarm_permission_description_title)
+                                            .setMessage(R.string.alarm_permission_description_message)
+                                            .setPositiveButton(android.R.string.ok) { _, _ ->
+                                                startActivity(Intent(ACTION_REQUEST_SCHEDULE_EXACT_ALARM))
+                                            }
+                                            .setNegativeButton(android.R.string.cancel) { _, _ ->
+                                                // do nothing
+                                            }
+                                            .show()
+                                        return@NoteEditorToolbar
+                                    }
+                                }
+                            }
+                            noteEditorViewModel.toggleReservationAt()
+                        },
+                        onPostButtonClicked = {
+                            noteEditorViewModel.post()
+                        },
+                    )
+                }
+            }
         }
-        noteEditorToolbar.lifecycleOwner = viewLifecycleOwner
-        noteEditorToolbar.noteVisibility.setOnClickListener {
-            logger.debug("公開範囲を設定しようとしています")
-            val dialog = VisibilitySelectionDialogV2()
-            dialog.show(childFragmentManager, VisibilitySelectionDialogV2.FRAGMENT_TAG)
-        }
-
-
-        confirmViewModel = ViewModelProvider(requireActivity())[ConfirmViewModel::class.java]
 
         val userChipAdapter =
             net.pantasystem.milktea.common_android_ui.user.UserChipListAdapter(viewLifecycleOwner)
         binding.addressUsersView.adapter = userChipAdapter
         binding.addressUsersView.applyFlexBoxLayout(requireContext())
 
-
-        binding.accountViewModel = accountViewModel
-        noteEditorToolbar.accountViewModel = accountViewModel
-        noteEditorToolbar.viewModel = noteEditorViewModel
-
         accountViewModel.switchAccountEvent.onEach {
-            NoteEditorSwitchAccountDialog().show(childFragmentManager, NoteEditorSwitchAccountDialog.FRAGMENT_TAG)
+            NoteEditorSwitchAccountDialog().show(
+                childFragmentManager,
+                NoteEditorSwitchAccountDialog.FRAGMENT_TAG
+            )
         }.flowWithLifecycle(
             viewLifecycleOwner.lifecycle, Lifecycle.State.RESUMED
         ).launchIn(viewLifecycleOwner.lifecycleScope)
@@ -424,15 +457,6 @@ class NoteEditorFragment : Fragment(R.layout.fragment_note_editor), EmojiSelecti
             noteEditorViewModel.setText((e?.toString() ?: ""))
         }
 
-        noteEditorViewModel.isPost.onEach {
-            if (it) {
-                noteEditorToolbar.postButton.isEnabled = false
-                requireActivity().finish()
-            }
-        }.flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.RESUMED)
-            .launchIn(viewLifecycleOwner.lifecycleScope)
-
-
         lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.RESUMED) {
                 noteEditorViewModel.address.collect {
@@ -458,11 +482,17 @@ class NoteEditorFragment : Fragment(R.layout.fragment_note_editor), EmojiSelecti
         }
 
         binding.reservationAtPickDateButton.setOnClickListener {
-            ReservationPostDatePickerDialog().show(childFragmentManager, ReservationPostDatePickerDialog.FRAGMENT_TAG)
+            ReservationPostDatePickerDialog().show(
+                childFragmentManager,
+                ReservationPostDatePickerDialog.FRAGMENT_TAG
+            )
         }
 
         binding.reservationAtPickTimeButton.setOnClickListener {
-            ReservationPostTimePickerDialog().show(childFragmentManager, ReservationPostTimePickerDialog.FRAGMENT_TAG)
+            ReservationPostTimePickerDialog().show(
+                childFragmentManager,
+                ReservationPostTimePickerDialog.FRAGMENT_TAG
+            )
         }
 
         binding.cw.setOnFocusChangeListener { _, hasFocus ->
@@ -565,6 +595,7 @@ class NoteEditorFragment : Fragment(R.layout.fragment_note_editor), EmojiSelecti
                     binding.cw.setSelection(newPos)
                 }
             }
+
             NoteEditorFocusEditTextType.Text -> {
                 val pos = binding.inputMain.selectionEnd
                 noteEditorViewModel.addEmoji(emoji, pos).let { newPos ->
@@ -585,6 +616,7 @@ class NoteEditorFragment : Fragment(R.layout.fragment_note_editor), EmojiSelecti
                     binding.cw.setSelection(newPos)
                 }
             }
+
             NoteEditorFocusEditTextType.Text -> {
                 val pos = binding.inputMain.selectionEnd
                 noteEditorViewModel.addEmoji(emoji, pos).let { newPos ->
@@ -629,7 +661,7 @@ class NoteEditorFragment : Fragment(R.layout.fragment_note_editor), EmojiSelecti
     /**
      * 設定をもとにToolbarを表示するベースとなるViewGroupを非表示・表示＆取得をしている
      */
-    private fun getToolbarBase(): ViewGroup {
+    private fun getToolbarBase(): ComposeView {
         return if (settingStore.isPostButtonAtTheBottom) {
             binding.noteEditorToolbar.visibility = View.GONE
             binding.bottomToolbarBase.visibility = View.VISIBLE
@@ -723,9 +755,11 @@ class NoteEditorFragment : Fragment(R.layout.fragment_note_editor), EmojiSelecti
 
 
     private fun startMentionToSearchAndSelectUser() {
-        val intent = searchAndUserNavigation.newIntent(SearchAndSelectUserNavigationArgs(
-            accountId = noteEditorViewModel.currentAccount.value?.accountId,
-        ))
+        val intent = searchAndUserNavigation.newIntent(
+            SearchAndSelectUserNavigationArgs(
+                accountId = noteEditorViewModel.currentAccount.value?.accountId,
+            )
+        )
         selectMentionToUserResult.launch(intent)
     }
 

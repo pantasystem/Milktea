@@ -18,7 +18,7 @@
             android:layout_height="match_parent"
             tools:context=".NoteEditorActivity">
 
-        <androidx.appcompat.widget.Toolbar
+        <androidx.compose.ui.platform.ComposeView
                 android:id="@+id/note_editor_toolbar"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -32,7 +32,7 @@
                 app:contentInsetStart="0dp">
 
 
-        </androidx.appcompat.widget.Toolbar>
+        </androidx.compose.ui.platform.ComposeView>
 
         <FrameLayout
                 android:id="@+id/frameLayout"
@@ -57,6 +57,7 @@
                             android:id="@+id/replyToViewBase"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
+                            tools:layout_height="200dp"
                             android:visibility="@{ viewModel.replyTo == null ? View.GONE : View.VISIBLE }"
                             >
                         <include
@@ -172,7 +173,7 @@
         </FrameLayout>
 
 
-        <FrameLayout
+        <androidx.compose.ui.platform.ComposeView
                 android:id="@+id/bottomToolbarBase"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
