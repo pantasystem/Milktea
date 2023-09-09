@@ -4,8 +4,8 @@ import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
-import net.pantasystem.milktea.data.infrastructure.file.CopyFileToAppDirUseCaseImpl
-import net.pantasystem.milktea.model.file.CopyFileToAppDirUseCase
+import net.pantasystem.milktea.data.infrastructure.file.CopyFileToAppDirRepositoryImpl
+import net.pantasystem.milktea.model.file.CopyFileToAppDirRepository
 import javax.inject.Singleton
 
 @InstallIn(SingletonComponent::class)
@@ -14,7 +14,7 @@ abstract class FileModule {
 
     @Singleton
     @Binds
-    abstract fun bindCopyFileToUseCase(
-        impl: CopyFileToAppDirUseCaseImpl
-    ): CopyFileToAppDirUseCase
+    abstract fun bindCopyFileToAppDirRepository(
+        impl: CopyFileToAppDirRepositoryImpl
+    ): CopyFileToAppDirRepository
 }

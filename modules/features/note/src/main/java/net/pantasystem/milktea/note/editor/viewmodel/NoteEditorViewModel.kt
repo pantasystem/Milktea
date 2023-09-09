@@ -557,7 +557,7 @@ class NoteEditorViewModel @Inject constructor(
         }
     }
 
-    fun removeFileNoteEditorData(file: AppFile) {
+    fun removeFileNoteEditorData(file: AppFile) = viewModelScope.launch {
         savedStateHandle.setFiles(
             savedStateHandle.getFiles().removeFile(file)
         )
