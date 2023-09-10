@@ -25,28 +25,28 @@ class WorkerJobInitializer @Inject constructor(
             enqueue(CleanupUnusedDriveCacheWorker.createOneTimeRequest())
             enqueueUniquePeriodicWork(
                 "syncMeta",
-                ExistingPeriodicWorkPolicy.REPLACE,
+                ExistingPeriodicWorkPolicy.UPDATE,
                 SyncMetaWorker.createPeriodicWorkRequest()
             )
             enqueueUniquePeriodicWork(
                 "syncNodeInfos",
-                ExistingPeriodicWorkPolicy.REPLACE,
+                ExistingPeriodicWorkPolicy.UPDATE,
                 SyncNodeInfoCacheWorker.createPeriodicWorkRequest()
             )
             enqueueUniquePeriodicWork(
                 "syncLoggedInUsers",
-                ExistingPeriodicWorkPolicy.REPLACE,
+                ExistingPeriodicWorkPolicy.UPDATE,
                 SyncLoggedInUserInfoWorker.createPeriodicWorkRequest(),
             )
             enqueueUniquePeriodicWork(
                 "syncAccountInfo",
-                ExistingPeriodicWorkPolicy.REPLACE,
+                ExistingPeriodicWorkPolicy.UPDATE,
                 SyncAccountInfoWorker.createPeriodicWorkRequest(),
             )
 
             enqueueUniquePeriodicWork(
                 "syncMastodonWordFilter",
-                ExistingPeriodicWorkPolicy.REPLACE,
+                ExistingPeriodicWorkPolicy.UPDATE,
                 SyncMastodonFilterWorker.createPeriodicWorkerRequest(),
             )
             enqueueUniquePeriodicWork(
