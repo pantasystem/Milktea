@@ -425,6 +425,13 @@ class NoteEditorFragment : Fragment(R.layout.fragment_note_editor), EmojiSelecti
             }
         }
 
+        noteEditorViewModel.isPost.onEach {
+            if (it) {
+                requireActivity().finish()
+            }
+        }.flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.RESUMED)
+            .launchIn(viewLifecycleOwner.lifecycleScope)
+
         binding.cw.addTextChangedListener { e ->
             noteEditorViewModel.setCw(e?.toString())
         }
