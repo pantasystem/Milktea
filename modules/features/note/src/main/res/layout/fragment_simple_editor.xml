@@ -87,7 +87,7 @@
                     android:layout_margin="4dp"
                     android:onClick="@{ ()-> accountViewModel.showSwitchDialog() }"
                     android:padding="12dp"
-                    app:circleIcon="@{noteEditorViewModel.currentUser.user.avatarUrl}"
+                    app:circleIcon="@{noteEditorViewModel.user.avatarUrl}"
 
                     tools:ignore="ContentDescription"
                      />

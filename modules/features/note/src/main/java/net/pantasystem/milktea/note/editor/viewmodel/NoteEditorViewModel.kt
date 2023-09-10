@@ -157,10 +157,6 @@ class NoteEditorViewModel @Inject constructor(
         channelId,
     )
 
-    val isLocalOnly = visibility.map {
-        it.isLocalOnly()
-    }.stateIn(viewModelScope, SharingStarted.Eagerly, false)
-
     private val reactionAcceptanceType = savedStateHandle.getStateFlow<String?>(
         NoteEditorSavedStateKey.ReactionAcceptance.name,
         null
@@ -220,18 +216,6 @@ class NoteEditorViewModel @Inject constructor(
         SharingStarted.Eagerly,
         initialValue = ResultState.initialState()
     )
-
-    @FlowPreview
-    @ExperimentalCoroutinesApi
-    val currentUser: StateFlow<UserViewData?> =
-        _currentAccount.filterNotNull().map {
-            val userId = User.Id(it.accountId, it.remoteId)
-            userViewDataFactory.create(
-                userId,
-                viewModelScope,
-                dispatcher
-            )
-        }.stateIn(viewModelScope, SharingStarted.Eagerly, null)
 
     @OptIn(ExperimentalCoroutinesApi::class)
     val user = currentAccount.filterNotNull().flatMapLatest { account ->
