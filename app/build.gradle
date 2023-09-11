@@ -270,9 +270,9 @@ dependencies {
 //    implementation libs.activity.ktx
     implementation libs.activity.ktx
 
-    debugImplementation 'com.facebook.flipper:flipper:0.183.0'
+    debugImplementation 'com.facebook.flipper:flipper:0.216.0'
     debugImplementation 'com.facebook.soloader:soloader:0.10.4'
-    debugImplementation 'com.facebook.flipper:flipper-network-plugin:0.183.0'
+    debugImplementation 'com.facebook.flipper:flipper-network-plugin:0.216.0'
 
     implementation libs.hilt.work
     kapt libs.androidx.hilt.compiler
