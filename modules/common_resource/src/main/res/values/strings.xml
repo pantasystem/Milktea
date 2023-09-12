@@ -107,6 +107,7 @@
     <string name="replied_by">Reply from %s</string>
     <string name="quoted_by">Quoted by %s</string>
     <string name="voted_by">poll voted in by %s</string>
+    <string name="total_vote_count">%s votes in total</string>
     <string name="mention_by">mentioned by %s</string>
     <string name="reacted_by">reaction sent by %s</string>
     <string name="renoted_by">renoted by %s</string>

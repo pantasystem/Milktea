@@ -110,6 +110,7 @@
     <string name="renoted_by">被 %s 转帖</string>
     <string name="follow_requested_by">来自 %s 的关注请求</string>
     <string name="poll_ended">投票结束</string>
+    <string name="total_vote_count">总票数 %s</string>
 
     <string name="input_message">有什么新鲜事?</string>
 
