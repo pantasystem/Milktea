@@ -33,7 +33,6 @@ import net.pantasystem.milktea.common_android_ui.PageableFragmentFactory
 import net.pantasystem.milktea.common_android_ui.UserPinnedNotesFragmentFactory
 import net.pantasystem.milktea.common_android_ui.report.ReportDialog
 import net.pantasystem.milktea.common_navigation.*
-import net.pantasystem.milktea.common_viewmodel.confirm.ConfirmViewModel
 import net.pantasystem.milktea.model.setting.Config
 import net.pantasystem.milktea.model.setting.LocalConfigRepository
 import net.pantasystem.milktea.model.setting.Theme
@@ -195,7 +194,6 @@ class UserDetailActivity : AppCompatActivity() {
         ActionNoteHandler(
             this,
             notesViewModel,
-            ViewModelProvider(this)[ConfirmViewModel::class.java],
             settingStore
         )
             .initViewModelListener()

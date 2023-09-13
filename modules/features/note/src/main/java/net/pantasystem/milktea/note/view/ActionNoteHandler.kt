@@ -11,7 +11,6 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import net.pantasystem.milktea.app_store.setting.SettingStore
 import net.pantasystem.milktea.common_android_ui.report.ReportDialog
-import net.pantasystem.milktea.common_viewmodel.confirm.ConfirmViewModel
 import net.pantasystem.milktea.note.NoteEditorActivity
 import net.pantasystem.milktea.note.dialog.ConfirmDeleteAndEditNoteDialog
 import net.pantasystem.milktea.note.dialog.ConfirmDeleteNoteDialog
@@ -21,9 +20,7 @@ import net.pantasystem.milktea.note.viewmodel.NotesViewModel
 class ActionNoteHandler(
     val activity: AppCompatActivity,
     private val mNotesViewModel: NotesViewModel,
-    val confirmViewModel: ConfirmViewModel,
     val settingStore: SettingStore
-
 ) {
 
     fun initViewModelListener() {

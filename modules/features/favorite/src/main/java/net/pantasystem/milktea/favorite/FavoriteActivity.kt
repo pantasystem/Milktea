@@ -5,14 +5,13 @@ import android.view.MenuItem
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
-import androidx.lifecycle.ViewModelProvider
 import dagger.hilt.android.AndroidEntryPoint
 import net.pantasystem.milktea.app_store.setting.SettingStore
 import net.pantasystem.milktea.common.ui.ApplyTheme
 import net.pantasystem.milktea.common_android_ui.PageableFragmentFactory
-import net.pantasystem.milktea.common_viewmodel.confirm.ConfirmViewModel
 import net.pantasystem.milktea.favorite.databinding.ActivityFavoriteBinding
 import net.pantasystem.milktea.model.account.page.Pageable
+import net.pantasystem.milktea.note.view.ActionNoteHandler
 import net.pantasystem.milktea.note.viewmodel.NotesViewModel
 import javax.inject.Inject
 
@@ -42,10 +41,9 @@ class FavoriteActivity : AppCompatActivity() {
         supportActionBar?.title = getString(R.string.favorite)
 
 
-        net.pantasystem.milktea.note.view.ActionNoteHandler(
+        ActionNoteHandler(
             this,
             notesViewModel,
-            ViewModelProvider(this)[ConfirmViewModel::class.java],
             settingStore
         ).initViewModelListener()
         val fragment = pageableFragmentFactory.create(

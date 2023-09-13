@@ -11,7 +11,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
@@ -47,7 +46,6 @@ import net.pantasystem.milktea.common_navigation.MainNavigation
 import net.pantasystem.milktea.common_navigation.UserDetailNavigation
 import net.pantasystem.milktea.common_viewmodel.CurrentPageableTimelineViewModel
 import net.pantasystem.milktea.common_viewmodel.ScrollToTopViewModel
-import net.pantasystem.milktea.common_viewmodel.confirm.ConfirmViewModel
 import net.pantasystem.milktea.model.instance.FeatureEnables
 import net.pantasystem.milktea.model.note.draft.DraftNoteService
 import net.pantasystem.milktea.note.renote.RenoteResultHandler
@@ -137,7 +135,6 @@ class MainActivity : AppCompatActivity(), ToolbarSetter {
         ActionNoteHandler(
             this,
             mNotesViewModel,
-            ViewModelProvider(this)[ConfirmViewModel::class.java],
             settingStore,
         ).initViewModelListener()
 

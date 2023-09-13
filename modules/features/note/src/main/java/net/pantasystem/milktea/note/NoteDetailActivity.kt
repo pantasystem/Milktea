@@ -9,7 +9,6 @@ import android.view.MenuItem
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.TaskStackBuilder
-import androidx.lifecycle.ViewModelProvider
 import com.wada811.databinding.dataBinding
 import dagger.hilt.android.AndroidEntryPoint
 import net.pantasystem.milktea.app_store.setting.SettingStore
@@ -20,7 +19,6 @@ import net.pantasystem.milktea.common_android.ui.getParentActivity
 import net.pantasystem.milktea.common_android_ui.PageableFragmentFactory
 import net.pantasystem.milktea.common_android_ui.account.viewmodel.AccountViewModel
 import net.pantasystem.milktea.common_navigation.MainNavigation
-import net.pantasystem.milktea.common_viewmodel.confirm.ConfirmViewModel
 import net.pantasystem.milktea.model.account.page.Page
 import net.pantasystem.milktea.model.account.page.Pageable
 import net.pantasystem.milktea.model.note.Note
@@ -102,7 +100,6 @@ class NoteDetailActivity : AppCompatActivity() {
         ActionNoteHandler(
             this,
             notesViewModel,
-            ViewModelProvider(this)[ConfirmViewModel::class.java],
             settingStore
         ).initViewModelListener()
         val ft = supportFragmentManager.beginTransaction()

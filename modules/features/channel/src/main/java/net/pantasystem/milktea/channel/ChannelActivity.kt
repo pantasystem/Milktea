@@ -25,7 +25,6 @@ import net.pantasystem.milktea.common_android_ui.PageableFragmentFactory
 import net.pantasystem.milktea.common_navigation.ChannelDetailNavigation
 import net.pantasystem.milktea.common_navigation.ChannelNavigation
 import net.pantasystem.milktea.common_navigation.ChannelNavigationArgs
-import net.pantasystem.milktea.common_viewmodel.confirm.ConfirmViewModel
 import net.pantasystem.milktea.model.account.page.Pageable
 import net.pantasystem.milktea.model.channel.Channel
 import net.pantasystem.milktea.model.channel.generateChannelNavUrl
@@ -53,7 +52,6 @@ class ChannelActivity : AppCompatActivity() {
 
     private val channelViewModel: ChannelViewModel by viewModels()
 
-    private val confirmViewModel: ConfirmViewModel by viewModels()
 
     private val notesViewModel: NotesViewModel by viewModels()
 
@@ -66,7 +64,6 @@ class ChannelActivity : AppCompatActivity() {
             settingStore = settingStore,
             activity = this,
             mNotesViewModel = notesViewModel,
-            confirmViewModel = confirmViewModel
         ).initViewModelListener()
 
         setContent {
