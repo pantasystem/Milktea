@@ -1,5 +1,6 @@
 package net.pantasystem.milktea.note.view
 
+import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Lifecycle
@@ -18,6 +19,7 @@ import net.pantasystem.milktea.model.note.Note
 import net.pantasystem.milktea.model.note.NoteRelation
 import net.pantasystem.milktea.note.NoteEditorActivity
 import net.pantasystem.milktea.note.R
+import net.pantasystem.milktea.note.dialog.ConfirmDeleteNoteDialog
 import net.pantasystem.milktea.note.viewmodel.NotesViewModel
 
 
@@ -52,18 +54,17 @@ class ActionNoteHandler(
         }.flowWithLifecycle(activity.lifecycle, Lifecycle.State.RESUMED)
             .launchIn(activity.lifecycleScope)
 
+        mNotesViewModel.confirmDeletionEvent.filterNotNull().onEach { note ->
+            if (activity.supportFragmentManager.findFragmentByTag(ConfirmDeleteNoteDialog.FRAGMENT_TAG) == null) {
+                Log.d("ActionNoteHandler", "confirmDeletionEvent: ${note.note.id}")
+                ConfirmDeleteNoteDialog.newInstance(note.note.id)
+                    .show(activity.supportFragmentManager, ConfirmDeleteNoteDialog.FRAGMENT_TAG)
+            }
+        }.flowWithLifecycle(
+            activity.lifecycle,
+            Lifecycle.State.RESUMED
+        ).launchIn(activity.lifecycleScope)
 
-        mNotesViewModel.confirmDeletionEvent.filterNotNull().onEach {
-            confirmViewModel.confirmEvent.tryEmit(
-                ConfirmCommand(
-                    activity.getString(R.string.confirm_deletion),
-                    null,
-                    eventType = "delete_note",
-                    args = it.note
-                )
-            )
-        }.flowWithLifecycle(activity.lifecycle, Lifecycle.State.RESUMED)
-            .launchIn(activity.lifecycleScope)
 
         mNotesViewModel.confirmDeleteAndEditEvent.filterNotNull().onEach {
             confirmViewModel.confirmEvent.tryEmit(
