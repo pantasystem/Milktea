@@ -21,23 +21,23 @@ class NoteActionHandler(
     private val fragmentManager: FragmentManager,
     private val context: Context,
     private val lifecycleOwner: LifecycleOwner,
-    private val mNotesViewModel: NotesViewModel
+    private val notesViewModel: NotesViewModel
 ) {
 
     fun initViewModelListener() {
 
-        mNotesViewModel.statusMessage.onEach {
+        notesViewModel.statusMessage.onEach {
             Toast.makeText(context, it.getString(context), Toast.LENGTH_LONG).show()
         }.flowWithLifecycle(lifecycleOwner.lifecycle, Lifecycle.State.RESUMED)
             .launchIn(lifecycleOwner.lifecycleScope)
 
-        mNotesViewModel.quoteRenoteTarget.onEach {
+        notesViewModel.quoteRenoteTarget.onEach {
             val intent = NoteEditorActivity.newBundle(context, quoteTo = it.id)
             context.startActivity(intent)
         }.flowWithLifecycle(lifecycleOwner.lifecycle, Lifecycle.State.RESUMED)
             .launchIn(lifecycleOwner.lifecycleScope)
 
-        mNotesViewModel.openNoteEditorEvent.filterNotNull().onEach { note ->
+        notesViewModel.openNoteEditorEvent.filterNotNull().onEach { note ->
             context.startActivity(
                 NoteEditorActivity.newBundle(
                     context,
@@ -47,7 +47,7 @@ class NoteActionHandler(
         }.flowWithLifecycle(lifecycleOwner.lifecycle, Lifecycle.State.RESUMED)
             .launchIn(lifecycleOwner.lifecycleScope)
 
-        mNotesViewModel.confirmDeletionEvent.filterNotNull().onEach { note ->
+        notesViewModel.confirmDeletionEvent.filterNotNull().onEach { note ->
             if (fragmentManager.findFragmentByTag(ConfirmDeleteNoteDialog.FRAGMENT_TAG) == null) {
                 ConfirmDeleteNoteDialog.newInstance(note.note.id)
                     .show(fragmentManager, ConfirmDeleteNoteDialog.FRAGMENT_TAG)
@@ -57,7 +57,7 @@ class NoteActionHandler(
             Lifecycle.State.RESUMED
         ).launchIn(lifecycleOwner.lifecycleScope)
 
-        mNotesViewModel.confirmDeleteAndEditEvent.filterNotNull().onEach { note ->
+        notesViewModel.confirmDeleteAndEditEvent.filterNotNull().onEach { note ->
             if (fragmentManager.findFragmentByTag(ConfirmDeleteAndEditNoteDialog.FRAGMENT_TAG) == null) {
                 ConfirmDeleteAndEditNoteDialog
                     .newInstance(note.note.id)
@@ -69,7 +69,7 @@ class NoteActionHandler(
         ).launchIn(lifecycleOwner.lifecycleScope)
 
 
-        mNotesViewModel.confirmReportEvent.onEach { report ->
+        notesViewModel.confirmReportEvent.onEach { report ->
             report?.let {
                 ReportDialog.newInstance(report.userId, report.comment, report.noteIds)
                     .show(fragmentManager, ReportDialog.FRAGMENT_TAG)
