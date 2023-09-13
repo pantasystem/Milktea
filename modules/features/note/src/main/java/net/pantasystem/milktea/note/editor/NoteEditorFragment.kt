@@ -40,13 +40,9 @@ import net.pantasystem.milktea.common_android.ui.listview.applyFlexBoxLayout
 import net.pantasystem.milktea.common_android.ui.putActivity
 import net.pantasystem.milktea.common_android.ui.text.CustomEmojiTokenizer
 import net.pantasystem.milktea.common_android_ui.account.viewmodel.AccountViewModel
-import net.pantasystem.milktea.common_android_ui.confirm.ConfirmDialog
 import net.pantasystem.milktea.common_compose.MilkteaStyleConfigApplyAndTheme
 import net.pantasystem.milktea.common_navigation.*
-import net.pantasystem.milktea.common_viewmodel.confirm.ConfirmViewModel
 import net.pantasystem.milktea.model.channel.Channel
-import net.pantasystem.milktea.model.confirm.ConfirmCommand
-import net.pantasystem.milktea.model.confirm.ResultType
 import net.pantasystem.milktea.model.drive.FileProperty
 import net.pantasystem.milktea.model.emoji.CustomEmojiRepository
 import net.pantasystem.milktea.model.emoji.Emoji
@@ -80,7 +76,6 @@ class NoteEditorFragment : Fragment(R.layout.fragment_note_editor), EmojiSelecti
         private const val EXTRA_DRAFT_NOTE_ID = "EXTRA_DRAFT_NOTE"
         private const val EXTRA_ACCOUNT_ID = "EXTRA_ACCOUNT_ID"
 
-        private const val CONFIRM_SAVE_AS_DRAFT_OR_DELETE = "confirm_save_as_draft_or_delete"
         private const val EXTRA_MENTIONS = "EXTRA_MENTIONS"
         private const val EXTRA_CHANNEL_ID = "EXTRA_CHANNEL_ID"
         private const val EXTRA_TEXT = "EXTRA_TEXT"
@@ -171,8 +166,6 @@ class NoteEditorFragment : Fragment(R.layout.fragment_note_editor), EmojiSelecti
     val logger by lazy {
         loggerFactory.create("NoteEditorFragment")
     }
-
-    private val confirmViewModel: ConfirmViewModel by activityViewModels()
 
     private val accountId: Long? by lazy(LazyThreadSafetyMode.NONE) {
         if (requireArguments().getLong(
@@ -527,27 +520,6 @@ class NoteEditorFragment : Fragment(R.layout.fragment_note_editor), EmojiSelecti
             }
         }
 
-        confirmViewModel.confirmedEvent.onEach {
-            when (it.eventType) {
-                CONFIRM_SAVE_AS_DRAFT_OR_DELETE -> {
-                    if (it.resultType == ResultType.POSITIVE) {
-                        noteEditorViewModel.saveDraft()
-                    } else {
-                        requireActivity().finish()
-                    }
-                }
-            }
-        }.flowWithLifecycle(
-            viewLifecycleOwner.lifecycle, Lifecycle.State.RESUMED
-        ).launchIn(viewLifecycleOwner.lifecycleScope)
-
-        confirmViewModel.confirmEvent.onEach {
-            ConfirmDialog.newInstance(it).show(childFragmentManager, ConfirmDialog.FRAGMENT_TAG)
-        }.flowWithLifecycle(
-            viewLifecycleOwner.lifecycle, Lifecycle.State.RESUMED
-        ).launchIn(viewLifecycleOwner.lifecycleScope)
-
-
         noteEditorViewModel.isSaveNoteAsDraft.onEach {
             Handler(Looper.getMainLooper()).post {
                 if (it == null) {
@@ -772,16 +744,9 @@ class NoteEditorFragment : Fragment(R.layout.fragment_note_editor), EmojiSelecti
 
     private fun finishOrConfirmSaveAsDraftOrDelete() {
         if (noteEditorViewModel.canSaveDraft()) {
-            confirmViewModel.confirmEvent.tryEmit(
-                ConfirmCommand(
-                    getString(R.string.save_draft),
-                    getString(R.string.save_the_note_as_a_draft),
-                    eventType = CONFIRM_SAVE_AS_DRAFT_OR_DELETE,
-                    args = "",
-                    positiveButtonText = getString(R.string.save),
-                    negativeButtonText = getString(R.string.delete)
-                )
-            )
+            if (childFragmentManager.findFragmentByTag(ConfirmSaveAsDraftDialog.FRAGMENT_TAG) == null) {
+                ConfirmSaveAsDraftDialog().show(childFragmentManager, ConfirmSaveAsDraftDialog.FRAGMENT_TAG)
+            }
         } else {
             upTo()
         }
@@ -905,9 +870,6 @@ class NoteEditorFragment : Fragment(R.layout.fragment_note_editor), EmojiSelecti
         // NOTE: 選択したファイルに対して永続的なアクセス権を得るようにしている
         val takeFlags = Intent.FLAG_GRANT_READ_URI_PERMISSION
         requireContext().contentResolver.takePersistableUriPermission(uri, takeFlags)
-//
-//
-//        val file = uri.toAppFile(requireContext())
         noteEditorViewModel.addFile(uri)
     }
 }
