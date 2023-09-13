@@ -61,9 +61,10 @@ class ChannelActivity : AppCompatActivity() {
         setTheme.invoke()
 
         ActionNoteHandler(
-            settingStore = settingStore,
-            activity = this,
-            mNotesViewModel = notesViewModel,
+            this.supportFragmentManager,
+            this,
+            this,
+            notesViewModel,
         ).initViewModelListener()
 
         setContent {

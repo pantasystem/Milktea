@@ -98,9 +98,10 @@ class NoteDetailActivity : AppCompatActivity() {
         mIsMainActive = intent.getBooleanExtra(EXTRA_IS_MAIN_ACTIVE, true)
 
         ActionNoteHandler(
+            this.supportFragmentManager,
+            this,
             this,
             notesViewModel,
-            settingStore
         ).initViewModelListener()
         val ft = supportFragmentManager.beginTransaction()
 

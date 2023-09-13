@@ -25,6 +25,7 @@ import net.pantasystem.milktea.common_navigation.SearchNavigation
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.page.Page
 import net.pantasystem.milktea.model.account.page.Pageable
+import net.pantasystem.milktea.note.view.ActionNoteHandler
 import net.pantasystem.milktea.note.viewmodel.NotesViewModel
 import net.pantasystem.milktea.search.databinding.ActivitySearchResultBinding
 import javax.inject.Inject
@@ -99,11 +100,13 @@ class SearchResultActivity : AppCompatActivity() {
 
 
 
-        net.pantasystem.milktea.note.view.ActionNoteHandler(
+        ActionNoteHandler(
+            this.supportFragmentManager,
+            this,
             this,
             notesViewModel,
-            settingStore
         ).initViewModelListener()
+
         invalidateOptionsMenu()
 
         searchResultViewModel.uiState.onEach {

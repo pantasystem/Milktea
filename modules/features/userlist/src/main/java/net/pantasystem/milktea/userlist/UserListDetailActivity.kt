@@ -22,6 +22,7 @@ import net.pantasystem.milktea.common_navigation.*
 import net.pantasystem.milktea.common_navigation.SearchAndSelectUserNavigation.Companion.EXTRA_SELECTED_USER_CHANGED_DIFF
 import net.pantasystem.milktea.model.list.UserList
 import net.pantasystem.milktea.model.setting.LocalConfigRepository
+import net.pantasystem.milktea.note.view.ActionNoteHandler
 import net.pantasystem.milktea.note.viewmodel.NotesViewModel
 import net.pantasystem.milktea.userlist.compose.UserListDetailScreen
 import net.pantasystem.milktea.userlist.viewmodel.UserListDetailViewModel
@@ -71,17 +72,18 @@ class UserListDetailActivity : AppCompatActivity(), UserListEditorDialog.OnSubmi
 
     private val mUserListDetailViewModel: UserListDetailViewModel by viewModels()
 
-    val notesViewModel by viewModels<NotesViewModel>()
+    private val notesViewModel by viewModels<NotesViewModel>()
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         applyTheme()
 
-        net.pantasystem.milktea.note.view.ActionNoteHandler(
+        ActionNoteHandler(
+            this.supportFragmentManager,
+            this,
             this,
             notesViewModel,
-            settingStore
         ).initViewModelListener()
 
         setContent {

@@ -29,7 +29,7 @@ class NotificationsActivity : AppCompatActivity(), ToolbarSetter {
     lateinit var applyTheme: ApplyTheme
 
     val binding: ActivityNotificationsBinding by dataBinding()
-    val notesViewModel by viewModels<NotesViewModel>()
+    private val notesViewModel by viewModels<NotesViewModel>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -37,9 +37,10 @@ class NotificationsActivity : AppCompatActivity(), ToolbarSetter {
         setContentView(R.layout.activity_notifications)
 
         ActionNoteHandler(
+            this.supportFragmentManager,
+            this,
             this,
             notesViewModel,
-            settingStore
         ).initViewModelListener()
 
         showNotificationFragment()

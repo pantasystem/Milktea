@@ -42,9 +42,10 @@ class FavoriteActivity : AppCompatActivity() {
 
 
         ActionNoteHandler(
+            this.supportFragmentManager,
+            this,
             this,
             notesViewModel,
-            settingStore
         ).initViewModelListener()
         val fragment = pageableFragmentFactory.create(
             Pageable.Favorite

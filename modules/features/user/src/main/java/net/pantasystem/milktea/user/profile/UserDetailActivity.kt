@@ -132,7 +132,7 @@ class UserDetailActivity : AppCompatActivity() {
     private var mIsMainActive: Boolean = true
 
     private var mParentActivity: Activities? = null
-    val notesViewModel by viewModels<NotesViewModel>()
+    private val notesViewModel by viewModels<NotesViewModel>()
 
     @Inject
     lateinit var settingStore: SettingStore
@@ -192,11 +192,11 @@ class UserDetailActivity : AppCompatActivity() {
         mIsMainActive = intent.getBooleanExtra(EXTRA_IS_MAIN_ACTIVE, true)
 
         ActionNoteHandler(
+            this.supportFragmentManager,
+            this,
             this,
             notesViewModel,
-            settingStore
-        )
-            .initViewModelListener()
+        ).initViewModelListener()
 
         val adapter = ProfileTabPagerAdapter(
             pageableFragmentFactory,

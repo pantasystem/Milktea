@@ -133,9 +133,10 @@ class MainActivity : AppCompatActivity(), ToolbarSetter {
         SetUpNavHeader(binding.navView, this, mAccountViewModel).invoke()
 
         ActionNoteHandler(
+            this.supportFragmentManager,
+            this,
             this,
             mNotesViewModel,
-            settingStore,
         ).initViewModelListener()
 
 
