@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.crashlytics.FirebaseCrashlytics
+import dagger.hilt.android.scopes.ActivityScoped
 import jp.panta.misskeyandroidclient.R
 import kotlinx.coroutines.launch
 import net.pantasystem.milktea.common.mapCancellableCatching
@@ -18,6 +19,7 @@ import net.pantasystem.milktea.model.notification.toPushNotification
 import net.pantasystem.milktea.model.user.User
 import net.pantasystem.milktea.note.NoteDetailActivity
 import net.pantasystem.milktea.note.NoteEditorActivity
+import javax.inject.Inject
 
 /**
  * MainActivity起動時にIntentを処理するクラス
@@ -30,6 +32,24 @@ class MainActivityInitialIntentHandler(
     private val userDetailNavigation: UserDetailNavigation,
     private val accountRepository: AccountRepository,
 ) {
+
+    @ActivityScoped
+    class Factory @Inject constructor(
+        private val userDetailNavigation: UserDetailNavigation,
+        private val accountRepository: AccountRepository,
+    ) {
+        fun create(
+            bottomNavigationView: BottomNavigationView,
+            activity: AppCompatActivity,
+        ): MainActivityInitialIntentHandler {
+            return MainActivityInitialIntentHandler(
+                bottomNavigationView,
+                activity,
+                userDetailNavigation,
+                accountRepository,
+            )
+        }
+    }
 
     operator fun invoke(intent: Intent) {
         // NOTE: バックグラウンドから通知を開いた場合、通知のデータがintentに入っている

@@ -33,16 +33,13 @@ import jp.panta.misskeyandroidclient.ui.main.SetupOnBackPressedDispatcherHandler
 import jp.panta.misskeyandroidclient.ui.main.ToggleNavigationDrawerDelegate
 import jp.panta.misskeyandroidclient.ui.main.viewmodel.MainViewModel
 import jp.panta.misskeyandroidclient.ui.setLongPressListenerOnNavigationItem
-import net.pantasystem.milktea.app_store.account.AccountStore
 import net.pantasystem.milktea.app_store.setting.SettingStore
 import net.pantasystem.milktea.common.ui.ApplyTheme
 import net.pantasystem.milktea.common.ui.ToolbarSetter
 import net.pantasystem.milktea.common_android_ui.account.AccountSwitchingDialog
 import net.pantasystem.milktea.common_android_ui.account.viewmodel.AccountViewModel
 import net.pantasystem.milktea.common_android_ui.report.ReportViewModel
-import net.pantasystem.milktea.common_navigation.AuthorizationNavigation
 import net.pantasystem.milktea.common_navigation.MainNavigation
-import net.pantasystem.milktea.common_navigation.UserDetailNavigation
 import net.pantasystem.milktea.common_viewmodel.CurrentPageableTimelineViewModel
 import net.pantasystem.milktea.common_viewmodel.ScrollToTopViewModel
 import net.pantasystem.milktea.note.renote.RenoteResultHandler
@@ -55,29 +52,26 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity(), ToolbarSetter {
 
-    private val notesViewModel: NotesViewModel by viewModels()
-
-    private val accountViewModel: AccountViewModel by viewModels()
-
-    private val binding: ActivityMainBinding by dataBinding()
-
-    @Inject
-    internal lateinit var accountStore: AccountStore
-
     @Inject
     internal lateinit var settingStore: SettingStore
-
-    @Inject
-    internal lateinit var authorizationNavigation: AuthorizationNavigation
 
     @Inject
     internal lateinit var applyTheme: ApplyTheme
 
     @Inject
-    internal lateinit var userDetailNavigation: UserDetailNavigation
+    internal lateinit var mainActivityEventHandlerFactory: MainActivityEventHandler.Factory
 
     @Inject
-    internal lateinit var mainActivityEventHandlerFactory: MainActivityEventHandler.Factory
+    internal lateinit var mainActivityInitialIntentHandlerFactory: MainActivityInitialIntentHandler.Factory
+
+    @Inject
+    internal lateinit var fabClickHandleFactory: FabClickHandler.Factory
+
+    private val notesViewModel: NotesViewModel by viewModels()
+
+    private val accountViewModel: AccountViewModel by viewModels()
+
+    private val binding: ActivityMainBinding by dataBinding()
 
     private val mainViewModel: MainViewModel by viewModels()
 
@@ -207,11 +201,9 @@ class MainActivity : AppCompatActivity(), ToolbarSetter {
     }
 
     private fun handleIntent() {
-        MainActivityInitialIntentHandler(
+        mainActivityInitialIntentHandlerFactory.create(
             binding.appBarMain.bottomNavigation,
             this,
-            userDetailNavigation,
-            accountStore.accountRepository
         ).invoke(intent)
     }
 
@@ -243,7 +235,10 @@ class MainActivity : AppCompatActivity(), ToolbarSetter {
     }
 
     private fun onFabClicked() {
-        FabClickHandler(currentPageableTimelineViewModel, this, accountStore).onClicked()
+        fabClickHandleFactory.create(
+            currentPageableTimelineViewModel = currentPageableTimelineViewModel,
+            activity = this,
+        ).onClicked()
     }
 
 
