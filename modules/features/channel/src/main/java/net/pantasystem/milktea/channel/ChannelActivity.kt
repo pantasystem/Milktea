@@ -29,7 +29,7 @@ import net.pantasystem.milktea.model.account.page.Pageable
 import net.pantasystem.milktea.model.channel.Channel
 import net.pantasystem.milktea.model.channel.generateChannelNavUrl
 import net.pantasystem.milktea.note.NoteEditorActivity
-import net.pantasystem.milktea.note.view.ActionNoteHandler
+import net.pantasystem.milktea.note.view.NoteActionHandler
 import net.pantasystem.milktea.note.viewmodel.NotesViewModel
 import javax.inject.Inject
 
@@ -60,7 +60,7 @@ class ChannelActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setTheme.invoke()
 
-        ActionNoteHandler(
+        NoteActionHandler(
             this.supportFragmentManager,
             this,
             this,

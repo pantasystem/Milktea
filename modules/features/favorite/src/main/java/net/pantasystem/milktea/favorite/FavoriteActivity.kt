@@ -11,7 +11,7 @@ import net.pantasystem.milktea.common.ui.ApplyTheme
 import net.pantasystem.milktea.common_android_ui.PageableFragmentFactory
 import net.pantasystem.milktea.favorite.databinding.ActivityFavoriteBinding
 import net.pantasystem.milktea.model.account.page.Pageable
-import net.pantasystem.milktea.note.view.ActionNoteHandler
+import net.pantasystem.milktea.note.view.NoteActionHandler
 import net.pantasystem.milktea.note.viewmodel.NotesViewModel
 import javax.inject.Inject
 
@@ -41,7 +41,7 @@ class FavoriteActivity : AppCompatActivity() {
         supportActionBar?.title = getString(R.string.favorite)
 
 
-        ActionNoteHandler(
+        NoteActionHandler(
             this.supportFragmentManager,
             this,
             this,

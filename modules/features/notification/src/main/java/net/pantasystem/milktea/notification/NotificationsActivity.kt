@@ -12,7 +12,7 @@ import kotlinx.coroutines.FlowPreview
 import net.pantasystem.milktea.app_store.setting.SettingStore
 import net.pantasystem.milktea.common.ui.ApplyTheme
 import net.pantasystem.milktea.common.ui.ToolbarSetter
-import net.pantasystem.milktea.note.view.ActionNoteHandler
+import net.pantasystem.milktea.note.view.NoteActionHandler
 import net.pantasystem.milktea.note.viewmodel.NotesViewModel
 import net.pantasystem.milktea.notification.databinding.ActivityNotificationsBinding
 import javax.inject.Inject
@@ -36,7 +36,7 @@ class NotificationsActivity : AppCompatActivity(), ToolbarSetter {
         applyTheme()
         setContentView(R.layout.activity_notifications)
 
-        ActionNoteHandler(
+        NoteActionHandler(
             this.supportFragmentManager,
             this,
             this,

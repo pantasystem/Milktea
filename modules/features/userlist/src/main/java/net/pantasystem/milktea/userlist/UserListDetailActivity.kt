@@ -22,7 +22,7 @@ import net.pantasystem.milktea.common_navigation.*
 import net.pantasystem.milktea.common_navigation.SearchAndSelectUserNavigation.Companion.EXTRA_SELECTED_USER_CHANGED_DIFF
 import net.pantasystem.milktea.model.list.UserList
 import net.pantasystem.milktea.model.setting.LocalConfigRepository
-import net.pantasystem.milktea.note.view.ActionNoteHandler
+import net.pantasystem.milktea.note.view.NoteActionHandler
 import net.pantasystem.milktea.note.viewmodel.NotesViewModel
 import net.pantasystem.milktea.userlist.compose.UserListDetailScreen
 import net.pantasystem.milktea.userlist.viewmodel.UserListDetailViewModel
@@ -79,7 +79,7 @@ class UserListDetailActivity : AppCompatActivity(), UserListEditorDialog.OnSubmi
         super.onCreate(savedInstanceState)
         applyTheme()
 
-        ActionNoteHandler(
+        NoteActionHandler(
             this.supportFragmentManager,
             this,
             this,

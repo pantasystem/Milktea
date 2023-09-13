@@ -17,7 +17,7 @@ import net.pantasystem.milktea.note.dialog.ConfirmDeleteNoteDialog
 import net.pantasystem.milktea.note.viewmodel.NotesViewModel
 
 
-class ActionNoteHandler(
+class NoteActionHandler(
     private val fragmentManager: FragmentManager,
     private val context: Context,
     private val lifecycleOwner: LifecycleOwner,

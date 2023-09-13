@@ -50,7 +50,7 @@ import net.pantasystem.milktea.model.instance.FeatureEnables
 import net.pantasystem.milktea.model.note.draft.DraftNoteService
 import net.pantasystem.milktea.note.renote.RenoteResultHandler
 import net.pantasystem.milktea.note.renote.RenoteViewModel
-import net.pantasystem.milktea.note.view.ActionNoteHandler
+import net.pantasystem.milktea.note.view.NoteActionHandler
 import net.pantasystem.milktea.note.viewmodel.NotesViewModel
 import net.pantasystem.milktea.worker.note.CreateNoteWorkerExecutor
 import javax.inject.Inject
@@ -132,7 +132,7 @@ class MainActivity : AppCompatActivity(), ToolbarSetter {
         AccountViewModelHandler(binding, this, mAccountViewModel).setup()
         SetUpNavHeader(binding.navView, this, mAccountViewModel).invoke()
 
-        ActionNoteHandler(
+        NoteActionHandler(
             this.supportFragmentManager,
             this,
             this,

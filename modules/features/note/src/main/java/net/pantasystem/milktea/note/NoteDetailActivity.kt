@@ -26,7 +26,7 @@ import net.pantasystem.milktea.note.databinding.ActivityNoteDetailBinding
 import net.pantasystem.milktea.note.detail.NoteDetailAccountSwitchDialog
 import net.pantasystem.milktea.note.detail.NoteDetailPagerFragment
 import net.pantasystem.milktea.note.detail.viewmodel.NoteDetailPagerViewModel
-import net.pantasystem.milktea.note.view.ActionNoteHandler
+import net.pantasystem.milktea.note.view.NoteActionHandler
 import net.pantasystem.milktea.note.viewmodel.NotesViewModel
 import javax.inject.Inject
 
@@ -97,7 +97,7 @@ class NoteDetailActivity : AppCompatActivity() {
 
         mIsMainActive = intent.getBooleanExtra(EXTRA_IS_MAIN_ACTIVE, true)
 
-        ActionNoteHandler(
+        NoteActionHandler(
             this.supportFragmentManager,
             this,
             this,
