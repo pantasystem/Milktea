@@ -156,9 +156,9 @@ class NotesViewModel @Inject constructor(
 
     }
 
-    fun removeAndEditNote(note: NoteRelation) {
+    fun removeAndEditNote(noteId: Note.Id) {
         viewModelScope.launch {
-            deleteAndEditUseCase(note.note.id).onSuccess {
+            deleteAndEditUseCase(noteId).onSuccess {
                 _openNoteEditorEvent.tryEmit(it)
             }.onFailure {
                 logger.error("削除に失敗しました", it)

@@ -16,7 +16,6 @@ class ConfirmDeleteNoteDialog : DialogFragment() {
     companion object {
         private const val ACCOUNT_ID = "account_id"
         private const val NOTE_ID = "note_id"
-
         const val FRAGMENT_TAG = "ConfirmDeleteNoteDialog"
         fun newInstance(noteId: Note.Id): ConfirmDeleteNoteDialog {
             return ConfirmDeleteNoteDialog().apply {
