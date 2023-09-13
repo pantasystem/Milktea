@@ -28,11 +28,13 @@ import net.pantasystem.milktea.auth.JoinMilkteaActivity
 import net.pantasystem.milktea.common_android_ui.report.ReportViewModel
 import net.pantasystem.milktea.common_viewmodel.CurrentPageType
 import net.pantasystem.milktea.common_viewmodel.CurrentPageableTimelineViewModel
+import net.pantasystem.milktea.model.instance.FeatureEnables
 import net.pantasystem.milktea.model.note.draft.DraftNoteService
 import net.pantasystem.milktea.model.user.report.ReportState
 import net.pantasystem.milktea.notification.notificationMessageScope
 import net.pantasystem.milktea.user.ReportStateHandler
 import net.pantasystem.milktea.worker.note.CreateNoteWorkerExecutor
+import javax.inject.Inject
 
 @Suppress("DEPRECATION")
 internal class MainActivityEventHandler(
@@ -50,6 +52,39 @@ internal class MainActivityEventHandler(
     private val draftNoteService: DraftNoteService,
     private val currentPageableTimelineViewModel: CurrentPageableTimelineViewModel,
 ) {
+
+    class Factory @Inject constructor(
+        private val createNoteWorkerExecutor: CreateNoteWorkerExecutor,
+        val accountStore: AccountStore,
+        private val configStore: SettingStore,
+        private val draftNoteService: DraftNoteService,
+        private val featureEnables: FeatureEnables,
+    ) {
+        fun create(
+            activity: MainActivity,
+            binding: ActivityMainBinding,
+            mainViewModel: MainViewModel,
+            reportViewModel: ReportViewModel,
+            requestPostNotificationsPermissionLauncher: ActivityResultLauncher<String>,
+            currentPageableTimelineViewModel: CurrentPageableTimelineViewModel,
+        ): MainActivityEventHandler {
+            return MainActivityEventHandler(
+                activity,
+                binding,
+                activity.lifecycleScope,
+                activity,
+                mainViewModel,
+                reportViewModel,
+                createNoteWorkerExecutor,
+                accountStore,
+                requestPostNotificationsPermissionLauncher,
+                ChangeNavMenuVisibilityFromAPIVersion(binding.navView, featureEnables),
+                configStore,
+                draftNoteService,
+                currentPageableTimelineViewModel
+            )
+        }
+    }
 
 
     fun setup() {

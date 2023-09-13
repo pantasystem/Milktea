@@ -22,7 +22,6 @@ import com.wada811.databinding.dataBinding
 import dagger.hilt.android.AndroidEntryPoint
 import jp.panta.misskeyandroidclient.databinding.ActivityMainBinding
 import jp.panta.misskeyandroidclient.ui.main.AccountViewModelHandler
-import jp.panta.misskeyandroidclient.ui.main.ChangeNavMenuVisibilityFromAPIVersion
 import jp.panta.misskeyandroidclient.ui.main.FabClickHandler
 import jp.panta.misskeyandroidclient.ui.main.MainActivityEventHandler
 import jp.panta.misskeyandroidclient.ui.main.MainActivityInitialIntentHandler
@@ -46,22 +45,19 @@ import net.pantasystem.milktea.common_navigation.MainNavigation
 import net.pantasystem.milktea.common_navigation.UserDetailNavigation
 import net.pantasystem.milktea.common_viewmodel.CurrentPageableTimelineViewModel
 import net.pantasystem.milktea.common_viewmodel.ScrollToTopViewModel
-import net.pantasystem.milktea.model.instance.FeatureEnables
-import net.pantasystem.milktea.model.note.draft.DraftNoteService
 import net.pantasystem.milktea.note.renote.RenoteResultHandler
 import net.pantasystem.milktea.note.renote.RenoteViewModel
 import net.pantasystem.milktea.note.view.NoteActionHandler
 import net.pantasystem.milktea.note.viewmodel.NotesViewModel
-import net.pantasystem.milktea.worker.note.CreateNoteWorkerExecutor
 import javax.inject.Inject
 
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity(), ToolbarSetter {
 
-    private val mNotesViewModel: NotesViewModel by viewModels()
+    private val notesViewModel: NotesViewModel by viewModels()
 
-    private val mAccountViewModel: AccountViewModel by viewModels()
+    private val accountViewModel: AccountViewModel by viewModels()
 
     private val binding: ActivityMainBinding by dataBinding()
 
@@ -72,22 +68,16 @@ class MainActivity : AppCompatActivity(), ToolbarSetter {
     internal lateinit var settingStore: SettingStore
 
     @Inject
-    internal lateinit var createNoteWorkerExecutor: CreateNoteWorkerExecutor
-
-    @Inject
     internal lateinit var authorizationNavigation: AuthorizationNavigation
 
     @Inject
-    internal lateinit var setTheme: ApplyTheme
+    internal lateinit var applyTheme: ApplyTheme
 
     @Inject
     internal lateinit var userDetailNavigation: UserDetailNavigation
 
     @Inject
-    internal lateinit var draftNoteService: DraftNoteService
-
-    @Inject
-    internal lateinit var featureEnables: FeatureEnables
+    internal lateinit var mainActivityEventHandlerFactory: MainActivityEventHandler.Factory
 
     private val mainViewModel: MainViewModel by viewModels()
 
@@ -103,13 +93,13 @@ class MainActivity : AppCompatActivity(), ToolbarSetter {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setTheme.invoke()
+        applyTheme.invoke()
         setContentView(R.layout.activity_main)
 
         toggleNavigationDrawerDelegate = ToggleNavigationDrawerDelegate(this, binding.drawerLayout)
 
         binding.navView.setNavigationItemSelectedListener { item ->
-            MainActivityNavigationDrawerMenuItemClickListener(this, mAccountViewModel)
+            MainActivityNavigationDrawerMenuItemClickListener(this, accountViewModel)
                 .onSelect(item)
             binding.drawerLayout.closeDrawerWhenOpened()
             false
@@ -129,14 +119,14 @@ class MainActivity : AppCompatActivity(), ToolbarSetter {
             true
         }
 
-        AccountViewModelHandler(binding, this, mAccountViewModel).setup()
-        SetUpNavHeader(binding.navView, this, mAccountViewModel).invoke()
+        AccountViewModelHandler(binding, this, accountViewModel).setup()
+        SetUpNavHeader(binding.navView, this, accountViewModel).invoke()
 
         NoteActionHandler(
             this.supportFragmentManager,
             this,
             this,
-            mNotesViewModel,
+            notesViewModel,
         ).initViewModelListener()
 
 
@@ -145,19 +135,12 @@ class MainActivity : AppCompatActivity(), ToolbarSetter {
 
         addMenuProvider(MainActivityMenuProvider(this, settingStore))
 
-        MainActivityEventHandler(
+        mainActivityEventHandlerFactory.create(
             activity = this,
-            accountStore = accountStore,
             binding = binding,
-            lifecycleOwner = this,
-            lifecycleScope = lifecycleScope,
             mainViewModel = mainViewModel,
-            createNoteWorkerExecutor = createNoteWorkerExecutor,
             reportViewModel = reportViewModel,
             requestPostNotificationsPermissionLauncher = requestPermissionLauncher,
-            changeNavMenuVisibilityFromAPIVersion = ChangeNavMenuVisibilityFromAPIVersion(binding.navView, featureEnables),
-            configStore = settingStore,
-            draftNoteService = draftNoteService,
             currentPageableTimelineViewModel = currentPageableTimelineViewModel
         ).setup()
 
