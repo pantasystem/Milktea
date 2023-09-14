@@ -204,13 +204,15 @@ fun NoteOptionDialogLayout(
                 )
             }
             Divider()
-            NormalBottomSheetDialogSelectionLayout(
-                onClick = {
-                    onReportButtonClicked(uiState.noteRelation)
-                },
-                icon = Icons.Default.Report,
-                text = stringResource(id = R.string.report)
-            )
+            if (!uiState.isMyNote) {
+                NormalBottomSheetDialogSelectionLayout(
+                    onClick = {
+                        onReportButtonClicked(uiState.noteRelation)
+                    },
+                    icon = Icons.Default.Report,
+                    text = stringResource(id = R.string.report)
+                )
+            }
         }
     }
 }
