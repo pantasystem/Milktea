@@ -4,7 +4,9 @@ import android.view.LayoutInflater
 import android.widget.LinearLayout
 import net.pantasystem.milktea.model.note.Note
 import net.pantasystem.milktea.model.note.poll.Poll
+import net.pantasystem.milktea.note.R
 import net.pantasystem.milktea.note.databinding.ItemChoiceBinding
+import net.pantasystem.milktea.note.databinding.ItemVoteResultBinding
 import net.pantasystem.milktea.note.view.NoteCardActionListenerAdapter
 
 object PollListLinearLayoutBinder {
@@ -37,16 +39,32 @@ object PollListLinearLayoutBinder {
         }
     }
 
-    private fun bindItem(binding: ItemChoiceBinding, choice: Poll.Choice, noteId: Note.Id, poll: Poll, onVoteSelected: (OnVoted) -> Unit) {
-        binding.radioChoice.setOnClickListener {
-            onVoteSelected(OnVoted(noteId, choice, poll))
-        }
+    fun bindVoteResult(
+        layout: LinearLayout,
+        totalVoteCount: Int
+    ) {
+        val binding = ItemVoteResultBinding.inflate(LayoutInflater.from(layout.context), layout, false)
 
-        binding.radioChoice.text = choice.text
-        binding.radioChoice.isEnabled = poll.canVote
-        binding.radioChoice.isChecked = choice.isVoted
-
-        binding.progressBar.max = poll.totalVoteCount
-        binding.progressBar.progress = choice.votes
+        binding.voteResult.text = layout.context.getString(R.string.total_vote_count, totalVoteCount.toString())
+        layout.addView(binding.root)
     }
+}
+
+private fun bindItem(
+    binding: ItemChoiceBinding,
+    choice: Poll.Choice,
+    noteId: Note.Id,
+    poll: Poll,
+    onVoteSelected: (OnVoted) -> Unit
+) {
+    binding.radioChoice.setOnClickListener {
+        onVoteSelected(OnVoted(noteId, choice, poll))
+    }
+
+    binding.radioChoice.text = choice.text
+    binding.radioChoice.isEnabled = poll.canVote
+    binding.radioChoice.isChecked = choice.isVoted
+
+    binding.progressBar.max = poll.totalVoteCount
+    binding.progressBar.progress = choice.votes
 }

@@ -112,6 +112,7 @@
     <string name="reacted_by">%sさんにリアクションされました</string>
     <string name="renoted_by">%sさんにリノートされました</string>
     <string name="follow_requested_by">%sさんにフォローリクエストされました。</string>
+    <string name="total_vote_count">計%s票</string>
     <string name="poll_ended">投票が終了</string>
 
     <string name="input_message">相手に思いを伝えてください</string>
