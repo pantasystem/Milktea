@@ -5,6 +5,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.widget.FrameLayout
 import androidx.activity.compose.setContent
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Icon
@@ -25,6 +26,8 @@ import net.pantasystem.milktea.common_navigation.ClipDetailNavigation
 import net.pantasystem.milktea.model.account.page.Pageable
 import net.pantasystem.milktea.model.clip.ClipId
 import net.pantasystem.milktea.model.setting.LocalConfigRepository
+import net.pantasystem.milktea.note.view.NoteActionHandler
+import net.pantasystem.milktea.note.viewmodel.NotesViewModel
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -39,6 +42,8 @@ class ClipDetailActivity : AppCompatActivity() {
     @Inject
     internal lateinit var configRepository: LocalConfigRepository
 
+    private val notesViewModel by viewModels<NotesViewModel>()
+
     private val clipId: ClipId by lazy {
         ClipId(
             requireNotNull(intent.getLongExtra(ClipDetailNavigationImpl.EXTRA_ACCOUNT_ID, 0)),
@@ -49,6 +54,13 @@ class ClipDetailActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         applyTheme()
+        NoteActionHandler(
+            supportFragmentManager,
+            this,
+            this,
+            notesViewModel,
+        ).initViewModelListener()
+
         setContent {
             MilkteaStyleConfigApplyAndTheme(configRepository = configRepository) {
                 Scaffold(
