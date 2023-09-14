@@ -84,7 +84,7 @@ fun NoteEditorUserActionMenuLayout(
                 }
             ) {
                 Icon(
-                    Icons.Default.AddToPhotos,
+                    Icons.Default.AttachFile,
                     contentDescription = null,
                     tint = iconColor
                 )
