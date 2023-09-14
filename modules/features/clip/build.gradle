@@ -52,6 +52,7 @@ dependencies {
     implementation project(path: ':modules:common_android_ui')
     implementation project(path: ':modules:common_viewmodel')
     implementation project(path: ':modules:common_compose')
+    implementation project(path: ':modules:features:note')
     testImplementation libs.junit
     androidTestImplementation libs.androidx.test.ext.junit
     androidTestImplementation libs.androidx.test.espresso.core
@@ -76,4 +77,10 @@ dependencies {
     implementation libs.accompanist.pager
     implementation libs.accompanist.pager.indicators
     implementation libs.coil.compose
+
+    implementation libs.lifecycle.runtime
+    kapt libs.lifecycle.compiler
+    implementation libs.lifecycle.viewmodel
+    implementation libs.fragment.ktx
+    implementation libs.activity.ktx
 }
