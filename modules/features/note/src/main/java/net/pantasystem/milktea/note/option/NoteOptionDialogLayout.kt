@@ -203,8 +203,8 @@ fun NoteOptionDialogLayout(
                     text = stringResource(id = R.string.remove_note)
                 )
             }
-            Divider()
             if (!uiState.isMyNote) {
+                Divider()
                 NormalBottomSheetDialogSelectionLayout(
                     onClick = {
                         onReportButtonClicked(uiState.noteRelation)
