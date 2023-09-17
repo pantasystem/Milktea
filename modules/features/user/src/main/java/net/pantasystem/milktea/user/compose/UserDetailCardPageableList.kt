@@ -1,8 +1,10 @@
 package net.pantasystem.milktea.user.compose
 
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.GridItemSpan
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -13,6 +15,7 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.rememberNestedScrollInteropConnection
+import androidx.compose.ui.unit.dp
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -42,7 +45,7 @@ fun UserDetailCardPageableList(
     myId: String?,
     onAction: (UserDetailCardPageableListAction) -> Unit,
 ) {
-    val scrollController = rememberLazyListState()
+    val scrollController = rememberLazyGridState()
     LaunchedEffect(key1 = null) {
         snapshotFlow {
             scrollController.isScrolledToTheEnd()
@@ -62,7 +65,7 @@ fun UserDetailCardPageableList(
                     .nestedScroll(rememberNestedScrollInteropConnection())
                     .fillMaxSize()
             ) {
-                LazyColumn(modifier = Modifier.fillMaxSize(), state = scrollController) {
+                LazyVerticalGrid(columns = GridCells.Adaptive(minSize = 351.dp), state = scrollController) {
                     items(count = users.size) { i ->
                         UserDetailCard(
                             userDetail = users[i],
@@ -74,7 +77,7 @@ fun UserDetailCardPageableList(
                             myId = myId,
                         )
                     }
-                    item {
+                    item(span = { GridItemSpan(maxLineSpan) }){
                         Row(
                             Modifier.fillMaxWidth(),
                             horizontalArrangement = Arrangement.Center,
