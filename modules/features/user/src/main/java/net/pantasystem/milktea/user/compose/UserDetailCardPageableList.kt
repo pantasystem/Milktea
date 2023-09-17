@@ -65,7 +65,7 @@ fun UserDetailCardPageableList(
                     .nestedScroll(rememberNestedScrollInteropConnection())
                     .fillMaxSize()
             ) {
-                LazyVerticalGrid(columns = GridCells.Adaptive(minSize = 351.dp), state = scrollController) {
+                LazyVerticalGrid(columns = GridCells.Adaptive(minSize = 350.dp), state = scrollController) {
                     items(count = users.size) { i ->
                         UserDetailCard(
                             userDetail = users[i],
@@ -80,7 +80,7 @@ fun UserDetailCardPageableList(
                     item(span = { GridItemSpan(maxLineSpan) }){
                         Row(
                             Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.Center,
+                            horizontalArrangement = Arrangement.Center
                         ) {
                             CircularProgressIndicator()
                         }
