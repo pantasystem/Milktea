@@ -12,6 +12,7 @@ import net.pantasystem.milktea.api.mastodon.emojis.TootEmojiDTO
 import net.pantasystem.milktea.api.mastodon.filter.V1FilterDTO
 import net.pantasystem.milktea.api.mastodon.instance.Instance
 import net.pantasystem.milktea.api.mastodon.list.AddAccountsToList
+import net.pantasystem.milktea.api.mastodon.list.CreateListRequest
 import net.pantasystem.milktea.api.mastodon.list.ListDTO
 import net.pantasystem.milktea.api.mastodon.list.RemoveAccountsFromList
 import net.pantasystem.milktea.api.mastodon.marker.MarkersDTO
@@ -242,6 +243,9 @@ interface MastodonAPI {
 
     @GET("api/v1/lists")
     suspend fun getMyLists(): Response<List<ListDTO>>
+
+    @POST("api/v1/lists")
+    suspend fun createList(@Body body: CreateListRequest): Response<ListDTO>
 
     @GET("api/v1/lists/{listId}")
     suspend fun getList(@Path("listId") listId: String): Response<ListDTO>
