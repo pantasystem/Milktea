@@ -80,7 +80,8 @@ fun SelectableAvatarOnlyAccount(
                 url = avatarUrl,
                 onAvatarClick = onClick,
                 size = 48.dp,
-                modifier = Modifier.background(Color.Black)
+                borderStrokeWidth = 1.dp,
+                borderStrokeColor = Color.Gray,
             )
             val tint = MaterialTheme.colors.primary
             val background = if (isSelected) Color.White else Color.Transparent
