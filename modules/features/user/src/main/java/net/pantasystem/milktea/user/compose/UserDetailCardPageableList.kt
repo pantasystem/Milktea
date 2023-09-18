@@ -1,14 +1,15 @@
 package net.pantasystem.milktea.user.compose
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.GridItemSpan
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.rememberLazyGridState
+import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
+import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
+import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridItemSpan
+import androidx.compose.foundation.lazy.staggeredgrid.rememberLazyStaggeredGridState
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -26,7 +27,7 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import net.pantasystem.milktea.common.PageableState
 import net.pantasystem.milktea.common.StateContent
-import net.pantasystem.milktea.common.ui.isScrolledToTheEnd
+import net.pantasystem.milktea.common.ui.isScrollToTheEnd
 import net.pantasystem.milktea.model.user.User
 
 sealed interface UserDetailCardPageableListAction {
@@ -38,6 +39,7 @@ sealed interface UserDetailCardPageableListAction {
     object Refresh : UserDetailCardPageableListAction
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun UserDetailCardPageableList(
     pageableState: PageableState<List<User.Id>>,
@@ -47,10 +49,10 @@ fun UserDetailCardPageableList(
     myId: String?,
     onAction: (UserDetailCardPageableListAction) -> Unit,
 ) {
-    val scrollController = rememberLazyGridState()
+    val scrollController = rememberLazyStaggeredGridState()
     LaunchedEffect(key1 = null) {
         snapshotFlow {
-            scrollController.isScrolledToTheEnd()
+            scrollController.isScrollToTheEnd()
         }.distinctUntilChanged().onEach {
             if (it) {
                 onAction(UserDetailCardPageableListAction.OnBottomReached)
@@ -67,7 +69,7 @@ fun UserDetailCardPageableList(
                     .nestedScroll(rememberNestedScrollInteropConnection())
                     .fillMaxSize()
             ) {
-                LazyVerticalGrid(columns = GridCells.Adaptive(minSize = 350.dp), state = scrollController) {
+                LazyVerticalStaggeredGrid(columns = StaggeredGridCells.Adaptive(350.dp), state = scrollController) {
                     items(count = users.size) { i ->
                         UserDetailCard(
                             userDetail = users[i],
@@ -79,7 +81,8 @@ fun UserDetailCardPageableList(
                             myId = myId,
                         )
                     }
-                    item(span = { GridItemSpan(maxLineSpan) }){
+
+                    item(span = StaggeredGridItemSpan.FullLine){
                         Row(
                             Modifier.fillMaxWidth(),
                             horizontalArrangement = Arrangement.Center

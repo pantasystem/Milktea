@@ -1,19 +1,21 @@
 package net.pantasystem.milktea.user.compose
 
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
+import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
+import androidx.compose.foundation.lazy.staggeredgrid.rememberLazyStaggeredGridState
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.rememberNestedScrollInteropConnection
+import androidx.compose.ui.unit.dp
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import net.pantasystem.milktea.common.ResultState
@@ -28,7 +30,7 @@ sealed interface UserDetailCardListAction {
     object Refresh : UserDetailCardListAction
 }
 
-@OptIn(ExperimentalComposeUiApi::class)
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun UserDetailCardList(
     pageableState: ResultState<List<User.Id>>,
@@ -38,7 +40,7 @@ fun UserDetailCardList(
     isUserNameMain: Boolean,
     onAction: (UserDetailCardListAction) -> Unit,
 ) {
-    val scrollController = rememberLazyListState()
+    val scrollController = rememberLazyStaggeredGridState()
 
 
     when (pageableState.content) {
@@ -50,7 +52,11 @@ fun UserDetailCardList(
                     .nestedScroll(rememberNestedScrollInteropConnection())
                     .fillMaxSize()
             ) {
-                LazyColumn(modifier = Modifier.fillMaxSize(), state = scrollController) {
+                LazyVerticalStaggeredGrid(
+                    modifier = Modifier.fillMaxSize(),
+                    state = scrollController,
+                    columns = StaggeredGridCells.Adaptive(350.dp)
+                ) {
                     items(count = users.size) { i ->
                         UserDetailCard(
                             userDetail = users[i],
@@ -65,6 +71,7 @@ fun UserDetailCardList(
                 }
             }
         }
+
         is StateContent.NotExist -> {
             Column(
                 modifier = Modifier.fillMaxSize(),
@@ -76,9 +83,11 @@ fun UserDetailCardList(
                         Text("Error")
                         Text(pageableState.throwable.toString())
                     }
+
                     is ResultState.Fixed -> {
                         Text("Content is empty")
                     }
+
                     is ResultState.Loading -> {
                         CircularProgressIndicator()
                     }
