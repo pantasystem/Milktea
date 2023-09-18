@@ -6,6 +6,8 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
+import net.pantasystem.milktea.api.mastodon.list.CreateListRequest
+import net.pantasystem.milktea.api.mastodon.list.ListDTO
 import net.pantasystem.milktea.api.misskey.I
 import net.pantasystem.milktea.api.misskey.list.CreateList
 import net.pantasystem.milktea.api.misskey.list.ListId
@@ -64,15 +66,32 @@ class UserListRepositoryWebAPIImpl @Inject constructor(
     override suspend fun create(accountId: Long, name: String): UserList {
         return withContext(ioDispatcher) {
             val account = accountRepository.get(accountId).getOrThrow()
-            val res = misskeyAPIProvider.get(account).createList(
-                CreateList(
-                    account.token,
-                    name = name
-                )
-            ).throwIfHasError()
-            res.body()!!.toEntity(account).also {
-                upsert(it)
+            when(account.instanceType) {
+                Account.InstanceType.MISSKEY, Account.InstanceType.FIREFISH -> {
+                    val res = misskeyAPIProvider.get(account).createList(
+                        CreateList(
+                            account.token,
+                            name = name
+                        )
+                    ).throwIfHasError()
+                    res.body()!!.toEntity(account).also {
+                        upsert(it)
+                    }
+                }
+                Account.InstanceType.MASTODON, Account.InstanceType.PLEROMA -> {
+                    val res = mastodonAPIProvider.get(account)
+                        .createList(
+                            CreateListRequest(
+                                title = name,
+                                repliesPolicy = ListDTO.RepliesPolicyType.List,
+                            )
+                        ).throwIfHasError()
+                    res.body()!!.toModel(account).also {
+                        upsert(it)
+                    }
+                }
             }
+
         }
     }
 
