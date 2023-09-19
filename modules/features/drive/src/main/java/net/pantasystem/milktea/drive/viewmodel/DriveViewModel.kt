@@ -50,6 +50,7 @@ class DriveViewModel @Inject constructor(
     private val filePagingStore: FilePropertyPagingStore,
     private val filePropertyRepository: DriveFileRepository,
     loggerFactory: Logger.Factory,
+    buildDriveUiState: DriveUiStateBuilder,
 ) : ViewModel() {
 
     companion object {
@@ -73,7 +74,7 @@ class DriveViewModel @Inject constructor(
         accountStore.getOrCurrent(accountId)
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
 
-    val maxSelectableSize = savedStateHandle.getStateFlow<Int?>(
+    private val maxSelectableSize = savedStateHandle.getStateFlow<Int?>(
         EXTRA_INT_SELECTABLE_FILE_MAX_SIZE,
         null,
     )
@@ -111,28 +112,6 @@ class DriveViewModel @Inject constructor(
     )
     private val _fileCardDropDowned = MutableStateFlow<FileProperty.Id?>(null)
 
-    private val filesState = combine(
-        fState,
-        selectedFileIds,
-        _fileCardDropDowned,
-        maxSelectableSize
-    ) { files, selected, dropdown, maxSize ->
-        files.convert { state ->
-            state.map {
-                FileViewData(
-                    fileProperty = it,
-                    isSelected = selected.contains(it.id),
-                    isDropdownMenuExpanded = dropdown == it.id,
-                    isEnabled = (maxSize == null || selected.size < maxSize) || selected.contains(it.id),
-                )
-            }
-        }
-    }.stateIn(
-        viewModelScope,
-        SharingStarted.WhileSubscribed(5_000),
-        PageableState.Loading.Init(),
-    )
-
     private val isSelectMode = savedStateHandle.getStateFlow<Boolean>(
         STATE_SELECTABLE_MODE,
         false,
@@ -156,39 +135,18 @@ class DriveViewModel @Inject constructor(
         Modes()
     )
 
-    private val pagingState = combine(
-        directoriesState,
-        filesState,
-    ) { dState, fState ->
-        PagingState(
-            directoriesState = dState,
-            driveFilesState = fState,
-        )
-    }.stateIn(
-        viewModelScope,
-        SharingStarted.WhileSubscribed(5_000),
-        PagingState()
-    )
 
-    val uiState = combine(
-        currentAccount,
-        currentDirectory,
-        pagingState,
-        modes,
-        selectedFileIds,
-    ) { ac, dir, pagingState, mode, selected ->
-        DriveUiState(
-            currentAccount = ac,
-            currentDirectory = dir,
-            directoriesState = pagingState.directoriesState,
-            driveFilesState = pagingState.driveFilesState,
-            selectedFilePropertyIds = selected,
-            actionMode = mode.actionMode,
-            viewMode = mode.viewMode,
-            isSelectMode = mode.isSelectMode || mode.maxSelectableSize != null && mode.maxSelectableSize > 0,
-            maxSelectableSize = mode.maxSelectableSize,
-        )
-    }.stateIn(
+    val uiState = buildDriveUiState(
+        currentAccountFlow = currentAccount,
+        currentDirectoryFlow = currentDirectory,
+        directoriesStateFlow = directoriesState,
+        filesStateFlow = fState,
+        fileCardDropDownedFlow = _fileCardDropDowned,
+        maxSelectableSizeFlow = maxSelectableSize,
+        modesFlow = modes,
+        selectedFileIdsFlow = selectedFileIds,
+        coroutineScope = viewModelScope,
+    ).stateIn(
         viewModelScope,
         SharingStarted.WhileSubscribed(5_000),
         DriveUiState()
@@ -482,14 +440,14 @@ data class DriveUiState(
     }
 }
 
-private data class Modes(
+data class Modes(
     val isSelectMode: Boolean = false,
     val maxSelectableSize: Int? = null,
     val actionMode: DriveUiState.ActionMode = DriveUiState.ActionMode.Normal,
     val viewMode: DriveUiState.ViewMode = DriveUiState.ViewMode.List,
 )
 
-private data class PagingState(
+data class PagingState(
     val directoriesState: PageableState<List<Directory>> = PageableState.Loading.Init(),
     val driveFilesState: PageableState<List<FileViewData>> = PageableState.Loading.Init(),
 )

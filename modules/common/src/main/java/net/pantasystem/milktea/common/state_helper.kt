@@ -57,6 +57,7 @@ fun<T> ResultState.Companion.initialState(): ResultState<T> {
 }
 
 sealed class PageableState<T>(val content: StateContent<T>) {
+    companion object
     class Fixed<T>(content: StateContent<T>) : PageableState<T>(content) {
         fun init() : Loading.Init<T> {
             return Loading.Init()
@@ -150,4 +151,8 @@ fun<T, R> Flow<PageableState<T>>.convert(converter: suspend (T?) -> Flow<R>): Fl
             }
         }
     }
+}
+
+fun<T> PageableState.Companion.initialState(): PageableState<T> {
+    return PageableState.Loading.Init()
 }
