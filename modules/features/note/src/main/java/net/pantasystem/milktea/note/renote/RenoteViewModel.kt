@@ -12,12 +12,10 @@ import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.common.ResultState
 import net.pantasystem.milktea.common.asLoadingStateFlow
 import net.pantasystem.milktea.common.initialState
-import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.instance.InstanceInfoService
 import net.pantasystem.milktea.model.note.*
 import net.pantasystem.milktea.model.note.repost.CreateRenoteMultipleAccountUseCase
-import net.pantasystem.milktea.model.user.User
 import net.pantasystem.milktea.model.user.UserDataSource
 import net.pantasystem.milktea.model.user.UserRepository
 import javax.inject.Inject
@@ -31,7 +29,8 @@ class RenoteViewModel @Inject constructor(
     val userDataSource: UserDataSource,
     val renoteUseCase: CreateRenoteMultipleAccountUseCase,
     val noteRelationGetter: NoteRelationGetter,
-    val instanceInfoService: InstanceInfoService,
+    private val instanceInfoService: InstanceInfoService,
+    renoteUiStateBuilder: RenoteUiStateBuilder,
     loggerFactory: Logger.Factory
 ) : ViewModel() {
 
@@ -66,38 +65,6 @@ class RenoteViewModel @Inject constructor(
         emptyList()
     )
 
-    @OptIn(ExperimentalCoroutinesApi::class)
-    private val accountWithUser = accounts.map { accounts ->
-        accounts.map {
-            it to User.Id(
-                it.accountId,
-                it.remoteId
-            )
-        }.map { (account, userId) ->
-            userRepository.observe(userId).map { user ->
-                account to user
-            }
-        }
-    }.flatMapLatest { flows ->
-        combine(flows) { users ->
-            users.toList()
-        }
-    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
-
-    private val accountWithUsers = combine(
-        accountWithUser,
-        _selectedAccountIds,
-        note,
-    ) { accountWithUser, selectedIds, note ->
-        accountWithUser.map { (account, user) ->
-            AccountWithUser(
-                accountId = account.accountId,
-                user = user,
-                isSelected = selectedIds.any { id -> id == account.accountId },
-                isEnable = note?.contentNote?.canRenote(account, user) == true,
-            )
-        }
-    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
 
     @OptIn(ExperimentalCoroutinesApi::class)
     private val _syncState = _targetNoteId.filterNotNull().flatMapLatest {
@@ -110,20 +77,6 @@ class RenoteViewModel @Inject constructor(
         ResultState.initialState(),
     )
 
-    private val _noteState = combine(note, _syncState) { n, s ->
-        RenoteViewModelTargetNoteState(
-            note = n?.contentNote?.note,
-            syncState = s
-        )
-    }.stateIn(
-        viewModelScope,
-        SharingStarted.WhileSubscribed(5_000),
-        RenoteViewModelTargetNoteState(
-            _syncState.value,
-            note.value?.contentNote?.note,
-        )
-    )
-
     @OptIn(ExperimentalCoroutinesApi::class)
     private val currentAccountInstanceInfo = _targetNoteId.filterNotNull().map {
         accountRepository.get(it.accountId).getOrThrow()
@@ -134,32 +87,18 @@ class RenoteViewModel @Inject constructor(
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
 
 
-    val uiState = combine(
-        _targetNoteId,
-        _noteState,
-        accountWithUsers,
-        currentAccountInstanceInfo,
-    ) { noteId, syncState, accounts, instanceInfo ->
-        logger.debug {
-            "canQuote: ${instanceInfo?.canQuote}"
-        }
-        RenoteViewModelUiState(
-            targetNoteId = noteId,
-            noteState = syncState,
-            accounts = accounts,
-            canQuote = instanceInfo?.canQuote ?: false
-        )
-    }.stateIn(
+    val uiState = renoteUiStateBuilder.buildState(
+        targetNoteIdFlow = _targetNoteId,
+        noteFlow = note,
+        noteSyncState = _syncState,
+        selectedAccountIds = _selectedAccountIds,
+        accountsFlow = accounts,
+        currentAccountInstanceInfo = currentAccountInstanceInfo,
+    ).stateIn(
         viewModelScope,
         SharingStarted.WhileSubscribed(5_000),
-        RenoteViewModelUiState(
-            _targetNoteId.value,
-            _noteState.value,
-            accountWithUsers.value,
-            true
-        )
+        RenoteViewModelUiState()
     )
-
 
     fun setTargetNoteId(noteId: Note.Id) {
         _targetNoteId.value = noteId
@@ -210,24 +149,6 @@ class RenoteViewModel @Inject constructor(
 
 }
 
-data class RenoteViewModelUiState(
-    val targetNoteId: Note.Id?,
-    val noteState: RenoteViewModelTargetNoteState,
-    val accounts: List<AccountWithUser>,
-    val canQuote: Boolean,
-)
-
-data class RenoteViewModelTargetNoteState(
-    val syncState: ResultState<Unit>,
-    val note: Note?,
-)
-
-data class AccountWithUser(
-    val accountId: Long,
-    val user: User,
-    val isSelected: Boolean,
-    val isEnable: Boolean,
-)
 
 sealed interface RenoteActionResultEvent {
     data class Renote(
@@ -239,30 +160,3 @@ sealed interface RenoteActionResultEvent {
     data class UnRenote(val result: Result<Note>, val noteId: Note.Id) : RenoteActionResultEvent
 }
 
-private fun NoteRelation.canRenote(account: Account, user: User): Boolean {
-    if (note.canRenote(user.id)) {
-        return true
-    }
-
-    // NOTE: 公開範囲がpublicなら可能
-    if (note.visibility is Visibility.Public && !note.visibility.isLocalOnly()) {
-        return true
-    }
-
-    // NOTE: 公開範囲がフォロワー、DMの場合は無理
-    if (note.visibility is Visibility.Followers || note.visibility is Visibility.Specified) {
-        return false
-    }
-
-    // NOTE: 同一ホストなら可能
-    if (note.visibility.isLocalOnly() && this.user.host == account.getHost()) {
-        return true
-    }
-
-    // NOTE: 投稿のホストとアカウントが同一ホストかつ公開範囲の場合はRenote可能
-    if (note.visibility is Visibility.Home && this.user.host == account.getHost()) {
-        return true
-    }
-
-    return false
-}

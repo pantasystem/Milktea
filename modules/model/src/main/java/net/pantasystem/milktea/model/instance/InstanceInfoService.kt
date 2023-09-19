@@ -3,6 +3,7 @@ package net.pantasystem.milktea.model.instance
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.asFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
@@ -111,6 +112,14 @@ open class InstanceInfoService @Inject constructor(
                 is NodeInfo.SoftwareType.Other -> flowOf(null)
                 null -> flowOf(null)
             }
+        }
+    }
+
+    open fun observeIn(instanceDomains: List<String>): Flow<List<InstanceInfoType>> {
+        return combine(instanceDomains.map { observe(it) }) {
+            it.filterNotNull()
+        }.map {
+            it.toList()
         }
     }
 }

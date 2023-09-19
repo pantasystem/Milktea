@@ -30,12 +30,7 @@ class AccountViewModelUiStateHelper(
 
     @OptIn(ExperimentalCoroutinesApi::class)
     private val metaList = accountStore.observeAccounts.flatMapLatest { accounts ->
-        val flows = accounts.map {
-            instanceInfoService.observe(it.normalizedInstanceUri).flowOn(Dispatchers.IO)
-        }
-        combine(flows) {
-            it.toList()
-        }
+        instanceInfoService.observeIn(accounts.map { it.normalizedInstanceUri })
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
 
     private val accountWithUserList = combine(

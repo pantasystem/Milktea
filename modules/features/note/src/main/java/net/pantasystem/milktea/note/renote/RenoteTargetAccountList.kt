@@ -29,7 +29,7 @@ import net.pantasystem.milktea.model.emoji.Emoji
 @Composable
 fun RenoteTargetAccountRowList(
     modifier: Modifier = Modifier,
-    accounts: List<AccountWithUser>,
+    accounts: List<AccountInfo>,
     onClick: (Long) -> Unit,
 ) {
     Row(
