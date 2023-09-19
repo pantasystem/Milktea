@@ -23,6 +23,7 @@ class GroupDetailViewModel @Inject constructor(
     private val groupDataSource: GroupDataSource,
     private val accountStore: AccountStore,
     loggerFactory: Logger.Factory,
+    buildUiState: GroupDetailUiStateBuilder,
 ) : ViewModel() {
 
     private val logger = loggerFactory.create("GroupDetailViewModel")
@@ -70,35 +71,13 @@ class GroupDetailViewModel @Inject constructor(
         SyncState(m, g)
     }.stateIn(viewModelScope, SharingStarted.Eagerly, SyncState())
 
-    val uiState = combine(
+    val uiState = buildUiState(
         accountStore.observeCurrentAccount,
         uiStateType,
         group,
         syncState,
-        members
-    ) { ac, type, g, sync,  m ->
-        // NOTE: groupIdがnullの状態の時はグループ関連のデータを空かnullにしたい
-        // NOTE: 源流となるflowがgroupIdがnullの時はfilterするようにしてしまっているので、ここでempty, nullを割り当てている
-        GroupDetailUiState(
-            ac,
-            type,
-            if (type.groupId == null) null else g?.group,
-            if (type.groupId == null) emptyList() else m,
-            if (type.groupId == null) ResultState.Fixed(StateContent.NotExist()) else sync.syncMembersState,
-            if (type.groupId == null) ResultState.Fixed(StateContent.NotExist()) else sync.syncGroupState,
-            when (type) {
-                is GroupDetailUiStateType.Editing -> {
-                    type.name
-                }
-                is GroupDetailUiStateType.Show -> {
-                    g?.group?.name ?: ""
-                }
-                is GroupDetailUiStateType.Rejecting -> {
-                    g?.group?.name ?: ""
-                }
-            }
-        )
-    }.stateIn(
+        members,
+    ).stateIn(
         viewModelScope,
         SharingStarted.WhileSubscribed(500),
         GroupDetailUiState(null, GroupDetailUiStateType.Editing(null), null)
