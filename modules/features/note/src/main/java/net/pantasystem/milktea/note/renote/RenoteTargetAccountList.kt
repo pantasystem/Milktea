@@ -34,7 +34,6 @@ import net.pantasystem.milktea.model.emoji.Emoji
 fun RenoteTargetAccountRowList(
     modifier: Modifier = Modifier,
     accounts: List<AccountInfo>,
-    accountIdToIconUrlMap: Map<Long, String>,
     onClick: (Long) -> Unit,
 ) {
     Row(
@@ -54,7 +53,7 @@ fun RenoteTargetAccountRowList(
                 emojis = it.user.emojis,
                 isEnable = it.isEnable,
                 accountHost = it.user.host,
-                iconUrl = accountIdToIconUrlMap[it.accountId]!!
+                iconUrl = it.instanceIconUrl ?: ""
             )
         }
     }

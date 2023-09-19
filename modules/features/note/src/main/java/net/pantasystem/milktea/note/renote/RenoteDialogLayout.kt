@@ -15,7 +15,6 @@ import net.pantasystem.milktea.note.view.NormalBottomSheetDialogSelectionLayout
 @Composable
 fun RenoteDialogContent(
     uiState: RenoteViewModelUiState,
-    accountIdToIconUrlMap: Map<Long, String>,
     isRenotedByMe: Boolean,
     onToggleAddAccount: (Long) -> Unit,
     onRenoteButtonClicked: () -> Unit,
@@ -32,7 +31,6 @@ fun RenoteDialogContent(
         ) {
             RenoteTargetAccountRowList(
                 accounts = uiState.accounts,
-                accountIdToIconUrlMap = accountIdToIconUrlMap,
                 onClick = onToggleAddAccount
             )
             NormalBottomSheetDialogSelectionLayout(
