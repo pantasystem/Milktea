@@ -1,12 +1,16 @@
 package net.pantasystem.milktea.note.renote
 
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import net.pantasystem.milktea.common.ResultState
+import net.pantasystem.milktea.common.initialState
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.instance.InstanceInfoService
 import net.pantasystem.milktea.model.instance.InstanceInfoType
@@ -30,6 +34,7 @@ class RenoteUiStateBuilder @Inject constructor(
         selectedAccountIds: Flow<List<Long>>,
         accountsFlow: Flow<List<Account>>,
         currentAccountInstanceInfo: Flow<InstanceInfoType?>,
+        coroutineScope: CoroutineScope,
     ): Flow<RenoteViewModelUiState> {
         val accountAndUserList = accountsFlow.map { accounts ->
             accounts.map {
@@ -46,14 +51,25 @@ class RenoteUiStateBuilder @Inject constructor(
             combine(flows) { users ->
                 users.toList()
             }
-        }
+        }.stateIn(
+            coroutineScope,
+            SharingStarted.WhileSubscribed(5_000),
+            emptyList()
+        )
 
         val noteState = combine(noteFlow, noteSyncState) { n, s ->
             RenoteViewModelTargetNoteState(
                 note = n?.contentNote?.note,
                 syncState = s
             )
-        }
+        }.stateIn(
+            coroutineScope,
+            SharingStarted.WhileSubscribed(5_000),
+            RenoteViewModelTargetNoteState(
+                syncState = ResultState.initialState(),
+                note = null
+            )
+        )
 
         val instanceInfoListFlow = accountsFlow.flatMapLatest { accounts ->
             instanceInfoService.observeIn(
@@ -61,7 +77,11 @@ class RenoteUiStateBuilder @Inject constructor(
                     it.normalizedInstanceUri
                 }
             )
-        }
+        }.stateIn(
+            coroutineScope,
+            SharingStarted.WhileSubscribed(5_000),
+            emptyList()
+        )
 
         val accountWithUsers = combine(
             accountAndUserList,
@@ -80,7 +100,11 @@ class RenoteUiStateBuilder @Inject constructor(
                     }?.iconUrl
                 )
             }
-        }
+        }.stateIn(
+            coroutineScope,
+            SharingStarted.WhileSubscribed(5_000),
+            emptyList()
+        )
 
         return combine(
             targetNoteIdFlow,

@@ -94,6 +94,7 @@ class RenoteViewModel @Inject constructor(
         selectedAccountIds = _selectedAccountIds,
         accountsFlow = accounts,
         currentAccountInstanceInfo = currentAccountInstanceInfo,
+        coroutineScope = viewModelScope
     ).stateIn(
         viewModelScope,
         SharingStarted.WhileSubscribed(5_000),
