@@ -70,8 +70,14 @@ class RenoteBottomSheetDialog : BottomSheetDialogFragment() {
             setContent {
                 MilkteaStyleConfigApplyAndTheme(configRepository = configRepository) {
                     val uiState by viewModel.uiState.collectAsState()
+
+                    val accountIdToIconUrlMap = uiState.accounts.map {
+                        it.accountId to (it.instanceIconUrl ?: "")
+                    }.toMap()
+
                     RenoteDialogContent(
                         uiState = uiState,
+                        accountIdToIconUrlMap = accountIdToIconUrlMap,
                         isRenotedByMe = isRenotedByMe,
                         onToggleAddAccount = {
                             viewModel.toggleAddAccount(it)
