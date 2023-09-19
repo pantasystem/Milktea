@@ -18,6 +18,7 @@ import net.pantasystem.milktea.app_store.notes.TimelineStore
 import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.common.PageableState
 import net.pantasystem.milktea.common.StateContent
+import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.common_android_ui.account.viewmodel.AccountViewModelUiStateHelper
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.AccountRepository
@@ -63,7 +64,7 @@ class NoteDetailPagerViewModel @Inject constructor(
 
 
     private val timelineStoreHolder = TimelineStoreHolder(
-        savedStateHandle.get<Pageable>(EXTRA_FROM_PAGEABLE) ?: Pageable.Show(getNoteId()),
+        savedStateHandle.get<Pageable>(EXTRA_FROM_PAGEABLE) ?: Pageable.Show(getNoteId() ?: ""),
         timelineStoreFactory,
         viewModelScope,
     ) {
@@ -112,28 +113,33 @@ class NoteDetailPagerViewModel @Inject constructor(
 
     fun load() {
         viewModelScope.launch {
-            runCatching {
+            runCancellableCatching {
                 timelineStoreHolder.timelineStore.clear(
                     InitialLoadQuery.UntilId(
-                        Note.Id(getAccount().accountId, getNoteId())
+                        Note.Id(getAccount().accountId, requireNotNull(getNoteId()))
                     )
                 )
                 timelineStoreHolder.timelineStore.loadPrevious()
                 timelineStoreHolder.timelineStore.loadFuture()
+            }.onFailure {
+                logger.error("Failed to load timeline", it)
             }
-
         }
     }
 
     fun loadPrevious() {
         viewModelScope.launch {
-            timelineStoreHolder.timelineStore.loadPrevious()
+            timelineStoreHolder.timelineStore.loadPrevious().onFailure {
+                logger.error("Failed to load previous timeline", it)
+            }
         }
     }
 
     fun loadFuture() {
         viewModelScope.launch {
-            timelineStoreHolder.timelineStore.loadFuture()
+            timelineStoreHolder.timelineStore.loadFuture().onFailure {
+                logger.error("Failed to load future timeline", it)
+            }
         }
     }
 
@@ -143,7 +149,7 @@ class NoteDetailPagerViewModel @Inject constructor(
                 val noteId = getNoteId()
                 val currentAccountId = requireNotNull(savedStateHandle.get<Long>(EXTRA_ACCOUNT_ID))
                 val resolvedNote =
-                    apResolverService.resolve(Note.Id(currentAccountId, noteId), accountId)
+                    apResolverService.resolve(Note.Id(currentAccountId, requireNotNull(noteId)), accountId)
                         .getOrThrow()
                 savedStateHandle[EXTRA_ACCOUNT_ID] = accountId
                 savedStateHandle[EXTRA_NOTE_ID] = resolvedNote.id.noteId
@@ -156,8 +162,8 @@ class NoteDetailPagerViewModel @Inject constructor(
         }
     }
 
-    private fun getNoteId(): String {
-        return requireNotNull(savedStateHandle.get<String>(EXTRA_NOTE_ID))
+    private fun getNoteId(): String? {
+        return savedStateHandle.get<String>(EXTRA_NOTE_ID)
     }
 
     private suspend fun getAccount(): Account {
