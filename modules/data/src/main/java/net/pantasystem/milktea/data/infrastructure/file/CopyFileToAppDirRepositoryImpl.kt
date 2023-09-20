@@ -26,19 +26,22 @@ class CopyFileToAppDirRepositoryImpl @Inject constructor(
     override suspend fun copyFileToAppDir(uri: Uri): Result<AppFile.Local> = runCancellableCatching{
         withContext(ioDispatcher) {
             val localFile = uri.toAppFile(context)
-            val appDir = context.filesDir ?: throw IllegalStateException("アプリディレクトリの取得に失敗")
-            val pathHash = Hash.sha256(localFile.path)
-            val copyTo = File(appDir, USER_FILE_DIR).apply {
-                if (!exists()) {
-                    mkdirs()
-                }
-            }.resolve(pathHash)
-            context.contentResolver.openInputStream(uri)?.use { inputStream ->
-                copyTo.outputStream().use { outputStream ->
-                    inputStream.copyTo(outputStream)
-                }
-            }
-            localFile.copy(path = copyTo.path)
+//            val appDir = context.filesDir ?: throw IllegalStateException("アプリディレクトリの取得に失敗")
+//            val pathHash = Hash.sha256(localFile.path)
+//            val copyTo = File(appDir, USER_FILE_DIR).apply {
+//                if (!exists()) {
+//                    mkdirs()
+//                }
+//            }.resolve(pathHash)
+//            context.contentResolver.openInputStream(uri)?.use { inputStream ->
+//                copyTo.outputStream().use { outputStream ->
+//                    inputStream.copyTo(outputStream)
+//                }
+//            } ?: throw IllegalStateException("ファイルのコピーに失敗")
+//            localFile.copy(path = copyTo.path).also {
+//                Log.d("CopyFileToAppDir", "copyTo: $copyTo")
+//            }
+            return@withContext localFile
         }
     }
 
