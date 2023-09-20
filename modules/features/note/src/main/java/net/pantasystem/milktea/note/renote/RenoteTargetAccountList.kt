@@ -1,5 +1,6 @@
 package net.pantasystem.milktea.note.renote
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Box
@@ -7,6 +8,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
@@ -19,9 +21,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil.compose.rememberAsyncImagePainter
 import net.pantasystem.milktea.common_compose.AvatarIcon
 import net.pantasystem.milktea.common_compose.CustomEmojiText
 import net.pantasystem.milktea.model.emoji.Emoji
@@ -49,6 +53,7 @@ fun RenoteTargetAccountRowList(
                 emojis = it.user.emojis,
                 isEnable = it.isEnable,
                 accountHost = it.user.host,
+                iconUrl = it.instanceIconUrl ?: ""
             )
         }
     }
@@ -63,6 +68,7 @@ fun SelectableAvatarOnlyAccount(
     avatarUrl: String,
     emojis: List<Emoji>,
     accountHost: String?,
+    iconUrl: String,
     onClick: () -> Unit,
 ) {
     Column(
@@ -106,9 +112,23 @@ fun SelectableAvatarOnlyAccount(
                 }
             }
 
-
+            Image(
+                painter = rememberAsyncImagePainter(iconUrl),
+                contentDescription = null,
+                contentScale = ContentScale.Crop,
+                modifier = modifier
+                    .size(12.dp)
+                    .align(Alignment.BottomEnd)
+            )
         }
-        CustomEmojiText(text = username, emojis = emojis, maxLines = 1, fontSize = 8.sp, accountHost = accountHost, sourceHost = accountHost)
+        CustomEmojiText(
+            text = username,
+            emojis = emojis,
+            maxLines = 1,
+            fontSize = 8.sp,
+            accountHost = accountHost,
+            sourceHost = accountHost
+        )
     }
 
 }
@@ -123,6 +143,7 @@ fun PreviewSelectableAvatarOnlyAccount() {
         username = "@harunon",
         emojis = emptyList(),
         isEnable = true,
-        accountHost = "misskey.io"
+        accountHost = "misskey.io",
+        iconUrl = ""
     )
 }
