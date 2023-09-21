@@ -99,7 +99,7 @@ class ChannelActivity : AppCompatActivity() {
                         val viewModel: ChannelDetailViewModel = hiltViewModel()
                         val channel by viewModel.channel.collectAsState()
                         ChannelDetailScreen(
-                            onNavigateUp = { navController.popBackStack() },
+                            onNavigateUp = { if(!navController.popBackStack()) finish() },
                             channelId = viewModel.channelId,
                             channel = channel,
                             onNavigateNoteEditor = {
