@@ -128,8 +128,8 @@ class NoteEditorViewModel @Inject constructor(
         featureEnables.enableFeatures(it.normalizedInstanceUri)
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptySet())
 
-    val maxFileCount = _currentAccount.filterNotNull().mapNotNull {
-        instanceInfoService.find(it.normalizedInstanceUri).getOrNull()?.maxFileCount
+    val maxFileCount = instanceInfoType.map {
+        it?.maxFileCount?: 4
     }.stateIn(viewModelScope + Dispatchers.IO, started = SharingStarted.Eagerly, initialValue = 4)
 
     private val _visibility = savedStateHandle.getStateFlow<Visibility?>(
@@ -381,7 +381,7 @@ class NoteEditorViewModel @Inject constructor(
     fun post() {
         _currentAccount.value?.let { account ->
             viewModelScope.launch {
-                if (_isPosting.value) {
+                if (isPosting.value) {
                     return@launch
                 }
                 _isPosting.value = true
