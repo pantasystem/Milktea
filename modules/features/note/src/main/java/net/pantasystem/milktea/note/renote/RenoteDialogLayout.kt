@@ -29,7 +29,10 @@ fun RenoteDialogContent(
                 .fillMaxWidth()
                 .padding(vertical = 8.dp)
         ) {
-            RenoteTargetAccountRowList(accounts = uiState.accounts, onClick = onToggleAddAccount)
+            RenoteTargetAccountRowList(
+                accounts = uiState.accounts,
+                onClick = onToggleAddAccount
+            )
             NormalBottomSheetDialogSelectionLayout(
                 onClick = onRenoteButtonClicked,
                 icon = Icons.Default.Repeat,

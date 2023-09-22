@@ -70,6 +70,7 @@ class RenoteBottomSheetDialog : BottomSheetDialogFragment() {
             setContent {
                 MilkteaStyleConfigApplyAndTheme(configRepository = configRepository) {
                     val uiState by viewModel.uiState.collectAsState()
+
                     RenoteDialogContent(
                         uiState = uiState,
                         isRenotedByMe = isRenotedByMe,
