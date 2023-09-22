@@ -306,6 +306,9 @@ class NoteEditorViewModel @Inject constructor(
     private val _isPost = MutableSharedFlow<Boolean>(extraBufferCapacity = 10)
     val isPost = _isPost.asSharedFlow()
 
+    private val _isPosting = MutableStateFlow(false)
+    val isPosting = _isPosting.asStateFlow()
+
     private val _showPollDatePicker = MutableSharedFlow<Unit>(extraBufferCapacity = 10)
     val showPollDatePicker = _showPollDatePicker.asSharedFlow()
 
@@ -411,6 +414,10 @@ class NoteEditorViewModel @Inject constructor(
     fun post() {
         _currentAccount.value?.let { account ->
             viewModelScope.launch {
+                if (_isPosting.value) {
+                    return@launch
+                }
+                _isPosting.value = true
                 val reservationPostingAt =
                     savedStateHandle.getNoteEditingUiState(
                         account,
@@ -435,6 +442,7 @@ class NoteEditorViewModel @Inject constructor(
                 }.onFailure {
                     logger.error("登録失敗", it)
                 }
+                _isPosting.value = false
             }
         }
 
