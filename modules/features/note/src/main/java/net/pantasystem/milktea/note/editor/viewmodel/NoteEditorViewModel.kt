@@ -88,7 +88,7 @@ class NoteEditorViewModel @Inject constructor(
     val cw = savedStateHandle.getStateFlow<String?>(NoteEditorSavedStateKey.Cw.name, null)
     val hasCw = savedStateHandle.getStateFlow(NoteEditorSavedStateKey.HasCW.name, false)
 
-    val files = savedStateHandle.getStateFlow<List<AppFile>>(
+    private val files = savedStateHandle.getStateFlow<List<AppFile>>(
         NoteEditorSavedStateKey.PickedFiles.name,
         emptyList()
     )
@@ -98,7 +98,7 @@ class NoteEditorViewModel @Inject constructor(
         instanceInfoService.observe(it.normalizedInstanceUri)
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
 
-    val isSensitiveMedia =
+    private val isSensitiveMedia =
         savedStateHandle.getStateFlow<Boolean?>(NoteEditorSavedStateKey.IsSensitive.name, null)
 
     private val filePreviewSources = NoteEditorFilePreviewSourcesMapper(
@@ -108,10 +108,6 @@ class NoteEditorViewModel @Inject constructor(
         viewModelScope
     ).create(files)
 
-    val totalImageCount = files.map {
-        it.size
-    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), 0)
-
     private val channelId =
         savedStateHandle.getStateFlow<Channel.Id?>(NoteEditorSavedStateKey.ChannelId.name, null)
     private val replyId =
@@ -119,17 +115,12 @@ class NoteEditorViewModel @Inject constructor(
     private val renoteId =
         savedStateHandle.getStateFlow<Note.Id?>(NoteEditorSavedStateKey.RenoteId.name, null)
 
-    @OptIn(ExperimentalCoroutinesApi::class)
-    val maxTextLength =
-        _currentAccount.filterNotNull().flatMapLatest { account ->
-            instanceInfoService.observe(account.normalizedInstanceUri).filterNotNull()
-                .map { meta ->
-                    meta.maxNoteTextLength
-                }
-        }.stateIn(
+    val maxTextLength = instanceInfoType.map {
+        it?.maxNoteTextLength ?: 3000
+    }.stateIn(
             viewModelScope + Dispatchers.IO,
             started = SharingStarted.Lazily,
-            initialValue = 1500
+            initialValue = 3000
         )
 
 
@@ -146,7 +137,7 @@ class NoteEditorViewModel @Inject constructor(
         null
     )
 
-    val visibility = NoteEditorVisibilityCombiner(
+    private val visibility = NoteEditorVisibilityCombiner(
         viewModelScope,
         localConfigRepository,
     ).create(

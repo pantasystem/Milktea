@@ -34,7 +34,6 @@ fun NoteFilePreview(
     val maxFileCount by noteEditorViewModel.maxFileCount.collectAsState()
 //    val instanceInfo by noteEditorViewModel.instanceInfo.collectAsState()
     val instanceInfoType by noteEditorViewModel.instanceInfoType.collectAsState()
-    val isSensitive by noteEditorViewModel.isSensitiveMedia.collectAsState()
 
     Column {
         if (uiState.files.size > maxFileCount) {
@@ -79,7 +78,7 @@ fun NoteFilePreview(
         if (instanceInfoType is InstanceInfoType.Mastodon && uiState.files.isNotEmpty()) {
             SwitchTile(
                 modifier = Modifier.padding(horizontal = 16.dp),
-                checked = isSensitive ?: false,
+                checked = uiState.formState.isSensitive,
                 onChanged = {
                     noteEditorViewModel.toggleSensitive()
                 }

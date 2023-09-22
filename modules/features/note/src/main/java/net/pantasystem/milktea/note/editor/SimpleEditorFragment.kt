@@ -305,7 +305,7 @@ class SimpleEditorFragment : Fragment(R.layout.fragment_simple_editor), SimpleEd
     }
 
     private fun showDriveFileSelector() {
-        val selectedSize = mViewModel.totalImageCount.value
+        val selectedSize = mViewModel.uiState.value.totalFilesCount
 
         //Directoryは既に選択済みのファイルの数も含めてしまうので選択済みの数も合わせる
         val selectableMaxSize = 4 - selectedSize
