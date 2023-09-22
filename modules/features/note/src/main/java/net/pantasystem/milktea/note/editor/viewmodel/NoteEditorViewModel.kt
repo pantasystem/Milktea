@@ -164,7 +164,7 @@ class NoteEditorViewModel @Inject constructor(
         }
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
 
-    val reservationPostingAt =
+    private val reservationPostingAt =
         savedStateHandle.getStateFlow<Date?>(NoteEditorSavedStateKey.ScheduleAt.name, null)
 
     val poll = savedStateHandle.getStateFlow<PollEditingState?>(

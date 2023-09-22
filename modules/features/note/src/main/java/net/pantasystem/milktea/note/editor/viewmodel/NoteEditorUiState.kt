@@ -17,6 +17,7 @@ import net.pantasystem.milktea.model.note.draft.DraftNote
 import net.pantasystem.milktea.model.note.draft.DraftNoteFile
 import net.pantasystem.milktea.model.note.toCreatePoll
 import net.pantasystem.milktea.model.user.User
+import java.util.Date
 
 
 data class NoteEditorFormState(
@@ -39,7 +40,13 @@ data class NoteEditorSendToState(
     val schedulePostAt: Instant? = null,
     val draftNoteId: Long? = null,
     val reactionAcceptanceType: ReactionAcceptanceType? = null,
-)
+) {
+    val schedulePostAtAsDate: Date? by lazy {
+        schedulePostAt?.let {
+            Date(it.toEpochMilliseconds())
+        }
+    }
+}
 
 data class NoteEditorUiState(
     val formState: NoteEditorFormState = NoteEditorFormState(),

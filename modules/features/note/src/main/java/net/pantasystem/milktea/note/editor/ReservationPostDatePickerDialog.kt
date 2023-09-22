@@ -33,7 +33,7 @@ class ReservationPostDatePickerDialog : AppCompatDialogFragment(), DatePickerDia
     }
 
     override fun onDateSet(p0: DatePicker?, p1: Int, p2: Int, p3: Int) {
-        val date = mViewModel?.reservationPostingAt?.value ?: Date()
+        val date = mViewModel?.uiState?.value?.sendToState?.schedulePostAtAsDate ?: Date()
 
         val c = Calendar.getInstance()
         c.time = date

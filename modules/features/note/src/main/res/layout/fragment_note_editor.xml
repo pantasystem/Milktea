@@ -73,7 +73,7 @@
                             android:gravity="center_vertical"
                             android:layout_marginBottom="16dp"
                             android:layout_marginHorizontal="16dp"
-                            android:visibility="@{ viewModel.reservationPostingAt == null ? View.GONE : View.VISIBLE }">
+                            android:visibility="@{ viewModel.uiState.sendToState.schedulePostAtAsDate == null ? View.GONE : View.VISIBLE }">
                         <TextView
                                 android:id="@+id/reservationLabelTextView"
                                 android:layout_width="match_parent"
@@ -97,7 +97,7 @@
                                 app:layout_constraintStart_toStartOf="parent"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                dateOnly="@{viewModel.reservationPostingAt}"/>
+                                dateOnly="@{viewModel.uiState.sendToState.schedulePostAtAsDate}"/>
                         <Button
                                 android:id="@+id/reservationAtPickTimeButton"
                                 android:layout_width="wrap_content"
@@ -105,7 +105,7 @@
                                 app:layout_constraintStart_toEndOf="@id/reservationAtPickDateButton"
                                 app:layout_constraintTop_toBottomOf="@id/reservationWarningMsgTextView"
                                 android:layout_marginStart="4dp"
-                                timeOnly="@{viewModel.reservationPostingAt}" />
+                                timeOnly="@{viewModel.uiState.sendToState.schedulePostAtAsDate}" />
                         <ImageButton
                                 android:id="@+id/closeReservationButton"
                                 android:layout_width="40dp"
