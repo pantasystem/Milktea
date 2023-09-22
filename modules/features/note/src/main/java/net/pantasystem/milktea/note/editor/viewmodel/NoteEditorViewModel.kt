@@ -745,7 +745,7 @@ class NoteEditorViewModel @Inject constructor(
     private suspend fun setAccount(account: Account) = runCancellableCatching<Unit> {
         val result = noteEditorSwitchAccountExecutor(
             _currentAccount.value,
-            noteEditorSendToState.value,
+            uiState.value.sendToState,
             account,
         )
 
