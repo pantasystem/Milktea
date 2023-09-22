@@ -47,6 +47,7 @@ class ChannelPagingModel(
             )
         }
     }
+
     val logger: Logger by lazy {
         loggerFactory.create("ChannelPagingModel")
     }
@@ -121,23 +122,25 @@ class ChannelPagingModel(
                     FindPageable(
                         i = i,
                         sinceId = null,
-                        untilId = null,
-//                    untilId = getUntilId()?.channelId,
+//                        untilId = null,
+                        untilId = getUntilId()?.channelId,
                         limit = 99,
                     )
                 )
             }
+
             ChannelListType.OWNED -> {
                 api.ownedChannels(
                     FindPageable(
                         i = i,
                         sinceId = null,
-                        untilId = null,
-//                    untilId = getUntilId()?.channelId,
+//                        untilId = null,
+                        untilId = getUntilId()?.channelId,
                         limit = 99,
                     )
                 )
             }
+
             ChannelListType.FEATURED -> {
                 if (getUntilId() != null) {
                     // NOTE: featuredはページネーションできないので
