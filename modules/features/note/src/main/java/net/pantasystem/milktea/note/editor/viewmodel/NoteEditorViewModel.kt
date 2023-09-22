@@ -69,6 +69,8 @@ class NoteEditorViewModel @Inject constructor(
     private val apResolverRepository: ApResolverRepository,
     userRepository: UserRepository,
     private val copyFileToAppDirUseCase: CopyFileToAppDirUseCase,
+    buildNoteEditorUiState: NoteEditorUiStateBuilder,
+    buildNoteEditorSendToStateBuilder: NoteEditorSendToStateBuilder,
     private val savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
 
@@ -116,10 +118,6 @@ class NoteEditorViewModel @Inject constructor(
         savedStateHandle.getStateFlow<Note.Id?>(NoteEditorSavedStateKey.ReplyId.name, null)
     private val renoteId =
         savedStateHandle.getStateFlow<Note.Id?>(NoteEditorSavedStateKey.RenoteId.name, null)
-
-    private val replyIdAndRenoteId = combine(replyId, renoteId) { replyId, renoteId ->
-        replyId to renoteId
-    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), Pair(null, null))
 
     @OptIn(ExperimentalCoroutinesApi::class)
     val maxTextLength =
@@ -174,16 +172,6 @@ class NoteEditorViewModel @Inject constructor(
         null
     )
 
-    private val noteEditorFormState =
-        combine(text, cw, hasCw, isSensitiveMedia) { text, cw, hasCw, sensitive ->
-            NoteEditorFormState(
-                text = text,
-                cw = cw,
-                hasCw = hasCw,
-                isSensitive = sensitive ?: false,
-            )
-        }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), NoteEditorFormState())
-
     val address = visibility.map {
         it as? Visibility.Specified
     }.map {
@@ -196,11 +184,6 @@ class NoteEditorViewModel @Inject constructor(
         it is Visibility.Specified
     }.stateIn(viewModelScope, SharingStarted.Eagerly, false)
 
-    val textRemaining = combine(maxTextLength, noteEditorFormState.map { it.text }) { max, t ->
-        max - (t?.codePointCount(0, t.length) ?: 0)
-    }.catch {
-        logger.error("observe meta error", it)
-    }.stateIn(viewModelScope + Dispatchers.IO, started = SharingStarted.Lazily, initialValue = 1500)
 
     @OptIn(ExperimentalCoroutinesApi::class)
     val channels = _currentAccount.filterNotNull().flatMapLatest {
@@ -231,45 +214,41 @@ class NoteEditorViewModel @Inject constructor(
     private val draftNoteId =
         savedStateHandle.getStateFlow<Long?>(NoteEditorSavedStateKey.DraftNoteId.name, null)
 
-    private val visibilityAndChannelId = combine(visibility, channelId) { v, c ->
-        VisibilityAndChannelId(v, c)
-    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), VisibilityAndChannelId())
+    private val _isPosting = MutableStateFlow(false)
+    val isPosting = _isPosting.asStateFlow()
 
-    private val noteEditorSendToState = combine(
-        visibilityAndChannelId,
-        replyIdAndRenoteId,
-        reservationPostingAt,
-        draftNoteId,
-        reactionAcceptanceType
-    ) { vc, (replyId, renoteId), scheduleDate, dfId, reactionAcceptance ->
-        NoteEditorSendToState(
-            visibility = vc.visibility,
-            channelId = vc.channelId,
-            replyId = replyId,
-            renoteId = renoteId,
-            schedulePostAt = scheduleDate?.let {
-                Instant.fromEpochMilliseconds(it.time)
-            },
-            draftNoteId = dfId,
-            reactionAcceptanceType = reactionAcceptance,
-        )
-    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), NoteEditorSendToState())
+    private val noteEditorSendToState = buildNoteEditorSendToStateBuilder(
+        visibilityFlow = _visibility,
+        currentAccountFlow = _currentAccount,
+        channelIdFlow = channelId,
+        replyIdFlow = replyId,
+        renoteIdFlow = renoteId,
+        reservationPostingAtFlow = reservationPostingAt,
+        draftNoteIdFlow = draftNoteId,
+        reactionAcceptanceType = reactionAcceptanceType,
+    ).stateIn(
+        viewModelScope,
+        SharingStarted.WhileSubscribed(5_000),
+        NoteEditorSendToState()
+    )
 
-    val uiState = combine(
-        noteEditorFormState,
-        noteEditorSendToState,
-        filePreviewSources,
-        poll,
-        _currentAccount,
-    ) { formState, sendToState, files, poll, account ->
-        NoteEditorUiState(
-            formState = formState,
-            sendToState = sendToState,
-            poll = poll,
-            files = files,
-            currentAccount = account,
-        )
-    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), NoteEditorUiState())
+    val uiState = buildNoteEditorUiState(
+        textFlow = text,
+        cwFlow = cw,
+        hasCwFlow = hasCw,
+        isSensitiveMediaFlow = isSensitiveMedia,
+        filePreviewSourcesFlow = filePreviewSources,
+        pollFlow = poll,
+        currentAccountFlow = _currentAccount,
+        noteEditorSendToStateFlow = noteEditorSendToState,
+    ).stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), NoteEditorUiState())
+
+    val textRemaining = combine(maxTextLength, uiState) { max, uiState ->
+        val t = uiState.formState.text
+        max - (t?.codePointCount(0, t.length) ?: 0)
+    }.catch {
+        logger.error("observe meta error", it)
+    }.stateIn(viewModelScope + Dispatchers.IO, started = SharingStarted.Lazily, initialValue = 1500)
 
     val isPostAvailable = uiState.map {
         it.checkValidate(textMaxLength = maxTextLength.value, maxFileCount = maxFileCount.value)
@@ -305,9 +284,6 @@ class NoteEditorViewModel @Inject constructor(
 
     private val _isPost = MutableSharedFlow<Boolean>(extraBufferCapacity = 10)
     val isPost = _isPost.asSharedFlow()
-
-    private val _isPosting = MutableStateFlow(false)
-    val isPosting = _isPosting.asStateFlow()
 
     private val _showPollDatePicker = MutableSharedFlow<Unit>(extraBufferCapacity = 10)
     val showPollDatePicker = _showPollDatePicker.asSharedFlow()
