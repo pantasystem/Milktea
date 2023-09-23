@@ -19,6 +19,6 @@ object PollHelper {
             this.visibility = View.VISIBLE
         }
         PollListLinearLayoutBinder.bindPollChoices(this, noteId, poll, noteCardActionListenerAdapter)
-        PollListLinearLayoutBinder.bindVoteResult(this, poll.totalVoteCount)
+//        PollListLinearLayoutBinder.bindVoteResult(this, poll.totalVoteCount)
     }
 }
