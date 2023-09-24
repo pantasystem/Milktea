@@ -6,13 +6,11 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.*
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.BookmarkAdd
-import androidx.compose.material.icons.filled.BookmarkRemove
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import net.pantasystem.milktea.common_compose.CircleCheckbox
@@ -62,13 +60,13 @@ private fun AddToTabButton(isPaged: Boolean, onPressed: () -> Unit) {
     IconButton(onClick = onPressed) {
         if (isPaged) {
             Icon(
-                imageVector = Icons.Default.BookmarkRemove,
+                painter = painterResource(R.drawable.ic_remove_to_tab_24px),
                 contentDescription = "add to tab",
                 tint = MaterialTheme.colors.secondary
             )
         } else {
             Icon(
-                imageVector = Icons.Default.BookmarkAdd,
+                painter = painterResource(R.drawable.ic_add_to_tab_24px),
                 contentDescription = "add to tab",
                 tint = MaterialTheme.colors.secondary
             )
