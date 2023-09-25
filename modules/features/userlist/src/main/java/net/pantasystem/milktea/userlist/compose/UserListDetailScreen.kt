@@ -10,6 +10,7 @@ import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
@@ -76,12 +77,12 @@ fun UserListDetailScreen(
                         IconButton(onClick = onToggleButtonClicked) {
                             if (isAddedTab) {
                                 Icon(
-                                    Icons.Default.BookmarkRemove,
+                                    painter = painterResource(R.drawable.ic_remove_to_tab_24px),
                                     contentDescription = null
                                 )
                             } else {
                                 Icon(
-                                    Icons.Default.BookmarkAdd,
+                                    painter = painterResource(R.drawable.ic_add_to_tab_24px),
                                     contentDescription = null
                                 )
                             }

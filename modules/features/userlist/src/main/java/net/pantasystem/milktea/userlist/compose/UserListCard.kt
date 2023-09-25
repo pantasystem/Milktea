@@ -2,13 +2,11 @@ package net.pantasystem.milktea.userlist.compose
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.BookmarkAdd
-import androidx.compose.material.icons.filled.BookmarkRemove
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -18,6 +16,7 @@ import net.pantasystem.milktea.model.list.UserList
 import net.pantasystem.milktea.model.list.UserListMember
 import net.pantasystem.milktea.model.list.UserListWithMembers
 import net.pantasystem.milktea.model.user.User
+import net.pantasystem.milktea.userlist.R
 import net.pantasystem.milktea.userlist.viewmodel.UserListBindingModel
 
 
@@ -100,13 +99,13 @@ private fun AddToTabButton(modifier: Modifier = Modifier, isPaged: Boolean, onPr
     IconButton(onClick = onPressed, modifier = modifier) {
         if (isPaged) {
             Icon(
-                imageVector = Icons.Default.BookmarkRemove,
+                painter = painterResource(R.drawable.ic_remove_to_tab_24px),
                 contentDescription = "add to tab",
                 tint = MaterialTheme.colors.secondary
             )
         } else {
             Icon(
-                imageVector = Icons.Default.BookmarkAdd,
+                painter = painterResource(R.drawable.ic_add_to_tab_24px),
                 contentDescription = "add to tab",
                 tint = MaterialTheme.colors.secondary
             )

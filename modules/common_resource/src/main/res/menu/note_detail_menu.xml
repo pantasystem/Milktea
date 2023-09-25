@@ -11,7 +11,7 @@
     <item
             android:id="@+id/nav_add_to_tab"
             android:title="@string/add_to_tab"
-            android:icon="@drawable/ic_add_black_24dp"
+            android:icon="@drawable/ic_add_to_tab_24px"
             app:showAsAction="ifRoom"
             />
 </menu>

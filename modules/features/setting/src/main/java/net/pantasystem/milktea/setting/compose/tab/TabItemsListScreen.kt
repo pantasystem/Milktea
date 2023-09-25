@@ -5,10 +5,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.BookmarkAdd
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import kotlinx.coroutines.launch
 import net.pantasystem.milktea.model.account.page.Page
@@ -72,7 +72,7 @@ internal fun TabItemsListScreen(
                         Text(stringResource(R.string.add_tab))
                     },
                     icon = {
-                        Icon(Icons.Default.BookmarkAdd, contentDescription = null)
+                        Icon(painter = painterResource(R.drawable.ic_add_to_tab_24px), contentDescription = null)
                     },
                     onClick = {
                         scope.launch {
