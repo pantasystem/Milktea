@@ -36,7 +36,7 @@ dependencyResolutionManagement {
             library("hilt-android-testing", "com.google.dagger:hilt-android-testing:2.45")
 
 
-            def lifecycle_version = "2.5.1"
+            def lifecycle_version = "2.6.2"
             def arch_version = "2.1.0"
 
             library("lifecycle-runtime", "androidx.lifecycle:lifecycle-runtime:$lifecycle_version")
