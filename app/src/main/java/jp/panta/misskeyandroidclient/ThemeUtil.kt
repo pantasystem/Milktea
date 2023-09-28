@@ -13,11 +13,12 @@ import net.pantasystem.milktea.model.setting.Theme
 import net.pantasystem.milktea.model.setting.isNightTheme
 
 fun Activity.setTheme() {
-    val settingStore = EntryPointAccessors.fromApplication(
+    val config = EntryPointAccessors.fromApplication(
             applicationContext,
             BindingProvider::class.java
-        ).settingStore()
-    val theme = settingStore.configState.value.theme
+        ).configRepository().get().getOrNull() ?: return
+
+    val theme = config.theme
     if (theme.isNightTheme()) {
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
     } else {
