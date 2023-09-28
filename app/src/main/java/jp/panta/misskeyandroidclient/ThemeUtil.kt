@@ -5,18 +5,14 @@ import android.content.Context
 import android.util.TypedValue
 import android.view.Menu
 import androidx.appcompat.app.AppCompatDelegate
-import dagger.hilt.android.EntryPointAccessors
 import net.pantasystem.milktea.common.ui.ApplyMenuTint
 import net.pantasystem.milktea.common.ui.ApplyTheme
-import net.pantasystem.milktea.common_android_ui.BindingProvider
+import net.pantasystem.milktea.model.setting.LocalConfigRepository
 import net.pantasystem.milktea.model.setting.Theme
 import net.pantasystem.milktea.model.setting.isNightTheme
 
-fun Activity.setTheme() {
-    val config = EntryPointAccessors.fromApplication(
-            applicationContext,
-            BindingProvider::class.java
-        ).configRepository().get().getOrNull() ?: return
+fun Activity.setTheme(configRepository: LocalConfigRepository) {
+    val config = configRepository.get().getOrNull() ?: return
 
     val theme = config.theme
     if (theme.isNightTheme()) {
@@ -46,9 +42,10 @@ fun Context.setMenuTint(menu: Menu) {
 
 class ApplyThemeImpl(
     val activity: Activity,
+    private val configRepository: LocalConfigRepository
 ) : ApplyTheme {
     override fun invoke() {
-        activity.setTheme()
+        activity.setTheme(configRepository)
     }
 }
 

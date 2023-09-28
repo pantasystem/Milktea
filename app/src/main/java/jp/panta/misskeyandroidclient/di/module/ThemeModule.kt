@@ -9,14 +9,15 @@ import jp.panta.misskeyandroidclient.ApplyMenuTintImpl
 import jp.panta.misskeyandroidclient.ApplyThemeImpl
 import net.pantasystem.milktea.common.ui.ApplyMenuTint
 import net.pantasystem.milktea.common.ui.ApplyTheme
+import net.pantasystem.milktea.model.setting.LocalConfigRepository
 
 @Module
 @InstallIn(ActivityComponent::class)
 object ThemeModule {
 
     @Provides
-    fun provideSetTheme(activity: Activity): ApplyTheme {
-        return ApplyThemeImpl(activity)
+    fun provideSetTheme(activity: Activity, configRepository: LocalConfigRepository): ApplyTheme {
+        return ApplyThemeImpl(activity, configRepository)
     }
 
     @Provides
