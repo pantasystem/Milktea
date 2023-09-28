@@ -1,7 +1,9 @@
 package net.pantasystem.milktea.channel
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
+import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -16,6 +18,7 @@ import net.pantasystem.milktea.common.StateContent
 import net.pantasystem.milktea.data.infrastructure.channel.ChannelListType
 import net.pantasystem.milktea.model.channel.Channel
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun ChannelListStateScreen(
     uiState: ChannelListUiState,
@@ -41,7 +44,10 @@ fun ChannelListStateScreen(
         modifier = Modifier
             .fillMaxSize()
     ) {
-        LazyColumn(Modifier.fillMaxSize()) {
+        LazyVerticalStaggeredGrid(
+            columns = StaggeredGridCells.Adaptive(350.dp),
+            modifier = Modifier.fillMaxSize(),
+        ) {
             when (val content = pagingState.content) {
                 is StateContent.Exist -> {
                     items(content.rawContent.size) { index ->
@@ -101,7 +107,9 @@ fun ChannelListStateScreen(
 fun ReachedElement() {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier.padding(16.dp).fillMaxWidth()
+        modifier = Modifier
+            .padding(16.dp)
+            .fillMaxWidth()
     ) {
         CircularProgressIndicator()
     }
