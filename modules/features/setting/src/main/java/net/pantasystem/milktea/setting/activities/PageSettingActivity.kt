@@ -13,8 +13,6 @@ import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.google.android.material.composethemeadapter.MdcTheme
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import net.pantasystem.milktea.common.ui.ApplyTheme
@@ -41,10 +39,12 @@ import net.pantasystem.milktea.setting.viewmodel.page.PageSettingViewModel
 import javax.inject.Inject
 
 @Suppress("DEPRECATION")
-@FlowPreview
-@ExperimentalCoroutinesApi
 @AndroidEntryPoint
 class PageSettingActivity : AppCompatActivity() {
+
+    companion object {
+        const val EXTRA_EDIT_TAB_ID = "edit_tab_id"
+    }
 
 
     @Inject
@@ -171,6 +171,15 @@ class PageSettingActivity : AppCompatActivity() {
                     dragDropState = dragAndDropState,
                 )
             }
+        }
+
+        if (savedInstanceState == null) {
+            mPageSettingViewModel.onEditTab(
+                intent.getLongExtra(
+                    EXTRA_EDIT_TAB_ID,
+                    -1,
+                )
+            )
         }
 
     }
