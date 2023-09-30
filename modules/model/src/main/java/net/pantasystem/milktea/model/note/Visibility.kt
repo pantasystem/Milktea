@@ -104,6 +104,7 @@ fun Visibility(type: String, circleId: String? = null, visibilityEx: String? = n
                 else -> Visibility.Followers(false)
             }
         }
+        "limited" -> Visibility.Limited(circleId)
         "unlisted" -> Visibility.Home(false)
         "public" -> Visibility.Public(false)
         "direct" -> when(visibilityEx) {
