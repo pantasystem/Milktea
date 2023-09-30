@@ -18,7 +18,7 @@ class EmojiImageCacheStore @Inject constructor(
         loggerFactory.create("EICStore")
     }
 
-    private val queue = MutableSharedFlow<Emoji>(extraBufferCapacity = 100)
+    private val queue = MutableSharedFlow<Emoji>(extraBufferCapacity = 25)
 
     init {
         queue.onEach { emoji ->

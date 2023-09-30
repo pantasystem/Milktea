@@ -26,6 +26,7 @@ import net.pantasystem.milktea.model.note.NoteStreaming
 import net.pantasystem.milktea.model.note.TimelineScrollPositionRepository
 import net.pantasystem.milktea.model.setting.LocalConfigRepository
 import net.pantasystem.milktea.note.R
+import net.pantasystem.milktea.note.timeline.viewmodel.filter.ExcludeRepostOrReplyFilter
 import net.pantasystem.milktea.note.viewmodel.PlaneNoteViewData
 import net.pantasystem.milktea.note.viewmodel.PlaneNoteViewDataCache
 import java.io.IOException
@@ -153,6 +154,7 @@ class TimelineViewModel @AssistedInject constructor(
                 return timelineFilterService.filterNote(viewData).filterResult
             }
         })
+        cache.addFilter(ExcludeRepostOrReplyFilter(pageable))
     }
 
 

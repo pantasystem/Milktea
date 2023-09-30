@@ -31,6 +31,8 @@ data class PageParams(
     val antennaId: String? = null,
     val channelId: String? = null,
     val clipId: String? = null,
+    val excludeReplies: Boolean? = null,
+    val excludeReposts: Boolean? = null,
 ) : Serializable, Parcelable {
 
 
@@ -44,13 +46,17 @@ data class PageParams(
                         withFiles = withFiles,
                         includeLocalRenotes = includeLocalRenotes,
                         includeMyRenotes = includeMyRenotes,
-                        includeRenotedMyRenotes = includeRenotedMyRenotes
+                        includeRenotedMyRenotes = includeRenotedMyRenotes,
+                        excludeReposts = excludeReposts,
+                        excludeReplies = excludeReplies,
                     )
                 }
                 LOCAL -> {
                     Pageable.LocalTimeline(
                         withFiles = withFiles,
-                        excludeNsfw = excludeNsfw
+                        excludeNsfw = excludeNsfw,
+                        excludeReplies = excludeReplies,
+                        excludeReposts = excludeReposts,
                     )
                 }
                 SOCIAL -> {
@@ -63,7 +69,9 @@ data class PageParams(
                 }
                 GLOBAL -> {
                     Pageable.GlobalTimeline(
-                        withFiles = withFiles
+                        withFiles = withFiles,
+                        excludeReposts = excludeReposts,
+                        excludeReplies = excludeReplies,
                     )
                 }
                 SEARCH -> {
@@ -151,16 +159,23 @@ data class PageParams(
                 }
                 MASTODON_LOCAL_TIMELINE -> {
                     Pageable.Mastodon.LocalTimeline(
-                        isOnlyMedia = withFiles
+                        isOnlyMedia = withFiles,
+                        excludeReposts = excludeReposts,
+                        excludeReplies = excludeReplies,
                     )
                 }
                 MASTODON_PUBLIC_TIMELINE -> {
                     Pageable.Mastodon.PublicTimeline(
                         isOnlyMedia = withFiles,
+                        excludeReposts = excludeReposts,
+                        excludeReplies = excludeReplies,
                     )
                 }
                 MASTODON_HOME_TIMELINE -> {
-                    Pageable.Mastodon.HomeTimeline
+                    Pageable.Mastodon.HomeTimeline(
+                        excludeReposts = excludeReposts,
+                        excludeReplies = excludeReplies,
+                    )
                 }
                 MASTODON_LIST_TIMELINE -> {
                     Pageable.Mastodon.ListTimeline(

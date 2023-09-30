@@ -626,6 +626,8 @@
     <string name="notification_sync_download_custom_emoji_title">Downloading custom emoji</string>
     <string name="alarm_permission_description_title">Requires alarm permission</string>
     <string name="alarm_permission_description_message">Scheduled posting uses the mechanism of the alarm function, so it is necessary to grant alarm permission to Milktea from the settings.</string>
+    <string name="exclude_replies">Exclude replies</string>
+    <string name="exclude_reposts">Exclude reposts</string>
     <!-- reaction-acceptance -->
 
 </resources>

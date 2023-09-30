@@ -255,7 +255,7 @@ class PageSettingViewModel @Inject constructor(
             )
             PageType.MASTODON_HOME_TIMELINE -> addPage(
                 account.value!!.newPage(
-                    Pageable.Mastodon.HomeTimeline,
+                    Pageable.Mastodon.HomeTimeline(),
                     name,
                 ),
                 type.relatedAccount

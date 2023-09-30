@@ -73,6 +73,12 @@ data class PageRecordParams(
 
     @ColumnInfo(name = "clipId")
     val clipId: String? = null,
+
+    @ColumnInfo(name = "excludeReplies")
+    val excludeReplies: Boolean? = null,
+
+    @ColumnInfo(name = "excludeReposts")
+    val excludeReposts: Boolean? = null,
 ) {
     fun toParams(): PageParams {
         return PageParams(
@@ -98,7 +104,9 @@ data class PageRecordParams(
             host = host,
             antennaId = antennaId,
             channelId = channelId,
-            clipId = clipId
+            clipId = clipId,
+            excludeReplies = excludeReplies,
+            excludeReposts = excludeReposts,
         )
     }
 
@@ -128,7 +136,9 @@ data class PageRecordParams(
                     host = host,
                     antennaId = antennaId,
                     channelId = channelId,
-                    clipId = clipId
+                    clipId = clipId,
+                    excludeReplies = excludeReplies,
+                    excludeReposts = excludeReposts,
                 )
             }
         }

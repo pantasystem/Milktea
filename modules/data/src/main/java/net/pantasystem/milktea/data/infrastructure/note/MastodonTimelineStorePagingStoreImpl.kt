@@ -4,8 +4,16 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.sync.Mutex
 import net.pantasystem.milktea.api.mastodon.status.TootStatusDTO
-import net.pantasystem.milktea.common.*
-import net.pantasystem.milktea.common.paginator.*
+import net.pantasystem.milktea.common.MastodonLinkHeaderDecoder
+import net.pantasystem.milktea.common.PageableState
+import net.pantasystem.milktea.common.StateContent
+import net.pantasystem.milktea.common.paginator.EntityConverter
+import net.pantasystem.milktea.common.paginator.FutureLoader
+import net.pantasystem.milktea.common.paginator.IdGetter
+import net.pantasystem.milktea.common.paginator.PreviousLoader
+import net.pantasystem.milktea.common.paginator.StateLocker
+import net.pantasystem.milktea.common.runCancellableCatching
+import net.pantasystem.milktea.common.throwIfHasError
 import net.pantasystem.milktea.data.api.mastodon.MastodonAPIProvider
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.page.Pageable
@@ -54,7 +62,7 @@ internal class MastodonTimelineStorePagingStoreImpl(
                 pageableTimeline.hashtag,
                 minId = getSinceId(),
             ).getBodyOrFail()
-            Pageable.Mastodon.HomeTimeline -> api.getHomeTimeline(
+            is Pageable.Mastodon.HomeTimeline -> api.getHomeTimeline(
                 minId = getSinceId(),
                 visibilities = getVisibilitiesParameter(getAccount()),
             ).getBodyOrFail()
@@ -154,7 +162,7 @@ internal class MastodonTimelineStorePagingStoreImpl(
                 maxId = maxId,
                 onlyMedia = pageableTimeline.getOnlyMedia()
             ).getBodyOrFail()
-            Pageable.Mastodon.HomeTimeline -> api.getHomeTimeline(
+            is Pageable.Mastodon.HomeTimeline -> api.getHomeTimeline(
                 maxId = maxId,
                 visibilities = getVisibilitiesParameter(getAccount())
             ).getBodyOrFail()

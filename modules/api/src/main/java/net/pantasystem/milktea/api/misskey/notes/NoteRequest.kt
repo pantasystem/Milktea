@@ -94,6 +94,12 @@ data class NoteRequest(
 
     @SerialName("clipId")
     val clipId: String? = null,
+
+    @SerialName("withReplies")
+    val withReplies: Boolean? = null,
+
+    @SerialName("withRenotes")
+    val withRenotes: Boolean? = null,
 ) : JavaSerializable {
 
 
@@ -135,7 +141,9 @@ data class NoteRequest(
                 listId = params.listId,
                 noteId = params.noteId,
                 channelId = params.channelId,
-                clipId = params.clipId
+                clipId = params.clipId,
+                withRenotes = params.excludeReposts?.not(),
+                withReplies = params.excludeReplies?.not(),
             )
         }
 

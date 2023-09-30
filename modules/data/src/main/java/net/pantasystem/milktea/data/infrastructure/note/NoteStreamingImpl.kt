@@ -89,7 +89,7 @@ class NoteStreamingImpl @Inject constructor(
                             requireNotNull(streamingAPIProvider.get(ac)).connectHashTag(pageable.hashtag)
                                 .convertToNoteFromStatus(getAccount, pageable)
                         }
-                        Pageable.Mastodon.HomeTimeline -> {
+                        is Pageable.Mastodon.HomeTimeline -> {
                             requireNotNull(streamingAPIProvider.get(ac)).connectUser()
                                 .convertNoteFromEvent(getAccount)
                         }
