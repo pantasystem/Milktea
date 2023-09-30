@@ -20,14 +20,13 @@ import net.pantasystem.milktea.common_android_ui.APIErrorStringConverter
 import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.account.CurrentAccountWatcher
 import net.pantasystem.milktea.model.account.UnauthorizedException
-import net.pantasystem.milktea.model.account.page.CanExcludeReplies
-import net.pantasystem.milktea.model.account.page.CanExcludeReposts
 import net.pantasystem.milktea.model.account.page.Pageable
 import net.pantasystem.milktea.model.note.Note
 import net.pantasystem.milktea.model.note.NoteStreaming
 import net.pantasystem.milktea.model.note.TimelineScrollPositionRepository
 import net.pantasystem.milktea.model.setting.LocalConfigRepository
 import net.pantasystem.milktea.note.R
+import net.pantasystem.milktea.note.timeline.viewmodel.filter.ExcludeRepostOrReplyFilter
 import net.pantasystem.milktea.note.viewmodel.PlaneNoteViewData
 import net.pantasystem.milktea.note.viewmodel.PlaneNoteViewDataCache
 import java.io.IOException
@@ -155,23 +154,7 @@ class TimelineViewModel @AssistedInject constructor(
                 return timelineFilterService.filterNote(viewData).filterResult
             }
         })
-        cache.addFilter(object : PlaneNoteViewDataCache.ViewDataFilter {
-            override suspend fun check(viewData: PlaneNoteViewData): PlaneNoteViewData.FilterResult {
-                if (
-                    (pageable as? CanExcludeReplies<*>)?.getExcludeReplies() == true
-                    && viewData.toShowNote.note.replyId != null
-                    ) {
-                    return PlaneNoteViewData.FilterResult.ShouldFilterNote
-                }
-
-                if ((pageable as? CanExcludeReposts<*>)?.getExcludeReposts() == true
-                    && viewData.toShowNote.note.isRenoteOnly()
-                    ) {
-                    return PlaneNoteViewData.FilterResult.ShouldFilterNote
-                }
-                return viewData.filterResult
-            }
-        })
+        cache.addFilter(ExcludeRepostOrReplyFilter(pageable))
     }
 
 
