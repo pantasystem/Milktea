@@ -154,9 +154,21 @@ class TabFragment : Fragment(R.layout.fragment_tab) {
             Lifecycle.State.RESUMED
         ).launchIn(viewLifecycleOwner.lifecycleScope)
 
+        currentPageViewModel.currentType.onEach {
+            (requireActivity() as MenuHost).invalidateMenu()
+        }.flowWithLifecycle(
+            viewLifecycleOwner.lifecycle,
+            Lifecycle.State.RESUMED
+        ).launchIn(viewLifecycleOwner.lifecycleScope)
+
         (requireActivity() as MenuHost).addMenuProvider(object : MenuProvider {
             override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
                 menuInflater.inflate(R.menu.tab_pager_menu, menu)
+                val currentPageId = when(val type = currentPageViewModel.currentType.value) {
+                    CurrentPageType.Account -> null
+                    is CurrentPageType.Page -> type.pageId
+                }
+                menu.findItem(R.id.edit_tab).isVisible = currentPageId != null
                 applyMenuTint(requireActivity(), menu)
             }
 
