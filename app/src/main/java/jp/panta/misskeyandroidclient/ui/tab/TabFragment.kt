@@ -177,7 +177,7 @@ class TabFragment : Fragment(R.layout.fragment_tab) {
                     else -> false
                 }
             }
-        })
+        }, viewLifecycleOwner, Lifecycle.State.RESUMED)
 
     }
 
