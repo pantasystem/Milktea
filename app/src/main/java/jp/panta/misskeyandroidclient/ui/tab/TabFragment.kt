@@ -1,10 +1,17 @@
 package jp.panta.misskeyandroidclient.ui.tab
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.MenuHost
+import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
@@ -21,10 +28,14 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import net.pantasystem.milktea.app_store.account.AccountStore
 import net.pantasystem.milktea.common.Logger
+import net.pantasystem.milktea.common.ui.ApplyMenuTint
 import net.pantasystem.milktea.common.ui.AvatarIconView.Companion.setShape
 import net.pantasystem.milktea.common.ui.ToolbarSetter
 import net.pantasystem.milktea.common_android_ui.PageableFragmentFactory
+import net.pantasystem.milktea.common_viewmodel.CurrentPageType
+import net.pantasystem.milktea.common_viewmodel.CurrentPageableTimelineViewModel
 import net.pantasystem.milktea.model.account.page.Page
+import net.pantasystem.milktea.setting.activities.PageSettingActivity
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -47,6 +58,11 @@ class TabFragment : Fragment(R.layout.fragment_tab) {
 
     @Inject
     lateinit var loggerFactory: Logger.Factory
+
+    @Inject
+    lateinit var applyMenuTint: ApplyMenuTint
+
+    private val currentPageViewModel by activityViewModels<CurrentPageableTimelineViewModel>()
 
     private val mTabViewModel by viewModels<TabViewModel>()
 
@@ -137,6 +153,43 @@ class TabFragment : Fragment(R.layout.fragment_tab) {
             viewLifecycleOwner.lifecycle,
             Lifecycle.State.RESUMED
         ).launchIn(viewLifecycleOwner.lifecycleScope)
+
+        currentPageViewModel.currentType.onEach {
+            (requireActivity() as MenuHost).invalidateMenu()
+        }.flowWithLifecycle(
+            viewLifecycleOwner.lifecycle,
+            Lifecycle.State.RESUMED
+        ).launchIn(viewLifecycleOwner.lifecycleScope)
+
+        (requireActivity() as MenuHost).addMenuProvider(object : MenuProvider {
+            override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
+                menuInflater.inflate(R.menu.tab_pager_menu, menu)
+                val currentPageId = when(val type = currentPageViewModel.currentType.value) {
+                    CurrentPageType.Account -> null
+                    is CurrentPageType.Page -> type.pageId
+                }
+                menu.findItem(R.id.edit_tab).isVisible = currentPageId != null
+                applyMenuTint(requireActivity(), menu)
+            }
+
+            override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
+                return when (menuItem.itemId) {
+                    R.id.edit_tab -> {
+                        when(val type = currentPageViewModel.currentType.value) {
+                            CurrentPageType.Account -> return false
+                            is CurrentPageType.Page -> {
+                                val intent =  Intent(requireContext(), PageSettingActivity::class.java).apply {
+                                    putExtra(PageSettingActivity.EXTRA_EDIT_TAB_ID, type.pageId)
+                                }
+                                startActivity(intent)
+                            }
+                        }
+                        true
+                    }
+                    else -> false
+                }
+            }
+        }, viewLifecycleOwner, Lifecycle.State.RESUMED)
 
     }
 

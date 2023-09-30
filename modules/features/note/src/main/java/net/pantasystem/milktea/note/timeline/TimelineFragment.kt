@@ -47,21 +47,26 @@ class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view)
         private const val EXTRA_PAGE = "jp.panta.misskeyandroidclient.EXTRA_PAGE"
         private const val EXTRA_PAGEABLE = "jp.panta.misskeyandroidclient.EXTRA_PAGEABLE"
         private const val EXTRA_ACCOUNT_ID = "jp.panta.misskeyandroidclient.EXTRA_ACCOUNT_ID"
+        private const val EXTRA_PAGE_ID = "jp.panta.misskeyandroidclient.EXTRA_PAGE_ID"
 
         fun newInstance(page: Page): TimelineFragment {
             return TimelineFragment().apply {
                 arguments = Bundle().apply {
                     putSerializable(EXTRA_PAGE, page)
+                    putLong(EXTRA_PAGE_ID, page.pageId)
                 }
             }
         }
 
-        fun newInstance(pageable: Pageable, accountId: Long? = null): TimelineFragment {
+        fun newInstance(pageable: Pageable, accountId: Long? = null, pageId: Long? = null): TimelineFragment {
             return TimelineFragment().apply {
                 arguments = Bundle().apply {
                     putSerializable(EXTRA_PAGEABLE, pageable)
                     if (accountId != null) {
                         putLong(EXTRA_ACCOUNT_ID, accountId)
+                    }
+                    if (pageId != null) {
+                        putLong(EXTRA_PAGE_ID, pageId)
                     }
                 }
             }
@@ -125,6 +130,12 @@ class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view)
 
     private val accountId: Long? by lazy {
         arguments?.getLong(EXTRA_ACCOUNT_ID, -1).takeIf {
+            it != -1L
+        }
+    }
+
+    private val pageId by lazy {
+        arguments?.getLong(EXTRA_PAGE_ID, -1).takeIf {
             it != -1L
         }
     }
@@ -302,7 +313,7 @@ class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view)
         isShowing = true
         mViewModel.onResume()
 
-        currentPageableTimelineViewModel.setCurrentPageable(mViewModel.accountId?.value, mPageable)
+        currentPageableTimelineViewModel.setCurrentPageable(mViewModel.accountId?.value, mPageable, pageId)
         try {
             layoutManager.scrollToPositionWithOffset(mViewModel.position, mViewModel.offset)
         } catch (_: Exception) {

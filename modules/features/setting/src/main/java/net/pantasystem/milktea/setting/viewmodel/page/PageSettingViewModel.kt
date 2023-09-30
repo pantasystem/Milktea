@@ -15,6 +15,7 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import net.pantasystem.milktea.app_store.account.AccountStore
 import net.pantasystem.milktea.app_store.setting.SettingStore
+import net.pantasystem.milktea.common.mapCancellableCatching
 import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.common_android.resource.StringSource
 import net.pantasystem.milktea.model.account.Account
@@ -304,6 +305,23 @@ class PageSettingViewModel @Inject constructor(
 
     fun onEditButtonClicked(page: Page) {
         _pageOnUpdateEvent.tryEmit(page)
+    }
+
+    fun onEditTab(pageId: Long) {
+        viewModelScope.launch {
+            accountRepository.findAll().mapCancellableCatching { accounts ->
+                accounts.map {
+                    it.pages
+                }.flatten().firstOrNull {
+                    it.pageId == pageId
+                }
+            }.onSuccess { page ->
+                if (page != null) {
+                    _pageOnUpdateEvent.tryEmit(page)
+                }
+            }
+
+        }
     }
 
 }

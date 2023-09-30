@@ -35,7 +35,7 @@ class CurrentPageableTimelineViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val _currentType = MutableStateFlow<CurrentPageType>(
-        CurrentPageType.Page(null, Pageable.HomeTimeline()))
+        CurrentPageType.Page(null, Pageable.HomeTimeline(), null))
 
     val currentType: StateFlow<CurrentPageType> = _currentType
 
@@ -43,8 +43,8 @@ class CurrentPageableTimelineViewModel @Inject constructor(
     private val _currentAccountId = MutableStateFlow<Long?>(null)
     val currentAccountId = _currentAccountId.asStateFlow()
 
-    fun setCurrentPageable(accountId: Long?, pageable: Pageable) {
-        _currentType.value = CurrentPageType.Page(accountId, pageable)
+    fun setCurrentPageable(accountId: Long?, pageable: Pageable, pageId: Long? = null,) {
+        _currentType.value = CurrentPageType.Page(accountId, pageable, pageId)
     }
 
     fun setCurrentPageType(type: CurrentPageType) {
@@ -54,6 +54,6 @@ class CurrentPageableTimelineViewModel @Inject constructor(
 }
 
 sealed interface CurrentPageType {
-    data class Page(val accountId: Long?, val pageable: Pageable) : CurrentPageType
+    data class Page(val accountId: Long?, val pageable: Pageable, val pageId: Long?) : CurrentPageType
     object Account : CurrentPageType
 }
