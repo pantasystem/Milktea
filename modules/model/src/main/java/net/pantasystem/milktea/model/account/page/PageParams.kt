@@ -159,16 +159,23 @@ data class PageParams(
                 }
                 MASTODON_LOCAL_TIMELINE -> {
                     Pageable.Mastodon.LocalTimeline(
-                        isOnlyMedia = withFiles
+                        isOnlyMedia = withFiles,
+                        excludeReposts = excludeReposts,
+                        excludeReplies = excludeReplies,
                     )
                 }
                 MASTODON_PUBLIC_TIMELINE -> {
                     Pageable.Mastodon.PublicTimeline(
                         isOnlyMedia = withFiles,
+                        excludeReposts = excludeReposts,
+                        excludeReplies = excludeReplies,
                     )
                 }
                 MASTODON_HOME_TIMELINE -> {
-                    Pageable.Mastodon.HomeTimeline
+                    Pageable.Mastodon.HomeTimeline(
+                        excludeReposts = excludeReposts,
+                        excludeReplies = excludeReplies,
+                    )
                 }
                 MASTODON_LIST_TIMELINE -> {
                     Pageable.Mastodon.ListTimeline(

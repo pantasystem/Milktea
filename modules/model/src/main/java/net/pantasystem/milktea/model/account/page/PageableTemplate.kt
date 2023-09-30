@@ -83,7 +83,7 @@ class PageableTemplate(val account: Account?) {
             account?.accountId ?: -1,
             title,
             0,
-            Pageable.Mastodon.HomeTimeline,
+            Pageable.Mastodon.HomeTimeline(),
             isSavePagePosition = true,
         )
     }

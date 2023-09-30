@@ -476,12 +476,16 @@ sealed class Pageable : Serializable {
 
     sealed class Mastodon : Pageable() {
         data class PublicTimeline(
-            val isOnlyMedia: Boolean? = null
-        ) : Mastodon(), CanOnlyMedia<PublicTimeline>, UntilPaginate, SincePaginate {
+            val isOnlyMedia: Boolean? = null,
+            val excludeReplies: Boolean? = null,
+            val excludeReposts: Boolean? = null,
+        ) : Mastodon(), CanOnlyMedia<PublicTimeline>, UntilPaginate, SincePaginate, CanExcludeReplies<PublicTimeline>, CanExcludeReposts<PublicTimeline> {
             override fun toParams(): PageParams {
                 return PageParams(
                     type = PageType.MASTODON_PUBLIC_TIMELINE,
-                    withFiles = isOnlyMedia
+                    withFiles = isOnlyMedia,
+                    excludeReplies = excludeReplies,
+                    excludeReposts = excludeReposts
                 )
             }
 
@@ -494,15 +498,39 @@ sealed class Pageable : Serializable {
             override fun getOnlyMedia(): Boolean {
                 return isOnlyMedia ?: false
             }
+
+            override fun setExcludeReplies(isExcludeReplies: Boolean): PublicTimeline {
+                return copy(
+                    excludeReplies = isExcludeReplies
+                )
+            }
+
+            override fun getExcludeReplies(): Boolean {
+                return excludeReplies ?: false
+            }
+
+            override fun setExcludeReposts(isExcludeReposts: Boolean): PublicTimeline {
+                return copy(
+                    excludeReposts = isExcludeReposts
+                )
+            }
+
+            override fun getExcludeReposts(): Boolean {
+                return excludeReposts ?: false
+            }
         }
 
         data class LocalTimeline(
-            val isOnlyMedia: Boolean? = null
-        ) : Mastodon(), CanOnlyMedia<LocalTimeline>, UntilPaginate, SincePaginate {
+            val isOnlyMedia: Boolean? = null,
+            val excludeReplies: Boolean? = null,
+            val excludeReposts: Boolean? = null,
+        ) : Mastodon(), CanOnlyMedia<LocalTimeline>, UntilPaginate, SincePaginate, CanExcludeReplies<LocalTimeline>, CanExcludeReposts<LocalTimeline> {
             override fun toParams(): PageParams {
                 return PageParams(
                     type = PageType.MASTODON_LOCAL_TIMELINE,
                     withFiles = isOnlyMedia,
+                    excludeReplies = excludeReplies,
+                    excludeReposts = excludeReposts
                 )
             }
 
@@ -514,6 +542,26 @@ sealed class Pageable : Serializable {
 
             override fun getOnlyMedia(): Boolean {
                 return isOnlyMedia ?: false
+            }
+
+            override fun setExcludeReplies(isExcludeReplies: Boolean): LocalTimeline {
+                return copy(
+                    excludeReplies = isExcludeReplies
+                )
+            }
+
+            override fun getExcludeReplies(): Boolean {
+                return excludeReplies ?: false
+            }
+
+            override fun setExcludeReposts(isExcludeReposts: Boolean): LocalTimeline {
+                return copy(
+                    excludeReposts = isExcludeReposts
+                )
+            }
+
+            override fun getExcludeReposts(): Boolean {
+                return excludeReposts ?: false
             }
         }
 
@@ -547,10 +595,35 @@ sealed class Pageable : Serializable {
             }
         }
 
-        object HomeTimeline : Mastodon(), SincePaginate, UntilPaginate {
+        data class HomeTimeline(
+            val excludeReplies: Boolean? = null,
+            val excludeReposts: Boolean? = null,
+        ) : Mastodon(), SincePaginate, UntilPaginate, CanExcludeReposts<HomeTimeline>, CanExcludeReplies<HomeTimeline> {
             override fun toParams(): PageParams {
                 return PageParams(
                     type = PageType.MASTODON_HOME_TIMELINE,
+                    excludeReplies = excludeReplies,
+                    excludeReposts = excludeReposts
+                )
+            }
+
+            override fun getExcludeReposts(): Boolean {
+                return excludeReposts ?: false
+            }
+
+            override fun getExcludeReplies(): Boolean {
+                return excludeReplies ?: false
+            }
+
+            override fun setExcludeReplies(isExcludeReplies: Boolean): HomeTimeline {
+                return copy(
+                    excludeReplies = isExcludeReplies
+                )
+            }
+
+            override fun setExcludeReposts(isExcludeReposts: Boolean): HomeTimeline {
+                return copy(
+                    excludeReposts = isExcludeReposts
                 )
             }
         }
