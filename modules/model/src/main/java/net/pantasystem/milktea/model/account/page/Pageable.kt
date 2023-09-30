@@ -186,7 +186,9 @@ sealed class Pageable : Serializable {
                 withFiles = withFiles,
                 includeRenotedMyRenotes = includeRenotedMyRenotes,
                 includeLocalRenotes = includeLocalRenotes,
-                includeMyRenotes = includeMyRenotes
+                includeMyRenotes = includeMyRenotes,
+                excludeReplies = excludeReplies,
+                excludeReposts = excludeReposts,
             )
         }
 

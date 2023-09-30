@@ -113,6 +113,7 @@ class EditTabSettingDialog : AppCompatDialogFragment(){
                 }
                 val updated = target.copy(title = name)
                 pageSettingViewModel.updatePage(updated)
+                pageSettingViewModel.save()
             }
             dismiss()
         }
