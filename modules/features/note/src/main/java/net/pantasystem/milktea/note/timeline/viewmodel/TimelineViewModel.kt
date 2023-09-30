@@ -20,6 +20,8 @@ import net.pantasystem.milktea.common_android_ui.APIErrorStringConverter
 import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.account.CurrentAccountWatcher
 import net.pantasystem.milktea.model.account.UnauthorizedException
+import net.pantasystem.milktea.model.account.page.CanExcludeReplies
+import net.pantasystem.milktea.model.account.page.CanExcludeReposts
 import net.pantasystem.milktea.model.account.page.Pageable
 import net.pantasystem.milktea.model.note.Note
 import net.pantasystem.milktea.model.note.NoteStreaming
@@ -151,6 +153,23 @@ class TimelineViewModel @AssistedInject constructor(
         cache.addFilter(object : PlaneNoteViewDataCache.ViewDataFilter {
             override suspend fun check(viewData: PlaneNoteViewData): PlaneNoteViewData.FilterResult {
                 return timelineFilterService.filterNote(viewData).filterResult
+            }
+        })
+        cache.addFilter(object : PlaneNoteViewDataCache.ViewDataFilter {
+            override suspend fun check(viewData: PlaneNoteViewData): PlaneNoteViewData.FilterResult {
+                if (
+                    (pageable as? CanExcludeReplies<*>)?.getExcludeReplies() == true
+                    && viewData.toShowNote.note.replyId != null
+                    ) {
+                    return PlaneNoteViewData.FilterResult.ShouldFilterNote
+                }
+
+                if ((pageable as? CanExcludeReposts<*>)?.getExcludeReposts() == true
+                    && viewData.toShowNote.note.isRenoteOnly()
+                    ) {
+                    return PlaneNoteViewData.FilterResult.ShouldFilterNote
+                }
+                return viewData.filterResult
             }
         })
     }
