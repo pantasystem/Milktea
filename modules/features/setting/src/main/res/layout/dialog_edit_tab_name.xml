@@ -30,12 +30,26 @@
             android:layout_below="@id/toggleOnlyMedia"
             android:text="@string/remember_scroll_position"/>
 
+        <com.google.android.material.switchmaterial.SwitchMaterial
+            android:id="@+id/toggleExcludeReplies"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/toggleSavePagePosition"
+            android:text="@string/exclude_replies"/>
+
+        <com.google.android.material.switchmaterial.SwitchMaterial
+            android:id="@+id/toggleExcludeReposts"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/toggleExcludeReplies"
+            android:text="@string/exclude_reposts"/>
+
         <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/tabNameInput"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="8dp"
-                android:layout_below="@id/toggleSavePagePosition"
+                android:layout_below="@id/toggleExcludeReposts"
                 >
             <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/editTabName"

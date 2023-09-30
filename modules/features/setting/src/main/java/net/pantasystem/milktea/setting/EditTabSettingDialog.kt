@@ -8,6 +8,8 @@ import androidx.core.view.isVisible
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.activityViewModels
 import dagger.hilt.android.AndroidEntryPoint
+import net.pantasystem.milktea.model.account.page.CanExcludeReplies
+import net.pantasystem.milktea.model.account.page.CanExcludeReposts
 import net.pantasystem.milktea.model.account.page.CanOnlyMedia
 import net.pantasystem.milktea.model.account.page.Page
 import net.pantasystem.milktea.model.account.page.Pageable
@@ -64,6 +66,20 @@ class EditTabSettingDialog : AppCompatDialogFragment(){
         }
 
 
+        if (page.pageable() is CanExcludeReposts<*>) {
+            binding.toggleExcludeReposts.isVisible = true
+            binding.toggleExcludeReposts.isChecked = page.pageParams.excludeReposts ?: false
+        } else {
+            binding.toggleExcludeReposts.isVisible = false
+        }
+
+        if (page.pageable() is CanExcludeReplies<*>) {
+            binding.toggleExcludeReplies.isVisible = true
+            binding.toggleExcludeReplies.isChecked = page.pageParams.excludeReplies ?: false
+        } else {
+            binding.toggleExcludeReplies.isVisible = false
+        }
+
         binding.okButton.setOnClickListener {
             val name = binding.editTabName.text?.toString()
             if(name?.isNotBlank() == true){
@@ -74,6 +90,23 @@ class EditTabSettingDialog : AppCompatDialogFragment(){
                     is CanOnlyMedia<*> -> {
                         target = target.copy(
                             pageParams = (pageable.setOnlyMedia(binding.toggleOnlyMedia.isChecked) as Pageable).toParams()
+                        )
+                    }
+                    else -> Unit
+                }
+                when(val pageable = target.pageable()) {
+                    is CanExcludeReplies<*> -> {
+                        target = target.copy(
+                            pageParams = (pageable.setExcludeReplies(binding.toggleExcludeReplies.isChecked) as Pageable).toParams()
+                        )
+                    }
+                    else -> Unit
+                }
+
+                when(val pageable = target.pageable()) {
+                    is CanExcludeReposts<*> -> {
+                        target = target.copy(
+                            pageParams = (pageable.setExcludeReposts(binding.toggleExcludeReposts.isChecked) as Pageable).toParams()
                         )
                     }
                     else -> Unit
