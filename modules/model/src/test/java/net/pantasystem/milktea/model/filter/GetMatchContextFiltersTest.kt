@@ -2,7 +2,7 @@ package net.pantasystem.milktea.model.filter
 
 import kotlinx.datetime.Clock
 import net.pantasystem.milktea.model.account.page.Pageable
-import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.minutes
@@ -51,7 +51,7 @@ internal class GetMatchContextFiltersTest {
             ),
         ) + expected
         val result = GetMatchContextFilters().invoke(
-            Pageable.Mastodon.HomeTimeline,
+            Pageable.Mastodon.HomeTimeline(),
             filters
         )
         assertEquals(expected, result)
@@ -106,7 +106,7 @@ internal class GetMatchContextFiltersTest {
             ),
         ) + expected
         val result = GetMatchContextFilters().invoke(
-            Pageable.Mastodon.HomeTimeline,
+            Pageable.Mastodon.HomeTimeline(),
             filters
         )
         assertEquals(expected, result)
