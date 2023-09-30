@@ -9,11 +9,20 @@ sealed class Pageable : Serializable {
 
     data class GlobalTimeline(
 
-        var withFiles: Boolean? = null
-
-    ) : Pageable(), UntilPaginate, SincePaginate, CanOnlyMedia<GlobalTimeline> {
+        var withFiles: Boolean? = null,
+        var excludeReposts: Boolean? = null,
+        var excludeReplies: Boolean? = null
+    ) : Pageable(), UntilPaginate, SincePaginate,
+        CanOnlyMedia<GlobalTimeline>,
+        CanExcludeReplies<GlobalTimeline>,
+        CanExcludeReposts<GlobalTimeline> {
         override fun toParams(): PageParams {
-            return PageParams(withFiles = withFiles, type = PageType.GLOBAL)
+            return PageParams(
+                withFiles = withFiles,
+                type = PageType.GLOBAL,
+                excludeReplies = excludeReplies,
+                excludeReposts = excludeReposts
+            )
         }
 
         override fun setOnlyMedia(isOnlyMedia: Boolean): GlobalTimeline {
@@ -29,16 +38,45 @@ sealed class Pageable : Serializable {
         override fun getOnlyMedia(): Boolean {
             return withFiles ?: false
         }
+
+        override fun getExcludeReplies(): Boolean {
+            return excludeReplies ?: false
+        }
+
+        override fun setExcludeReplies(isExcludeReplies: Boolean): GlobalTimeline {
+            return copy(
+                excludeReplies = isExcludeReplies
+            )
+        }
+
+        override fun getExcludeReposts(): Boolean {
+            return excludeReposts ?: false
+        }
+
+        override fun setExcludeReposts(isExcludeReposts: Boolean): GlobalTimeline {
+            return copy(
+                excludeReposts = isExcludeReposts
+            )
+        }
     }
 
     data class LocalTimeline(
 
         var withFiles: Boolean? = null,
-        var excludeNsfw: Boolean? = null
+        var excludeNsfw: Boolean? = null,
+        var excludeReplies: Boolean? = null,
+        var excludeReposts: Boolean? = null
 
-    ) : Pageable(), UntilPaginate, SincePaginate, CanOnlyMedia<LocalTimeline> {
+    ) : Pageable(), UntilPaginate, SincePaginate, CanOnlyMedia<LocalTimeline>,
+        CanExcludeReplies<LocalTimeline>, CanExcludeReposts<LocalTimeline> {
         override fun toParams(): PageParams {
-            return PageParams(PageType.LOCAL, withFiles = withFiles, excludeNsfw = excludeNsfw)
+            return PageParams(
+                PageType.LOCAL,
+                withFiles = withFiles,
+                excludeNsfw = excludeNsfw,
+                excludeReplies = excludeReplies,
+                excludeReposts = excludeReposts
+            )
         }
 
         override fun setOnlyMedia(isOnlyMedia: Boolean): LocalTimeline {
@@ -52,6 +90,26 @@ sealed class Pageable : Serializable {
         override fun getOnlyMedia(): Boolean {
             return withFiles ?: false
         }
+
+        override fun setExcludeReplies(isExcludeReplies: Boolean): LocalTimeline {
+            return copy(
+                excludeReplies = isExcludeReplies
+            )
+        }
+
+        override fun getExcludeReplies(): Boolean {
+            return excludeReplies ?: false
+        }
+
+        override fun setExcludeReposts(isExcludeReposts: Boolean): LocalTimeline {
+            return copy(
+                excludeReposts = isExcludeReposts
+            )
+        }
+
+        override fun getExcludeReposts(): Boolean {
+            return excludeReposts ?: false
+        }
     }
 
     data class HybridTimeline(
@@ -59,16 +117,21 @@ sealed class Pageable : Serializable {
         var withFiles: Boolean? = null,
         var includeLocalRenotes: Boolean? = null,
         var includeMyRenotes: Boolean? = null,
-        var includeRenotedMyRenotes: Boolean? = null
+        var includeRenotedMyRenotes: Boolean? = null,
+        var excludeReplies: Boolean? = null,
+        var excludeReposts: Boolean? = null
 
-    ) : Pageable(), UntilPaginate, SincePaginate, CanOnlyMedia<HybridTimeline> {
+    ) : Pageable(), UntilPaginate, SincePaginate, CanOnlyMedia<HybridTimeline>,
+        CanExcludeReplies<HybridTimeline>, CanExcludeReposts<HybridTimeline> {
         override fun toParams(): PageParams {
             return PageParams(
                 type = PageType.SOCIAL,
                 withFiles = withFiles,
                 includeLocalRenotes = includeLocalRenotes,
                 includeMyRenotes = includeMyRenotes,
-                includeRenotedMyRenotes = includeRenotedMyRenotes
+                includeRenotedMyRenotes = includeRenotedMyRenotes,
+                excludeReplies = excludeReplies,
+                excludeReposts = excludeReposts
             )
         }
 
@@ -83,6 +146,26 @@ sealed class Pageable : Serializable {
         override fun getOnlyMedia(): Boolean {
             return withFiles ?: false
         }
+
+        override fun setExcludeReplies(isExcludeReplies: Boolean): HybridTimeline {
+            return copy(
+                excludeReplies = isExcludeReplies
+            )
+        }
+
+        override fun getExcludeReplies(): Boolean {
+            return excludeReplies ?: false
+        }
+
+        override fun setExcludeReposts(isExcludeReposts: Boolean): HybridTimeline {
+            return copy(
+                excludeReposts = isExcludeReposts
+            )
+        }
+
+        override fun getExcludeReposts(): Boolean {
+            return excludeReposts ?: false
+        }
     }
 
     data class HomeTimeline(
@@ -90,9 +173,12 @@ sealed class Pageable : Serializable {
         var withFiles: Boolean? = null,
         var includeLocalRenotes: Boolean? = null,
         var includeMyRenotes: Boolean? = null,
-        var includeRenotedMyRenotes: Boolean? = null
+        var includeRenotedMyRenotes: Boolean? = null,
+        var excludeReplies: Boolean? = null,
+        var excludeReposts: Boolean? = null
 
-    ) : Pageable(), UntilPaginate, SincePaginate, CanOnlyMedia<HomeTimeline> {
+    ) : Pageable(), UntilPaginate, SincePaginate, CanOnlyMedia<HomeTimeline>,
+        CanExcludeReplies<HomeTimeline>, CanExcludeReposts<HomeTimeline> {
 
         override fun toParams(): PageParams {
             return PageParams(
@@ -114,6 +200,26 @@ sealed class Pageable : Serializable {
 
         override fun getOnlyMedia(): Boolean {
             return withFiles ?: false
+        }
+
+        override fun setExcludeReplies(isExcludeReplies: Boolean): HomeTimeline {
+            return copy(
+                excludeReplies = isExcludeReplies
+            )
+        }
+
+        override fun getExcludeReplies(): Boolean {
+            return excludeReplies ?: false
+        }
+
+        override fun setExcludeReposts(isExcludeReposts: Boolean): HomeTimeline {
+            return copy(
+                excludeReposts = isExcludeReposts
+            )
+        }
+
+        override fun getExcludeReposts(): Boolean {
+            return excludeReposts ?: false
         }
     }
 
@@ -527,4 +633,14 @@ sealed class Pageable : Serializable {
 interface CanOnlyMedia<T> {
     fun setOnlyMedia(isOnlyMedia: Boolean): T
     fun getOnlyMedia(): Boolean
+}
+
+interface CanExcludeReplies<T> {
+    fun setExcludeReplies(isExcludeReplies: Boolean): T
+    fun getExcludeReplies(): Boolean
+}
+
+interface CanExcludeReposts<T> {
+    fun setExcludeReposts(isExcludeReposts: Boolean): T
+    fun getExcludeReposts(): Boolean
 }
