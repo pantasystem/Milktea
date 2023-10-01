@@ -7,7 +7,7 @@ import android.widget.TextView
 import net.pantasystem.milktea.common.glide.GlideApp
 import net.pantasystem.milktea.model.emoji.CustomEmojiParsedResult
 import net.pantasystem.milktea.model.emoji.CustomEmojiParser
-import net.pantasystem.milktea.model.emoji.Emoji
+import net.pantasystem.milktea.model.emoji.CustomEmoji
 import net.pantasystem.milktea.model.emoji.EmojiResolvedType
 import kotlin.math.max
 
@@ -16,7 +16,7 @@ class CustomEmojiDecorator {
     fun decorate(
         accountHost: String?,
         sourceHost: String?,
-        emojis: List<Emoji>?,
+        emojis: List<CustomEmoji>?,
         text: String,
         view: TextView,
     ): Spanned {

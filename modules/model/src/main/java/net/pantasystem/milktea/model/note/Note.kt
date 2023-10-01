@@ -7,7 +7,7 @@ import net.pantasystem.milktea.model.EntityId
 import net.pantasystem.milktea.model.app.AppType
 import net.pantasystem.milktea.model.channel.Channel
 import net.pantasystem.milktea.model.drive.FileProperty
-import net.pantasystem.milktea.model.emoji.Emoji
+import net.pantasystem.milktea.model.emoji.CustomEmoji
 import net.pantasystem.milktea.model.note.poll.Poll
 import net.pantasystem.milktea.model.note.reaction.ReactionCount
 import net.pantasystem.milktea.model.user.User
@@ -35,7 +35,7 @@ data class Note(
     val uri: String?,
     val renoteCount: Int,
     val reactionCounts: List<ReactionCount>,
-    val emojis: List<Emoji>?,
+    val emojis: List<CustomEmoji>?,
     val repliesCount: Int,
     val fileIds: List<FileProperty.Id>?,
     val poll: Poll?,
@@ -268,7 +268,7 @@ fun Note.Companion.make(
     uri: String? = null,
     renoteCount: Int = 0,
     reactionCounts: List<ReactionCount> = emptyList(),
-    emojis: List<Emoji>? = null,
+    emojis: List<CustomEmoji>? = null,
     repliesCount: Int = 0,
     fileIds: List<FileProperty.Id>? = null,
     poll: Poll? = null,

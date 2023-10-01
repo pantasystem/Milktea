@@ -7,7 +7,7 @@ import io.objectbox.annotation.Unique
 import kotlinx.datetime.toInstant
 import net.pantasystem.milktea.model.channel.Channel
 import net.pantasystem.milktea.model.drive.FileProperty
-import net.pantasystem.milktea.model.emoji.Emoji
+import net.pantasystem.milktea.model.emoji.CustomEmoji
 import net.pantasystem.milktea.model.note.Note
 import net.pantasystem.milktea.model.note.Visibility
 import net.pantasystem.milktea.model.note.poll.Poll
@@ -218,7 +218,7 @@ data class NoteRecord(
                         it == entry.key
                     } ?: false
                 ) },
-            emojis = emojis?.map { Emoji(
+            emojis = emojis?.map { CustomEmoji(
                 name = it.key,
                 url = it.value,
                 aspectRatio = customEmojiAspectRatioMap?.get(it.value)?.toFloatOrNull(),

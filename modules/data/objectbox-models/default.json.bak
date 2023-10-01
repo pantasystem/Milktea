@@ -405,7 +405,7 @@
     },
     {
       "id": "5:192241672526547352",
-      "lastPropertyId": "4:2544401018528846153",
+      "lastPropertyId": "6:1197102331106729580",
       "name": "ImageCacheRecord",
       "properties": [
         {
@@ -430,6 +430,16 @@
           "id": "4:2544401018528846153",
           "name": "cachedAt",
           "type": 6
+        },
+        {
+          "id": "5:1403113483980738635",
+          "name": "width",
+          "type": 5
+        },
+        {
+          "id": "6:1197102331106729580",
+          "name": "height",
+          "type": 5
         }
       ],
       "relations": []

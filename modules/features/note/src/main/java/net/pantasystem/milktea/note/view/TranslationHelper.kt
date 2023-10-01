@@ -10,7 +10,7 @@ import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.common_android.mfm.MFMParser
 import net.pantasystem.milktea.common_android_ui.LazyDecorateSkipElementsHolder
 import net.pantasystem.milktea.common_android_ui.MFMDecorator
-import net.pantasystem.milktea.model.emoji.Emoji
+import net.pantasystem.milktea.model.emoji.CustomEmoji
 import net.pantasystem.milktea.model.note.Translation
 import net.pantasystem.milktea.note.R
 
@@ -19,7 +19,7 @@ object TranslationHelper {
 
     @JvmStatic
     @BindingAdapter("translationState", "emojis")
-    fun TextView.setTranslatedText(state: ResultState<Translation>?, emojis: List<Emoji>?) {
+    fun TextView.setTranslatedText(state: ResultState<Translation>?, emojis: List<CustomEmoji>?) {
         if(state == null) {
             this.visibility = View.GONE
             return

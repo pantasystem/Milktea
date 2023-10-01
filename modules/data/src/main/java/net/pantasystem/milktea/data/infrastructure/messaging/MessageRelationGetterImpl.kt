@@ -95,7 +95,7 @@ suspend fun MessageDTO.entities(
                 filePropertyDTOEntityConverter.convert(it, account)
             },
             isRead,
-            emojis ?: emptyList(),
+            emojis?.map { it.toModel() } ?: emptyList(),
             recipientId = User.Id(account.accountId, recipientId!!)
         )
     } else {
@@ -109,7 +109,7 @@ suspend fun MessageDTO.entities(
                 filePropertyDTOEntityConverter.convert(it, account)
             },
             isRead = reads?.contains(account.remoteId) ?: false,
-            emojis ?: emptyList(),
+            emojis?.map { it.toModel() } ?: emptyList(),
             Group.Id(account.accountId, groupId!!),
             reads = reads?.map {
                 User.Id(account.accountId, it)

@@ -5,7 +5,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import net.pantasystem.milktea.api.mastodon.emojis.TootEmojiDTO
 import net.pantasystem.milktea.model.account.Account
-import net.pantasystem.milktea.model.emoji.Emoji
+import net.pantasystem.milktea.model.emoji.CustomEmoji
 import net.pantasystem.milktea.model.user.User
 
 @Serializable
@@ -68,7 +68,7 @@ data class MastodonAccountDTO(
             name = displayName,
             avatarUrl = avatar,
             emojis = emojis.map {
-                Emoji(
+                CustomEmoji(
                     name = it.shortcode,
                     uri = it.url,
                     url = it.url,

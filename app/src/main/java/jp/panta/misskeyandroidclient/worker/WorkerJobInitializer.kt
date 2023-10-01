@@ -25,7 +25,7 @@ class WorkerJobInitializer @Inject constructor(
             enqueue(CleanupUnusedDriveCacheWorker.createOneTimeRequest())
             enqueueUniquePeriodicWork(
                 "syncMeta",
-                ExistingPeriodicWorkPolicy.UPDATE,
+                ExistingPeriodicWorkPolicy.REPLACE,
                 SyncMetaWorker.createPeriodicWorkRequest()
             )
             enqueueUniquePeriodicWork(

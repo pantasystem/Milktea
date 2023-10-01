@@ -28,7 +28,7 @@ import androidx.compose.ui.unit.sp
 import coil.compose.rememberAsyncImagePainter
 import net.pantasystem.milktea.common_compose.AvatarIcon
 import net.pantasystem.milktea.common_compose.CustomEmojiText
-import net.pantasystem.milktea.model.emoji.Emoji
+import net.pantasystem.milktea.model.emoji.CustomEmoji
 
 @Composable
 fun RenoteTargetAccountRowList(
@@ -66,7 +66,7 @@ fun SelectableAvatarOnlyAccount(
     isEnable: Boolean,
     username: String,
     avatarUrl: String,
-    emojis: List<Emoji>,
+    emojis: List<CustomEmoji>,
     accountHost: String?,
     iconUrl: String,
     onClick: () -> Unit,

@@ -129,4 +129,8 @@ object DbModule {
     @Provides
     @Singleton
     fun provideRenoteMuteDao(db: DataBase) = db.renoteMuteDao()
+
+    @Provides
+    @Singleton
+    fun provideCustomEmojiDao(db: DataBase) = db.customEmojiDao()
 }

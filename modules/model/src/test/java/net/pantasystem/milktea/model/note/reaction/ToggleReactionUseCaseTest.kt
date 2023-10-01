@@ -3,7 +3,7 @@ package net.pantasystem.milktea.model.note.reaction
 import kotlinx.coroutines.runBlocking
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.GetAccount
-import net.pantasystem.milktea.model.emoji.Emoji
+import net.pantasystem.milktea.model.emoji.CustomEmoji
 import net.pantasystem.milktea.model.instance.InstanceInfoType
 import net.pantasystem.milktea.model.instance.MastodonInstanceInfo
 import net.pantasystem.milktea.model.instance.Meta
@@ -85,7 +85,7 @@ class ToggleReactionUseCaseTest {
                     findByName(any(), any())
                 } doReturn Result.success(
                     listOf(
-                        Emoji(
+                        CustomEmoji(
                             name = "kawaii"
                         )
                     )
@@ -173,7 +173,7 @@ class ToggleReactionUseCaseTest {
             customEmojiRepository = mock() {
                 onBlocking {
                     findByName(any(), any())
-                } doReturn Result.success(listOf(Emoji(name = "wakaranai")))
+                } doReturn Result.success(listOf(CustomEmoji(name = "wakaranai")))
             },
             instanceInfoService = mock() {
                 onBlocking {
@@ -264,7 +264,7 @@ class ToggleReactionUseCaseTest {
             customEmojiRepository = mock() {
                 onBlocking {
                     findByName(any(), any())
-                } doReturn Result.success(listOf(Emoji("kawaii")))
+                } doReturn Result.success(listOf(CustomEmoji("kawaii")))
             },
             instanceInfoService = mock() {
                 onBlocking {

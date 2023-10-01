@@ -5,7 +5,7 @@ import net.pantasystem.milktea.common_android.html.MastodonHTMLParser
 import net.pantasystem.milktea.common_android.mfm.MFMParser
 import net.pantasystem.milktea.common_android.mfm.Root
 import net.pantasystem.milktea.model.account.Account
-import net.pantasystem.milktea.model.emoji.Emoji
+import net.pantasystem.milktea.model.emoji.CustomEmoji
 import net.pantasystem.milktea.model.note.Note
 import net.pantasystem.milktea.model.note.NoteRelation
 
@@ -18,7 +18,7 @@ sealed interface TextType {
     ) : TextType
 }
 
-fun getTextType(account: Account, note: NoteRelation, instanceEmojis: Map<String, Emoji>?): TextType? {
+fun getTextType(account: Account, note: NoteRelation, instanceEmojis: Map<String, CustomEmoji>?): TextType? {
     return when (account.instanceType) {
         Account.InstanceType.MISSKEY, Account.InstanceType.FIREFISH -> {
             val root = MFMParser.parse(

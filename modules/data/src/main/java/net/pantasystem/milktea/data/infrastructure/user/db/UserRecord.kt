@@ -4,7 +4,7 @@ import androidx.room.*
 import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDate
 import net.pantasystem.milktea.data.infrastructure.account.db.AccountRecord
-import net.pantasystem.milktea.model.emoji.Emoji
+import net.pantasystem.milktea.model.emoji.CustomEmoji
 import net.pantasystem.milktea.model.note.Note
 import net.pantasystem.milktea.model.user.User
 import net.pantasystem.milktea.model.user.nickname.UserNickname
@@ -292,8 +292,8 @@ data class UserEmojiRecord(
     @ColumnInfo(name = "id")
     @PrimaryKey(autoGenerate = true) val id: Long = 0L,
 ) {
-    fun toModel(): Emoji {
-        return Emoji(
+    fun toModel(): CustomEmoji {
+        return CustomEmoji(
             name = name,
             url = url,
             uri = uri,
@@ -302,7 +302,7 @@ data class UserEmojiRecord(
         )
     }
 
-    fun isEqualToModel(model: Emoji): Boolean {
+    fun isEqualToModel(model: CustomEmoji): Boolean {
         return name == model.name &&
             url == model.url &&
             uri == model.uri &&
@@ -311,7 +311,7 @@ data class UserEmojiRecord(
     }
 }
 
-fun List<UserEmojiRecord>?.isEqualToModels(models: List<Emoji>): Boolean {
+fun List<UserEmojiRecord>?.isEqualToModels(models: List<CustomEmoji>): Boolean {
     if (this == null && models.isEmpty()) return true
     if (this == null) return false
     if (size != models.size) return false

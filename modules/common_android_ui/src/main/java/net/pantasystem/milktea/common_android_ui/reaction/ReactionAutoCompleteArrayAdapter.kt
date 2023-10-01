@@ -10,10 +10,10 @@ import android.widget.Filterable
 import androidx.databinding.DataBindingUtil
 import net.pantasystem.milktea.common_android_ui.R
 import net.pantasystem.milktea.common_android_ui.databinding.ItemReactionPreviewBinding
-import net.pantasystem.milktea.model.emoji.Emoji
+import net.pantasystem.milktea.model.emoji.CustomEmoji
 
 class ReactionAutoCompleteArrayAdapter(
-    private val reactions: List<Emoji>,
+    private val reactions: List<CustomEmoji>,
     private val context: Context
 ) : BaseAdapter(), Filterable{
 
@@ -55,9 +55,7 @@ class ReactionAutoCompleteArrayAdapter(
             val text = constraint?.toString()
             if(text != null){
                 suggestions = reactions.filter{
-                    it.name.startsWith(text.replace(":", "")) || it.aliases?.any { alias ->
-                        alias.startsWith(text.replace(":", ""))
-                    }?: false
+                    it.name.startsWith(text.replace(":", ""))
                 }.map {
                     ":${it.name}:"
                 }

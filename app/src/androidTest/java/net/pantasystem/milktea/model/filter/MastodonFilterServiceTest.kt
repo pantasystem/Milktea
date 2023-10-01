@@ -18,7 +18,7 @@ class MastodonFilterServiceTest {
             GetMatchContextFilters()
         )
         val actual = service.isShouldFilterNote(
-            Pageable.Mastodon.HomeTimeline,
+            Pageable.Mastodon.HomeTimeline(),
             filters = listOf(
                 MastodonWordFilter(
                     id = MastodonWordFilter.Id(
@@ -50,7 +50,7 @@ class MastodonFilterServiceTest {
             GetMatchContextFilters()
         )
         val actual = service.isShouldFilterNote(
-            Pageable.Mastodon.HomeTimeline,
+            Pageable.Mastodon.HomeTimeline(),
             filters = listOf(
                 MastodonWordFilter(
                     id = MastodonWordFilter.Id(
@@ -82,7 +82,7 @@ class MastodonFilterServiceTest {
             GetMatchContextFilters()
         )
         val actual = service.isShouldFilterNote(
-            Pageable.Mastodon.HomeTimeline,
+            Pageable.Mastodon.HomeTimeline(),
             filters = listOf(
                 MastodonWordFilter(
                     id = MastodonWordFilter.Id(
@@ -138,7 +138,7 @@ class MastodonFilterServiceTest {
             GetMatchContextFilters()
         )
         val actual = service.isShouldFilterNote(
-            Pageable.Mastodon.HomeTimeline,
+            Pageable.Mastodon.HomeTimeline(),
             filters = listOf(
                 MastodonWordFilter(
                     id = MastodonWordFilter.Id(
@@ -207,7 +207,7 @@ class MastodonFilterServiceTest {
             GetMatchContextFilters()
         )
         val actual = service.isShouldFilterNote(
-            Pageable.Mastodon.HomeTimeline,
+            Pageable.Mastodon.HomeTimeline(),
             filters = listOf(
                 MastodonWordFilter(
                     id = MastodonWordFilter.Id(
@@ -265,7 +265,7 @@ class MastodonFilterServiceTest {
             GetMatchContextFilters()
         )
         val actual = service.isShouldFilterNote(
-            Pageable.Mastodon.HomeTimeline,
+            Pageable.Mastodon.HomeTimeline(),
             filters = listOf(
                 MastodonWordFilter(
                     id = MastodonWordFilter.Id(
@@ -323,7 +323,7 @@ class MastodonFilterServiceTest {
             GetMatchContextFilters()
         )
         val actual = service.isShouldFilterNote(
-            Pageable.Mastodon.HomeTimeline,
+            Pageable.Mastodon.HomeTimeline(),
             filters = listOf(
                 MastodonWordFilter(
                     id = MastodonWordFilter.Id(
@@ -355,7 +355,7 @@ class MastodonFilterServiceTest {
             GetMatchContextFilters()
         )
         val actual = service.isShouldFilterNote(
-            Pageable.Mastodon.HomeTimeline,
+            Pageable.Mastodon.HomeTimeline(),
             filters = listOf(
                 MastodonWordFilter(
                     id = MastodonWordFilter.Id(

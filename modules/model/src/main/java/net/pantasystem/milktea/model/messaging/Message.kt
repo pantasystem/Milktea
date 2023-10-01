@@ -5,7 +5,7 @@ import kotlinx.datetime.Instant
 import net.pantasystem.milktea.model.EntityId
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.drive.FileProperty
-import net.pantasystem.milktea.model.emoji.Emoji
+import net.pantasystem.milktea.model.emoji.CustomEmoji
 import net.pantasystem.milktea.model.group.GroupRepository
 import net.pantasystem.milktea.model.user.User
 import net.pantasystem.milktea.model.user.UserRepository
@@ -25,7 +25,7 @@ sealed class Message {
     abstract val fileId: String?
     abstract val file: FileProperty?
     abstract val isRead: Boolean
-    abstract val emojis: List<Emoji>
+    abstract val emojis: List<CustomEmoji>
 
     /**
      * isReadをtrueにして新しいオブジェクトを返す
@@ -48,7 +48,7 @@ sealed class Message {
         override val fileId: String?,
         override val file: FileProperty?,
         override val isRead: Boolean,
-        override val emojis: List<Emoji>,
+        override val emojis: List<CustomEmoji>,
         val groupId: GroupEntity.Id,
         val reads: List<User.Id>
     ) : Message() {
@@ -68,7 +68,7 @@ sealed class Message {
         override val fileId: String?,
         override val file: FileProperty?,
         override val isRead: Boolean,
-        override val emojis: List<Emoji>,
+        override val emojis: List<CustomEmoji>,
         val recipientId: User.Id
     ) : Message() {
 
@@ -98,7 +98,7 @@ fun Message.Direct.Companion.make(
     fileId: String? = null,
     file: FileProperty? = null,
     isRead: Boolean = false,
-    emojis: List<Emoji> = emptyList()
+    emojis: List<CustomEmoji> = emptyList()
 ): Message.Direct {
 
     return Message.Direct(

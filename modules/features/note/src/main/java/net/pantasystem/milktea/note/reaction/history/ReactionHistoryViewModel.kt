@@ -13,7 +13,7 @@ import net.pantasystem.milktea.common_android.emoji.V13EmojiUrlResolver
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.emoji.CustomEmojiRepository
-import net.pantasystem.milktea.model.emoji.Emoji
+import net.pantasystem.milktea.model.emoji.CustomEmoji
 import net.pantasystem.milktea.model.note.Note
 import net.pantasystem.milktea.model.note.NoteRepository
 import net.pantasystem.milktea.model.note.reaction.*
@@ -87,7 +87,7 @@ class ReactionHistoryViewModel @AssistedInject constructor(
                 type?.let { type ->
                     EmojiType.from(emojis + (noteInfo.note?.emojis ?: emptyList()), type)
                         ?: EmojiType.CustomEmoji(
-                            Emoji(
+                            CustomEmoji(
                                 name = type,
                                 url = V13EmojiUrlResolver.resolve(
                                     accountHost = a?.getHost(),

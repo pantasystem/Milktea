@@ -2,10 +2,10 @@ package jp.panta.misskeyandroidclient.mfm
 
 import net.pantasystem.milktea.common_android.mfm.ElementType
 import net.pantasystem.milktea.common_android.mfm.Leaf
-import net.pantasystem.milktea.model.emoji.Emoji
+import net.pantasystem.milktea.model.emoji.CustomEmoji
 
 class EmojiElement(
-    val emoji: Emoji,
+    val emoji: CustomEmoji,
     override val text: String,
     override val start: Int,
     override val end: Int,
