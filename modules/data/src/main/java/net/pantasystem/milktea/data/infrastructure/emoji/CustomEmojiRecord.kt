@@ -16,7 +16,7 @@ data class CustomEmojiRecord(
     val type: String? = null,
     val serverId: String? = null,
     val category: String? = null,
-    @PrimaryKey val id: Long = 0L,
+    @PrimaryKey(autoGenerate = true) val id: Long = 0L,
 ) {
 
     companion object {
