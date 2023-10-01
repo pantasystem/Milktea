@@ -7,11 +7,12 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
 import net.pantasystem.milktea.app_store.account.AccountStore
 import net.pantasystem.milktea.common.Logger
+import net.pantasystem.milktea.common.coroutines.combine
 import net.pantasystem.milktea.common.text.LevenshteinDistance
 import net.pantasystem.milktea.common_android.resource.StringSource
 import net.pantasystem.milktea.model.account.Account
-import net.pantasystem.milktea.model.emoji.CustomEmojiRepository
 import net.pantasystem.milktea.model.emoji.CustomEmoji
+import net.pantasystem.milktea.model.emoji.CustomEmojiRepository
 import net.pantasystem.milktea.model.emoji.UserEmojiConfig
 import net.pantasystem.milktea.model.emoji.UserEmojiConfigRepository
 import net.pantasystem.milktea.model.note.reaction.LegacyReaction
@@ -71,25 +72,6 @@ class EmojiPickerUiStateService(
             logger.error("ユーザーリアクション設定情報の取得に失敗", it)
         }.stateIn(coroutineScope, SharingStarted.WhileSubscribed(5_000), emptyList())
 
-    private val reactions = combine(reactionCount, userSetting) { counts, settings ->
-        Reactions(
-            settings,
-            counts,
-        )
-    }.stateIn(
-        coroutineScope,
-        SharingStarted.WhileSubscribed(5_000),
-        Reactions(emptyList(), emptyList())
-    )
-
-    private val baseInfo = combine(account, emojis) { account, emojis ->
-        BaseInfo(account, emojis)
-    }.stateIn(
-        coroutineScope,
-        SharingStarted.WhileSubscribed(5_000),
-        BaseInfo(null, emptyList())
-    )
-
     @OptIn(ExperimentalCoroutinesApi::class)
     private val recentlyUsedReactions =
         account.filterNotNull().flatMapLatest {
@@ -101,10 +83,15 @@ class EmojiPickerUiStateService(
     val searchWord = MutableStateFlow("")
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    private val filteredEmojis = combine(searchWord, account.filterNotNull()) { word, ac ->
-        word to ac
+    private val filteredEmojis = searchWord.flatMapLatest { keyword ->
+        account.filterNotNull().map { account ->
+            keyword to account
+        }
     }.flatMapLatest { (word, ac) ->
-        customEmojiRepository.observeWithSearch(host = ac.getHost(), keyword = word.replace(":", "")).map {
+        customEmojiRepository.observeWithSearch(
+            host = ac.getHost(),
+            keyword = word.replace(":", "")
+        ).map {
             it.sortedBy { emoji ->
                 LevenshteinDistance(emoji.name, word)
             }
@@ -119,10 +106,17 @@ class EmojiPickerUiStateService(
     val uiState: StateFlow<EmojiPickerUiState> = combine(
         searchWord,
         filteredEmojis,
-        baseInfo,
-        reactions,
+        account,
+        emojis,
+        reactionCount, userSetting,
         recentlyUsedReactions
-    ) { word, filtered, (ac, emojis), (settings, counts), recentlyUsed ->
+    ) { word,
+        filtered,
+        ac,
+        emojis,
+        counts,
+        settings,
+        recentlyUsed ->
         EmojiPickerUiState(
             keyword = word,
             account = ac,
@@ -229,7 +223,9 @@ data class EmojiPickerUiState(
             } + EmojiListItemType.Header(StringSource.invoke(R.string.other)) + otherEmojis.map {
                 EmojiListItemType.EmojiItem(it)
             } + categories.map { category ->
-                listOf(EmojiListItemType.Header(StringSource.invoke(category))) + getCategoryBy(category).map {
+                listOf(EmojiListItemType.Header(StringSource.invoke(category))) + getCategoryBy(
+                    category
+                ).map {
                     EmojiListItemType.EmojiItem(it)
                 }
             }.flatten()
@@ -269,9 +265,11 @@ sealed interface EmojiType {
             is CustomEmoji -> {
                 emoji == (other as? CustomEmoji)?.emoji
             }
+
             is Legacy -> {
                 type == (other as? Legacy)?.type
             }
+
             is UtfEmoji -> {
                 code == (other as? UtfEmoji)?.code
             }
@@ -288,9 +286,11 @@ fun EmojiType.toTextReaction(): String {
         is EmojiType.CustomEmoji -> {
             ":${type.emoji.name}:"
         }
+
         is EmojiType.Legacy -> {
             type.type
         }
+
         is EmojiType.UtfEmoji -> {
             type.code
         }
@@ -326,13 +326,3 @@ fun EmojiType.Companion.from(emojis: List<CustomEmoji>?, reaction: String): Emoj
     }
 }
 
-private data class Reactions(
-    val userSettings: List<UserEmojiConfig>,
-    val reactionHistoryCounts: List<ReactionHistoryCount>,
-)
-
-private data class BaseInfo(
-    val account: Account?,
-    val emojis: List<CustomEmoji>,
-
-    )
