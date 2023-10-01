@@ -4,7 +4,7 @@ import kotlinx.coroutines.flow.Flow
 
 interface CustomEmojiRepository {
 
-    suspend fun findBy(host: String, withAliases: Boolean = false): Result<List<CustomEmoji>>
+    suspend fun findBy(host: String): Result<List<CustomEmoji>>
 
     suspend fun sync(host: String): Result<Unit>
 

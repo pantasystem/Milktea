@@ -9,9 +9,9 @@ import kotlinx.coroutines.withContext
 import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.common_android.hilt.DefaultDispatcher
 import net.pantasystem.milktea.common_android.hilt.IODispatcher
+import net.pantasystem.milktea.model.emoji.CustomEmoji
 import net.pantasystem.milktea.model.emoji.CustomEmojiAspectRatioDataSource
 import net.pantasystem.milktea.model.emoji.CustomEmojiRepository
-import net.pantasystem.milktea.model.emoji.CustomEmoji
 import net.pantasystem.milktea.model.emoji.EmojiWithAlias
 import net.pantasystem.milktea.model.image.ImageCacheRepository
 import net.pantasystem.milktea.model.nodeinfo.NodeInfo
@@ -29,7 +29,7 @@ internal class CustomEmojiRepositoryImpl @Inject constructor(
     @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher
 ) : CustomEmojiRepository {
 
-    override suspend fun findBy(host: String, withAliases: Boolean): Result<List<CustomEmoji>> = runCancellableCatching {
+    override suspend fun findBy(host: String): Result<List<CustomEmoji>> = runCancellableCatching {
         withContext(ioDispatcher) {
             val emojisInMemory = customEmojiCache.get(host)
             if (emojisInMemory != null) {
@@ -81,12 +81,8 @@ internal class CustomEmojiRepositoryImpl @Inject constructor(
                 )
             }
 
-            // NOTE: aliasの含む絵文字はメモリ上にキャッシュしない
-            if (!withAliases) {
-                customEmojiCache.put(host, converted)
-            }
+            customEmojiCache.put(host, converted)
             converted
-
         }
     }
 
