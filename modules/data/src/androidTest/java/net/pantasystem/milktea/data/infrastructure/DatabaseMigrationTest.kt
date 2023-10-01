@@ -279,4 +279,11 @@ class DatabaseMigrationTest {
         helper.createDatabase(testDb, 51)
         helper.runMigrationsAndValidate(testDb, 52, true, MIGRATION_51_52)
     }
+
+    @Test
+    fun migrate51To54() {
+        helper.createDatabase(testDb, 51)
+        helper.runMigrationsAndValidate(testDb, 54, true, MIGRATION_51_52)
+    }
+
 }
