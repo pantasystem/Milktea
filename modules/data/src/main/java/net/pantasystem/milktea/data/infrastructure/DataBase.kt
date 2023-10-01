@@ -15,6 +15,8 @@ import net.pantasystem.milktea.data.infrastructure.account.page.db.TimelinePageT
 import net.pantasystem.milktea.data.infrastructure.core.*
 import net.pantasystem.milktea.data.infrastructure.drive.DriveFileRecord
 import net.pantasystem.milktea.data.infrastructure.drive.DriveFileRecordDao
+import net.pantasystem.milktea.data.infrastructure.emoji.CustomEmojiAliasRecord
+import net.pantasystem.milktea.data.infrastructure.emoji.CustomEmojiRecord
 import net.pantasystem.milktea.data.infrastructure.filter.db.MastodonFilterDao
 import net.pantasystem.milktea.data.infrastructure.filter.db.MastodonWordFilterRecord
 import net.pantasystem.milktea.data.infrastructure.group.GroupDao
@@ -109,8 +111,11 @@ import net.pantasystem.milktea.data.infrastructure.user.renote.mute.db.RenoteMut
         FedibirdCapabilitiesRecord::class,
 
         PleromaMetadataFeatures::class,
+
+        CustomEmojiRecord::class,
+        CustomEmojiAliasRecord::class,
     ],
-    version = 53,
+    version = 54,
     exportSchema = true,
     autoMigrations = [
         AutoMigration(from = 11, to = 12),
@@ -154,6 +159,7 @@ import net.pantasystem.milktea.data.infrastructure.user.renote.mute.db.RenoteMut
         AutoMigration(from = 49, to = 50),
         AutoMigration(from = 50, to = 51),
         AutoMigration(from = 52, to = 53),
+        AutoMigration(from = 53, to = 54),
     ],
     views = [UserView::class, GroupMemberView::class, UserListMemberView::class]
 )
