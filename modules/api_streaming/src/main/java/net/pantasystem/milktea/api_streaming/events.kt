@@ -5,13 +5,13 @@ import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import net.pantasystem.milktea.api.misskey.drive.FilePropertyDTO
+import net.pantasystem.milktea.api.misskey.emoji.CustomEmojiNetworkDTO
 import net.pantasystem.milktea.api.misskey.messaging.MessageDTO
 import net.pantasystem.milktea.api.misskey.notes.NoteDTO
 import net.pantasystem.milktea.api.misskey.notification.NotificationDTO
 import net.pantasystem.milktea.api.misskey.users.UserDTO
 import net.pantasystem.milktea.api.misskey.v12.antenna.AntennaDTO
 import net.pantasystem.milktea.common.serializations.DateSerializer
-import net.pantasystem.milktea.model.emoji.Emoji
 import java.util.*
 
 
@@ -298,7 +298,7 @@ data class NoteUpdated(
                 val userId: String,
 
                 @SerialName("emoji")
-                val emoji: Emoji? = null
+                val emoji: CustomEmojiNetworkDTO? = null
             )
         }
 
@@ -374,7 +374,7 @@ data class EmojiAdded(
     @Serializable
     data class Body(
         @SerialName("emoji")
-        val emoji: Emoji
+        val emoji: CustomEmojiNetworkDTO
     )
 }
 
@@ -387,7 +387,7 @@ data class EmojiDeleted(
     @Serializable
     data class Body(
         @SerialName("emojis")
-        val emojis: List<Emoji>,
+        val emojis: List<CustomEmojiNetworkDTO>,
     )
 }
 
@@ -401,6 +401,6 @@ data class EmojiUpdated(
     @Serializable
     data class Body(
         @SerialName("emojis")
-        val emojis: List<Emoji>,
+        val emojis: List<CustomEmojiNetworkDTO>,
     )
 }

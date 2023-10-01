@@ -64,9 +64,7 @@ class CustomEmojiCompleteAdapter(
             val text = constraint?.toString()
             val suggestions = if(text != null){
                 emojis.filter{
-                    it.name.startsWith(text.replace(":", "")) || it.aliases?.any { alias ->
-                        alias.startsWith(text.replace(":", ""))
-                    }?: false
+                    it.name.startsWith(text.replace(":", ""))
                 }.map {
                     ":${it.name}:"
                 }

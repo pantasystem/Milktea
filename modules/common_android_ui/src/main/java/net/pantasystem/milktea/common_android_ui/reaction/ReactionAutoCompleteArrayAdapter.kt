@@ -55,9 +55,7 @@ class ReactionAutoCompleteArrayAdapter(
             val text = constraint?.toString()
             if(text != null){
                 suggestions = reactions.filter{
-                    it.name.startsWith(text.replace(":", "")) || it.aliases?.any { alias ->
-                        alias.startsWith(text.replace(":", ""))
-                    }?: false
+                    it.name.startsWith(text.replace(":", ""))
                 }.map {
                     ":${it.name}:"
                 }

@@ -50,7 +50,7 @@ fun Note.onReacted(
         list = list + ReactionCount(reaction = e.body.reaction, count = 1, me = false)
     }
 
-    val emojis = when (val emoji = e.body.emoji?.copy(
+    val emojis = when (val emoji = e.body.emoji?.toModel(
         aspectRatio = aspectRatio?.aspectRatio,
         cachePath = imageCache?.cachePath
     )) {

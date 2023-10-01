@@ -58,7 +58,7 @@ class EmojiEventHandlerImpl @Inject constructor(
                             requireNotNull(currentAccount?.getHost()),
                             e.body.emojis.map {
                                 EmojiWithAlias(
-                                    emoji = it,
+                                    emoji = it.toModel(),
                                     aliases = it.aliases ?: emptyList()
                                 )
                             }
@@ -74,7 +74,9 @@ class EmojiEventHandlerImpl @Inject constructor(
                     coroutineScope.launch {
                         customEmojiRepository.deleteEmojis(
                             requireNotNull(currentAccount?.getHost()),
-                            e.body.emojis
+                            e.body.emojis.map {
+                                it.toModel()
+                            }
                         ).onFailure {
                             logger.error("deleteEmojis failed", it)
                         }
