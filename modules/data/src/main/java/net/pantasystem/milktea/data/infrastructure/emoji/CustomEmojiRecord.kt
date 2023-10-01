@@ -2,11 +2,17 @@ package net.pantasystem.milktea.data.infrastructure.emoji
 
 import androidx.room.Entity
 import androidx.room.ForeignKey
+import androidx.room.Index
 import androidx.room.PrimaryKey
 import net.pantasystem.milktea.model.emoji.Emoji
 
 @Entity(
-    tableName = "custom_emojis"
+    tableName = "custom_emojis",
+    indices = [
+        Index(value = ["emojiHost", "name"]),
+        Index(value = ["emojiHost"]),
+        Index(value = ["name"])
+    ]
 )
 data class CustomEmojiRecord(
     val name: String,
@@ -59,6 +65,9 @@ data class CustomEmojiRecord(
             childColumns = ["emojiId"],
             onDelete = ForeignKey.CASCADE
         )
+    ],
+    indices = [
+        Index(value = ["emojiId"]),
     ],
     primaryKeys = ["name", "emojiId"],
 )

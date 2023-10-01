@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 54,
-    "identityHash": "5407340b183247391d86db1e78c48ec0",
+    "identityHash": "38acced0ecc597053a7967cce77dbe32",
     "entities": [
       {
         "tableName": "connection_information",
@@ -3530,7 +3530,36 @@
             "id"
           ]
         },
-        "indices": [],
+        "indices": [
+          {
+            "name": "index_custom_emojis_emojiHost_name",
+            "unique": false,
+            "columnNames": [
+              "emojiHost",
+              "name"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_custom_emojis_emojiHost_name` ON `${TABLE_NAME}` (`emojiHost`, `name`)"
+          },
+          {
+            "name": "index_custom_emojis_emojiHost",
+            "unique": false,
+            "columnNames": [
+              "emojiHost"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_custom_emojis_emojiHost` ON `${TABLE_NAME}` (`emojiHost`)"
+          },
+          {
+            "name": "index_custom_emojis_name",
+            "unique": false,
+            "columnNames": [
+              "name"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_custom_emojis_name` ON `${TABLE_NAME}` (`name`)"
+          }
+        ],
         "foreignKeys": []
       },
       {
@@ -3557,7 +3586,17 @@
             "emojiId"
           ]
         },
-        "indices": [],
+        "indices": [
+          {
+            "name": "index_custom_emoji_aliases_emojiId",
+            "unique": false,
+            "columnNames": [
+              "emojiId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_custom_emoji_aliases_emojiId` ON `${TABLE_NAME}` (`emojiId`)"
+          }
+        ],
         "foreignKeys": [
           {
             "table": "custom_emojis",
@@ -3589,7 +3628,7 @@
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '5407340b183247391d86db1e78c48ec0')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '38acced0ecc597053a7967cce77dbe32')"
     ]
   }
 }
