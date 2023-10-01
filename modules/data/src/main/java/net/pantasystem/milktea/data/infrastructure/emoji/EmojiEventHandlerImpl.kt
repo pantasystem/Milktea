@@ -13,6 +13,7 @@ import net.pantasystem.milktea.data.streaming.SocketWithAccountProvider
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.emoji.CustomEmojiRepository
 import net.pantasystem.milktea.model.emoji.EmojiEventHandler
+import net.pantasystem.milktea.model.emoji.EmojiWithAlias
 import net.pantasystem.milktea.model.instance.SyncMetaExecutor
 import javax.inject.Inject
 
@@ -55,7 +56,12 @@ class EmojiEventHandlerImpl @Inject constructor(
                     coroutineScope.launch {
                         customEmojiRepository.addEmojis(
                             requireNotNull(currentAccount?.getHost()),
-                            e.body.emojis
+                            e.body.emojis.map {
+                                EmojiWithAlias(
+                                    emoji = it,
+                                    aliases = it.aliases ?: emptyList()
+                                )
+                            }
                         ).onFailure {
                             logger.error("addEmojis failed", it)
                         }

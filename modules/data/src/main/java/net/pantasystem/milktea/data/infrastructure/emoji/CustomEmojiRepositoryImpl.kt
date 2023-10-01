@@ -45,13 +45,21 @@ internal class CustomEmojiRepositoryImpl @Inject constructor(
                     CustomEmojiRecord.from(it.emoji, nodeInfo.host)
                 }
 
-                emojisBeforeInsert.chunked(500).map { chunkedEmojis ->
+                val inserted = emojisBeforeInsert.chunked(500).map { chunkedEmojis ->
                     val ids = customEmojiDAO.insertAll(chunkedEmojis)
                     chunkedEmojis.mapIndexed { index, customEmojiRecord ->
                         customEmojiRecord.copy(id = ids[index])
                     }
                 }.flatten()
-                // TODO: aliasの同期
+                insertAliases(
+                    inserted.map {
+                        it.id
+                    },
+                    remoteEmojis.map {
+                        it.aliases ?: emptyList()
+                    }
+                )
+                inserted
             }
 
 
@@ -131,13 +139,15 @@ internal class CustomEmojiRepositoryImpl @Inject constructor(
             customEmojiCache.put(host, emojis)
             customEmojiDAO.deleteByHost(nodeInfo.host)
 
-            remoteEmojis.map {
+            val ids = remoteEmojis.map {
                 CustomEmojiRecord.from(it.emoji, nodeInfo.host)
             }.chunked(500).map { chunkedEmojis ->
                 customEmojiDAO.insertAll(chunkedEmojis)
             }.flatten()
 
-            // TODO: aliasの同期
+            insertAliases(ids, remoteEmojis.map {
+                it.aliases ?: emptyList()
+            })
         }
     }
 
@@ -159,13 +169,16 @@ internal class CustomEmojiRepositoryImpl @Inject constructor(
         return customEmojiCache.get(host)
     }
 
-    override suspend fun addEmojis(host: String, emojis: List<Emoji>): Result<Unit> = runCancellableCatching {
+    override suspend fun addEmojis(host: String, emojis: List<EmojiWithAlias>): Result<Unit> = runCancellableCatching {
         withContext(ioDispatcher) {
-            customEmojiDAO.insertAll(
+            val ids = customEmojiDAO.insertAll(
                 emojis.map {
-                    CustomEmojiRecord.from(it, host)
+                    CustomEmojiRecord.from(it.emoji, host)
                 }
             )
+            insertAliases(ids, emojis.map {
+                it.aliases ?: emptyList()
+            })
             // NOTE: inMemキャッシュなどを更新したい
             findBy(host).getOrThrow()
         }
@@ -209,6 +222,23 @@ internal class CustomEmojiRepositoryImpl @Inject constructor(
                 fileCaches[it.url ?: it.uri]?.cachePath,
             )
         }
+    }
+
+    private suspend fun insertAliases(emojiIds: List<Long>, aliases: List<List<String>>) {
+        assert(emojiIds.size == aliases.size) {
+            "emojis.size != aliases.size"
+        }
+        emojiIds.asSequence().mapIndexed { index, l ->
+            aliases[index].map {
+                CustomEmojiAliasRecord(
+                    name = it,
+                    emojiId = l
+                )
+            }
+        }.flatten().chunked(500).toList().map { chunkedAliases ->
+            customEmojiDAO.insertAliases(chunkedAliases)
+        }.flatten().toList()
+
     }
 }
 

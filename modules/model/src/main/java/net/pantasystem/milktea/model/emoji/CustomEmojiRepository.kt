@@ -13,7 +13,7 @@ interface CustomEmojiRepository {
      */
     suspend fun findByName(host: String, name: String): Result<List<Emoji>>
 
-    suspend fun addEmojis(host: String, emojis: List<Emoji>): Result<Unit>
+    suspend fun addEmojis(host: String, emojis: List<EmojiWithAlias>): Result<Unit>
 
     suspend fun deleteEmojis(host: String, emojis: List<Emoji>): Result<Unit>
 
