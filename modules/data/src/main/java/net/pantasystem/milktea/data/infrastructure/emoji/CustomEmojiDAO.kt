@@ -41,7 +41,10 @@ interface CustomEmojiDAO {
     @Query("""
         SELECT * FROM custom_emojis 
             WHERE emojiHost = :host AND name LIKE '%' || :keyword || '%'
-            AND id IN (SELECT emojiId FROM custom_emoji_aliases WHERE name LIKE '%' || :keyword || '%')
+            OR EXISTS(
+                SELECT 1 FROM custom_emoji_aliases WHERE emojiHost = :host AND name LIKE '%' || :keyword || '%'
+                    AND custom_emoji_aliases.emojiId = custom_emojis.id
+            )
     """)
     fun search(host: String, keyword: String): Flow<List<CustomEmojiRecord>>
 
