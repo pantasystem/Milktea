@@ -23,3 +23,8 @@ data class Emoji(
         return cachePath ?: url ?: uri
     }
 }
+
+data class EmojiWithAlias(
+    val emoji: Emoji,
+    val aliases: List<String>?,
+)

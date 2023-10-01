@@ -16,6 +16,7 @@ import net.pantasystem.milktea.data.infrastructure.core.*
 import net.pantasystem.milktea.data.infrastructure.drive.DriveFileRecord
 import net.pantasystem.milktea.data.infrastructure.drive.DriveFileRecordDao
 import net.pantasystem.milktea.data.infrastructure.emoji.CustomEmojiAliasRecord
+import net.pantasystem.milktea.data.infrastructure.emoji.CustomEmojiDAO
 import net.pantasystem.milktea.data.infrastructure.emoji.CustomEmojiRecord
 import net.pantasystem.milktea.data.infrastructure.filter.db.MastodonFilterDao
 import net.pantasystem.milktea.data.infrastructure.filter.db.MastodonWordFilterRecord
@@ -223,4 +224,6 @@ abstract class DataBase : RoomDatabase() {
     abstract fun mastodonFilterDao(): MastodonFilterDao
 
     abstract fun renoteMuteDao(): RenoteMuteDao
+
+    abstract fun customEmojiDao(): CustomEmojiDAO
 }
