@@ -59,9 +59,10 @@ data class CustomEmojiRecord(
             childColumns = ["emojiId"],
             onDelete = ForeignKey.CASCADE
         )
-    ]
+    ],
+    primaryKeys = ["name", "emojiId"],
 )
 data class CustomEmojiAliasRecord(
     val name: String,
-    @PrimaryKey val emojiId: Long,
+    val emojiId: Long,
 )

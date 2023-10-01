@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 54,
-    "identityHash": "0f3e4df168e6eac82f9405534989e997",
+    "identityHash": "5407340b183247391d86db1e78c48ec0",
     "entities": [
       {
         "tableName": "connection_information",
@@ -3535,7 +3535,7 @@
       },
       {
         "tableName": "custom_emoji_aliases",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`name` TEXT NOT NULL, `emojiId` INTEGER NOT NULL, PRIMARY KEY(`emojiId`), FOREIGN KEY(`emojiId`) REFERENCES `custom_emojis`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`name` TEXT NOT NULL, `emojiId` INTEGER NOT NULL, PRIMARY KEY(`name`, `emojiId`), FOREIGN KEY(`emojiId`) REFERENCES `custom_emojis`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
         "fields": [
           {
             "fieldPath": "name",
@@ -3553,6 +3553,7 @@
         "primaryKey": {
           "autoGenerate": false,
           "columnNames": [
+            "name",
             "emojiId"
           ]
         },
@@ -3588,7 +3589,7 @@
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '0f3e4df168e6eac82f9405534989e997')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '5407340b183247391d86db1e78c48ec0')"
     ]
   }
 }

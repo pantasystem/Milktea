@@ -30,7 +30,9 @@ interface CustomEmojiDAO {
     suspend fun deleteByHostAndNames(host: String, names: List<String>)
 
 
-    @Insert
+    @Insert(
+        onConflict = OnConflictStrategy.REPLACE,
+    )
     suspend fun insertAliases(aliases: List<CustomEmojiAliasRecord>): List<Long>
 
     @Query("SELECT * FROM custom_emojis WHERE emojiHost = :host")
