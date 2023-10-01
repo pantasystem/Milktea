@@ -13,7 +13,7 @@ import net.pantasystem.milktea.common.asLoadingStateFlow
 import net.pantasystem.milktea.common.initialState
 import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.emoji.CustomEmojiRepository
-import net.pantasystem.milktea.model.emoji.Emoji
+import net.pantasystem.milktea.model.emoji.CustomEmoji
 import net.pantasystem.milktea.model.note.Note
 import net.pantasystem.milktea.model.note.NoteRepository
 import net.pantasystem.milktea.model.note.reaction.Reaction
@@ -44,7 +44,7 @@ class RemoteReactionEmojiSuggestionViewModel @Inject constructor(
         val name = remoteReaction?.reaction?.getName()
         if (name == null) {
             flow {
-                emit(ResultState.Fixed<List<Emoji>>(StateContent.NotExist()))
+                emit(ResultState.Fixed<List<CustomEmoji>>(StateContent.NotExist()))
             }
         } else {
             suspend {

@@ -21,7 +21,7 @@ import androidx.compose.ui.unit.sp
 import coil.compose.rememberAsyncImagePainter
 import net.pantasystem.milktea.model.emoji.CustomEmojiParsedResult
 import net.pantasystem.milktea.model.emoji.CustomEmojiParser
-import net.pantasystem.milktea.model.emoji.Emoji
+import net.pantasystem.milktea.model.emoji.CustomEmoji
 import net.pantasystem.milktea.model.emoji.EmojiResolvedType
 import net.pantasystem.milktea.model.instance.HostWithVersion
 
@@ -31,7 +31,7 @@ import net.pantasystem.milktea.model.instance.HostWithVersion
 fun CustomEmojiText(
     modifier: Modifier = Modifier,
     text: String,
-    emojis: List<Emoji>,
+    emojis: List<CustomEmoji>,
     accountHost: String? = null,
     sourceHost: String? = null,
     parsedResult: CustomEmojiParsedResult? = null,

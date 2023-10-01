@@ -3,7 +3,7 @@ package net.pantasystem.milktea.model.emoji
 object CustomEmojiParser {
 
 
-    fun parse(sourceHost: String?, emojis: List<Emoji>?, text: String, instanceEmojis: Map<String, Emoji>? = null): CustomEmojiParsedResult {
+    fun parse(sourceHost: String?, emojis: List<CustomEmoji>?, text: String, instanceEmojis: Map<String, CustomEmoji>? = null): CustomEmojiParsedResult {
         val emojiMap = emojis?.associateBy {
             it.name
         }
@@ -65,7 +65,7 @@ data class CustomEmojiParsedResult(
 )
 
 sealed interface EmojiResolvedType {
-    data class Resolved(val emoji: Emoji, val sourceHost: String) : EmojiResolvedType {
+    data class Resolved(val emoji: CustomEmoji, val sourceHost: String) : EmojiResolvedType {
         override val tag: String = emoji.name
     }
     data class UnResolved(override val tag: String, val sourceHost: String) : EmojiResolvedType

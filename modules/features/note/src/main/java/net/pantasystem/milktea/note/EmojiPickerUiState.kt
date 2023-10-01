@@ -11,7 +11,7 @@ import net.pantasystem.milktea.common.text.LevenshteinDistance
 import net.pantasystem.milktea.common_android.resource.StringSource
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.emoji.CustomEmojiRepository
-import net.pantasystem.milktea.model.emoji.Emoji
+import net.pantasystem.milktea.model.emoji.CustomEmoji
 import net.pantasystem.milktea.model.emoji.UserEmojiConfig
 import net.pantasystem.milktea.model.emoji.UserEmojiConfigRepository
 import net.pantasystem.milktea.model.note.reaction.LegacyReaction
@@ -150,8 +150,8 @@ class EmojiPickerUiStateService(
 data class EmojiPickerUiState(
     val keyword: String,
     val account: Account?,
-    val customEmojis: List<Emoji>,
-    val filteredEmojis: List<Emoji>,
+    val customEmojis: List<CustomEmoji>,
+    val filteredEmojis: List<CustomEmoji>,
     val reactionHistoryCounts: List<ReactionHistoryCount>,
     val userSettingReactions: List<UserEmojiConfig>,
     val recentlyUsedReactions: List<ReactionHistory>,
@@ -254,7 +254,7 @@ sealed interface EmojiListItemType {
 
 sealed interface EmojiType {
     data class Legacy(val type: String) : EmojiType
-    data class CustomEmoji(val emoji: Emoji) : EmojiType
+    data class CustomEmoji(val emoji: net.pantasystem.milktea.model.emoji.CustomEmoji) : EmojiType
     data class UtfEmoji(val code: String) : EmojiType
     companion object
 
@@ -298,7 +298,7 @@ fun EmojiType.toTextReaction(): String {
 }
 
 
-fun EmojiType.Companion.from(emojis: List<Emoji>?, reaction: String): EmojiType? {
+fun EmojiType.Companion.from(emojis: List<CustomEmoji>?, reaction: String): EmojiType? {
     return if (reaction.codePointCount(0, reaction.length) == 1) {
         EmojiType.UtfEmoji(reaction)
     } else if (reaction.startsWith(":") && reaction.endsWith(":") && reaction.contains(
@@ -333,6 +333,6 @@ private data class Reactions(
 
 private data class BaseInfo(
     val account: Account?,
-    val emojis: List<Emoji>,
+    val emojis: List<CustomEmoji>,
 
-)
+    )

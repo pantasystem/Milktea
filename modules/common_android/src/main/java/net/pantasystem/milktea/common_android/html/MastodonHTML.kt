@@ -4,7 +4,7 @@ import android.text.Spanned
 import androidx.core.text.parseAsHtml
 import net.pantasystem.milktea.model.emoji.CustomEmojiParsedResult
 import net.pantasystem.milktea.model.emoji.CustomEmojiParser
-import net.pantasystem.milktea.model.emoji.Emoji
+import net.pantasystem.milktea.model.emoji.CustomEmoji
 
 data class MastodonHTML(
     val spanned: Spanned,
@@ -15,7 +15,7 @@ data class MastodonHTML(
 object MastodonHTMLParser {
     fun parse(
         text: String,
-        emojis: List<Emoji>? = emptyList(),
+        emojis: List<CustomEmoji>? = emptyList(),
         userHost: String? = null,
         accountHost: String? = null
     ): MastodonHTML {

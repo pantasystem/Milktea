@@ -1,6 +1,6 @@
 package net.pantasystem.milktea.note.reaction
 
-import net.pantasystem.milktea.model.emoji.Emoji
+import net.pantasystem.milktea.model.emoji.CustomEmoji
 import net.pantasystem.milktea.model.note.Note
 import net.pantasystem.milktea.model.note.reaction.LegacyReaction
 import net.pantasystem.milktea.model.note.reaction.Reaction
@@ -11,13 +11,13 @@ data class ReactionViewData(
     val reaction: String,
     val reactionCount: ReactionCount,
     val isMyReaction: Boolean,
-    val emoji: Emoji?
+    val emoji: CustomEmoji?
 ) {
     companion object {
         fun from(
             reactions: List<ReactionCount>,
             note: Note,
-            instanceEmojis: Map<String, Emoji>?,
+            instanceEmojis: Map<String, CustomEmoji>?,
         ): List<ReactionViewData> {
             val noteEmojis = note.emojiNameMap
             return reactions.map { reactionCount ->

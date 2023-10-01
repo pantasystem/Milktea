@@ -20,7 +20,7 @@ class CustomEmojiAspectRatioStore @Inject constructor(
         loggerFactory.create("CEARStore")
     }
 
-    private val saveEvents = MutableSharedFlow<Pair<Emoji, Float>>(
+    private val saveEvents = MutableSharedFlow<Pair<CustomEmoji, Float>>(
         extraBufferCapacity = 200,
         onBufferOverflow = BufferOverflow.DROP_LATEST
     )
@@ -31,7 +31,7 @@ class CustomEmojiAspectRatioStore @Inject constructor(
         }.launchIn(coroutineScope)
     }
 
-    fun save(emoji: Emoji, aspectRatio: Float) {
+    fun save(emoji: CustomEmoji, aspectRatio: Float) {
         val url = (emoji.url ?: emoji.uri)
         if (aspectRatio <= 0f || url == null) {
             logger.debug {
@@ -42,7 +42,7 @@ class CustomEmojiAspectRatioStore @Inject constructor(
         saveEvents.tryEmit(emoji to aspectRatio)
     }
 
-    private suspend fun doSave(emoji: Emoji, aspectRatio: Float) {
+    private suspend fun doSave(emoji: CustomEmoji, aspectRatio: Float) {
         val url = (emoji.url ?: emoji.uri)
         if (aspectRatio <= 0f || url == null) {
             logger.debug {

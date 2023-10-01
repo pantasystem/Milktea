@@ -45,7 +45,7 @@ import net.pantasystem.milktea.common_navigation.*
 import net.pantasystem.milktea.model.channel.Channel
 import net.pantasystem.milktea.model.drive.FileProperty
 import net.pantasystem.milktea.model.emoji.CustomEmojiRepository
-import net.pantasystem.milktea.model.emoji.Emoji
+import net.pantasystem.milktea.model.emoji.CustomEmoji
 import net.pantasystem.milktea.model.instance.FeatureType
 import net.pantasystem.milktea.model.note.Note
 import net.pantasystem.milktea.model.setting.LocalConfigRepository
@@ -565,7 +565,7 @@ class NoteEditorFragment : Fragment(R.layout.fragment_note_editor), EmojiSelecti
     }
 
 
-    override fun onSelect(emoji: Emoji) {
+    override fun onSelect(emoji: CustomEmoji) {
         when (noteEditorViewModel.focusType) {
             NoteEditorFocusEditTextType.Cw -> {
                 val pos = binding.cw.selectionEnd

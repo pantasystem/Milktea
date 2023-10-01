@@ -42,7 +42,7 @@ import net.pantasystem.milktea.common_android.ui.text.DrawableEmojiSpan
 import net.pantasystem.milktea.common_android.ui.text.EmojiAdapter
 import net.pantasystem.milktea.common_navigation.SearchNavType
 import net.pantasystem.milktea.common_navigation.UserDetailNavigationArgs
-import net.pantasystem.milktea.model.emoji.Emoji
+import net.pantasystem.milktea.model.emoji.CustomEmoji
 import java.lang.ref.WeakReference
 import kotlin.math.max
 
@@ -376,13 +376,13 @@ class LazyDecorateSkipElementsHolder {
 }
 
 class SkipEmojiHolder {
-    private var skipEmojis = mutableSetOf<Emoji>()
-    fun add(emoji: Emoji): SkipEmojiHolder {
+    private var skipEmojis = mutableSetOf<CustomEmoji>()
+    fun add(emoji: CustomEmoji): SkipEmojiHolder {
         skipEmojis.add(emoji)
         return this
     }
 
-    fun contains(emoji: Emoji): Boolean {
+    fun contains(emoji: CustomEmoji): Boolean {
         return skipEmojis.contains(emoji)
     }
 }

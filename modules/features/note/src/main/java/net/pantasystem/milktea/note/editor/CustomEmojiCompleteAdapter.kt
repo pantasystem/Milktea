@@ -9,11 +9,11 @@ import android.widget.Filter
 import android.widget.Filterable
 import androidx.databinding.DataBindingUtil
 import net.pantasystem.milktea.common_android_ui.databinding.ItemReactionPreviewBinding
-import net.pantasystem.milktea.model.emoji.Emoji
+import net.pantasystem.milktea.model.emoji.CustomEmoji
 import net.pantasystem.milktea.note.R
 
 class CustomEmojiCompleteAdapter(
-    private val emojis: List<Emoji>,
+    private val emojis: List<CustomEmoji>,
     private val context: Context
 ) : BaseAdapter(), Filterable {
 

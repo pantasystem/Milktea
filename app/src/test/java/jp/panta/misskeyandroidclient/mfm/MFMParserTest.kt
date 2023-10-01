@@ -2,7 +2,7 @@ package jp.panta.misskeyandroidclient.mfm
 
 import net.pantasystem.milktea.common_android.mfm.ElementType
 import net.pantasystem.milktea.common_android.mfm.MFMParser
-import net.pantasystem.milktea.model.emoji.Emoji
+import net.pantasystem.milktea.model.emoji.CustomEmoji
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 
@@ -154,7 +154,7 @@ class MFMParserTest{
     @Test
     fun emojiTest(){
         val emojis = listOf(
-            Emoji(
+            CustomEmoji(
                 null,
                 "kawaii",
                 null,
@@ -163,7 +163,7 @@ class MFMParserTest{
                 null,
                 null
             ),
-            Emoji(
+            CustomEmoji(
                 null,
                 "ai",
                 null,
@@ -172,7 +172,7 @@ class MFMParserTest{
                 null,
                 null
             ),
-            Emoji(
+            CustomEmoji(
                 null,
                 "misskey",
                 null,
@@ -233,19 +233,19 @@ class MFMParserTest{
             <small>まあ、:_ni::_ri::_ra::_mi::_bu:では連合から入ってにゃいっぽいのでGTLにも流れてこにゃいけどne！</small>
         """.trimIndent()
         val result = MFMParser.parse(text = text, emojis = listOf(
-            Emoji(
+            CustomEmoji(
                 "_ni"
             ),
-            Emoji(
+            CustomEmoji(
                 "_ri"
             ),
-            Emoji(
+            CustomEmoji(
                 "_ra"
             ),
-            Emoji(
+            CustomEmoji(
                 "_mi"
             ),
-            Emoji(
+            CustomEmoji(
                 "_bu"
             )
 

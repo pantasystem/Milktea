@@ -1,9 +1,10 @@
 package net.pantasystem.milktea.data.infrastructure.note
 
+import net.pantasystem.milktea.api.misskey.emoji.CustomEmojiNetworkDTO
 import net.pantasystem.milktea.api_streaming.NoteUpdated
 import net.pantasystem.milktea.api_streaming.mastodon.EmojiReaction
 import net.pantasystem.milktea.model.account.Account
-import net.pantasystem.milktea.model.emoji.Emoji
+import net.pantasystem.milktea.model.emoji.CustomEmoji
 import net.pantasystem.milktea.model.note.Note
 import net.pantasystem.milktea.model.note.make
 import net.pantasystem.milktea.model.note.reaction.ReactionCount
@@ -217,7 +218,7 @@ class NoteEventReducerKtTest {
                 body = NoteUpdated.Body.Reacted.Body(
                     reaction = ":kawaii:",
                     userId = account.remoteId,
-                    emoji = Emoji(
+                    emoji = CustomEmojiNetworkDTO(
                         name = ":kawaii:"
                     )
                 )
@@ -227,7 +228,7 @@ class NoteEventReducerKtTest {
         )
         Assertions.assertEquals(
             listOf(
-                Emoji(
+                CustomEmoji(
                     name = ":kawaii:"
                 )
             ), result.emojis

@@ -1,7 +1,7 @@
 package net.pantasystem.milktea.api.misskey.emoji
 
 import kotlinx.serialization.SerialName
-import net.pantasystem.milktea.model.emoji.Emoji
+import net.pantasystem.milktea.model.emoji.CustomEmoji
 import net.pantasystem.milktea.model.emoji.EmojiWithAlias
 
 @kotlinx.serialization.Serializable
@@ -18,7 +18,7 @@ data class CustomEmojiNetworkDTO(
     @SerialName("height") val height: Int? = null,
 ) {
     fun toModelWithAlias(aspectRatio: Float? = null, cachePath: String? = null): EmojiWithAlias {
-        val emoji = Emoji(
+        val emoji = CustomEmoji(
             id = id,
             name = name,
             host = host,
@@ -35,8 +35,8 @@ data class CustomEmojiNetworkDTO(
         )
     }
 
-    fun toModel(aspectRatio: Float? = null, cachePath: String? = null): Emoji {
-        return Emoji(
+    fun toModel(aspectRatio: Float? = null, cachePath: String? = null): CustomEmoji {
+        return CustomEmoji(
             id = id,
             name = name,
             host = host,

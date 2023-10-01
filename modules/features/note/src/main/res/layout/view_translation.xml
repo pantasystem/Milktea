@@ -6,13 +6,13 @@
                 type="net.pantasystem.milktea.common.ResultState&lt;net.pantasystem.milktea.model.note.Translation>" />
         <variable
                 name="emojis"
-                type="List&lt;net.pantasystem.milktea.model.emoji.Emoji>" />
+                type="List&lt;net.pantasystem.milktea.model.emoji.CustomEmoji>" />
         <import type="android.view.View" />
         <import type="net.pantasystem.milktea.common.ResultState" />
         <import type="net.pantasystem.milktea.model.note.Translation" />
         <import type="net.pantasystem.milktea.common.StateContent"/>
         <import type="java.util.List" />
-        <import type="net.pantasystem.milktea.model.emoji.Emoji" />
+        <import type="net.pantasystem.milktea.model.emoji.CustomEmoji" />
     </data>
     <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
             android:layout_width="match_parent"

@@ -3,7 +3,7 @@ package net.pantasystem.milktea.api_streaming.mastodon
 import kotlinx.serialization.SerialName
 import net.pantasystem.milktea.api.mastodon.notification.MstNotificationDTO
 import net.pantasystem.milktea.api.mastodon.status.TootStatusDTO
-import net.pantasystem.milktea.model.emoji.Emoji
+import net.pantasystem.milktea.model.emoji.CustomEmoji
 
 sealed interface Event {
 
@@ -53,12 +53,12 @@ data class EmojiReaction(
     }
 
 
-    fun toEmoji(cachePath: String? = null): Emoji? {
+    fun toEmoji(cachePath: String? = null): CustomEmoji? {
         if (!isCustomEmoji) {
             return null
         }
 
-        return Emoji(
+        return CustomEmoji(
             name = if (domain == null) {
                 "$name@."
             } else {

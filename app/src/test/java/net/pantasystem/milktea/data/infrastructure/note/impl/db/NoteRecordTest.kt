@@ -3,7 +3,7 @@ package net.pantasystem.milktea.data.infrastructure.note.impl.db
 import kotlinx.datetime.Clock
 import net.pantasystem.milktea.model.channel.Channel
 import net.pantasystem.milktea.model.drive.FileProperty
-import net.pantasystem.milktea.model.emoji.Emoji
+import net.pantasystem.milktea.model.emoji.CustomEmoji
 import net.pantasystem.milktea.model.note.Note
 import net.pantasystem.milktea.model.note.Visibility
 import net.pantasystem.milktea.model.note.make
@@ -43,9 +43,9 @@ internal class NoteRecordTest {
                 ReactionCount("angry", 6, me = true),
             ),
             emojis = listOf(
-                Emoji(name = "name1", url = "url1"),
-                Emoji(name = "name2", url = "url2"),
-                Emoji(name = "name3", url = "url3"),
+                CustomEmoji(name = "name1", url = "url1"),
+                CustomEmoji(name = "name2", url = "url2"),
+                CustomEmoji(name = "name3", url = "url3"),
             ),
             repliesCount = 10,
             fileIds = listOf(FileProperty.Id(0L, "fid1"), FileProperty.Id(0L, "fid2")),
@@ -391,8 +391,8 @@ internal class NoteRecordTest {
                 ReactionCount(reaction = "smile", count = 3, me = false)
             ),
             emojis = listOf(
-                Emoji(name = "smile", url = "https://example.com/emoji/smile.png"),
-                Emoji(name = "heart", url = "https://example.com/emoji/heart.png")
+                CustomEmoji(name = "smile", url = "https://example.com/emoji/smile.png"),
+                CustomEmoji(name = "heart", url = "https://example.com/emoji/heart.png")
             ),
             repliesCount = 2,
             fileIds = listOf(

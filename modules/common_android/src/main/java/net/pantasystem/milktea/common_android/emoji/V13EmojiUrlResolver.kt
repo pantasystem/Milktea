@@ -1,7 +1,7 @@
 package net.pantasystem.milktea.common_android.emoji
 
 import net.pantasystem.milktea.model.account.Account
-import net.pantasystem.milktea.model.emoji.Emoji
+import net.pantasystem.milktea.model.emoji.CustomEmoji
 import net.pantasystem.milktea.model.note.reaction.Reaction
 
 /**
@@ -27,7 +27,7 @@ object V13EmojiUrlResolver {
      * localで使用されているEmojiのURLの解決を想定している
      */
     fun resolve(
-        emoji: Emoji,
+        emoji: CustomEmoji,
         instanceDomain: String
     ): String {
         return "$instanceDomain/emoji/${emoji.name}.webp"

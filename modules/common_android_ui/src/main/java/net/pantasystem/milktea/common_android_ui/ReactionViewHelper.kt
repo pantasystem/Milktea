@@ -10,7 +10,7 @@ import androidx.databinding.BindingAdapter
 import dagger.hilt.android.EntryPointAccessors
 import net.pantasystem.milktea.common.glide.GlideApp
 import net.pantasystem.milktea.common_android.ui.VisibilityHelper.setMemoVisibility
-import net.pantasystem.milktea.model.emoji.Emoji
+import net.pantasystem.milktea.model.emoji.CustomEmoji
 import net.pantasystem.milktea.model.note.reaction.LegacyReaction
 
 object ReactionViewHelper {
@@ -38,7 +38,7 @@ object ReactionViewHelper {
     @BindingAdapter("emojis", "reaction")
     @JvmStatic
     fun ImageView.setCustomEmoji(
-        emojis: List<Emoji>?,
+        emojis: List<CustomEmoji>?,
         reaction: String?,
     ) {
         reaction ?: return

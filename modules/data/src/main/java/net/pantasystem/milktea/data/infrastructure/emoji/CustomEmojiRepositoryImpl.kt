@@ -11,7 +11,7 @@ import net.pantasystem.milktea.common_android.hilt.DefaultDispatcher
 import net.pantasystem.milktea.common_android.hilt.IODispatcher
 import net.pantasystem.milktea.model.emoji.CustomEmojiAspectRatioDataSource
 import net.pantasystem.milktea.model.emoji.CustomEmojiRepository
-import net.pantasystem.milktea.model.emoji.Emoji
+import net.pantasystem.milktea.model.emoji.CustomEmoji
 import net.pantasystem.milktea.model.emoji.EmojiWithAlias
 import net.pantasystem.milktea.model.image.ImageCacheRepository
 import net.pantasystem.milktea.model.nodeinfo.NodeInfo
@@ -29,7 +29,7 @@ internal class CustomEmojiRepositoryImpl @Inject constructor(
     @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher
 ) : CustomEmojiRepository {
 
-    override suspend fun findBy(host: String, withAliases: Boolean): Result<List<Emoji>> = runCancellableCatching {
+    override suspend fun findBy(host: String, withAliases: Boolean): Result<List<CustomEmoji>> = runCancellableCatching {
         withContext(ioDispatcher) {
             val emojisInMemory = customEmojiCache.get(host)
             if (emojisInMemory != null) {
@@ -90,7 +90,7 @@ internal class CustomEmojiRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun findByName(host: String, name: String): Result<List<Emoji>> = runCancellableCatching {
+    override suspend fun findByName(host: String, name: String): Result<List<CustomEmoji>> = runCancellableCatching {
         withContext(ioDispatcher) {
             val dtoList = customEmojiDAO.findByHostAndName(host, name)
             val aspects = aspectRatioDataSource.findIn(
@@ -151,7 +151,7 @@ internal class CustomEmojiRepositoryImpl @Inject constructor(
         }
     }
 
-    override fun observeBy(host: String, withAliases: Boolean): Flow<List<Emoji>> {
+    override fun observeBy(host: String, withAliases: Boolean): Flow<List<CustomEmoji>> {
         return customEmojiDAO.observeBy(host).map { list ->
             convertToModel(list)
         }.onEach {
@@ -165,7 +165,7 @@ internal class CustomEmojiRepositoryImpl @Inject constructor(
         customEmojiApiAdapter.fetch(nodeInfo)
     }
 
-    override fun get(host: String): List<Emoji>? {
+    override fun get(host: String): List<CustomEmoji>? {
         return customEmojiCache.get(host)
     }
 
@@ -184,7 +184,7 @@ internal class CustomEmojiRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun deleteEmojis(host: String, emojis: List<Emoji>): Result<Unit> = runCancellableCatching {
+    override suspend fun deleteEmojis(host: String, emojis: List<CustomEmoji>): Result<Unit> = runCancellableCatching {
         withContext(ioDispatcher) {
             customEmojiDAO.deleteByHostAndNames(host, emojis.map { it.name })
             // NOTE: inMemキャッシュなどを更新したい
@@ -192,18 +192,18 @@ internal class CustomEmojiRepositoryImpl @Inject constructor(
         }
     }
 
-    override fun getAndConvertToMap(host: String): Map<String, Emoji>? {
+    override fun getAndConvertToMap(host: String): Map<String, CustomEmoji>? {
         return customEmojiCache.getMap(host)
     }
 
-    override fun observeWithSearch(host: String, keyword: String): Flow<List<Emoji>> {
+    override fun observeWithSearch(host: String, keyword: String): Flow<List<CustomEmoji>> {
         return customEmojiDAO.search(host, keyword).map { list ->
             convertToModel(list)
         }.flowOn(defaultDispatcher)
     }
 
 
-    private suspend fun convertToModel(emojis: List<CustomEmojiRecord>): List<Emoji> {
+    private suspend fun convertToModel(emojis: List<CustomEmojiRecord>): List<CustomEmoji> {
         val aspects = aspectRatioDataSource.findIn(
             emojis.mapNotNull {
                 it.url ?: it.uri

@@ -2,7 +2,7 @@ package net.pantasystem.milktea.api.mastodon.emojis
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import net.pantasystem.milktea.model.emoji.Emoji
+import net.pantasystem.milktea.model.emoji.CustomEmoji
 import net.pantasystem.milktea.model.emoji.EmojiWithAlias
 
 @Serializable
@@ -40,8 +40,8 @@ data class TootEmojiDTO(
         )
     }
 
-    fun toEmoji(cachePath: String? = null): Emoji {
-        return Emoji(
+    fun toEmoji(cachePath: String? = null): CustomEmoji {
+        return CustomEmoji(
             name = shortcode,
             url = url,
             category = category,

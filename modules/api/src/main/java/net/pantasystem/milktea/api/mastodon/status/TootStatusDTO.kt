@@ -8,7 +8,7 @@ import net.pantasystem.milktea.api.mastodon.filter.FilterResultDTO
 import net.pantasystem.milktea.api.mastodon.media.TootMediaAttachment
 import net.pantasystem.milktea.api.mastodon.poll.TootPollDTO
 import net.pantasystem.milktea.common.serializations.EnumIgnoreUnknownSerializer
-import net.pantasystem.milktea.model.emoji.Emoji
+import net.pantasystem.milktea.model.emoji.CustomEmoji
 import net.pantasystem.milktea.model.note.Note
 
 @kotlinx.serialization.Serializable
@@ -197,11 +197,11 @@ data class TootStatusDTO(
             name
         }
         
-        fun getEmoji(cachePath: String? = null): Emoji? {
+        fun getEmoji(cachePath: String? = null): CustomEmoji? {
             if (!isCustomEmoji) {
                 return null
             }
-            return Emoji(
+            return CustomEmoji(
                 name = if (domain == null) {
                     "$name@."
                 } else {

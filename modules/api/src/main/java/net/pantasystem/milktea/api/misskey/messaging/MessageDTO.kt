@@ -5,9 +5,9 @@ import kotlinx.datetime.serializers.InstantIso8601Serializer
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import net.pantasystem.milktea.api.misskey.drive.FilePropertyDTO
+import net.pantasystem.milktea.api.misskey.emoji.CustomEmojiNetworkDTO
 import net.pantasystem.milktea.api.misskey.groups.GroupDTO
 import net.pantasystem.milktea.api.misskey.users.UserDTO
-import net.pantasystem.milktea.model.emoji.Emoji
 import java.io.Serializable as JavaSerializable
 
 @Serializable
@@ -49,7 +49,7 @@ data class MessageDTO(
     val isRead: Boolean,
 
     @SerialName("emojis")
-    val emojis: List<Emoji>? = null,
+    val emojis: List<CustomEmojiNetworkDTO>? = null,
 
     @SerialName("reads")
     val reads: List<String>? = null,

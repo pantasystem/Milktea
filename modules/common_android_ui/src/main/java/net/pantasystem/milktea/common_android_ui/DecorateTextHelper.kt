@@ -23,7 +23,7 @@ import net.pantasystem.milktea.common_android.ui.text.DrawableEmojiSpan
 import net.pantasystem.milktea.common_navigation.SearchNavType
 import net.pantasystem.milktea.common_navigation.UserDetailNavigationArgs
 import net.pantasystem.milktea.model.account.Account
-import net.pantasystem.milktea.model.emoji.Emoji
+import net.pantasystem.milktea.model.emoji.CustomEmoji
 
 object DecorateTextHelper {
 
@@ -152,7 +152,7 @@ object DecorateTextHelper {
 
     @BindingAdapter("sourceText", "emojis", "account", "host")
     @JvmStatic
-    fun TextView.decorateWithLowPerformance(sourceText: String?, emojis: List<Emoji>?, account: Account?, host: String?) {
+    fun TextView.decorateWithLowPerformance(sourceText: String?, emojis: List<CustomEmoji>?, account: Account?, host: String?) {
         sourceText ?: return
         emojis ?: return
         account ?: return

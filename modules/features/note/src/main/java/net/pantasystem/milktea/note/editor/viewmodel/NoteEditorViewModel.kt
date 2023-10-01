@@ -23,7 +23,7 @@ import net.pantasystem.milktea.model.ap.ApResolverRepository
 import net.pantasystem.milktea.model.channel.Channel
 import net.pantasystem.milktea.model.channel.ChannelRepository
 import net.pantasystem.milktea.model.drive.*
-import net.pantasystem.milktea.model.emoji.Emoji
+import net.pantasystem.milktea.model.emoji.CustomEmoji
 import net.pantasystem.milktea.model.file.AppFile
 import net.pantasystem.milktea.model.file.CopyFileToAppDirUseCase
 import net.pantasystem.milktea.model.file.UpdateAppFileSensitiveUseCase
@@ -603,7 +603,7 @@ class NoteEditorViewModel @Inject constructor(
         return nextPos
     }
 
-    fun addEmoji(emoji: Emoji, pos: Int): Int {
+    fun addEmoji(emoji: CustomEmoji, pos: Int): Int {
         return addEmoji(":${emoji.name}:", pos)
     }
 

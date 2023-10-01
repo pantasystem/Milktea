@@ -4,7 +4,7 @@ import android.util.Log
 import jp.panta.misskeyandroidclient.mfm.*
 import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.common_android.emoji.V13EmojiUrlResolver
-import net.pantasystem.milktea.model.emoji.Emoji
+import net.pantasystem.milktea.model.emoji.CustomEmoji
 import net.pantasystem.milktea.model.instance.HostWithVersion
 import java.net.URLDecoder
 import java.util.regex.Matcher
@@ -34,7 +34,7 @@ object MFMParser {
 
     fun parse(
         text: String?,
-        emojis: List<Emoji>? = emptyList(),
+        emojis: List<CustomEmoji>? = emptyList(),
         userHost: String? = null,
         accountHost: String? = null
     ): Root? {
@@ -56,8 +56,8 @@ object MFMParser {
 
     fun parse(
         text: String?,
-        emojis: Map<String, Emoji>? = null,
-        instanceEmojis: Map<String, Emoji>? = null,
+        emojis: Map<String, CustomEmoji>? = null,
+        instanceEmojis: Map<String, CustomEmoji>? = null,
         userHost: String? = null,
         accountHost: String? = null
     ): Root? {
@@ -86,8 +86,8 @@ object MFMParser {
     class NodeParser(
         private val sourceText: String,
         val parent: Node,
-        private val emojiNameMap: Map<String, Emoji>,
-        private val instanceEmojiNameMap: Map<String, Emoji>,
+        private val emojiNameMap: Map<String, CustomEmoji>,
+        private val instanceEmojiNameMap: Map<String, CustomEmoji>,
         val start: Int = parent.insideStart,
         val end: Int = parent.insideEnd,
         val userHost: String?,
@@ -446,7 +446,7 @@ object MFMParser {
 
             val tagName = matcher.group(1) ?: return null
 
-            var emoji: Emoji? = emojiNameMap[tagName] ?: instanceEmojiNameMap[tagName]
+            var emoji: CustomEmoji? = emojiNameMap[tagName] ?: instanceEmojiNameMap[tagName]
 
             // NOTE: v13の絵文字周りの改悪対応
             if (emoji == null) {
@@ -460,7 +460,7 @@ object MFMParser {
                 }
 
                 val url = V13EmojiUrlResolver.resolve(accountHost, tagName, userHost)
-                emoji = Emoji(
+                emoji = CustomEmoji(
                     name = tagName,
                     url = url,
                     uri = url,

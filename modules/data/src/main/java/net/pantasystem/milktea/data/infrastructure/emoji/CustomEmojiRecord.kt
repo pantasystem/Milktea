@@ -4,7 +4,7 @@ import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Index
 import androidx.room.PrimaryKey
-import net.pantasystem.milktea.model.emoji.Emoji
+import net.pantasystem.milktea.model.emoji.CustomEmoji
 
 @Entity(
     tableName = "custom_emojis",
@@ -26,7 +26,7 @@ data class CustomEmojiRecord(
 ) {
 
     companion object {
-        fun from(model: Emoji, host: String, id: Long = 0L): CustomEmojiRecord {
+        fun from(model: CustomEmoji, host: String, id: Long = 0L): CustomEmojiRecord {
             return CustomEmojiRecord(
                 name = model.name,
                 emojiHost = host,
@@ -41,8 +41,8 @@ data class CustomEmojiRecord(
     }
 
 
-    fun toModel(aspectRatio: Float? = null, cachePath: String? = null): Emoji {
-        return Emoji(
+    fun toModel(aspectRatio: Float? = null, cachePath: String? = null): CustomEmoji {
+        return CustomEmoji(
             id = serverId,
             name = name,
             host = emojiHost,

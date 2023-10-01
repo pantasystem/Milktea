@@ -8,10 +8,10 @@ import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.target.Target
 import dagger.hilt.android.EntryPointAccessors
 import net.pantasystem.milktea.common_android_ui.BindingProvider
-import net.pantasystem.milktea.model.emoji.Emoji
+import net.pantasystem.milktea.model.emoji.CustomEmoji
 
 class SaveImageAspectRequestListener(
-    val emoji: Emoji,
+    val emoji: CustomEmoji,
     val context: Context,
 ) : RequestListener<Drawable> {
     override fun onLoadFailed(

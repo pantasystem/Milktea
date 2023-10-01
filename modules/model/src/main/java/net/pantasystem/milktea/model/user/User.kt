@@ -9,7 +9,7 @@ import net.pantasystem.milktea.model.EntityId
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.emoji.CustomEmojiParsedResult
 import net.pantasystem.milktea.model.emoji.CustomEmojiParser
-import net.pantasystem.milktea.model.emoji.Emoji
+import net.pantasystem.milktea.model.emoji.CustomEmoji
 import net.pantasystem.milktea.model.note.Note
 import net.pantasystem.milktea.model.user.nickname.UserNickname
 
@@ -23,7 +23,7 @@ sealed interface User : Entity {
     val userName: String
     val name: String?
     val avatarUrl: String?
-    val emojis: List<Emoji>
+    val emojis: List<CustomEmoji>
     val isCat: Boolean?
     val isBot: Boolean?
     val host: String
@@ -72,7 +72,7 @@ sealed interface User : Entity {
         override val userName: String,
         override val name: String?,
         override val avatarUrl: String?,
-        override val emojis: List<Emoji>,
+        override val emojis: List<CustomEmoji>,
         override val isCat: Boolean?,
         override val isBot: Boolean?,
         override val host: String,
@@ -96,7 +96,7 @@ sealed interface User : Entity {
         override val userName: String,
         override val name: String?,
         override val avatarUrl: String?,
-        override val emojis: List<Emoji>,
+        override val emojis: List<CustomEmoji>,
         override val isCat: Boolean?,
         override val isBot: Boolean?,
         override val host: String,
@@ -254,7 +254,7 @@ fun User.Simple.Companion.make(
     userName: String,
     name: String? = null,
     avatarUrl: String? = null,
-    emojis: List<Emoji> = emptyList(),
+    emojis: List<CustomEmoji> = emptyList(),
     isCat: Boolean? = null,
     isBot: Boolean? = null,
     host: String? = null,
@@ -285,7 +285,7 @@ fun User.Detail.Companion.make(
     userName: String,
     name: String? = null,
     avatarUrl: String? = null,
-    emojis: List<Emoji> = emptyList(),
+    emojis: List<CustomEmoji> = emptyList(),
     isCat: Boolean? = null,
     isBot: Boolean? = null,
     host: String? = null,
