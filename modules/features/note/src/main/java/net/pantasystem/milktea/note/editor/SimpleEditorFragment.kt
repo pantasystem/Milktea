@@ -132,21 +132,21 @@ class SimpleEditorFragment : Fragment(R.layout.fragment_simple_editor), SimpleEd
             startActivity(intent)
         }.flowWithLifecycle(lifecycle, Lifecycle.State.RESUMED).launchIn(lifecycleScope)
 
-        accountStore.observeCurrentAccount.filterNotNull().flatMapLatest {
-            customEmojiRepository.observeBy(it.getHost())
-        }.distinctUntilChanged().onEach { emojis ->
+        mViewModel.currentAccount.filterNotNull().distinctUntilChanged().onEach { account ->
             mBinding.inputMainText.setAdapter(
                 CustomEmojiCompleteAdapter(
-                    emojis,
-                    requireContext()
+                    account,
+                    requireContext(),
+                    customEmojiRepository,
                 )
             )
             mBinding.inputMainText.setTokenizer(CustomEmojiTokenizer())
 
             mBinding.inputCw.setAdapter(
                 CustomEmojiCompleteAdapter(
-                    emojis,
-                    requireContext()
+                    account,
+                    requireContext(),
+                    customEmojiRepository,
                 )
             )
             mBinding.inputCw.setTokenizer(CustomEmojiTokenizer())

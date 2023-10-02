@@ -44,8 +44,8 @@ import net.pantasystem.milktea.common_compose.MilkteaStyleConfigApplyAndTheme
 import net.pantasystem.milktea.common_navigation.*
 import net.pantasystem.milktea.model.channel.Channel
 import net.pantasystem.milktea.model.drive.FileProperty
-import net.pantasystem.milktea.model.emoji.CustomEmojiRepository
 import net.pantasystem.milktea.model.emoji.CustomEmoji
+import net.pantasystem.milktea.model.emoji.CustomEmojiRepository
 import net.pantasystem.milktea.model.instance.FeatureType
 import net.pantasystem.milktea.model.note.Note
 import net.pantasystem.milktea.model.setting.LocalConfigRepository
@@ -308,23 +308,22 @@ class NoteEditorFragment : Fragment(R.layout.fragment_note_editor), EmojiSelecti
         ).launchIn(viewLifecycleOwner.lifecycleScope)
 
 
-        accountViewModel.currentAccount.filterNotNull().flatMapLatest {
-            customEmojiRepository.observeBy(it.getHost(), withAliases = true)
-        }.distinctUntilChanged().onEach { emojis ->
+        noteEditorViewModel.currentAccount.filterNotNull().onEach { account ->
             binding.inputMain.setAdapter(
                 CustomEmojiCompleteAdapter(
-                    emojis, requireContext()
+                    account, requireContext(), customEmojiRepository,
                 )
             )
             binding.inputMain.setTokenizer(CustomEmojiTokenizer())
 
             binding.cw.setAdapter(
                 CustomEmojiCompleteAdapter(
-                    emojis, requireContext()
+                    account, requireContext(), customEmojiRepository,
                 )
             )
             binding.cw.setTokenizer(CustomEmojiTokenizer())
         }.launchIn(viewLifecycleOwner.lifecycleScope)
+
 
         if (!text.isNullOrBlank() && savedInstanceState == null) {
             noteEditorViewModel.changeText(text)
