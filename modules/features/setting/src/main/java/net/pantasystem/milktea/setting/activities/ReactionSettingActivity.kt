@@ -89,12 +89,11 @@ class ReactionSettingActivity : AppCompatActivity() {
         binding.reactionPickerType.setSelection(mReactionPickerSettingViewModel.reactionPickerType.ordinal)
 
 
-        accountStore.observeCurrentAccount.filterNotNull().flatMapLatest {
-            customEmojiRepository.observeBy(it.getHost())
-        }.distinctUntilChanged().onEach { emojis ->
+        accountStore.observeCurrentAccount.filterNotNull().onEach { account ->
             val reactionAutoCompleteArrayAdapter = ReactionAutoCompleteArrayAdapter(
-                emojis,
-                this
+                account,
+                this,
+                customEmojiRepository,
             )
             binding.reactionSettingField.setAdapter(reactionAutoCompleteArrayAdapter)
             binding.reactionSettingField.setOnItemClickListener { _, _, position, _ ->

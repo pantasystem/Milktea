@@ -91,13 +91,12 @@ class ReactionPickerDialog : AppCompatDialogFragment(){
 
         }
 
-        accountStore.observeCurrentAccount.filterNotNull().flatMapLatest {
-            customEmojiRepository.observeBy(it.getHost())
-        }.onEach { emojis ->
+        accountStore.observeCurrentAccount.filterNotNull().onEach { account ->
             val autoCompleteAdapter =
                 ReactionAutoCompleteArrayAdapter(
-                    emojis,
-                    view.context
+                    account,
+                    view.context,
+                    customEmojiRepository,
                 )
             binding.reactionField.setAdapter(autoCompleteAdapter)
             binding.reactionField.setOnItemClickListener { _, _, i, _ ->

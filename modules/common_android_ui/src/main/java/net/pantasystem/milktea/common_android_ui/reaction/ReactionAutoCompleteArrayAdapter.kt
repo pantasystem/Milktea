@@ -8,13 +8,16 @@ import android.widget.BaseAdapter
 import android.widget.Filter
 import android.widget.Filterable
 import androidx.databinding.DataBindingUtil
+import kotlinx.coroutines.runBlocking
 import net.pantasystem.milktea.common_android_ui.R
 import net.pantasystem.milktea.common_android_ui.databinding.ItemReactionPreviewBinding
-import net.pantasystem.milktea.model.emoji.CustomEmoji
+import net.pantasystem.milktea.model.account.Account
+import net.pantasystem.milktea.model.emoji.CustomEmojiRepository
 
 class ReactionAutoCompleteArrayAdapter(
-    private val reactions: List<CustomEmoji>,
-    private val context: Context
+    private val account: Account,
+    private val context: Context,
+    private val customEmojiRepository: CustomEmojiRepository,
 ) : BaseAdapter(), Filterable{
 
     var suggestions = listOf<String>()
@@ -54,10 +57,10 @@ class ReactionAutoCompleteArrayAdapter(
 
             val text = constraint?.toString()
             if(text != null){
-                suggestions = reactions.filter{
-                    it.name.startsWith(text.replace(":", ""))
-                }.map {
-                    ":${it.name}:"
+                suggestions = runBlocking {
+                    customEmojiRepository.search(account.getHost(), text.replace(":", "")).getOrElse { emptyList() }.map {
+                        ":${it.name}:"
+                    }
                 }
             }
 
