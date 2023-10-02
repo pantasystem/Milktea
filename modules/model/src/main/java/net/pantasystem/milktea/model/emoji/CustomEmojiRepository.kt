@@ -21,6 +21,8 @@ interface CustomEmojiRepository {
 
     fun observeWithSearch(host: String, keyword: String): Flow<List<CustomEmoji>>
 
+    suspend fun search(host: String, keyword: String): Result<List<CustomEmoji>>
+
     fun get(host: String): List<CustomEmoji>?
 
     fun getAndConvertToMap(host: String): Map<String, CustomEmoji>?

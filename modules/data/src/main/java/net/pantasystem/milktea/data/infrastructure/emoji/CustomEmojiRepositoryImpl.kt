@@ -193,11 +193,16 @@ internal class CustomEmojiRepositoryImpl @Inject constructor(
     }
 
     override fun observeWithSearch(host: String, keyword: String): Flow<List<CustomEmoji>> {
-        return customEmojiDAO.search(host, keyword).map { list ->
+        return customEmojiDAO.observeAndSearch(host, keyword).map { list ->
             convertToModel(list)
         }.flowOn(defaultDispatcher)
     }
 
+    override suspend fun search(host: String, keyword: String): Result<List<CustomEmoji>> = runCancellableCatching {
+        withContext(ioDispatcher) {
+            convertToModel(customEmojiDAO.search(host, keyword))
+        }
+    }
 
     private suspend fun convertToModel(emojis: List<CustomEmojiRecord>): List<CustomEmoji> {
         val aspects = aspectRatioDataSource.findIn(
