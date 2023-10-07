@@ -1,5 +1,3 @@
-@file:Suppress("DEPRECATION")
-
 package net.pantasystem.milktea.media
 
 import android.app.Activity
@@ -95,31 +93,6 @@ class MediaActivity : AppCompatActivity() {
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.title = ""
 
-        val file = intent.getSerializableExtra(MediaNavigationKeys.EXTRA_FILE) as File?
-
-        val files =
-            (intent.getSerializableExtra(MediaNavigationKeys.EXTRA_FILES) as List<*>?)?.mapNotNull {
-                it as File?
-            }
-
-
-        val list = when {
-            !files.isNullOrEmpty() -> {
-                files.map {
-                    Media.FileMedia(it)
-                }
-            }
-            file != null -> {
-                listOf<Media>(Media.FileMedia(file))
-            }
-            else -> {
-                Log.e(MediaNavigationKeys.TAG, "params must not null")
-                throw IllegalArgumentException()
-            }
-        }
-
-        mMedias = list
-
         val pagerAdapter = MediaPagerAdapter(supportFragmentManager)
         mBinding.mediaViewPager.adapter = pagerAdapter
 
@@ -127,7 +100,7 @@ class MediaActivity : AppCompatActivity() {
         viewModel.uiState.onEach { uiState ->
             pagerAdapter.setFiles(uiState.medias)
             mBinding.mediaViewPager.currentItem = uiState.currentIndex
-
+            mMedias = uiState.medias
         }.flowWithLifecycle(lifecycle).launchIn(lifecycleScope)
     }
 
