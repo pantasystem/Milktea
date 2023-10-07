@@ -1,5 +1,3 @@
-@file:Suppress("DEPRECATION")
-
 package net.pantasystem.milktea.media
 
 import android.app.Activity
@@ -9,13 +7,16 @@ import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.Toast
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
-import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
-import androidx.fragment.app.FragmentPagerAdapter
+import androidx.lifecycle.flowWithLifecycle
+import androidx.lifecycle.lifecycleScope
 import androidx.work.WorkManager
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import net.pantasystem.milktea.common.ui.ApplyTheme
 import net.pantasystem.milktea.common_navigation.MediaNavigation
 import net.pantasystem.milktea.common_navigation.MediaNavigationArgs
@@ -55,12 +56,12 @@ class MediaNavigationImpl @Inject constructor(
     }
 }
 
+sealed class Media : Serializable {
+    data class FileMedia(val file: File) : Media()
+}
 @AndroidEntryPoint
 class MediaActivity : AppCompatActivity() {
 
-    private sealed class Media : Serializable {
-        data class FileMedia(val file: File) : Media()
-    }
 
 
     companion object {
@@ -82,6 +83,8 @@ class MediaActivity : AppCompatActivity() {
     @Inject
     lateinit var setTheme: ApplyTheme
 
+    private val viewModel by viewModels<MediaViewModel>()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setTheme.invoke()
@@ -90,37 +93,18 @@ class MediaActivity : AppCompatActivity() {
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.title = ""
 
-        val file = intent.getSerializableExtra(MediaNavigationKeys.EXTRA_FILE) as File?
-
-        val files =
-            (intent.getSerializableExtra(MediaNavigationKeys.EXTRA_FILES) as List<*>?)?.mapNotNull {
-                it as File?
-            }
-
-
-        val fileCurrentIndex = intent.getIntExtra(MediaNavigationKeys.EXTRA_FILE_CURRENT_INDEX, 0)
-        val list = when {
-            files != null && files.isNotEmpty() -> {
-                files.map {
-                    Media.FileMedia(it)
-                }
-            }
-            file != null -> {
-                listOf<Media>(Media.FileMedia(file))
-            }
-            else -> {
-                Log.e(MediaNavigationKeys.TAG, "params must not null")
-                throw IllegalArgumentException()
-            }
-        }
-
-        mMedias = list
-
-        val pagerAdapter = MediaPagerAdapter(list)
+        val pagerAdapter = MediaPagerAdapter(supportFragmentManager)
         mBinding.mediaViewPager.adapter = pagerAdapter
 
-        mBinding.mediaViewPager.currentItem = fileCurrentIndex
+
+        viewModel.uiState.onEach { uiState ->
+            pagerAdapter.setFiles(uiState.medias)
+            mBinding.mediaViewPager.currentItem = uiState.currentIndex
+            mMedias = uiState.medias
+        }.flowWithLifecycle(lifecycle).launchIn(lifecycleScope)
     }
+
+
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
@@ -177,27 +161,6 @@ class MediaActivity : AppCompatActivity() {
             )
     }
 
-    private inner class MediaPagerAdapter(
-        private val list: List<Media>
-    ) : FragmentPagerAdapter(supportFragmentManager, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT) {
-        override fun getCount(): Int {
-            return list.size
-        }
 
-        override fun getItem(position: Int): Fragment {
-            return when (val item = list[position]) {
-                is Media.FileMedia -> createFragment(position, item.file)
-            }
-        }
-    }
-
-    private fun createFragment(index: Int, file: File): Fragment {
-
-        return if (file.type?.contains("image") == true) {
-            ImageFragment.newInstance(index, file)
-        } else {
-            PlayerFragment.newInstance(index, file.path!!)
-        }
-    }
 
 }
