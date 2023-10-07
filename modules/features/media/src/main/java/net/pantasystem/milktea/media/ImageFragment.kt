@@ -4,6 +4,7 @@ import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Bundle
 import android.view.View
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.flowWithLifecycle
@@ -91,6 +92,12 @@ class ImageFragment : Fragment(R.layout.fragment_image){
                     }
                 })
                 .into(binding.imageView)
+        }.flowWithLifecycle(lifecycle).launchIn(lifecycleScope)
+
+        viewModel.uiState.map {
+            it.isLoading
+        }.distinctUntilChanged().onEach {
+            binding.progressBar.isVisible = it
         }.flowWithLifecycle(lifecycle).launchIn(lifecycleScope)
     }
 
