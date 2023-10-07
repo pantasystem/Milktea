@@ -9,16 +9,24 @@ import androidx.fragment.app.FragmentPagerAdapter
 @Suppress("DEPRECATION")
 class MediaPagerAdapter(
     fragmentManager: FragmentManager,
-    private val list: List<Media>
 ) : FragmentPagerAdapter(fragmentManager, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT) {
+
+    private var _files = emptyList<Media>()
+
     override fun getCount(): Int {
-        return list.size
+        return _files.size
     }
 
     override fun getItem(position: Int): Fragment {
-        return when (val item = list[position]) {
+        return when (val item = _files[position]) {
             is Media.FileMedia -> createFragment(position, item.file)
         }
+    }
+
+    fun setFiles(files: List<Media>) {
+        if (_files == files) return
+        _files = files
+        notifyDataSetChanged()
     }
 
     private fun createFragment(index: Int, file: File): Fragment {

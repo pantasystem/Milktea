@@ -9,11 +9,16 @@ import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.Toast
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.FragmentActivity
+import androidx.lifecycle.flowWithLifecycle
+import androidx.lifecycle.lifecycleScope
 import androidx.work.WorkManager
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import net.pantasystem.milktea.common.ui.ApplyTheme
 import net.pantasystem.milktea.common_navigation.MediaNavigation
 import net.pantasystem.milktea.common_navigation.MediaNavigationArgs
@@ -80,6 +85,8 @@ class MediaActivity : AppCompatActivity() {
     @Inject
     lateinit var setTheme: ApplyTheme
 
+    private val viewModel by viewModels<MediaViewModel>()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setTheme.invoke()
@@ -96,7 +103,6 @@ class MediaActivity : AppCompatActivity() {
             }
 
 
-        val fileCurrentIndex = intent.getIntExtra(MediaNavigationKeys.EXTRA_FILE_CURRENT_INDEX, 0)
         val list = when {
             !files.isNullOrEmpty() -> {
                 files.map {
@@ -114,11 +120,18 @@ class MediaActivity : AppCompatActivity() {
 
         mMedias = list
 
-        val pagerAdapter = MediaPagerAdapter(supportFragmentManager, list)
+        val pagerAdapter = MediaPagerAdapter(supportFragmentManager)
         mBinding.mediaViewPager.adapter = pagerAdapter
 
-        mBinding.mediaViewPager.currentItem = fileCurrentIndex
+
+        viewModel.uiState.onEach { uiState ->
+            pagerAdapter.setFiles(uiState.medias)
+            mBinding.mediaViewPager.currentItem = uiState.currentIndex
+
+        }.flowWithLifecycle(lifecycle).launchIn(lifecycleScope)
     }
+
+
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
