@@ -11,9 +11,7 @@ import android.view.MenuItem
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
-import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
-import androidx.fragment.app.FragmentPagerAdapter
 import androidx.work.WorkManager
 import dagger.hilt.android.AndroidEntryPoint
 import net.pantasystem.milktea.common.ui.ApplyTheme
@@ -55,12 +53,12 @@ class MediaNavigationImpl @Inject constructor(
     }
 }
 
+sealed class Media : Serializable {
+    data class FileMedia(val file: File) : Media()
+}
 @AndroidEntryPoint
 class MediaActivity : AppCompatActivity() {
 
-    private sealed class Media : Serializable {
-        data class FileMedia(val file: File) : Media()
-    }
 
 
     companion object {
@@ -100,7 +98,7 @@ class MediaActivity : AppCompatActivity() {
 
         val fileCurrentIndex = intent.getIntExtra(MediaNavigationKeys.EXTRA_FILE_CURRENT_INDEX, 0)
         val list = when {
-            files != null && files.isNotEmpty() -> {
+            !files.isNullOrEmpty() -> {
                 files.map {
                     Media.FileMedia(it)
                 }
@@ -116,7 +114,7 @@ class MediaActivity : AppCompatActivity() {
 
         mMedias = list
 
-        val pagerAdapter = MediaPagerAdapter(list)
+        val pagerAdapter = MediaPagerAdapter(supportFragmentManager, list)
         mBinding.mediaViewPager.adapter = pagerAdapter
 
         mBinding.mediaViewPager.currentItem = fileCurrentIndex
@@ -177,27 +175,6 @@ class MediaActivity : AppCompatActivity() {
             )
     }
 
-    private inner class MediaPagerAdapter(
-        private val list: List<Media>
-    ) : FragmentPagerAdapter(supportFragmentManager, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT) {
-        override fun getCount(): Int {
-            return list.size
-        }
 
-        override fun getItem(position: Int): Fragment {
-            return when (val item = list[position]) {
-                is Media.FileMedia -> createFragment(position, item.file)
-            }
-        }
-    }
-
-    private fun createFragment(index: Int, file: File): Fragment {
-
-        return if (file.type?.contains("image") == true) {
-            ImageFragment.newInstance(index, file)
-        } else {
-            PlayerFragment.newInstance(index, file.path!!)
-        }
-    }
 
 }
