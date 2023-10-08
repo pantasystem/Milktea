@@ -25,6 +25,7 @@ import net.pantasystem.milktea.model.setting.LocalConfigRepository
 import net.pantasystem.milktea.model.user.*
 import net.pantasystem.milktea.model.user.block.BlockUserUseCase
 import net.pantasystem.milktea.model.user.block.UnBlockUserUseCase
+import net.pantasystem.milktea.model.user.follow.ToggleNotifyUserPostsUseCase
 import net.pantasystem.milktea.model.user.mute.CreateMute
 import net.pantasystem.milktea.model.user.mute.MuteUserUseCase
 import net.pantasystem.milktea.model.user.mute.UnMuteUserUseCase
@@ -54,6 +55,7 @@ class UserDetailViewModel @Inject constructor(
     private val savedStateHandle: SavedStateHandle,
     private val userDetailTabTypeFactory: UserDetailTabTypeFactory,
     private val toggleUserTimelineAddTabUseCase: ToggleUserTimelineAddTabUseCase,
+    private val toggleNotifyUserPostsUseCase: ToggleNotifyUserPostsUseCase,
     private val userIdResolver: UserIdResolver,
     configRepository: LocalConfigRepository,
 ) : ViewModel() {
@@ -268,9 +270,20 @@ class UserDetailViewModel @Inject constructor(
     fun toggleUserTimelineTab() {
         viewModelScope.launch {
             getUserId().mapCancellableCatching {
-                toggleUserTimelineAddTabUseCase(it)
+                toggleUserTimelineAddTabUseCase(it).getOrThrow()
             }.onFailure {
                 logger.error("toggle user timeline tab failed", it)
+                _errors.tryEmit(it)
+            }
+        }
+    }
+
+    fun toggleNotifyUserPosts() {
+        viewModelScope.launch {
+            getUserId().mapCancellableCatching {
+                toggleNotifyUserPostsUseCase(it).getOrThrow()
+            }.onFailure {
+                logger.error("toggle user notify posts failed", it)
                 _errors.tryEmit(it)
             }
         }

@@ -403,6 +403,12 @@ class UserDetailActivity : AppCompatActivity() {
             R.id.show_qr_code -> {
                 QRShareDialog().show(supportFragmentManager, QRShareDialog.FRAGMENT_TAG)
             }
+            R.id.notify_about_new_posts -> {
+                mViewModel.toggleNotifyUserPosts()
+            }
+            R.id.stop_notify_about_new_posts -> {
+                mViewModel.toggleNotifyUserPosts()
+            }
             else -> return false
 
         }
