@@ -102,7 +102,9 @@ class UserDTOEntityConverter @Inject constructor(
                     hasPendingFollowRequestFromYou = userDTO.hasPendingFollowRequestFromYou
                         ?: false,
                     hasPendingFollowRequestToYou = userDTO.hasPendingFollowRequestToYou ?: false,
-                    isNotify = userDTO.notifyState == "normal"
+                    isNotify = userDTO.notifyState?.let {
+                        userDTO.notifyState == "normal"
+                    }
                 )
             )
         } else {

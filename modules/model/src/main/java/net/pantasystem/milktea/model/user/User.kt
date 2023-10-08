@@ -163,7 +163,7 @@ sealed interface User : Entity {
         val isMuting: Boolean,
         val hasPendingFollowRequestFromYou: Boolean,
         val hasPendingFollowRequestToYou: Boolean,
-        val isNotify: Boolean,
+        val isNotify: Boolean?,
     )
 
     data class InstanceInfo(
