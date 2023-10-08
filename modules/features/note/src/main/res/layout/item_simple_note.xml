@@ -48,6 +48,7 @@
             android:scaleType="centerCrop"
             app:iconShape="@{note.config.avatarIconShapeType.value}"
             app:imageUrl="@{note.avatarUrl}"
+            app:blurhash="@{note.toShowNote.user.avatarBlurhash}"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:transitionDestinationUser="@{note.toShowNote.user}"
@@ -285,6 +286,7 @@
                             android:scaleType="centerCrop"
                             app:iconShape="@{note.config.avatarIconShapeType.value}"
                             app:imageUrl="@{note.subNoteAvatarUrl}"
+                            app:blurhash="@{note.subNote.user.avatarBlurhash}"
                             app:layout_constraintStart_toStartOf="parent"
                             app:layout_constraintTop_toTopOf="parent"
                             app:transitionDestinationUser="@{note.subNote.user}" />

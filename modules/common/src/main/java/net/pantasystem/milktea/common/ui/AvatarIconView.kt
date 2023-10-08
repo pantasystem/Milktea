@@ -6,6 +6,7 @@ import androidx.appcompat.widget.AppCompatImageView
 import androidx.databinding.BindingAdapter
 import net.pantasystem.milktea.common.R
 import net.pantasystem.milktea.common.glide.GlideApp
+import net.pantasystem.milktea.common.glide.blurhash.BlurHashSource
 
 class AvatarIconView : AppCompatImageView {
 
@@ -13,11 +14,17 @@ class AvatarIconView : AppCompatImageView {
         const val SHAPE_CIRCLE = 0
         const val SHAPE_ROUNDED_CORNER = 1
 
-        @BindingAdapter("imageUrl")
+        @BindingAdapter("imageUrl", "blurhash")
         @JvmStatic
-        fun setImageUrl(iconView: AvatarIconView, url: String?) {
+        fun setImageUrl(iconView: AvatarIconView, url: String?, blurhash: String?) {
             GlideApp.with(iconView.context)
                 .load(url)
+                .thumbnail(
+                    GlideApp.with(iconView.context)
+                        .load(blurhash?.let {
+                            BlurHashSource(it)
+                        })
+                )
                 .error(R.drawable.ic_cloud_off_black_24dp)
                 .into(iconView)
         }

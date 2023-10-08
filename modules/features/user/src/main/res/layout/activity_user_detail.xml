@@ -99,6 +99,7 @@
                             android:layout_marginTop="-50dp"
                             android:layout_marginStart="16dp"
                             app:imageUrl="@{userViewModel.userState.avatarUrl}"
+                            app:blurhash="@{userViewModel.userState.avatarBlurhash}"
                             app:iconShape="@{userViewModel.config.avatarIconShapeType.value}"
                             tools:srcCompat="@drawable/ic_follow"
                             android:layout_marginBottom="8dp"
