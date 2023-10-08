@@ -5,7 +5,20 @@ import net.pantasystem.milktea.data.infrastructure.toGroup
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.group.InvitationId
 import net.pantasystem.milktea.model.note.Note
-import net.pantasystem.milktea.model.notification.*
+import net.pantasystem.milktea.model.notification.FollowNotification
+import net.pantasystem.milktea.model.notification.FollowRequestAcceptedNotification
+import net.pantasystem.milktea.model.notification.GroupInvitedNotification
+import net.pantasystem.milktea.model.notification.MentionNotification
+import net.pantasystem.milktea.model.notification.Notification
+import net.pantasystem.milktea.model.notification.PollEndedNotification
+import net.pantasystem.milktea.model.notification.PollVoteNotification
+import net.pantasystem.milktea.model.notification.QuoteNotification
+import net.pantasystem.milktea.model.notification.ReactionNotification
+import net.pantasystem.milktea.model.notification.ReceiveFollowRequestNotification
+import net.pantasystem.milktea.model.notification.RenoteNotification
+import net.pantasystem.milktea.model.notification.ReplyNotification
+import net.pantasystem.milktea.model.notification.PostNotification
+import net.pantasystem.milktea.model.notification.UnknownNotification
 import net.pantasystem.milktea.model.user.User
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -142,6 +155,18 @@ class NotificationDTOEntityConverter @Inject constructor(
                     group = notificationDTO.invitation!!.group.toGroup(account.accountId),
                     User.Id(account.accountId, notificationDTO.userId!!),
                     InvitationId(account.accountId, notificationDTO.invitation!!.id),
+                )
+            }
+            "note" -> {
+                PostNotification(
+                    id,
+                    notificationDTO.createdAt,
+                    User.Id(account.accountId, notificationDTO.userId!!),
+                    Note.Id(
+                        account.accountId,
+                        notificationDTO.note?.id ?: throw IllegalStateException("noteId参照不能")
+                    ),
+                    notificationDTO.isRead ?: true
                 )
             }
             else -> {

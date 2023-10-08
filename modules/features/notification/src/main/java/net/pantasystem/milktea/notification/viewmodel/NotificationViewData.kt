@@ -50,7 +50,7 @@ class NotificationViewData(
         is GroupInvitedNotification -> Type.GROUP_INVITED
         is UnknownNotification -> Type.UNKNOWN
         is FavoriteNotification -> Type.FAVORITE
-        is StatusNotification -> Type.STATUS
+        is PostNotification -> Type.STATUS
     }
     val statusType: String = type.default
 

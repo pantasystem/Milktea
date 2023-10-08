@@ -114,7 +114,7 @@ fun MstNotificationDTO.toModel(a: Account, isRead: Boolean): Notification {
             )
         }
         MstNotificationDTO.NotificationType.Status -> {
-            StatusNotification(
+            PostNotification(
                 createdAt = createdAt,
                 id = id,
                 userId = userId,

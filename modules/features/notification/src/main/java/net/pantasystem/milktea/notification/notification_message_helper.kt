@@ -64,7 +64,7 @@ class NotificationMessageScope(val context: Context) {
                 R.string.notification_favorited_by,
                 user?.displayUserName ?: ""
             )
-            is StatusNotification -> context.getString(
+            is PostNotification -> context.getString(
                 R.string.notification_posted_by,
                 user?.displayUserName ?: ""
             )
