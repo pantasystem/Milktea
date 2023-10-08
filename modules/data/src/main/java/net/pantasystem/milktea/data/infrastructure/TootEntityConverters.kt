@@ -23,6 +23,7 @@ import net.pantasystem.milktea.model.notification.PollEndedNotification
 import net.pantasystem.milktea.model.notification.PostNotification
 import net.pantasystem.milktea.model.notification.ReactionNotification
 import net.pantasystem.milktea.model.notification.RenoteNotification
+import net.pantasystem.milktea.model.notification.UnknownNotification
 import net.pantasystem.milktea.model.user.User
 
 fun TootPollDTO?.toPoll(): Poll? {
@@ -174,13 +175,31 @@ fun MstNotificationDTO.toModel(a: Account, isRead: Boolean): Notification {
             )
         }
         MstNotificationDTO.NotificationType.Update -> {
-            TODO("通知種別${type}はまだ実装されていません")
+            UnknownNotification(
+                id = id,
+                createdAt = createdAt,
+                isRead = isRead,
+                rawType = type.name,
+                userId = userId,
+            )
         }
         MstNotificationDTO.NotificationType.AdminSingUp -> {
-            TODO("通知種別${type}はまだ実装されていません")
+            UnknownNotification(
+                id = id,
+                createdAt = createdAt,
+                isRead = isRead,
+                rawType = type.name,
+                userId = userId,
+            )
         }
         MstNotificationDTO.NotificationType.AdminReport -> {
-            TODO("通知種別${type}はまだ実装されていません")
+            UnknownNotification(
+                id = id,
+                createdAt = createdAt,
+                isRead = isRead,
+                rawType = type.name,
+                userId = userId,
+            )
         }
         MstNotificationDTO.NotificationType.EmojiReaction -> {
             ReactionNotification(
