@@ -46,6 +46,7 @@ import net.pantasystem.milktea.api.misskey.trend.HashtagTrend
 import net.pantasystem.milktea.api.misskey.users.*
 import net.pantasystem.milktea.api.misskey.users.follow.FollowUserRequest
 import net.pantasystem.milktea.api.misskey.users.follow.UnFollowUserRequest
+import net.pantasystem.milktea.api.misskey.users.follow.UpdateUserFollowRequest
 import net.pantasystem.milktea.api.misskey.users.renote.mute.CreateRenoteMuteRequest
 import net.pantasystem.milktea.api.misskey.users.renote.mute.DeleteRenoteMuteRequest
 import net.pantasystem.milktea.api.misskey.users.renote.mute.RenoteMuteDTO
@@ -136,6 +137,9 @@ interface MisskeyAPI {
 
     @POST("api/following/create")
     suspend fun followUser(@Body requestUser: FollowUserRequest): Response<UserDTO>
+
+    @POST("api/following/update")
+    suspend fun updateFollowUser(@Body request: UpdateUserFollowRequest): Response<UserDTO>
 
     @POST("api/following/requests/accept")
     suspend fun acceptFollowRequest(@Body followRequest: AcceptFollowRequest) : Response<Unit>
