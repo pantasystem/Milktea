@@ -118,6 +118,9 @@ data class UserDTO(
 
     @SerialName("avatarBlurhash")
     val avatarBlurhash: String? = null,
+
+    @SerialName("notify")
+    val notifyState: String? = null,
 ) : Serializable {
 
     @kotlinx.serialization.Serializable

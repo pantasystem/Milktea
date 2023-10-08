@@ -1,5 +1,6 @@
 package net.pantasystem.milktea.api.mastodon
 
+import net.pantasystem.milktea.api.mastodon.accounts.FollowParamsRequest
 import net.pantasystem.milktea.api.mastodon.accounts.MastodonAccountDTO
 import net.pantasystem.milktea.api.mastodon.accounts.MastodonAccountRelationshipDTO
 import net.pantasystem.milktea.api.mastodon.accounts.MuteAccountRequest
@@ -127,7 +128,7 @@ interface MastodonAPI {
     ): Response<List<MastodonAccountRelationshipDTO>>
 
     @POST("api/v1/accounts/{accountId}/follow")
-    suspend fun follow(@Path("accountId") accountId: String): Response<MastodonAccountRelationshipDTO>
+    suspend fun follow(@Path("accountId") accountId: String, @Body params: FollowParamsRequest): Response<MastodonAccountRelationshipDTO>
 
     @POST("api/v1/accounts/{accountId}/unfollow")
     suspend fun unfollow(@Path("accountId") accountId: String): Response<MastodonAccountRelationshipDTO>

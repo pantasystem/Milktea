@@ -46,6 +46,14 @@ class UserDetailActivityMenuBinder(
             menu.findItem(R.id.renoteUnmute).isVisible = true
         }
 
+        if (state?.related?.isNotify == null) {
+            menu.findItem(R.id.notify_about_new_posts).isVisible = false
+            menu.findItem(R.id.stop_notify_about_new_posts).isVisible = false
+        } else {
+            menu.findItem(R.id.notify_about_new_posts).isVisible = state.related?.isNotify == false
+            menu.findItem(R.id.stop_notify_about_new_posts).isVisible = state.related?.isNotify == true
+        }
+
         val tab = menu.findItem(R.id.nav_add_to_tab)
         val page = accountStore.currentAccount?.pages?.firstOrNull {
             val pageable = it.pageable()

@@ -39,6 +39,15 @@
     <item
             android:id="@+id/add_list"
             android:title="@string/add_to_list"/>
+
+    <item
+            android:id="@+id/notify_about_new_posts"
+            android:title="@string/notify_about_new_posts" />
+
+    <item
+            android:id="@+id/stop_notify_about_new_posts"
+            android:title="@string/stop_notify_about_new_posts" />
+
     <item
             android:id="@+id/report_user"
             android:title="@string/report"/>

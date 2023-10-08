@@ -14,7 +14,16 @@ import net.pantasystem.milktea.model.instance.MastodonInstanceInfo
 import net.pantasystem.milktea.model.note.Note
 import net.pantasystem.milktea.model.note.Visibility
 import net.pantasystem.milktea.model.note.poll.Poll
-import net.pantasystem.milktea.model.notification.*
+import net.pantasystem.milktea.model.notification.FavoriteNotification
+import net.pantasystem.milktea.model.notification.FollowNotification
+import net.pantasystem.milktea.model.notification.FollowRequestAcceptedNotification
+import net.pantasystem.milktea.model.notification.MentionNotification
+import net.pantasystem.milktea.model.notification.Notification
+import net.pantasystem.milktea.model.notification.PollEndedNotification
+import net.pantasystem.milktea.model.notification.PostNotification
+import net.pantasystem.milktea.model.notification.ReactionNotification
+import net.pantasystem.milktea.model.notification.RenoteNotification
+import net.pantasystem.milktea.model.notification.UnknownNotification
 import net.pantasystem.milktea.model.user.User
 
 fun TootPollDTO?.toPoll(): Poll? {
@@ -97,6 +106,7 @@ fun MastodonAccountRelationshipDTO.toUserRelated(): User.Related {
         hasPendingFollowRequestFromYou = requested,
         isMuting = muting,
         hasPendingFollowRequestToYou = false,
+        isNotify = notifying ?: false,
     )
 }
 
@@ -165,13 +175,31 @@ fun MstNotificationDTO.toModel(a: Account, isRead: Boolean): Notification {
             )
         }
         MstNotificationDTO.NotificationType.Update -> {
-            TODO("通知種別${type}はまだ実装されていません")
+            UnknownNotification(
+                id = id,
+                createdAt = createdAt,
+                isRead = isRead,
+                rawType = type.name,
+                userId = userId,
+            )
         }
         MstNotificationDTO.NotificationType.AdminSingUp -> {
-            TODO("通知種別${type}はまだ実装されていません")
+            UnknownNotification(
+                id = id,
+                createdAt = createdAt,
+                isRead = isRead,
+                rawType = type.name,
+                userId = userId,
+            )
         }
         MstNotificationDTO.NotificationType.AdminReport -> {
-            TODO("通知種別${type}はまだ実装されていません")
+            UnknownNotification(
+                id = id,
+                createdAt = createdAt,
+                isRead = isRead,
+                rawType = type.name,
+                userId = userId,
+            )
         }
         MstNotificationDTO.NotificationType.EmojiReaction -> {
             ReactionNotification(

@@ -629,6 +629,8 @@
     <string name="alarm_permission_description_message">予約投稿はアラーム機能の仕組みを利用するため、設定からMilkteaにアラームの権限を付与する必要性があります。</string>
     <string name="exclude_replies">Exclude replies</string>
     <string name="exclude_reposts">Exclude reposts</string>
+    <string name="notify_about_new_posts">投稿の通知を受信する</string>
+    <string name="stop_notify_about_new_posts">投稿の通知をやめる</string>
     <!-- User -->
 
 

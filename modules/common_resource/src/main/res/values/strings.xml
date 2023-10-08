@@ -628,6 +628,8 @@
     <string name="alarm_permission_description_message">Scheduled posting uses the mechanism of the alarm function, so it is necessary to grant alarm permission to Milktea from the settings.</string>
     <string name="exclude_replies">Exclude replies</string>
     <string name="exclude_reposts">Exclude reposts</string>
+    <string name="notify_about_new_posts">Notify about new posts</string>
+    <string name="stop_notify_about_new_posts">Stop notify about new posts</string>
     <!-- reaction-acceptance -->
 
 </resources>

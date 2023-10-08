@@ -44,6 +44,9 @@ import net.pantasystem.milktea.api.misskey.register.WebClientBaseRequest
 import net.pantasystem.milktea.api.misskey.register.WebClientRegistries
 import net.pantasystem.milktea.api.misskey.trend.HashtagTrend
 import net.pantasystem.milktea.api.misskey.users.*
+import net.pantasystem.milktea.api.misskey.users.follow.FollowUserRequest
+import net.pantasystem.milktea.api.misskey.users.follow.UnFollowUserRequest
+import net.pantasystem.milktea.api.misskey.users.follow.UpdateUserFollowRequest
 import net.pantasystem.milktea.api.misskey.users.renote.mute.CreateRenoteMuteRequest
 import net.pantasystem.milktea.api.misskey.users.renote.mute.DeleteRenoteMuteRequest
 import net.pantasystem.milktea.api.misskey.users.renote.mute.RenoteMuteDTO
@@ -73,7 +76,6 @@ import net.pantasystem.milktea.api.misskey.v12_75_0.Show
 import net.pantasystem.milktea.api.misskey.v12_75_0.UnLike
 import net.pantasystem.milktea.api.misskey.v12_75_0.Update
 import net.pantasystem.milktea.api.misskey.v13.EmojisResponse
-import net.pantasystem.milktea.api.misskey.notes.Vote
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.Headers
@@ -131,10 +133,13 @@ interface MisskeyAPI {
     suspend fun pullUserFromList(@Body listUserOperation: ListUserOperation): Response<Unit>
 
     @POST("api/following/delete")
-    suspend fun unFollowUser(@Body requestUser: RequestUser): Response<UserDTO>
+    suspend fun unFollowUser(@Body requestUser: UnFollowUserRequest): Response<UserDTO>
 
     @POST("api/following/create")
-    suspend fun followUser(@Body requestUser: RequestUser): Response<UserDTO>
+    suspend fun followUser(@Body requestUser: FollowUserRequest): Response<UserDTO>
+
+    @POST("api/following/update")
+    suspend fun updateFollowUser(@Body request: UpdateUserFollowRequest): Response<UserDTO>
 
     @POST("api/following/requests/accept")
     suspend fun acceptFollowRequest(@Body followRequest: AcceptFollowRequest) : Response<Unit>
