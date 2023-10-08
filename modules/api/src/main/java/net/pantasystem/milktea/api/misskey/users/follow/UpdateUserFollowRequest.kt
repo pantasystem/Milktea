@@ -7,6 +7,6 @@ import kotlinx.serialization.Serializable
 class UpdateUserFollowRequest(
     @SerialName("i") val i: String,
     @SerialName("userId") val userId: String,
-    @SerialName("notify") val notify: Boolean? = null,
+    @SerialName("notify") val notify: String? = null,
     @SerialName("withReplies") val withReplies: Boolean? = null,
 )
