@@ -41,6 +41,7 @@ internal class FollowApiAdapterImpl @Inject constructor(
                 ).throwIfHasError()
                 UserActionResult.Misskey
             }
+
             Account.InstanceType.MASTODON, Account.InstanceType.PLEROMA -> {
                 mastodonAPIProvider.get(account).follow(userId.id, FollowParamsRequest())
                     .throwIfHasError().body().let {
@@ -60,6 +61,7 @@ internal class FollowApiAdapterImpl @Inject constructor(
                     .body()
                 UserActionResult.Misskey
             }
+
             Account.InstanceType.MASTODON, Account.InstanceType.PLEROMA -> {
                 mastodonAPIProvider.get(account).unfollow(userId.id)
                     .throwIfHasError()
@@ -83,6 +85,7 @@ internal class FollowApiAdapterImpl @Inject constructor(
                 ).throwIfHasError()
                 UserActionResult.Misskey
             }
+
             Account.InstanceType.MASTODON, Account.InstanceType.PLEROMA -> {
                 mastodonAPIProvider.get(account).unfollow(userId.id).throwIfHasError()
                     .body().let {
@@ -94,23 +97,28 @@ internal class FollowApiAdapterImpl @Inject constructor(
 
     override suspend fun update(userId: User.Id, params: FollowUpdateParams): UserActionResult {
         val account = accountRepository.get(userId.accountId).getOrThrow()
-        return when(account.instanceType) {
+        return when (account.instanceType) {
             Account.InstanceType.MASTODON, Account.InstanceType.PLEROMA -> {
-                mastodonAPIProvider.get(account).follow(userId.id, FollowParamsRequest(
-                    reblogs = params.isReblog,
-                    notify = params.isNotify
-                )).throwIfHasError()
+                mastodonAPIProvider.get(account).follow(
+                    userId.id, FollowParamsRequest(
+//                    reblogs = params.isReblog,
+                        notify = params.isNotify
+                    )
+                ).throwIfHasError()
                     .body().let {
                         UserActionResult.Mastodon(requireNotNull(it))
                     }
             }
+
             Account.InstanceType.FIREFISH, Account.InstanceType.MISSKEY -> {
                 misskeyAPIProvider.get(account).updateFollowUser(
                     UpdateUserFollowRequest(
                         i = account.token,
                         userId = userId.id,
-                        notify = params.isNotify,
-                        withReplies = params.withReplies,
+                        notify = params.isNotify?.let {
+                            if (it) "normal" else "none"
+                        },
+//                        withReplies = params.withReplies,
                     )
                 ).throwIfHasError()
                 UserActionResult.Misskey
