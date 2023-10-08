@@ -7,9 +7,9 @@ import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.model.Entity
 import net.pantasystem.milktea.model.EntityId
 import net.pantasystem.milktea.model.account.Account
+import net.pantasystem.milktea.model.emoji.CustomEmoji
 import net.pantasystem.milktea.model.emoji.CustomEmojiParsedResult
 import net.pantasystem.milktea.model.emoji.CustomEmojiParser
-import net.pantasystem.milktea.model.emoji.CustomEmoji
 import net.pantasystem.milktea.model.note.Note
 import net.pantasystem.milktea.model.user.nickname.UserNickname
 
@@ -163,6 +163,7 @@ sealed interface User : Entity {
         val isMuting: Boolean,
         val hasPendingFollowRequestFromYou: Boolean,
         val hasPendingFollowRequestToYou: Boolean,
+        val isNotify: Boolean,
     )
 
     data class InstanceInfo(
@@ -313,6 +314,7 @@ fun User.Detail.Companion.make(
     updatedAt: Instant? = null,
     isPublicReactions: Boolean = false,
     avatarBlurhash: String? = null,
+    isNotify: Boolean = false,
 ): User.Detail {
     return User.Detail(
         id,
@@ -350,6 +352,7 @@ fun User.Detail.Companion.make(
             isMuting = isMuting,
             hasPendingFollowRequestFromYou = hasPendingFollowRequestFromYou,
             hasPendingFollowRequestToYou = hasPendingFollowRequestToYou,
+            isNotify = isNotify,
         )
     )
 }

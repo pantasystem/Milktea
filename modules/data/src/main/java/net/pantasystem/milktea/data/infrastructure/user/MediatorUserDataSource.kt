@@ -1,13 +1,30 @@
 package net.pantasystem.milktea.data.infrastructure.user
 
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.mapNotNull
+import kotlinx.coroutines.flow.merge
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.withContext
 import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.common.collection.LRUCache
 import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.common_android.hilt.IODispatcher
-import net.pantasystem.milktea.data.infrastructure.user.db.*
+import net.pantasystem.milktea.data.infrastructure.user.db.PinnedNoteIdRecord
+import net.pantasystem.milktea.data.infrastructure.user.db.UserDao
+import net.pantasystem.milktea.data.infrastructure.user.db.UserEmojiRecord
+import net.pantasystem.milktea.data.infrastructure.user.db.UserInfoStateRecord
+import net.pantasystem.milktea.data.infrastructure.user.db.UserInstanceInfoRecord
+import net.pantasystem.milktea.data.infrastructure.user.db.UserProfileFieldRecord
+import net.pantasystem.milktea.data.infrastructure.user.db.UserRecord
+import net.pantasystem.milktea.data.infrastructure.user.db.UserRelatedStateRecord
+import net.pantasystem.milktea.data.infrastructure.user.db.isEqualToModels
 import net.pantasystem.milktea.model.AddResult
 import net.pantasystem.milktea.model.user.Acct
 import net.pantasystem.milktea.model.user.User
@@ -160,6 +177,7 @@ class MediatorUserDataSource @Inject constructor(
                                 isFollowing = related.isFollowing,
                                 hasPendingFollowRequestToYou = related.hasPendingFollowRequestToYou,
                                 hasPendingFollowRequestFromYou = related.hasPendingFollowRequestFromYou,
+                                isNotify = related.isNotify,
                                 userId = dbId,
                             )
                         )

@@ -1,6 +1,13 @@
 package net.pantasystem.milktea.data.infrastructure.user.db
 
-import androidx.room.*
+import androidx.room.ColumnInfo
+import androidx.room.DatabaseView
+import androidx.room.Embedded
+import androidx.room.Entity
+import androidx.room.ForeignKey
+import androidx.room.Index
+import androidx.room.PrimaryKey
+import androidx.room.Relation
 import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDate
 import net.pantasystem.milktea.data.infrastructure.account.db.AccountRecord
@@ -173,6 +180,9 @@ data class UserRelatedStateRecord(
 
     @ColumnInfo(name = "hasPendingFollowRequestToYou")
     val hasPendingFollowRequestToYou: Boolean,
+
+    @ColumnInfo(name = "isNotify")
+    val isNotify: Boolean? = null,
 
     @ColumnInfo(name = "userId")
     @PrimaryKey(autoGenerate = false) val userId: Long
@@ -644,6 +654,7 @@ data class UserRelated(
                         isMuting = related.isMuting,
                         hasPendingFollowRequestFromYou = related.hasPendingFollowRequestFromYou,
                         hasPendingFollowRequestToYou = related.hasPendingFollowRequestToYou,
+                        isNotify = related.isNotify ?: false,
                     )
                 }
             )
