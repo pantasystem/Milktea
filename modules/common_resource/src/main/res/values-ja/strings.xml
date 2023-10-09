@@ -128,7 +128,7 @@
 
     <string name="detail">詳細</string>
 
-    <string name="instance_domain">インスタンスドメイン</string>
+    <string name="instance_domain">サーバドメイン</string>
     <string name="sign_in">ログイン</string>
     <string name="user_name">ユーザー名</string>
     <string name="password">パスワード</string>
@@ -377,7 +377,7 @@
     <string name="nickname">ニックネーム</string>
     <string name="delete_nickname">ニックネームを削除</string>
     <string name="suggested_emojis">絵文字の候補</string>
-    <string name="the_remote_emoji_does_not_exist_in_this_instance">そのリモート絵文字はこのインスタンスには存在しません。</string>
+    <string name="the_remote_emoji_does_not_exist_in_this_instance">そのリモート絵文字はこのサーバには存在しません。</string>
     <string name="view_in_browser">ブラウザで表示</string>
     <string name="note_creation_failure">投稿の作成失敗</string>
     <string name="channel">チャンネル</string>
@@ -399,7 +399,7 @@
 <!--    <string name="n_posts">%d投稿</string>-->
 <!--    <string name="owned">私の</string>-->
     <string name="groups">グループ一覧</string>
-    <string name="is_enable_instance_ticker">インスタンス情報を表示</string>
+    <string name="is_enable_instance_ticker">サーバ情報を表示</string>
     <string name="successfully_created_schedule_note">スケジュール投稿が正常に作成されました</string>
     <string name="account">アカウント</string>
     <string name="switch_account">アカウント切り替え</string>
@@ -449,7 +449,7 @@
     <string name="settings_app_restart_required">アプリの再起動が必要です</string>
 
     <string name="note_editor_poll_choice_n">候補%d</string>
-    <string name="settings_visible_instance_domain_in_toolbar">ツールバーにインスタンスのドメインを表示する</string>
+    <string name="settings_visible_instance_domain_in_toolbar">ツールバーにサーバのドメインを表示する</string>
     <string name="settings_hide_media_when_mobile_network">モバイル ネットワーク時にメディアを非表示にする</string>
     <string name="notes_media_click_to_load_image">クリックして画像を読み込み</string>
     <string name="notifications_follow_requests">フォローリクエスト</string>
@@ -476,7 +476,7 @@
     <string name="auth_error_s">エラー %s</string>
     <string name="auth_continue_auth">Continue</string>
     <string name="auth_copied_to_clipboard">クリップボードにコピーしました</string>
-    <string name="auth_instance_domain">インスタンスドメイン</string>
+    <string name="auth_instance_domain">サーバドメイン</string>
     <string name="auth_https">https://</string>
     <string name="auth_waiting_4_u_to_approve">あなたが認可するのを待っています</string>
     <string name="auth_i_have_approved">私は認可をしました</string>
