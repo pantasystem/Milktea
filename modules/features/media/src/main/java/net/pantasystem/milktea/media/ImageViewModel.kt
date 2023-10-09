@@ -2,9 +2,13 @@ package net.pantasystem.milktea.media
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
@@ -15,6 +19,7 @@ class ImageViewModel @Inject constructor(
     companion object {
         const val EXTRA_IMAGE_URL = "jp.panta.misskeyandroidclient.ui.media.EXTRA_IMAGE_URL"
         const val EXTRA_IMAGE_URI = "jp.panta.misskeyandroidclient.ui.media.EXTRA_IMAGE_URI"
+        const val EXTRA_IMAGE_THUMBNAIL_URL = "jp.panta.misskeyandroidclient.ui.media.EXTRA_IMAGE_THUMBNAIL_URL"
     }
 
     private val url = savedStateHandle.getStateFlow<String?>(
@@ -27,27 +32,37 @@ class ImageViewModel @Inject constructor(
         null,
     )
 
-    private val isImageLoading = MutableStateFlow(true)
+    private val thumbnailUrl = savedStateHandle.getStateFlow<String?>(
+        EXTRA_IMAGE_THUMBNAIL_URL,
+        null,
+    )
 
-    val uiState = combine(url, uri, isImageLoading) { url, uri, loading ->
+    private val _isImageLoading = MutableStateFlow(true)
+    val isImageLoading = _isImageLoading.asStateFlow()
+
+    val uiState = combine(url, uri, thumbnailUrl) { url, uri, thumbnail ->
         ImageUiState(
-            url = url,
-            uri = uri,
-            isLoading = loading,
+            uri = url ?: uri,
+            thumbnailUrl = thumbnail,
         )
     }
 
     fun onResourceReady() {
-        isImageLoading.value = false
+        viewModelScope.launch {
+            delay(100)
+            _isImageLoading.value = false
+        }
     }
 
     fun onLoadFailed() {
-        isImageLoading.value = false
+        viewModelScope.launch {
+            delay(100)
+            _isImageLoading.value = false
+        }
     }
 }
 
 data class ImageUiState(
     val uri: String?,
-    val url: String?,
-    val isLoading: Boolean = false,
+    val thumbnailUrl: String?,
 )

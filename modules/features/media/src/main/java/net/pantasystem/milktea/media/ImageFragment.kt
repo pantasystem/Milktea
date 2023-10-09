@@ -14,30 +14,29 @@ import com.bumptech.glide.load.engine.GlideException
 import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.target.Target
 import com.wada811.databinding.dataBinding
-import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import net.pantasystem.milktea.common.glide.GlideApp
 import net.pantasystem.milktea.media.databinding.FragmentImageBinding
 
-class ImageFragment : Fragment(R.layout.fragment_image){
+class ImageFragment : Fragment(R.layout.fragment_image) {
 
-    companion object{
+    companion object {
         private const val EXTRA_INDEX = "jp.panta.misskeyandroidclient.ui.media.EXTRA_INDEX"
-        fun newInstance(index: Int, url: String): ImageFragment {
-            val bundle = Bundle().apply{
+        fun newInstance(index: Int, url: String, thumbnailUrl: String? = null): ImageFragment {
+            val bundle = Bundle().apply {
                 putString(ImageViewModel.EXTRA_IMAGE_URL, url)
                 putInt(EXTRA_INDEX, index)
+                putString(ImageViewModel.EXTRA_IMAGE_THUMBNAIL_URL, thumbnailUrl)
             }
-            return ImageFragment().apply{
+            return ImageFragment().apply {
                 arguments = bundle
             }
         }
 
         fun newInstance(index: Int, uri: Uri): ImageFragment {
-            return ImageFragment().apply{
-                arguments = Bundle().apply{
+            return ImageFragment().apply {
+                arguments = Bundle().apply {
                     putString(ImageViewModel.EXTRA_IMAGE_URI, uri.toString())
                     putInt(EXTRA_INDEX, index)
                 }
@@ -45,7 +44,7 @@ class ImageFragment : Fragment(R.layout.fragment_image){
         }
 
         fun newInstance(index: Int, file: File): ImageFragment {
-            return newInstance(index, file.path!!)
+            return newInstance(index, file.path!!, file.thumbnailUrl)
         }
     }
 
@@ -57,18 +56,16 @@ class ImageFragment : Fragment(R.layout.fragment_image){
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        index = arguments?.getInt(EXTRA_INDEX)?: 0
+        index = arguments?.getInt(EXTRA_INDEX) ?: 0
 
         binding.swipeFinishLayout.setOnFinishEventListener {
             requireActivity().finish()
         }
 
 
-        viewModel.uiState.map {
-            it.uri ?: it.url
-        }.distinctUntilChanged().onEach { url ->
+        viewModel.uiState.onEach { uiState ->
             GlideApp.with(view)
-                .load(url)
+                .load(uiState.uri)
                 .addListener(object : RequestListener<Drawable?> {
                     override fun onLoadFailed(
                         e: GlideException?,
@@ -91,12 +88,18 @@ class ImageFragment : Fragment(R.layout.fragment_image){
                         return false
                     }
                 })
+                .let {
+                    if (uiState.thumbnailUrl != null && uiState.uri != uiState.thumbnailUrl)
+                        it.thumbnail(
+                            GlideApp.with(view).load(uiState.thumbnailUrl)
+                        )
+                    else
+                        it
+                }
                 .into(binding.imageView)
         }.flowWithLifecycle(lifecycle).launchIn(lifecycleScope)
 
-        viewModel.uiState.map {
-            it.isLoading
-        }.distinctUntilChanged().onEach {
+        viewModel.isImageLoading.onEach {
             binding.progressBar.isVisible = it
         }.flowWithLifecycle(lifecycle).launchIn(lifecycleScope)
     }
@@ -105,7 +108,7 @@ class ImageFragment : Fragment(R.layout.fragment_image){
         super.onResume()
 
         val activity = requireActivity()
-        if(activity is MediaActivity){
+        if (activity is MediaActivity) {
             activity.setCurrentFileIndex(index)
         }
 
