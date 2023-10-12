@@ -1,12 +1,19 @@
 package net.pantasystem.milktea.setting.compose.tab
 
+import androidx.compose.foundation.gestures.detectDragGesturesAfterLongPress
 import androidx.compose.foundation.gestures.scrollBy
 import androidx.compose.foundation.lazy.LazyListItemInfo
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.input.pointer.PointerInputChange
+import androidx.compose.ui.input.pointer.pointerInput
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
@@ -26,6 +33,21 @@ internal fun rememberDragDropListState(
     onMove: (Int, Int) -> Unit
 ): DragAndDropState {
     return remember { DragAndDropState(listState = lazyListState, scope = scope, onMove = onMove) }
+}
+
+internal fun Modifier.dragAndDrop(dragDropState: DragAndDropState): Modifier {
+    return then(
+        Modifier.pointerInput(
+            Unit
+        ) {
+            detectDragGesturesAfterLongPress(
+                onDrag = dragDropState::onDrag,
+                onDragStart = dragDropState::onDragStart,
+                onDragEnd = dragDropState::onDragEnd,
+                onDragCancel = dragDropState::onDragCancel
+            )
+        }
+    )
 }
 
 

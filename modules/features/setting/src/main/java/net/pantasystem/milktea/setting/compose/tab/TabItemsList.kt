@@ -2,11 +2,21 @@ package net.pantasystem.milktea.setting.compose.tab
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectDragGestures
-import androidx.compose.foundation.gestures.detectDragGesturesAfterLongPress
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.material.*
+import androidx.compose.material.Divider
+import androidx.compose.material.Icon
+import androidx.compose.material.IconButton
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Text
+import androidx.compose.material.contentColorFor
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.MoreVert
@@ -30,16 +40,7 @@ internal fun TabItemsList(
 ) {
 
 
-    LazyColumn(modifier = modifier.pointerInput(Unit) {
-        detectDragGesturesAfterLongPress(
-            onDrag = dragDropState::onDrag,
-            onDragStart = dragDropState::onDragStart,
-            onDragEnd = dragDropState::onDragEnd,
-            onDragCancel = dragDropState::onDragCancel
-        )
-    }, state = dragDropState.listState) {
-
-
+    LazyColumn(modifier = modifier.dragAndDrop(dragDropState), state = dragDropState.listState) {
         itemsIndexed(list) { index, item ->
             Column(
                 modifier = Modifier
