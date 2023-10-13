@@ -61,7 +61,7 @@ class CustomEmojiInserterTest {
             )
         )
 
-        inserter.convertAndReplaceAll("host", remoteEmojis)
+        val result = inserter.convertAndReplaceAll("host", remoteEmojis)
         verifyBlocking(dao) {
             deleteByHost("host")
             insertAll(
@@ -101,6 +101,16 @@ class CustomEmojiInserterTest {
                 )
             )
         }
+        Assertions.assertEquals(
+            remoteEmojis.mapIndexed { index, it ->
+                CustomEmojiRecord.from(
+                    it.emoji,
+                    "host",
+                    id = index + 1L,
+                )
+            },
+            result,
+        )
     }
 
     @Test
