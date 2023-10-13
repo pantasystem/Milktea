@@ -63,41 +63,41 @@ class ImageFragment : Fragment(R.layout.fragment_image) {
         }
 
 
-        viewModel.uiState.onEach { uiState ->
-            GlideApp.with(view)
-                .load(uiState.uri)
-                .addListener(object : RequestListener<Drawable?> {
-                    override fun onLoadFailed(
-                        e: GlideException?,
-                        model: Any?,
-                        target: Target<Drawable?>?,
-                        isFirstResource: Boolean
-                    ): Boolean {
-                        viewModel.onLoadFailed()
-                        return false
-                    }
-
-                    override fun onResourceReady(
-                        resource: Drawable?,
-                        model: Any?,
-                        target: Target<Drawable?>?,
-                        dataSource: DataSource?,
-                        isFirstResource: Boolean
-                    ): Boolean {
-                        viewModel.onResourceReady()
-                        return false
-                    }
-                })
-                .let {
-                    if (uiState.thumbnailUrl != null && uiState.uri != uiState.thumbnailUrl)
-                        it.thumbnail(
-                            GlideApp.with(view).load(uiState.thumbnailUrl)
-                        )
-                    else
-                        it
+        GlideApp.with(view)
+            .load(viewModel.getUri())
+            .addListener(object : RequestListener<Drawable?> {
+                override fun onLoadFailed(
+                    e: GlideException?,
+                    model: Any?,
+                    target: Target<Drawable?>?,
+                    isFirstResource: Boolean
+                ): Boolean {
+                    viewModel.onLoadFailed()
+                    return false
                 }
-                .into(binding.imageView)
-        }.flowWithLifecycle(lifecycle).launchIn(lifecycleScope)
+
+                override fun onResourceReady(
+                    resource: Drawable?,
+                    model: Any?,
+                    target: Target<Drawable?>?,
+                    dataSource: DataSource?,
+                    isFirstResource: Boolean
+                ): Boolean {
+                    viewModel.onResourceReady()
+                    return false
+                }
+            })
+            .let {
+                val thumbnailUrl = viewModel.getThumbnailUrl()
+                val uri = viewModel.getUri()
+                if (thumbnailUrl != null && uri != thumbnailUrl)
+                    it.thumbnail(
+                        GlideApp.with(view).load(thumbnailUrl)
+                    )
+                else
+                    it
+            }
+            .into(binding.imageView)
 
         viewModel.isImageLoading.onEach {
             binding.progressBar.isVisible = it
