@@ -2,6 +2,7 @@ package net.pantasystem.milktea.data.infrastructure.emoji
 
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import org.jetbrains.annotations.VisibleForTesting
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -10,8 +11,10 @@ class CustomEmojiInserter @Inject constructor(
     private val customEmojiDAO: CustomEmojiDAO,
 ) {
 
-    private var locks: Map<String, Mutex> = mapOf()
+    @VisibleForTesting
+    var locks: Map<String, Mutex> = mapOf()
     private val lock = Mutex()
+
     suspend fun replaceAll(host: String, emojis: List<CustomEmojiRecord>): List<CustomEmojiRecord> {
         return inLock(host) {
             customEmojiDAO.deleteByHost(host)
@@ -25,7 +28,8 @@ class CustomEmojiInserter @Inject constructor(
         }
     }
 
-    private suspend fun<T> inLock(host: String, block: suspend () -> T): T {
+    @VisibleForTesting
+    suspend fun<T> inLock(host: String, block: suspend () -> T): T {
         val l = lock.withLock {
             var l = locks[host]
             if (l == null) {
