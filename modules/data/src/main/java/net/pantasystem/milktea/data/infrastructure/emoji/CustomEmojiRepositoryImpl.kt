@@ -40,23 +40,10 @@ internal class CustomEmojiRepositoryImpl @Inject constructor(
 
             val emojis =  customEmojiDAO.findByHost(host).ifEmpty {
                 val remoteEmojis = fetch(nodeInfo).getOrThrow()
-                val emojisBeforeInsert = remoteEmojis.map {
-                    CustomEmojiRecord.from(it.emoji, nodeInfo.host)
-                }
-
-                val inserted = customEmojiInserter.replaceAll(
+                customEmojiInserter.convertAndReplaceAll(
                     host,
-                    emojisBeforeInsert,
+                    remoteEmojis,
                 )
-                insertAliases(
-                    inserted.map {
-                        it.id
-                    },
-                    remoteEmojis.map {
-                        it.aliases ?: emptyList()
-                    }
-                )
-                inserted
             }
 
 
@@ -130,19 +117,10 @@ internal class CustomEmojiRepositoryImpl @Inject constructor(
             }
 
             customEmojiCache.put(host, emojis)
-            customEmojiDAO.deleteByHost(nodeInfo.host)
-
-
-            val insertedEmojis = customEmojiInserter.replaceAll(
+            customEmojiInserter.convertAndReplaceAll(
                 nodeInfo.host,
-                remoteEmojis.map {
-                    CustomEmojiRecord.from(it.emoji, nodeInfo.host)
-                },
+                remoteEmojis,
             )
-
-            insertAliases(insertedEmojis.map { it.id }, remoteEmojis.map {
-                it.aliases ?: emptyList()
-            })
         }
     }
 
