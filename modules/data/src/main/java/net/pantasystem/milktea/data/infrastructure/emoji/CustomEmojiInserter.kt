@@ -1,8 +1,7 @@
 package net.pantasystem.milktea.data.infrastructure.emoji
 
 import androidx.annotation.VisibleForTesting
-import kotlinx.coroutines.sync.Mutex
-import kotlinx.coroutines.sync.withLock
+import net.pantasystem.milktea.common.coroutines.PessimisticCollectiveMutex
 import net.pantasystem.milktea.model.emoji.EmojiWithAlias
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -11,11 +10,7 @@ import javax.inject.Singleton
 class CustomEmojiInserter @Inject constructor(
     private val customEmojiDAO: CustomEmojiDAO,
 ) {
-
-    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
-    var locks: Map<String, Mutex> = mapOf()
-    private val lock = Mutex()
-
+    private val mutex = PessimisticCollectiveMutex<String>()
 
     suspend fun convertAndReplaceAll(host: String, emojis: List<EmojiWithAlias>): List<CustomEmojiRecord> {
         val emojisBeforeInsert = emojis.map {
@@ -38,7 +33,7 @@ class CustomEmojiInserter @Inject constructor(
 
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
     suspend fun replaceAll(host: String, emojis: List<CustomEmojiRecord>): List<CustomEmojiRecord> {
-        return inLock(host) {
+        return mutex.withLock(host) {
             customEmojiDAO.deleteByHost(host)
             val inserted = emojis.chunked(500).map { chunkedEmojis ->
                 val ids = customEmojiDAO.insertAll(chunkedEmojis)
@@ -65,21 +60,6 @@ class CustomEmojiInserter @Inject constructor(
             customEmojiDAO.insertAliases(chunkedAliases)
         }.flatten().toList()
 
-    }
-
-    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
-    suspend fun<T> inLock(host: String, block: suspend () -> T): T {
-        val l = lock.withLock {
-            var l = locks[host]
-            if (l == null) {
-                l = Mutex()
-                locks = locks + (host to l)
-            }
-            l
-        }
-        return l.withLock {
-            block()
-        }
     }
 
 }

@@ -168,16 +168,4 @@ class CustomEmojiInserterTest {
         }
     }
 
-    @Test
-    fun inLock() = runTest {
-        val inserter = CustomEmojiInserter(
-            mock()
-        )
-        inserter.inLock("host") {
-            Assertions.assertNotNull(inserter.locks["host"])
-            Assertions.assertEquals(inserter.locks["host"]?.isLocked, true)
-        }
-        Assertions.assertNotNull(inserter.locks["host"])
-        Assertions.assertEquals(inserter.locks["host"]?.isLocked, false)
-    }
 }
