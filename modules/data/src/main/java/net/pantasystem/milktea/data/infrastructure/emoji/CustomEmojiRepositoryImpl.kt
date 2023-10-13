@@ -25,6 +25,7 @@ internal class CustomEmojiRepositoryImpl @Inject constructor(
     private val aspectRatioDataSource: CustomEmojiAspectRatioDataSource,
     private val imageCacheRepository: ImageCacheRepository,
     private val customEmojiDAO: CustomEmojiDAO,
+    private val customEmojiInserter: CustomEmojiInserter,
     @IODispatcher private val ioDispatcher: CoroutineDispatcher,
     @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher
 ) : CustomEmojiRepository {
@@ -39,18 +40,14 @@ internal class CustomEmojiRepositoryImpl @Inject constructor(
 
             val emojis =  customEmojiDAO.findByHost(host).ifEmpty {
                 val remoteEmojis = fetch(nodeInfo).getOrThrow()
-                customEmojiDAO.deleteByHost(nodeInfo.host)
-
                 val emojisBeforeInsert = remoteEmojis.map {
                     CustomEmojiRecord.from(it.emoji, nodeInfo.host)
                 }
 
-                val inserted = emojisBeforeInsert.chunked(500).map { chunkedEmojis ->
-                    val ids = customEmojiDAO.insertAll(chunkedEmojis)
-                    chunkedEmojis.mapIndexed { index, customEmojiRecord ->
-                        customEmojiRecord.copy(id = ids[index])
-                    }
-                }.flatten()
+                val inserted = customEmojiInserter.replaceAll(
+                    host,
+                    emojisBeforeInsert,
+                )
                 insertAliases(
                     inserted.map {
                         it.id
@@ -135,13 +132,15 @@ internal class CustomEmojiRepositoryImpl @Inject constructor(
             customEmojiCache.put(host, emojis)
             customEmojiDAO.deleteByHost(nodeInfo.host)
 
-            val ids = remoteEmojis.map {
-                CustomEmojiRecord.from(it.emoji, nodeInfo.host)
-            }.chunked(500).map { chunkedEmojis ->
-                customEmojiDAO.insertAll(chunkedEmojis)
-            }.flatten()
 
-            insertAliases(ids, remoteEmojis.map {
+            val insertedEmojis = customEmojiInserter.replaceAll(
+                nodeInfo.host,
+                remoteEmojis.map {
+                    CustomEmojiRecord.from(it.emoji, nodeInfo.host)
+                },
+            )
+
+            insertAliases(insertedEmojis.map { it.id }, remoteEmojis.map {
                 it.aliases ?: emptyList()
             })
         }
