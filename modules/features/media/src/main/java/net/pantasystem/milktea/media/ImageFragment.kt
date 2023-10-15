@@ -92,7 +92,7 @@ class ImageFragment : Fragment(R.layout.fragment_image) {
                 val uri = viewModel.getUri()
                 if (thumbnailUrl != null && uri != thumbnailUrl)
                     it.thumbnail(
-                        GlideApp.with(view).load(thumbnailUrl)
+                        GlideApp.with(view).load(thumbnailUrl).fitCenter()
                     )
                 else
                     it
