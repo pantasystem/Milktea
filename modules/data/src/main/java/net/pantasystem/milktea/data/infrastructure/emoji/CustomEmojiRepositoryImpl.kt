@@ -5,6 +5,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.withContext
 import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.common_android.hilt.DefaultDispatcher
@@ -172,7 +173,13 @@ internal class CustomEmojiRepositoryImpl @Inject constructor(
     override fun observeWithSearch(host: String, keyword: String): Flow<List<CustomEmoji>> {
         return customEmojiDAO.observeAndSearch(host, keyword).map { list ->
             convertToModel(list)
-        }.flowOn(defaultDispatcher)
+        }.flowOn(defaultDispatcher).onStart {
+            customEmojiCache.get(host)?.filter {
+                it.name.contains(keyword)
+            }?.let {
+                emit(it)
+            }
+        }
     }
 
     override suspend fun search(host: String, keyword: String): Result<List<CustomEmoji>> = runCancellableCatching {
