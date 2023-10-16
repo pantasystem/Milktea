@@ -68,6 +68,7 @@ data class CustomEmojiRecord(
     ],
     indices = [
         Index(value = ["emojiId"]),
+        Index(value = ["name"]),
     ],
     primaryKeys = ["name", "emojiId"],
 )
