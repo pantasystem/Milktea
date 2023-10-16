@@ -10,14 +10,10 @@ import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.common.coroutines.combine
 import net.pantasystem.milktea.common.text.LevenshteinDistance
 import net.pantasystem.milktea.common_android.resource.StringSource
-import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.emoji.CustomEmoji
 import net.pantasystem.milktea.model.emoji.CustomEmojiRepository
-import net.pantasystem.milktea.model.emoji.UserEmojiConfig
 import net.pantasystem.milktea.model.emoji.UserEmojiConfigRepository
 import net.pantasystem.milktea.model.note.reaction.LegacyReaction
-import net.pantasystem.milktea.model.note.reaction.history.ReactionHistory
-import net.pantasystem.milktea.model.note.reaction.history.ReactionHistoryCount
 import net.pantasystem.milktea.model.note.reaction.history.ReactionHistoryRepository
 
 
@@ -102,108 +98,146 @@ class EmojiPickerUiStateService(
         emptyList()
     )
 
-    // 検索時の候補
-    val uiState: StateFlow<EmojiPickerUiState> = combine(
-        searchWord,
-        filteredEmojis,
-        account,
+    private val recentlyUsed = combine(
+        recentlyUsedReactions,
         emojis,
-        reactionCount, userSetting,
-        recentlyUsedReactions
-    ) { word,
-        filtered,
-        ac,
-        emojis,
-        counts,
-        settings,
-        recentlyUsed ->
-        EmojiPickerUiState(
-            keyword = word,
-            account = ac,
-            customEmojis = emojis,
-            reactionHistoryCounts = counts,
-            userSettingReactions = settings,
-            recentlyUsedReactions = recentlyUsed,
-            filteredEmojis = filtered,
-            customEmojiNameMap = ac?.getHost()?.let {
-                customEmojiRepository.getAndConvertToMap(it)
-            } ?: emptyMap()
-        )
-    }.stateIn(
-        coroutineScope,
-        SharingStarted.Eagerly,
-        EmojiPickerUiState(
-            "",
-            null, emptyList(),
-            emptyList(),
-            emptyList(),
-            emptyList(),
-            emptyList(),
-            emptyMap(),
-        )
-    )
-
-}
-
-data class EmojiPickerUiState(
-    val keyword: String,
-    val account: Account?,
-    val customEmojis: List<CustomEmoji>,
-    val filteredEmojis: List<CustomEmoji>,
-    val reactionHistoryCounts: List<ReactionHistoryCount>,
-    val userSettingReactions: List<UserEmojiConfig>,
-    val recentlyUsedReactions: List<ReactionHistory>,
-    val customEmojiNameMap: Map<String, CustomEmoji>,
-) {
-
-    val isSearchMode = keyword.isNotBlank()
-
-
-    private val frequencyUsedReactionsV2: List<EmojiType> by lazy {
+        account
+    ) { reactionHistoryCounts, _, account ->
         reactionHistoryCounts.map {
             it.reaction
         }.mapNotNull { reaction ->
-            EmojiType.from(customEmojiNameMap, reaction)
+            EmojiType.from(account?.getHost()?.let {
+                customEmojiRepository.getAndConvertToMap(it)
+            } ?: emptyMap(), reaction)
         }.distinct()
-    }
+    }.stateIn(
+        coroutineScope,
+        SharingStarted.WhileSubscribed(5_000),
+        emptyList()
+    )
 
-    private val userSettingEmojis: List<EmojiType> by lazy {
+    private val userSettingEmojis = combine(
+        userSetting,
+        emojis,
+        account
+    ) { userSettingReactions, _, account ->
         userSettingReactions.mapNotNull { setting ->
-            EmojiType.from(customEmojiNameMap, setting.reaction)
+            EmojiType.from(account?.getHost()?.let {
+                customEmojiRepository.getAndConvertToMap(it)
+            } ?: emptyMap(), setting.reaction)
         }.ifEmpty {
             LegacyReaction.defaultReaction.map {
                 EmojiType.Legacy(it)
             }
         }
-    }
+    }.stateIn(
+        coroutineScope,
+        SharingStarted.WhileSubscribed(5_000),
+        emptyList()
+    )
 
-    private val otherEmojis = customEmojis.filter {
-        it.category.isNullOrBlank()
-    }.map {
-        EmojiType.CustomEmoji(it)
-    }
+    private val frequencyUsedReactionsV2 = combine(
+        reactionCount,
+        emojis,
+        account,
+    ) { reactionHistoryCounts, _, account ->
+        reactionHistoryCounts.map {
+            it.reaction
+        }.mapNotNull { reaction ->
+            EmojiType.from(account?.let {
+                customEmojiRepository.getAndConvertToMap(it.getHost())
+            } ?: emptyMap(), reaction)
+        }.distinct()
+    }.stateIn(
+        coroutineScope,
+        SharingStarted.WhileSubscribed(5_000),
+        emptyList()
+    )
 
-    private fun getCategoryBy(category: String): List<EmojiType> {
-        return customEmojis.filter {
-            it.category == category
-
+    private val otherEmojis = emojis.map { emojis ->
+        emojis.filter {
+            it.category.isNullOrBlank()
         }.map {
             EmojiType.CustomEmoji(it)
         }
-    }
+    }.stateIn(
+        coroutineScope,
+        SharingStarted.WhileSubscribed(5_000),
+        emptyList()
+    )
 
-    private val categories = customEmojis.filterNot {
-        it.category.isNullOrBlank()
-    }.mapNotNull {
-        it.category
-    }.distinct()
+    private val filteredEmojisViewData = filteredEmojis.map { emojis ->
+        emojis.map {
+            EmojiType.CustomEmoji(it)
+        }
+    }.stateIn(
+        coroutineScope,
+        SharingStarted.WhileSubscribed(5_000),
+        emptyList()
+    )
 
-    private val recentlyUsed = recentlyUsedReactions.mapNotNull {
-        EmojiType.from(customEmojiNameMap, it.reaction)
-    }
+    private val categorisedEmojis = emojis.map { emojis ->
+        emojis.filterNot {
+            it.category.isNullOrBlank()
+        }.groupBy {
+            it.category ?: ""
+        }
+    }.stateIn(
+        coroutineScope,
+        SharingStarted.WhileSubscribed(5_000),
+        emptyMap()
+    )
+
+    val uiState = combine(
+        searchWord,
+        frequencyUsedReactionsV2,
+        userSettingEmojis,
+        recentlyUsed,
+        otherEmojis,
+        filteredEmojisViewData,
+        categorisedEmojis
+    ) { searchWord, frequencyUsedReactionsV2,
+        userSettingEmojis,
+        recentlyUsed,
+        otherEmojis,
+        filteredEmojisViewData,
+        categorisedEmojis ->
+
+        EmojiPickerUiState(
+            keyword = searchWord,
+            userSettingEmojis = userSettingEmojis,
+            emojiListItems = generateEmojiListItems(
+                keyword = searchWord,
+                frequencyUsedReactionsV2 = frequencyUsedReactionsV2,
+                userSettingEmojis = userSettingEmojis,
+                otherEmojis = otherEmojis,
+                recentlyUsed = recentlyUsed,
+                filteredEmojis = filteredEmojisViewData,
+                categorisedEmojis = categorisedEmojis
+            )
+        )
+    }.stateIn(
+        coroutineScope,
+        SharingStarted.WhileSubscribed(5_000),
+        EmojiPickerUiState(
+            keyword = "",
+            userSettingEmojis = emptyList(),
+            emojiListItems = emptyList()
+        )
+    )
 
 
-    val emojiListItems: List<EmojiListItemType> = generateEmojiListItems()
+}
+
+data class EmojiPickerUiState(
+    val keyword: String,
+    val userSettingEmojis: List<EmojiType>,
+    val emojiListItems: List<EmojiListItemType>,
+) {
+
+    val isSearchMode = keyword.isNotBlank()
+
+
 
 
     val tabHeaderLabels = emojiListItems.mapNotNull {
@@ -216,35 +250,7 @@ data class EmojiPickerUiState(
         }
     }
 
-    private fun generateEmojiListItems(): List<EmojiListItemType> {
-        return if (keyword.isBlank()) {
-            listOf(
-                EmojiListItemType.Header(StringSource.invoke(R.string.user)),
-            ) + userSettingEmojis.map {
-                EmojiListItemType.EmojiItem(it)
-            } + EmojiListItemType.Header(StringSource.invoke(R.string.often_use)) + frequencyUsedReactionsV2.map {
-                EmojiListItemType.EmojiItem(it)
-            } + EmojiListItemType.Header(StringSource(R.string.recently_used)) + recentlyUsed.map {
-                EmojiListItemType.EmojiItem(it)
-            } + EmojiListItemType.Header(StringSource.invoke(R.string.other)) + otherEmojis.map {
-                EmojiListItemType.EmojiItem(it)
-            } + categories.map { category ->
-                listOf(EmojiListItemType.Header(StringSource.invoke(category))) + getCategoryBy(
-                    category
-                ).map {
-                    EmojiListItemType.EmojiItem(it)
-                }
-            }.flatten()
-        } else {
-            filteredEmojis.map {
-                EmojiType.CustomEmoji(it)
-            }.sortedBy {
-                LevenshteinDistance(it.emoji.name, keyword)
-            }.map {
-                EmojiListItemType.EmojiItem(it)
-            }
-        }
-    }
+
 }
 
 
@@ -326,3 +332,36 @@ fun EmojiType.Companion.from(emojis: Map<String, CustomEmoji>, reaction: String)
     }
 }
 
+private fun generateEmojiListItems(
+    keyword: String,
+    frequencyUsedReactionsV2: List<EmojiType>,
+    userSettingEmojis: List<EmojiType>,
+    recentlyUsed: List<EmojiType>,
+    otherEmojis: List<EmojiType>,
+    filteredEmojis: List<EmojiType>,
+    categorisedEmojis: Map<String, List<CustomEmoji>>,
+): List<EmojiListItemType> {
+    return if (keyword.isBlank()) {
+        listOf(
+            EmojiListItemType.Header(StringSource.invoke(R.string.user)),
+        ) + userSettingEmojis.map {
+            EmojiListItemType.EmojiItem(it)
+        } + EmojiListItemType.Header(StringSource.invoke(R.string.often_use)) + frequencyUsedReactionsV2.map {
+            EmojiListItemType.EmojiItem(it)
+        } + EmojiListItemType.Header(StringSource(R.string.recently_used)) + recentlyUsed.map {
+            EmojiListItemType.EmojiItem(it)
+        } + EmojiListItemType.Header(StringSource.invoke(R.string.other)) + otherEmojis.map {
+            EmojiListItemType.EmojiItem(it)
+        } + categorisedEmojis.map {
+            listOf(EmojiListItemType.Header(StringSource.invoke(it.key))) + it.value.map { emoji ->
+                EmojiListItemType.EmojiItem(EmojiType.CustomEmoji(emoji))
+            }
+        }.flatten()
+    } else {
+        filteredEmojis.sortedBy {
+            LevenshteinDistance(it.toTextReaction(), keyword)
+        }.map {
+            EmojiListItemType.EmojiItem(it)
+        }
+    }
+}
