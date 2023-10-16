@@ -125,6 +125,9 @@ class EmojiPickerUiStateService(
             userSettingReactions = settings,
             recentlyUsedReactions = recentlyUsed,
             filteredEmojis = filtered,
+            customEmojiNameMap = ac?.getHost()?.let {
+                customEmojiRepository.getAndConvertToMap(it)
+            } ?: emptyMap()
         )
     }.stateIn(
         coroutineScope,
@@ -135,7 +138,8 @@ class EmojiPickerUiStateService(
             emptyList(),
             emptyList(),
             emptyList(),
-            emptyList()
+            emptyList(),
+            emptyMap(),
         )
     )
 
@@ -149,21 +153,23 @@ data class EmojiPickerUiState(
     val reactionHistoryCounts: List<ReactionHistoryCount>,
     val userSettingReactions: List<UserEmojiConfig>,
     val recentlyUsedReactions: List<ReactionHistory>,
+    val customEmojiNameMap: Map<String, CustomEmoji>,
 ) {
 
     val isSearchMode = keyword.isNotBlank()
+
 
     private val frequencyUsedReactionsV2: List<EmojiType> by lazy {
         reactionHistoryCounts.map {
             it.reaction
         }.mapNotNull { reaction ->
-            EmojiType.from(customEmojis, reaction)
+            EmojiType.from(customEmojiNameMap, reaction)
         }.distinct()
     }
 
     private val userSettingEmojis: List<EmojiType> by lazy {
         userSettingReactions.mapNotNull { setting ->
-            EmojiType.from(customEmojis, setting.reaction)
+            EmojiType.from(customEmojiNameMap, setting.reaction)
         }.ifEmpty {
             LegacyReaction.defaultReaction.map {
                 EmojiType.Legacy(it)
@@ -193,7 +199,7 @@ data class EmojiPickerUiState(
     }.distinct()
 
     private val recentlyUsed = recentlyUsedReactions.mapNotNull {
-        EmojiType.from(customEmojis, it.reaction)
+        EmojiType.from(customEmojiNameMap, it.reaction)
     }
 
 
@@ -298,7 +304,7 @@ fun EmojiType.toTextReaction(): String {
 }
 
 
-fun EmojiType.Companion.from(emojis: List<CustomEmoji>?, reaction: String): EmojiType? {
+fun EmojiType.Companion.from(emojis: Map<String, CustomEmoji>, reaction: String): EmojiType? {
     return if (reaction.codePointCount(0, reaction.length) == 1) {
         EmojiType.UtfEmoji(reaction)
     } else if (reaction.startsWith(":") && reaction.endsWith(":") && reaction.contains(
@@ -306,21 +312,15 @@ fun EmojiType.Companion.from(emojis: List<CustomEmoji>?, reaction: String): Emoj
         )
     ) {
         val nameOnly = reaction.replace(":", "")
-        (emojis?.firstOrNull {
-            it.name == nameOnly
-        } ?: (nameOnly.split("@")[0]).let { name ->
-            emojis?.firstOrNull {
-                it.name == name
-            }
+        (emojis[nameOnly] ?: (nameOnly.split("@")[0]).let { name ->
+            emojis[name]
         })?.let {
             EmojiType.CustomEmoji(it)
         }
     } else if (LegacyReaction.reactionMap[reaction] != null) {
         EmojiType.Legacy(reaction)
     } else {
-        emojis?.firstOrNull {
-            it.name == reaction.replace(":", "")
-        }?.let {
+        emojis[reaction.replace(":", "")]?.let {
             EmojiType.CustomEmoji(it)
         }
     }
