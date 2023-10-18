@@ -87,7 +87,9 @@ internal class TimelinePagingStoreImpl(
                 limit = LIMIT
             )
             val req = builder.build(NoteRequest.Conditions(sinceId = getSinceId()?.noteId))
-            getStore()!!.invoke(req).throwIfHasError().body()!!
+            getStore()!!.invoke(req).throwIfHasError().body()!!.sortedBy {
+                it.id
+            }
         }
     }
 
