@@ -15,6 +15,18 @@ class PreviousPagingController<DTO, E>(
     private val previousLoader: PreviousLoader<DTO>,
     private val dispatcher: CoroutineDispatcher = Dispatchers.IO
 ) : PreviousPaginator {
+
+    companion object {
+        fun <T, DTO, E> create(impl: T): PreviousPagingController<DTO, E> where T : EntityConverter<DTO, E>, T : StateLocker, T : PaginationState<E>, T : PreviousLoader<DTO> {
+            return PreviousPagingController(
+                impl,
+                impl,
+                impl,
+                impl
+            )
+        }
+    }
+
     override suspend fun loadPrevious(): Result<Int> {
         if (locker.mutex.isLocked) {
             return Result.failure(IllegalStateException())
@@ -37,7 +49,7 @@ class PreviousPagingController<DTO, E>(
                 )
                 state.setState(errorState)
             }.onSuccess {
-                when(val content = this.state.getState().content) {
+                when (val content = this.state.getState().content) {
                     is StateContent.Exist -> {
                         val newList = content.rawContent.toMutableList()
                         newList.addAll(it)
@@ -49,6 +61,7 @@ class PreviousPagingController<DTO, E>(
                             )
                         )
                     }
+
                     is StateContent.NotExist -> {
                         state.setState(
                             PageableState.Fixed(

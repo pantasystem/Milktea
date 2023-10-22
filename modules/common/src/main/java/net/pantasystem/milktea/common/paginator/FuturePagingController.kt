@@ -16,6 +16,18 @@ class FuturePagingController<DTO, E>(
     private val futureLoader: FutureLoader<DTO>,
     private val dispatcher: CoroutineDispatcher = Dispatchers.IO
 ) : FuturePaginator {
+
+    companion object {
+        fun <T, DTO, E> create(impl: T): FuturePagingController<DTO, E> where T : EntityConverter<DTO, E>, T : StateLocker, T : PaginationState<E>, T : FutureLoader<DTO> {
+            return FuturePagingController(
+                impl,
+                impl,
+                impl,
+                impl
+            )
+        }
+    }
+
     override suspend fun loadFuture(): Result<Int> {
         if (locker.mutex.isLocked) {
             return Result.failure(IllegalStateException())

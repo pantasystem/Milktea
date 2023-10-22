@@ -137,26 +137,17 @@ class TimelineStoreImpl(
         return runCancellableCatching<Unit> {
             val addedCount = when (val store = pageableStore) {
                 is TimelinePagingStoreImpl -> {
-                    FuturePagingController(
-                        store,
-                        store,
-                        store,
+                    FuturePagingController.create(
                         store,
                     ).loadFuture()
                 }
                 is FavoriteNoteTimelinePagingStoreImpl -> {
-                    FuturePagingController(
-                        store,
-                        store,
-                        store,
+                    FuturePagingController.create(
                         store,
                     ).loadFuture()
                 }
                 is MastodonTimelineStorePagingStoreImpl -> {
-                    FuturePagingController(
-                        store,
-                        store,
-                        store,
+                    FuturePagingController.create(
                         store,
                     ).loadFuture()
                 }
@@ -173,26 +164,17 @@ class TimelineStoreImpl(
         return runCancellableCatching<Unit> {
             when (val store = pageableStore) {
                 is TimelinePagingStoreImpl -> {
-                    PreviousPagingController(
-                        store,
-                        store,
-                        store,
+                    PreviousPagingController.create(
                         store,
                     ).loadPrevious()
                 }
                 is FavoriteNoteTimelinePagingStoreImpl -> {
-                    PreviousPagingController(
-                        store,
-                        store,
-                        store,
+                    PreviousPagingController.create(
                         store,
                     ).loadPrevious()
                 }
                 is MastodonTimelineStorePagingStoreImpl -> {
-                    PreviousPagingController(
-                        store,
-                        store,
-                        store,
+                    PreviousPagingController.create(
                         store,
                     ).loadPrevious()
                 }
