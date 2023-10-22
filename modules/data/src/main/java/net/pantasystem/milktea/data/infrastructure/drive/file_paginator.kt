@@ -51,11 +51,8 @@ class FilePropertyPagingStoreImpl @Inject constructor(
     )
 
     private val previousPagingController: PreviousPagingController<FilePropertyDTO, FileProperty.Id> =
-        PreviousPagingController(
+        PreviousPagingController.create(
             filePropertyPagingImpl,
-            filePropertyPagingImpl,
-            filePropertyPagingImpl,
-            filePropertyPagingImpl
         )
 
     override val state = this.filePropertyPagingImpl.state

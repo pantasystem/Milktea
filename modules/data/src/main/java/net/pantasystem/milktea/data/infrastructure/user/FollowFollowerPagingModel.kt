@@ -74,10 +74,7 @@ class FollowFollowerPagingStoreImpl(
         nodeInfoRepository = nodeInfoRepository,
     )
 
-    private val previousPagingController = PreviousPagingController(
-        loader,
-        loader,
-        loader,
+    private val previousPagingController = PreviousPagingController.create(
         loader,
     )
 

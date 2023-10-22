@@ -36,10 +36,7 @@ class DriveDirectoryPagingStoreImpl @Inject constructor(
         )
     }
 
-    private val controller = PreviousPagingController(
-        pagingImpl,
-        pagingImpl,
-        pagingImpl,
+    private val controller = PreviousPagingController.create(
         pagingImpl,
     )
 

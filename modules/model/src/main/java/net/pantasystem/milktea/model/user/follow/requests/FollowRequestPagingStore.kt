@@ -27,10 +27,7 @@ class FollowRequestPagingStore(
     }
 
     private val impl = FollowRequestPagingStoreImpl(getAccount, followRequestRepository)
-    private val previousController = PreviousPagingController(
-        impl,
-        impl,
-        impl,
+    private val previousController = PreviousPagingController.create(
         impl,
     )
 
