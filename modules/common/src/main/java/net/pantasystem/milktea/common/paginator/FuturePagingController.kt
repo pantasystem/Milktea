@@ -41,6 +41,11 @@ class FuturePagingController<DTO, E>(
             runCancellableCatching {
                 withContext(dispatcher) {
                     val res = futureLoader.loadFuture().getOrThrow()
+
+                    // MisskeyではsinceIdで取得した場合に[1, 2, 3, 4, 5]という順番で取得される
+                    // しかしアプリ上では[5, 4, 3, 2, 1]という順番で扱えた方が好ましいため、
+                    // reverseするようにしている。
+                    // ※ untilIdの場合は[5, 4, 3, 2, 1]という順番で取得される。
                     entityConverter.convertAll(res).asReversed()
                 }
             }.onFailure {
