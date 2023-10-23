@@ -87,6 +87,13 @@ internal class TimelinePagingStoreImpl(
                 limit = LIMIT
             )
             val req = builder.build(NoteRequest.Conditions(sinceId = getSinceId()?.noteId))
+
+            // MisskeyはsinceIdで取得した場合
+            // [1, 2, 3, 4, 5]という順番で取得されるようになっていた。
+            // しかしアプリ上では[5, 4, 3, 2, 1]という順番で扱えた方が好ましいため、
+            // FuturePagingControllerではasReverseする処理を行っている。
+            // しかしMisskey側の変更によって[5, 4, 3, 2, 1]という順番で取得されるようになったため、
+            // sortedByをして、ソート順が変わっても対応できるようにしている。
             getStore()!!.invoke(req).throwIfHasError().body()!!.sortedBy {
                 it.id
             }
