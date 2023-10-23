@@ -1,7 +1,4 @@
-package jp.panta.misskeyandroidclient.mfm
-
-import net.pantasystem.milktea.common_android.mfm.Element
-import net.pantasystem.milktea.common_android.mfm.ElementType
+package net.pantasystem.milktea.common_android.mfm
 
 open class Node(
     override val start: Int,
