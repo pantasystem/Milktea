@@ -17,6 +17,7 @@ import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.drive.FileProperty
 import net.pantasystem.milktea.model.drive.FilePropertyDataSource
 import net.pantasystem.milktea.model.file.AppFile
+import net.pantasystem.milktea.model.file.FileUploadFailedException
 import okhttp3.MultipartBody
 import okhttp3.OkHttpClient
 import okhttp3.Request

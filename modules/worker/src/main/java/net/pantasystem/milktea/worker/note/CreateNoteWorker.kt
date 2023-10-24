@@ -15,6 +15,7 @@ import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.common.MisskeyErrorCodes
 import net.pantasystem.milktea.common.mapCancellableCatching
 import net.pantasystem.milktea.model.account.AccountRepository
+import net.pantasystem.milktea.model.file.FileUploadFailedException
 import net.pantasystem.milktea.model.note.CreateNoteUseCase
 import net.pantasystem.milktea.model.note.draft.DraftNoteRepository
 import net.pantasystem.milktea.model.note.toCreateNote
@@ -103,35 +104,44 @@ class CreateNoteWorker @AssistedInject constructor(
     private fun convertToErrorReason(type: Throwable): ErrorReasonType {
         return when(type) {
             is APIError -> {
-                when (type) {
-                    is APIError.AuthenticationException -> ErrorReasonType.UnauthorizedError
-                    is APIError.ClientException -> {
-                        when(val errorType = type.error) {
-                            is ErrorType.Misskey -> {
-                                when(errorType.errorCodeeType) {
-                                    MisskeyErrorCodes.NoFreeSpace -> ErrorReasonType.FileUploadDriveNoFreeSpaceError
-                                    else -> ErrorReasonType.ClientError
-                                }
-                            }
-                            is ErrorType.Raw -> ErrorReasonType.ClientError
-                            null -> ErrorReasonType.ClientError
-                        }
-                    }
-                    is APIError.ForbiddenException -> ErrorReasonType.UnauthorizedError
-                    is APIError.IAmAIException -> ErrorReasonType.IAmAiError
-                    is APIError.InternalServerException -> ErrorReasonType.ServerError
-                    is APIError.NotFoundException -> ErrorReasonType.NotFoundError
-                    is APIError.SomethingException -> ErrorReasonType.UnknownError
-                    is APIError.ToManyRequestsException -> ErrorReasonType.ToManyRequestError
-                }
+                convertToErrorReasonFromApiError(type)
             }
             is SecurityException -> {
                 ErrorReasonType.FileUploadDeviceSecurityError
+            }
+            is FileUploadFailedException -> {
+                type.throwable?.let {
+                    convertToErrorReason(it)
+                } ?: ErrorReasonType.UnknownError
             }
             is IOException -> {
                 ErrorReasonType.NetworkError
             }
             else -> ErrorReasonType.UnknownError
+        }
+    }
+
+    private fun convertToErrorReasonFromApiError(type: APIError): ErrorReasonType {
+        return when (type) {
+            is APIError.AuthenticationException -> ErrorReasonType.UnauthorizedError
+            is APIError.ClientException -> {
+                when(val errorType = type.error) {
+                    is ErrorType.Misskey -> {
+                        when(errorType.errorCodeeType) {
+                            MisskeyErrorCodes.NoFreeSpace -> ErrorReasonType.FileUploadDriveNoFreeSpaceError
+                            else -> ErrorReasonType.ClientError
+                        }
+                    }
+                    is ErrorType.Raw -> ErrorReasonType.ClientError
+                    null -> ErrorReasonType.ClientError
+                }
+            }
+            is APIError.ForbiddenException -> ErrorReasonType.UnauthorizedError
+            is APIError.IAmAIException -> ErrorReasonType.IAmAiError
+            is APIError.InternalServerException -> ErrorReasonType.ServerError
+            is APIError.NotFoundException -> ErrorReasonType.NotFoundError
+            is APIError.SomethingException -> ErrorReasonType.UnknownError
+            is APIError.ToManyRequestsException -> ErrorReasonType.ToManyRequestError
         }
     }
 }
