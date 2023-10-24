@@ -254,8 +254,8 @@ class MediatorUserDataSource @Inject constructor(
         if (serverIds.isEmpty()) {
             return flowOf(emptyList())
         }
-        return serverIds.distinct().chunked(50).map {
-            userDao.observeInServerIds(accountId, serverIds).distinctUntilChanged().map { list ->
+        return serverIds.distinct().chunked(500).map { chunkedIds ->
+            userDao.observeInServerIds(accountId, chunkedIds).distinctUntilChanged().map { list ->
                 list.map {
                     it.toModel()
                 }

@@ -30,7 +30,7 @@ class FuturePagingController<DTO, E>(
 
     override suspend fun loadFuture(): Result<Int> {
         if (locker.mutex.isLocked) {
-            return Result.failure(IllegalStateException())
+            return Result.failure(IllegalStateException("ローディング中にさらにローディング処理を実行することはできません"))
         }
         return locker.mutex.withLock {
 
