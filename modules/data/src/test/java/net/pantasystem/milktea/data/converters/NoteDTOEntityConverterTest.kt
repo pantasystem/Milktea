@@ -106,4 +106,187 @@ class NoteDTOEntityConverterTest {
         Assertions.assertEquals(noteDTO.text, result.text)
 
     }
+
+    @Test
+    fun convert_WhenRequireNyaize() = runTest {
+
+        val converter = NoteDTOEntityConverter(
+            mock() {
+                onBlocking {
+                    findIn(any())
+                } doReturn Result.success(emptyList())
+            },
+            mock() {
+                onBlocking {
+                    findBySourceUrls(any())
+                } doReturn emptyList()
+            },
+            mock() {
+                onBlocking {
+                    find(any())
+                } doReturn Result.success(
+                    InstanceInfoType.Misskey(
+                        Meta(
+                            uri = "https://misskey.pantasystem.com",
+                            version = "2023.10.2"
+                        )
+                    )
+                )
+            }
+        )
+
+        val account = Account(
+            remoteId = "test-id",
+            instanceDomain = "https://misskey.pantasystem.com",
+            userName = "Panta",
+            instanceType = Account.InstanceType.MISSKEY,
+            token = "",
+        ).copy(accountId = 1L)
+
+        val noteDTO = NoteDTO(
+            id = "noteId",
+            createdAt = Clock.System.now(),
+            text = "test",
+            cw = "cw",
+            userId = "user-1",
+            replyId = "reply-id",
+            renoteId = "renote-id",
+            viaMobile = false,
+            visibility = NoteVisibilityType.Public,
+            localOnly = false,
+            visibleUserIds = listOf(),
+            rawReactionEmojis = net.pantasystem.milktea.api.misskey.emoji.EmojisType.None,
+            url = null,
+            uri = null,
+            renoteCount = 0,
+            reactionCounts = null,
+            rawEmojis = null,
+            replyCount = 0,
+            user = UserDTO(
+                id = "idididi",
+                userName = "test",
+                isCat = true,
+            ),
+            files = listOf(),
+            fileIds = listOf(),
+            poll = null,
+            reNote = null,
+            reply = null,
+            myReaction = "😇",
+            tmpFeaturedId = null,
+            promotionId = null,
+            channelId = null,
+            app = null,
+            channel = null
+        )
+
+        val result = converter.convert(
+            noteDTO, account
+        )
+        Assertions.assertEquals(Note.Id(account.accountId, noteDTO.id), result.id)
+        Assertions.assertEquals(noteDTO.cw, result.cw)
+        Assertions.assertEquals(noteDTO.text, result.text)
+        Assertions.assertEquals(User.Id(account.accountId, noteDTO.userId), result.userId)
+        Assertions.assertEquals(noteDTO.replyId?.let {
+            Note.Id(account.accountId, it)
+        }, result.replyId)
+        Assertions.assertEquals(noteDTO.renoteId?.let {
+            Note.Id(account.accountId, it)
+        }, result.renoteId)
+        Assertions.assertEquals(noteDTO.cw, result.cw)
+        Assertions.assertEquals(noteDTO.text, result.text)
+        Assertions.assertEquals(true, (result.type as Note.Type.Misskey).isRequireNyaize)
+    }
+
+
+    @Test
+    fun convert_WhenRequireNyaizeAndGiveNotCat() = runTest {
+
+        val converter = NoteDTOEntityConverter(
+            mock() {
+                onBlocking {
+                    findIn(any())
+                } doReturn Result.success(emptyList())
+            },
+            mock() {
+                onBlocking {
+                    findBySourceUrls(any())
+                } doReturn emptyList()
+            },
+            mock() {
+                onBlocking {
+                    find(any())
+                } doReturn Result.success(
+                    InstanceInfoType.Misskey(
+                        Meta(
+                            uri = "https://misskey.pantasystem.com",
+                            version = "2023.10.2"
+                        )
+                    )
+                )
+            }
+        )
+
+        val account = Account(
+            remoteId = "test-id",
+            instanceDomain = "https://misskey.pantasystem.com",
+            userName = "Panta",
+            instanceType = Account.InstanceType.MISSKEY,
+            token = "",
+        ).copy(accountId = 1L)
+
+        val noteDTO = NoteDTO(
+            id = "noteId",
+            createdAt = Clock.System.now(),
+            text = "test",
+            cw = "cw",
+            userId = "user-1",
+            replyId = "reply-id",
+            renoteId = "renote-id",
+            viaMobile = false,
+            visibility = NoteVisibilityType.Public,
+            localOnly = false,
+            visibleUserIds = listOf(),
+            rawReactionEmojis = net.pantasystem.milktea.api.misskey.emoji.EmojisType.None,
+            url = null,
+            uri = null,
+            renoteCount = 0,
+            reactionCounts = null,
+            rawEmojis = null,
+            replyCount = 0,
+            user = UserDTO(
+                id = "idididi",
+                userName = "test",
+                isCat = false,
+            ),
+            files = listOf(),
+            fileIds = listOf(),
+            poll = null,
+            reNote = null,
+            reply = null,
+            myReaction = "😇",
+            tmpFeaturedId = null,
+            promotionId = null,
+            channelId = null,
+            app = null,
+            channel = null
+        )
+
+        val result = converter.convert(
+            noteDTO, account
+        )
+        Assertions.assertEquals(Note.Id(account.accountId, noteDTO.id), result.id)
+        Assertions.assertEquals(noteDTO.cw, result.cw)
+        Assertions.assertEquals(noteDTO.text, result.text)
+        Assertions.assertEquals(User.Id(account.accountId, noteDTO.userId), result.userId)
+        Assertions.assertEquals(noteDTO.replyId?.let {
+            Note.Id(account.accountId, it)
+        }, result.replyId)
+        Assertions.assertEquals(noteDTO.renoteId?.let {
+            Note.Id(account.accountId, it)
+        }, result.renoteId)
+        Assertions.assertEquals(noteDTO.cw, result.cw)
+        Assertions.assertEquals(noteDTO.text, result.text)
+        Assertions.assertEquals(false, (result.type as Note.Type.Misskey).isRequireNyaize)
+    }
 }
