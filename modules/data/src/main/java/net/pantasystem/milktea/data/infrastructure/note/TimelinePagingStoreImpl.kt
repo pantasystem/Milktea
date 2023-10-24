@@ -19,6 +19,7 @@ import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.page.Pageable
 import net.pantasystem.milktea.model.account.page.SincePaginate
 import net.pantasystem.milktea.model.account.page.UntilPaginate
+import net.pantasystem.milktea.model.instance.InstanceInfoType
 import net.pantasystem.milktea.model.note.Note
 import retrofit2.Response
 
@@ -29,6 +30,7 @@ internal class TimelinePagingStoreImpl(
     private val getAccount: suspend () -> Account,
     private val getInitialLoadQuery: () -> InitialLoadQuery?,
     private val misskeyAPIProvider: MisskeyAPIProvider,
+    private val getCurrentInstanceInfo: suspend (String) -> InstanceInfoType?,
 ) : EntityConverter<NoteDTO, Note.Id>, PreviousLoader<NoteDTO>, FutureLoader<NoteDTO>,
     IdGetter<Note.Id>, TimelinePagingBase, StreamingReceivableStore {
 
@@ -101,10 +103,11 @@ internal class TimelinePagingStoreImpl(
     }
 
     override suspend fun convertAll(list: List<NoteDTO>): List<Note.Id> {
+        val info = getCurrentInstanceInfo(getAccount().normalizedInstanceUri)
         return list.filter {
             it.promotionId == null || it.tmpFeaturedId == null
         }.map {
-            noteAdder.addNoteDtoToDataSource(getAccount.invoke(), it).id
+            noteAdder.addNoteDtoToDataSource(getAccount.invoke(), it, instanceType = info).id
         }
     }
 

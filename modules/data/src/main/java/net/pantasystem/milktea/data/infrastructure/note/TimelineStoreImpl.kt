@@ -20,6 +20,7 @@ import net.pantasystem.milktea.data.api.mastodon.MastodonAPIProvider
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.page.Pageable
+import net.pantasystem.milktea.model.instance.InstanceInfoService
 import net.pantasystem.milktea.model.nodeinfo.NodeInfoRepository
 import net.pantasystem.milktea.model.note.Note
 import net.pantasystem.milktea.model.note.NoteDataSource
@@ -40,6 +41,7 @@ class TimelineStoreImpl(
     private val noteRelationGetter: NoteRelationGetter,
     private val mastodonAPIProvider: MastodonAPIProvider,
     private val nodeInfoRepository: NodeInfoRepository,
+    private val instanceInfoService: InstanceInfoService,
 ) : TimelineStore {
 
     class Factory @Inject constructor(
@@ -48,7 +50,8 @@ class TimelineStoreImpl(
         private val misskeyAPIProvider: MisskeyAPIProvider,
         private val noteRelationGetter: NoteRelationGetter,
         private val mastodonAPIProvider: MastodonAPIProvider,
-        private val nodeInfoRepository: NodeInfoRepository
+        private val nodeInfoRepository: NodeInfoRepository,
+        private val instanceInfoService: InstanceInfoService,
     ) : TimelineStore.Factory {
         override fun create(
             pageable: Pageable,
@@ -64,7 +67,8 @@ class TimelineStoreImpl(
                 coroutineScope,
                 noteRelationGetter,
                 mastodonAPIProvider,
-                nodeInfoRepository = nodeInfoRepository
+                nodeInfoRepository = nodeInfoRepository,
+                instanceInfoService = instanceInfoService
             )
         }
     }
@@ -100,6 +104,9 @@ class TimelineStoreImpl(
                     initialLoadQuery
                 },
                 misskeyAPIProvider,
+                {
+                    instanceInfoService.find(it).getOrNull()
+                }
             )
         }
     }
