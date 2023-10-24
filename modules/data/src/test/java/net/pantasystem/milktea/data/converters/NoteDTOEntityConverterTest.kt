@@ -1,6 +1,5 @@
 package net.pantasystem.milktea.data.converters
 
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import kotlinx.datetime.Clock
 import net.pantasystem.milktea.api.misskey.notes.NoteDTO
@@ -19,7 +18,6 @@ import org.mockito.kotlin.mock
 
 class NoteDTOEntityConverterTest {
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     @Test
     fun convert() = runTest {
 
