@@ -296,6 +296,7 @@ internal class NoteRecordTest {
                 ),
                 isAcceptingOnlyLikeReaction = false,
                 isNotAcceptingSensitiveReaction = true,
+                isRequireNyaize = true,
             )
         )
         record.applyModel(note)
@@ -314,6 +315,10 @@ internal class NoteRecordTest {
         Assertions.assertEquals(
             true,
             record.misskeyIsNotAcceptingSensitiveReaction
+        )
+        Assertions.assertEquals(
+            true,
+            record.misskeyIsRequireNyaize,
         )
     }
 
