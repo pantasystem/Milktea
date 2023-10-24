@@ -153,7 +153,7 @@ suspend fun NoteDTO.toEntities(
         dtoList.add(reNote!!)
     }
 
-    val note = noteDTOEntityConverter.convert(this, account)
+    val note = noteDTOEntityConverter.convert(account, this)
     val users = mutableListOf<User>()
     val notes = mutableListOf<Note>()
     val files = mutableListOf<FileProperty>()
@@ -226,7 +226,8 @@ suspend fun NoteDTO.toNoteAndUser(
     userDTOEntityConverter: UserDTOEntityConverter,
     noteDTOEntityConverter: NoteDTOEntityConverter,
 ): Pair<Note, User> {
-    val note = noteDTOEntityConverter.convert(this, account)
+    val note = noteDTOEntityConverter.convert(account, this)
     val user = userDTOEntityConverter.convert(account, user, false)
     return note to user
 }
+

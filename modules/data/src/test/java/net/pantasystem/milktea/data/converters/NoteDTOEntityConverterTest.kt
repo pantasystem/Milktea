@@ -90,7 +90,7 @@ class NoteDTOEntityConverterTest {
         )
 
         val result = converter.convert(
-            noteDTO, account
+            account, noteDTO
         )
         Assertions.assertEquals(Note.Id(account.accountId, noteDTO.id), result.id)
         Assertions.assertEquals(noteDTO.cw, result.cw)
@@ -181,7 +181,7 @@ class NoteDTOEntityConverterTest {
         )
 
         val result = converter.convert(
-            noteDTO, account
+            account, noteDTO
         )
         Assertions.assertEquals(Note.Id(account.accountId, noteDTO.id), result.id)
         Assertions.assertEquals(noteDTO.cw, result.cw)
@@ -273,7 +273,7 @@ class NoteDTOEntityConverterTest {
         )
 
         val result = converter.convert(
-            noteDTO, account
+            account, noteDTO
         )
         Assertions.assertEquals(Note.Id(account.accountId, noteDTO.id), result.id)
         Assertions.assertEquals(noteDTO.cw, result.cw)

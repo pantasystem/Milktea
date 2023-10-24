@@ -25,7 +25,7 @@ class NoteDTOEntityConverter @Inject constructor(
     private val instanceInfoService: InstanceInfoService,
 ) {
 
-    suspend fun convert(noteDTO: NoteDTO, account: Account): Note {
+    suspend fun convert(account: Account, noteDTO: NoteDTO): Note {
         val emojis = (noteDTO.emojiList + (noteDTO.reactionEmojiList))
 
         val instanceInfo = instanceInfoService.find(account.normalizedInstanceUri).getOrNull()

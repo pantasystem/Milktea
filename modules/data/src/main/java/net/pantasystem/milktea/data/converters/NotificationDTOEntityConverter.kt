@@ -12,12 +12,12 @@ import net.pantasystem.milktea.model.notification.MentionNotification
 import net.pantasystem.milktea.model.notification.Notification
 import net.pantasystem.milktea.model.notification.PollEndedNotification
 import net.pantasystem.milktea.model.notification.PollVoteNotification
+import net.pantasystem.milktea.model.notification.PostNotification
 import net.pantasystem.milktea.model.notification.QuoteNotification
 import net.pantasystem.milktea.model.notification.ReactionNotification
 import net.pantasystem.milktea.model.notification.ReceiveFollowRequestNotification
 import net.pantasystem.milktea.model.notification.RenoteNotification
 import net.pantasystem.milktea.model.notification.ReplyNotification
-import net.pantasystem.milktea.model.notification.PostNotification
 import net.pantasystem.milktea.model.notification.UnknownNotification
 import net.pantasystem.milktea.model.user.User
 import javax.inject.Inject
@@ -111,7 +111,7 @@ class NotificationDTOEntityConverter @Inject constructor(
                     "想定しないデータ=$notificationDTO"
                 }
                 require(notificationDTO.note != null)
-                val n = noteDTOEntityConverter.convert(notificationDTO.note!!, account)
+                val n = noteDTOEntityConverter.convert(account, notificationDTO.note!!)
                 ReactionNotification(
                     id,
                     notificationDTO.createdAt,
