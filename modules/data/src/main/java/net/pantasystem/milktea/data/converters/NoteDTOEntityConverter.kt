@@ -10,8 +10,6 @@ import net.pantasystem.milktea.model.drive.FileProperty
 import net.pantasystem.milktea.model.emoji.CustomEmojiAspectRatioDataSource
 import net.pantasystem.milktea.model.image.ImageCacheRepository
 import net.pantasystem.milktea.model.instance.InstanceInfoService
-import net.pantasystem.milktea.model.instance.InstanceInfoType
-import net.pantasystem.milktea.model.instance.Version
 import net.pantasystem.milktea.model.note.Note
 import net.pantasystem.milktea.model.note.Visibility
 import net.pantasystem.milktea.model.note.poll.Poll
@@ -30,8 +28,8 @@ class NoteDTOEntityConverter @Inject constructor(
     suspend fun convert(noteDTO: NoteDTO, account: Account): Note {
         val emojis = (noteDTO.emojiList + (noteDTO.reactionEmojiList))
 
-        val instanceInfo = instanceInfoService.find(account.getHost()).getOrNull()
-        val isRequireNyaize = instanceInfo is InstanceInfoType.Misskey && instanceInfo.meta.getVersion() >= Version("2023.10.2")
+        val instanceInfo = instanceInfoService.find(account.normalizedInstanceUri).getOrNull()
+        val isRequireNyaize = (instanceInfo?.isRequirePerformNyaizeFrontend ?: false)
                 && (noteDTO.user.isCat ?: false)
         val aspects = customEmojiAspectRatioDataSource.findIn(emojis.mapNotNull {
             it.url ?: it.uri
