@@ -25,7 +25,7 @@
     <string name="renote">リポスト</string>
     <string name="quote_renote">引用</string>
     <string name="discovery">discovery</string>
-    <string name="renote_was">renoteしました</string>
+    <string name="renote_was">リポストしました</string>
     <string name="input_custom_emoji">絵文字/カスタム絵文字を入力</string>
     <string name="title_activity_settings">Settings</string>
 
@@ -69,9 +69,9 @@
     <string name="media">メディア</string>
     <string name="follow">フォロー</string>
 
-    <string name="include_local_renotes">ローカルの投稿のRenoteをタイムラインに表示する</string>
-    <string name="include_renoted_my_notes">自分の投稿のRenoteをタイムラインに表示する</string>
-    <string name="include_my_renotes">自分の行ったRenoteをタイムラインに表示する</string>
+    <string name="include_local_renotes">ローカルの投稿のリポストをタイムラインに表示する</string>
+    <string name="include_renoted_my_notes">自分の投稿のリポストをタイムラインに表示する</string>
+    <string name="include_my_renotes">自分の行ったリポストをタイムラインに表示する</string>
     <string name="auto_load_timeline">タイムラインを自動で読み込む</string>
     <string name="timeline">タイムライン</string>
 
@@ -262,9 +262,9 @@
     <string name="with_files">ファイルが添付された投稿のみ</string>
     <string name="group">グループ</string>
     <string name="save">保存</string>
-    <string name="unrenote">Renote解除</string>
+    <string name="unrenote">リポスト解除</string>
 
-    <string name="confirm_delete_and_edit_note_description">この投稿へのリアクション、Renote、返信も全て削除されます。削除してもう一度編集しますか？</string>
+    <string name="confirm_delete_and_edit_note_description">この投稿へのリアクション、リポスト、返信も全て削除されます。削除してもう一度編集しますか？</string>
     <string name="via">via</string>
     <string name="search_emojis">絵文字を検索</string>
 
