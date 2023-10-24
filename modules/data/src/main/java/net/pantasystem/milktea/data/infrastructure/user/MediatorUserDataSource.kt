@@ -81,11 +81,11 @@ class MediatorUserDataSource @Inject constructor(
         isSimple: Boolean
     ): Result<List<User>> = runCancellableCatching {
         withContext(ioDispatcher) {
-            val list = serverIds.distinct().chunked(100).map {
+            val list = serverIds.distinct().chunked(100).map { chunkedIds ->
                 if (isSimple) {
-                    userDao.getSimplesInServerIds(accountId, serverIds)
+                    userDao.getSimplesInServerIds(accountId, chunkedIds)
                 } else {
-                    userDao.getInServerIds(accountId, serverIds)
+                    userDao.getInServerIds(accountId, chunkedIds)
                 }.map {
                     it.toModel()
                 }
