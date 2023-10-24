@@ -16,6 +16,7 @@ import com.bumptech.glide.load.resource.gif.GifDrawable
 import com.github.penfeizhou.animation.apng.APNGDrawable
 import dagger.hilt.android.EntryPointAccessors
 import dagger.hilt.android.internal.managers.FragmentComponentManager
+import net.pantasystem.milktea.common_android.html.MastodonHTMLParser
 import net.pantasystem.milktea.common_android.mfm.MFMParser
 import net.pantasystem.milktea.common_android.mfm.Root
 import net.pantasystem.milktea.common_android.ui.text.CustomEmojiDecorator
@@ -157,11 +158,31 @@ object DecorateTextHelper {
         emojis ?: return
         account ?: return
         host ?: return
-        val node = MFMParser.parse(sourceText, emojis, accountHost = account.getHost(), userHost = host)
-            ?: return
-        this.movementMethod = LinkMovementMethod.getInstance()
-        val lazy = MFMDecorator.decorate(node, LazyDecorateSkipElementsHolder())
-        this.text = MFMDecorator.decorate(this, lazy)
+        when(account.instanceType) {
+            Account.InstanceType.MISSKEY, Account.InstanceType.FIREFISH -> {
+                val node = MFMParser.parse(sourceText, emojis, accountHost = account.getHost(), userHost = host)
+                    ?: return
+                this.movementMethod = LinkMovementMethod.getInstance()
+                val lazy = MFMDecorator.decorate(node, LazyDecorateSkipElementsHolder())
+                this.text = MFMDecorator.decorate(this, lazy)
+            }
+            Account.InstanceType.MASTODON, Account.InstanceType.PLEROMA -> {
+                this.decorate(
+                    TextType.Mastodon(
+                        MastodonHTMLParser.parse(
+                            sourceText,
+                            emojis,
+                            userHost = host,
+                            accountHost = account.getHost()
+                        ),
+                        tags = emptyList(),
+                        mentions = emptyList()
+                    ),
+                    1.0f
+                )
+            }
+        }
+
     }
 }
 
