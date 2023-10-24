@@ -39,7 +39,7 @@ class MediatorUserDataSource @Inject constructor(
     loggerFactory: Logger.Factory
 ) : UserDataSource {
 
-    val memCache = LRUCache<User.Id, User>(250)
+    val memCache = LRUCache<User.Id, User>(50)
 
     val logger = loggerFactory.create("MediatorUserDataSource")
 
