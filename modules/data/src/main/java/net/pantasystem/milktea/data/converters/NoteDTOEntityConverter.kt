@@ -9,6 +9,9 @@ import net.pantasystem.milktea.model.channel.Channel
 import net.pantasystem.milktea.model.drive.FileProperty
 import net.pantasystem.milktea.model.emoji.CustomEmojiAspectRatioDataSource
 import net.pantasystem.milktea.model.image.ImageCacheRepository
+import net.pantasystem.milktea.model.instance.InstanceInfoService
+import net.pantasystem.milktea.model.instance.InstanceInfoType
+import net.pantasystem.milktea.model.instance.Version
 import net.pantasystem.milktea.model.note.Note
 import net.pantasystem.milktea.model.note.Visibility
 import net.pantasystem.milktea.model.note.poll.Poll
@@ -21,10 +24,15 @@ import javax.inject.Singleton
 class NoteDTOEntityConverter @Inject constructor(
     private val customEmojiAspectRatioDataSource: CustomEmojiAspectRatioDataSource,
     private val imageCacheRepository: ImageCacheRepository,
+    private val instanceInfoService: InstanceInfoService,
 ) {
 
     suspend fun convert(noteDTO: NoteDTO, account: Account): Note {
         val emojis = (noteDTO.emojiList + (noteDTO.reactionEmojiList))
+
+        val instanceInfo = instanceInfoService.find(account.getHost()).getOrNull()
+        val isRequireNyaize = instanceInfo is InstanceInfoType.Misskey && instanceInfo.meta.getVersion() >= Version("2023.10.2")
+                && (noteDTO.user.isCat ?: false)
         val aspects = customEmojiAspectRatioDataSource.findIn(emojis.mapNotNull {
             it.url ?: it.uri
         }).getOrElse {
@@ -98,6 +106,7 @@ class NoteDTOEntityConverter @Inject constructor(
                     ReactionAcceptanceType.NonSensitiveOnly4LocalOnly4Remote -> true
                     else -> false
                 },
+                isRequireNyaize = isRequireNyaize,
             ),
             maxReactionsPerAccount = 1
         )

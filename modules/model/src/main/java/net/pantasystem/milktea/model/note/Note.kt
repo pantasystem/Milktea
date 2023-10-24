@@ -83,6 +83,7 @@ data class Note(
             val channel: SimpleChannelInfo? = null,
             val isAcceptingOnlyLikeReaction: Boolean = false,
             val isNotAcceptingSensitiveReaction: Boolean = false,
+            val isRequireNyaize: Boolean = false,
         ) : Type {
             data class SimpleChannelInfo(val id: Channel.Id, val name: String)
 
