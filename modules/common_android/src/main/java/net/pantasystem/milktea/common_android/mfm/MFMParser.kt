@@ -1,9 +1,12 @@
 package net.pantasystem.milktea.common_android.mfm
 
 import android.util.Log
-import jp.panta.misskeyandroidclient.mfm.*
+import jp.panta.misskeyandroidclient.mfm.EmojiElement
+import jp.panta.misskeyandroidclient.mfm.HashTag
+import jp.panta.misskeyandroidclient.mfm.Mention
 import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.common_android.emoji.V13EmojiUrlResolver
+import net.pantasystem.milktea.common_android.nyaize.nyaize
 import net.pantasystem.milktea.model.emoji.CustomEmoji
 import net.pantasystem.milktea.model.instance.HostWithVersion
 import java.net.URLDecoder
@@ -36,7 +39,8 @@ object MFMParser {
         text: String?,
         emojis: List<CustomEmoji>? = emptyList(),
         userHost: String? = null,
-        accountHost: String? = null
+        accountHost: String? = null,
+        isRequireProcessNyaize: Boolean = false,
     ): Root? {
         text ?: return null
         //println("textSize:${text.length}")
@@ -50,6 +54,7 @@ object MFMParser {
             emojisMap,
             userHost = userHost,
             accountHost = accountHost,
+            isRequireProcessNyaize = isRequireProcessNyaize,
         ).parse()
         return root
     }
@@ -59,7 +64,8 @@ object MFMParser {
         emojis: Map<String, CustomEmoji>? = null,
         instanceEmojis: Map<String, CustomEmoji>? = null,
         userHost: String? = null,
-        accountHost: String? = null
+        accountHost: String? = null,
+        isRequireProcessNyaize: Boolean = false,
     ): Root? {
         text ?: return null
         //println("textSize:${text.length}")
@@ -70,6 +76,7 @@ object MFMParser {
             instanceEmojiNameMap = instanceEmojis ?: emptyMap(),
             userHost = userHost,
             accountHost = accountHost,
+            isRequireProcessNyaize = isRequireProcessNyaize
         ).parse()
         return root
     }
@@ -92,6 +99,7 @@ object MFMParser {
         val end: Int = parent.insideEnd,
         val userHost: String?,
         val accountHost: String?,
+        val isRequireProcessNyaize: Boolean,
     ) {
         // タグ探索開始
         // タグ探索中
@@ -139,7 +147,12 @@ object MFMParser {
             // 文字数が０より多いとき
             if ((tagStart - finallyDetected) > 0) {
                 val text = sourceText.substring(finallyDetected, tagStart)
-                parent.childElements.add(Text(text, finallyDetected))
+                val converted = if (isRequireProcessNyaize) {
+                    nyaize(text)
+                } else {
+                    text
+                }
+                parent.childElements.add(Text(converted, finallyDetected))
             }
         }
 
@@ -183,6 +196,7 @@ object MFMParser {
                                 userHost = userHost,
                                 accountHost = accountHost,
                                 instanceEmojiNameMap = instanceEmojiNameMap,
+                                isRequireProcessNyaize = isRequireProcessNyaize,
                             ).parse()
                         }
 

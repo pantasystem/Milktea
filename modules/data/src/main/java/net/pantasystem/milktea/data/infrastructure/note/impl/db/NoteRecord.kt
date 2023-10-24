@@ -93,6 +93,7 @@ data class NoteRecord(
 
     var customEmojiAspectRatioMap: MutableMap<String, String>? = null,
     var customEmojiUrlAndCachePathMap: MutableMap<String, String?>? = null,
+    var misskeyIsRequireNyaize: Boolean = false,
 ) {
 
     companion object {
@@ -172,6 +173,7 @@ data class NoteRecord(
                 misskeyChannelName = t.channel?.name
                 misskeyIsAcceptingOnlyLikeReaction = t.isAcceptingOnlyLikeReaction
                 misskeyIsNotAcceptingSensitiveReaction = t.isNotAcceptingSensitiveReaction
+                misskeyIsRequireNyaize = t.isRequireNyaize
             }
         }
         customEmojiAspectRatioMap = model.emojis?.mapNotNull {  emoji ->
@@ -241,6 +243,7 @@ data class NoteRecord(
                         },
                         isAcceptingOnlyLikeReaction = misskeyIsAcceptingOnlyLikeReaction,
                         isNotAcceptingSensitiveReaction = misskeyIsNotAcceptingSensitiveReaction,
+                        isRequireNyaize = misskeyIsRequireNyaize,
                     )
                 }
                 "mastodon" -> {

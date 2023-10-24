@@ -5,7 +5,7 @@
   "entities": [
     {
       "id": "1:4355718382021751829",
-      "lastPropertyId": "54:1696546822899785376",
+      "lastPropertyId": "55:68607803971520561",
       "name": "NoteRecord",
       "properties": [
         {
@@ -286,6 +286,11 @@
           "id": "54:1696546822899785376",
           "name": "customEmojiUrlAndCachePathMap",
           "type": 13
+        },
+        {
+          "id": "55:68607803971520561",
+          "name": "misskeyIsRequireNyaize",
+          "type": 1
         }
       ],
       "relations": []
