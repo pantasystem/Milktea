@@ -8,7 +8,6 @@ import net.pantasystem.milktea.common.PageableState
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.page.Pageable
 import net.pantasystem.milktea.model.note.Note
-import net.pantasystem.milktea.model.note.NoteRelation
 
 interface TimelineStore {
     interface Factory {
@@ -16,7 +15,6 @@ interface TimelineStore {
     }
 
     val timelineState: Flow<PageableState<List<Note.Id>>>
-    val relatedNotes: Flow<PageableState<List<NoteRelation>>>
     val receiveNoteQueue: SharedFlow<Note.Id>
     val isActiveStreaming: Boolean
 

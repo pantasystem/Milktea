@@ -28,9 +28,9 @@ internal class TimelinePagingStoreImpl(
     private val pageableTimeline: Pageable,
     private val noteAdder: NoteDataSourceAdder,
     private val getAccount: suspend () -> Account,
+    private val getCurrentInstanceInfo: suspend (String) -> InstanceInfoType?,
     private val getInitialLoadQuery: () -> InitialLoadQuery?,
     private val misskeyAPIProvider: MisskeyAPIProvider,
-    private val getCurrentInstanceInfo: suspend (String) -> InstanceInfoType?,
 ) : EntityConverter<NoteDTO, Note.Id>, PreviousLoader<NoteDTO>, FutureLoader<NoteDTO>,
     IdGetter<Note.Id>, TimelinePagingBase, StreamingReceivableStore {
 
