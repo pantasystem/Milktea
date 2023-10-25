@@ -21,7 +21,7 @@ internal suspend fun<T, V> releaseUnusedPage(pageableStore: T, position: Int, of
     }
 }
 
-internal fun<V> releaseUnusedPage(state: PageableState<List<V>>, position: Int, offset: Int): PageableState<List<V>>? {
+internal fun<V> releaseUnusedPage(state: PageableState<List<V>>, position: Int, offset: Int, removeDiffCount: Int = 20): PageableState<List<V>>? {
     val items = when(val content = state.content) {
         is StateContent.Exist -> content.rawContent
         is StateContent.NotExist -> return null
@@ -29,21 +29,21 @@ internal fun<V> releaseUnusedPage(state: PageableState<List<V>>, position: Int, 
 
     // 末端の削除位置を求める
     var end = position + offset
-    if (end >= items.size) {
+    if (end >= items.size || end < 0) {
         end = items.size
     }
     var diffCount = items.size - end
 
     // 先頭の削除位置を求める
     var start = position - offset
-    if (start < 0) {
+    if (start < 0 || start >= items.size) {
         start = 0
     }
 
     diffCount += start
 
     // 削除件数が20件未満の時は削除しない
-    if (diffCount < 20) {
+    if (diffCount < removeDiffCount) {
         return null
     }
 
