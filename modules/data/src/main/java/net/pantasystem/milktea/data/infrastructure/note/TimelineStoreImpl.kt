@@ -29,6 +29,7 @@ import javax.inject.Inject
 
 
 const val LIMIT = 10
+const val REMOVE_DIFF_COUNT = 20
 
 class TimelineStoreImpl(
     private val pageableTimeline: Pageable,
@@ -239,7 +240,7 @@ class TimelineStoreImpl(
     }
 
     override suspend fun releaseUnusedPages(position: Int, offset: Int) {
-        releaseUnusedPage(pageableStore, position, offset)
+        releaseUnusedPage(pageableStore, position, offset, REMOVE_DIFF_COUNT)
         if (pageableStore.mutex.isLocked) {
             return
         }

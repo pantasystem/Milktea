@@ -6,14 +6,14 @@ import net.pantasystem.milktea.common.StateContent
 import net.pantasystem.milktea.common.paginator.PaginationState
 import net.pantasystem.milktea.common.paginator.StateLocker
 
-internal suspend fun<T, V> releaseUnusedPage(pageableStore: T, position: Int, offset: Int) where T : PaginationState<V>, T : StateLocker {
+internal suspend fun<T, V> releaseUnusedPage(pageableStore: T, position: Int, offset: Int, removeDiffCount: Int = 20) where T : PaginationState<V>, T : StateLocker {
     if (pageableStore.mutex.isLocked) {
         return
     }
 
     pageableStore.mutex.withLock {
         val state = pageableStore.getState()
-        val newState = releaseUnusedPage(state, position, offset) ?: return@withLock
+        val newState = releaseUnusedPage(state, position, offset, removeDiffCount) ?: return@withLock
 
         pageableStore.setState(
             newState
