@@ -18,6 +18,8 @@
             reactionStringView="@{reactionStringPreview}"
             reaction="@{reaction}"
             android:onClick="@{ ()-> reactionSelection.selectReaction(reaction) }"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:theme="@style/EmojiPickerLayoutStyle"
             >
         <ImageView
                 android:id="@+id/reactionImagePreview"

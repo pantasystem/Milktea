@@ -8,6 +8,7 @@
             android:padding="4dp"
             android:layout_margin="8dp"
             android:background="?attr/selectableItemBackgroundBorderless"
+            android:theme="@style/EmojiPickerLayoutStyle"
             >
         <ImageView
                 android:id="@+id/reactionImagePreview"

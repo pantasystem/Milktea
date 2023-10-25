@@ -40,6 +40,8 @@
         <item name="colorDotTabSelected">#575DAE</item>
         <item name="colorDotTabNormal">@color/colorItemNotSelected</item>
         <item name="android:windowLightStatusBar">true</item>
+
+        <item name="emojiPickerRippleColor">#5C000000</item>
     </style>
 
     <style name="AppThemeDark" parent="Theme.MaterialComponents.DayNight.NoActionBar">
@@ -71,5 +73,6 @@
         <item name="colorDotTabSelected">@color/colorDarkAccent</item>
         <item name="colorDotTabNormal">@color/colorDarkTextColor</item>
 
+        <item name="emojiPickerRippleColor">#66FFFFFF</item>
     </style>
 </resources>

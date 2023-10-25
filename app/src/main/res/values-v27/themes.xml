@@ -33,5 +33,7 @@
         <item name="colorDotTabSelected">#575DAE</item>
         <item name="colorDotTabNormal">@color/colorItemNotSelected</item>
         <item name="android:windowLightStatusBar">true</item>
+
+        <item name="emojiPickerRippleColor">#5C000000</item>
     </style>
 </resources>
