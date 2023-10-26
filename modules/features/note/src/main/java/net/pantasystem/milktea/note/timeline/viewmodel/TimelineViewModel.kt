@@ -10,27 +10,20 @@ import kotlinx.datetime.Instant
 import net.pantasystem.milktea.app_store.account.AccountStore
 import net.pantasystem.milktea.app_store.notes.InitialLoadQuery
 import net.pantasystem.milktea.app_store.notes.TimelineStore
-import net.pantasystem.milktea.common.APIError
 import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.common.PageableState
 import net.pantasystem.milktea.common.StateContent
 import net.pantasystem.milktea.common.coroutines.throttleLatest
-import net.pantasystem.milktea.common_android.resource.StringSource
-import net.pantasystem.milktea.common_android_ui.APIErrorStringConverter
 import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.account.CurrentAccountWatcher
-import net.pantasystem.milktea.model.account.UnauthorizedException
 import net.pantasystem.milktea.model.account.page.Pageable
 import net.pantasystem.milktea.model.note.Note
 import net.pantasystem.milktea.model.note.NoteStreaming
 import net.pantasystem.milktea.model.note.TimelineScrollPositionRepository
 import net.pantasystem.milktea.model.setting.LocalConfigRepository
-import net.pantasystem.milktea.note.R
 import net.pantasystem.milktea.note.timeline.viewmodel.filter.ExcludeRepostOrReplyFilter
 import net.pantasystem.milktea.note.viewmodel.PlaneNoteViewData
 import net.pantasystem.milktea.note.viewmodel.PlaneNoteViewDataCache
-import java.io.IOException
-import java.net.SocketTimeoutException
 
 class TimelineViewModel @AssistedInject constructor(
     timelineStoreFactory: TimelineStore.Factory,
@@ -323,104 +316,8 @@ class PageId(val value: Long)
 
 class AccountId(val value: Long)
 
-sealed interface TimelineListItem {
-    object Loading : TimelineListItem
-    data class Note(val note: PlaneNoteViewData) : TimelineListItem
-    data class Error(val throwable: Throwable) : TimelineListItem {
-        fun getErrorMessage(): StringSource {
-            return when (throwable) {
-                is SocketTimeoutException -> {
-                    StringSource(R.string.timeout_error)
-                }
-                is IOException -> {
-                    StringSource(R.string.timeout_error)
-                }
-                is APIError -> {
-                    APIErrorStringConverter()(throwable)
-                }
-                is UnauthorizedException -> {
-                    StringSource(R.string.unauthorized_error)
-                }
-                else -> {
-                    StringSource("error:$throwable")
-                }
-            }
-        }
 
-        fun isUnauthorizedError(): Boolean {
-            return throwable is APIError.AuthenticationException
-                    || throwable is APIError.ForbiddenException
-                    || throwable is UnauthorizedException
-        }
-    }
 
-    object Empty : TimelineListItem
-}
-
-fun PageableState<List<PlaneNoteViewData>>.toList(): List<TimelineListItem> {
-    return when (val content = this.content) {
-        is StateContent.Exist -> {
-            content.rawContent.map {
-                TimelineListItem.Note(it)
-            } + if (this is PageableState.Loading.Previous) {
-                listOf(TimelineListItem.Loading)
-            } else {
-                emptyList()
-            }
-        }
-        is StateContent.NotExist -> {
-            listOf(
-                when (this) {
-                    is PageableState.Error -> {
-                        TimelineListItem.Error(this.throwable)
-                    }
-                    is PageableState.Fixed -> {
-                        TimelineListItem.Empty
-                    }
-                    is PageableState.Loading -> TimelineListItem.Loading
-                }
-            )
-        }
-    }
-}
-
-class NoteStreamingCollector(
-    val coroutineScope: CoroutineScope,
-    val timelineStore: TimelineStore,
-    val accountStore: AccountStore,
-    val noteStreaming: NoteStreaming,
-    val logger: Logger,
-    val pageable: Pageable,
-    val currentAccountWatcher: CurrentAccountWatcher,
-) {
-
-    private var job: Job? = null
-
-    fun onSuspend() {
-        synchronized(this) {
-            job?.cancel()
-            job = null
-        }
-    }
-
-    @OptIn(ExperimentalCoroutinesApi::class)
-    fun onResume() {
-        synchronized(this) {
-            if (job != null) {
-                return
-            }
-            job = accountStore.observeCurrentAccount.filterNotNull().distinctUntilChanged()
-                .flatMapLatest {
-                    noteStreaming.connect(currentAccountWatcher::getAccount, pageable)
-                }.map {
-                    timelineStore.onReceiveNote(it.id)
-                }.catch {
-                    logger.error("receive not error", it)
-                }.launchIn(coroutineScope + Dispatchers.IO)
-        }
-
-    }
-}
 
 class PagingLoaderScopeController(private val coroutineScope: CoroutineScope) {
 
