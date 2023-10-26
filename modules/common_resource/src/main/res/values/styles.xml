@@ -25,6 +25,7 @@
         <attr name="colorDotTabNormal" format="color" />
         <attr name="colorDotTabSelected" format="color" />
 
+        <attr name="emojiPickerRippleColor" format="color" />
     </declare-styleable>
     <!-- Base application theme. -->
 
@@ -74,5 +75,9 @@
         <item name="elevation">4dp</item>
         <item name="android:elevation">4dp</item>
 
+    </style>
+
+    <style name="EmojiPickerLayoutStyle">
+        <item name="colorControlHighlight">?attr/emojiPickerRippleColor</item>
     </style>
 </resources>
