@@ -50,6 +50,8 @@ object ApngDecoderDelegate {
         val sourceBytes = source.array()
         val iEndChunkPos = findIEndChunkPosition(sourceBytes)
 
+        // IENDチャンクより後にバイト配列がある状態でライブラリに渡すと例外が発生するため、
+        // IENDチャンクの終わる位置が終端となるよう切り詰めておく
         source.limit(iEndChunkPos + IENDBytes.size)
 
         val loader: Loader = object : ByteBufferLoader() {
@@ -67,31 +69,46 @@ object ApngDecoderDelegate {
     fun handles(source: ByteBuffer, options: Options): Boolean {
         val sourceBytes = source.array()
         if (!checkHeaderBytes(sourceBytes)) {
+            // PNGのヘッダではない
             return false
         }
 
         if (findIEndChunkPosition(sourceBytes) < 0) {
+            // IENDチャンクを持たない
             return false
         }
 
         return APNGParser.isAPNG(ByteBufferReader(source))
     }
 
+    /**
+     * [source]の先頭がPNGヘッダかどうかを確認する。
+     * PNGヘッダであった場合はtrue、そうでない場合はfalseを返却する。
+     */
     @JvmStatic
     private fun checkHeaderBytes(source: ByteArray): Boolean {
         val headerBytes = source.sliceArray(0..PNGHeaderBytes.size)
         return headerBytes.contentEquals(PNGHeaderBytes)
     }
 
+    /**
+     * [source]からIENDチャンクを検索し、IENDチャンクの先頭のインデックスを返却する。
+     * IENDチャンクが見つからない場合は-1を返却する。
+     */
     @JvmStatic
     private fun findIEndChunkPosition(source: ByteArray): Int {
         if (source.size < IENDBytes.size) {
             return -1
         }
 
+        // 計算量をなるべく抑えたいので、IENDチャンクのサイズを除外した位置から検索する。
+        // IENDチャンクが終端にある正常なファイルの場合はループせず1回で抜けるはず…
         val startPos = source.size - IENDBytes.size
         for (idx in (0..startPos).reversed()) {
             val curByte = source[idx]
+
+            // 現在のインデックスから取れるバイト値がIENDチャンクの先頭と合致していた場合は、
+            // その位置からIENDチャンクと同じサイズ分だけ配列をスライスし、配列の中身が完全に一致するかを確認する
             if (curByte == IENDBytes[0]) {
                 val hitTestTargetBytes = source.sliceArray(idx until (idx + IENDBytes.size))
                 if (hitTestTargetBytes.contentEquals(IENDBytes)) {
