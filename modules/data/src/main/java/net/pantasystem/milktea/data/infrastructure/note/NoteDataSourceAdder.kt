@@ -40,7 +40,81 @@ class NoteDataSourceAdder @Inject constructor(
     }
 
 
-    suspend fun addNoteDtoToDataSource(account: Account, noteDTO: NoteDTO, skipExists: Boolean = false, instanceType: InstanceInfoType? = null): Note {
+    suspend fun addNoteDtoListToDataSource(
+        account: Account,
+        noteDTOs: List<NoteDTO>,
+        skipExists: Boolean = false,
+        instanceType: InstanceInfoType? = null
+    ): List<Note> {
+        val info = instanceType?.takeIf {
+            it.uri == account.normalizedInstanceUri
+        } ?: instanceInfoService.find(account.normalizedInstanceUri).getOrNull()
+        val entities = noteDTOs.map {
+            it.toEntities(
+                account,
+                userDTOEntityConverter,
+                noteDTOEntityConverter,
+                filePropertyDTOEntityConverter,
+                info,
+            )
+
+        }
+        if (skipExists) {
+            userDataSource.addAll(
+                entities.flatMap {
+                    it.users
+                }.filterNot {
+                    userDataSource.get(it.id).isSuccess
+                }
+            ).onFailure {
+                logger.error("UserDataSourceへの追加に失敗", it)
+            }
+            noteDataSource.addAll(
+                entities.flatMap {
+                    it.notes
+                }.filterNot {
+                    noteDataSource.exists(it.id)
+                }
+            ).onFailure {
+                logger.error("NoteDataSourceへの追加に失敗", it)
+            }
+            filePropertyDataSource.addAll(
+                entities.flatMap {
+                    it.files
+                }.filterNot {
+                    filePropertyDataSource.find(it.id).isSuccess
+                }
+            ).onFailure {
+                logger.error("FilePropertyDataSourceへの追加に失敗", it)
+            }
+        } else {
+            userDataSource.addAll(entities.flatMap {
+                it.users
+            }).onFailure {
+                logger.error("UserDataSourceへの追加に失敗", it)
+            }
+            noteDataSource.addAll(entities.flatMap {
+                it.notes
+            }).onFailure {
+                logger.error("NoteDataSourceへの追加に失敗", it)
+            }
+            filePropertyDataSource.addAll(entities.flatMap {
+                it.files
+            }).onFailure {
+                logger.error("FilePropertyDataSourceへの追加に失敗", it)
+            }
+        }
+        return entities.map {
+            it.note
+        }
+    }
+
+    suspend fun addNoteDtoToDataSource(
+        account: Account,
+        noteDTO: NoteDTO,
+        skipExists: Boolean = false,
+        instanceType: InstanceInfoType? = null
+    ): Note {
         val info = instanceType?.takeIf {
             it.uri == account.normalizedInstanceUri
         } ?: instanceInfoService.find(account.normalizedInstanceUri).getOrNull()
@@ -94,7 +168,11 @@ class NoteDataSourceAdder @Inject constructor(
         return entities.note
     }
 
-    suspend fun addTootStatusDtoIntoDataSource(account: Account, status: TootStatusDTO, skipExists: Boolean = false): Note {
+    suspend fun addTootStatusDtoIntoDataSource(
+        account: Account,
+        status: TootStatusDTO,
+        skipExists: Boolean = false
+    ): Note {
         val entities = status.toEntities(tootDTOEntityConverter, account)
         if (skipExists) {
             userDataSource.addAll(
@@ -193,7 +271,7 @@ private suspend fun NoteDTO.pickEntities(
     noteDTOEntityConverter: NoteDTOEntityConverter,
     filePropertyDTOEntityConverter: FilePropertyDTOEntityConverter,
     instanceType: InstanceInfoType?,
-    ) {
+) {
     val (note, user) = this.toNoteAndUser(
         account,
         userDTOEntityConverter,

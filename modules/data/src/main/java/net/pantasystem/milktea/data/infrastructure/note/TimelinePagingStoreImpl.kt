@@ -104,10 +104,14 @@ internal class TimelinePagingStoreImpl(
 
     override suspend fun convertAll(list: List<NoteDTO>): List<Note.Id> {
         val info = getCurrentInstanceInfo(getAccount().normalizedInstanceUri)
-        return list.filter {
-            it.promotionId == null || it.tmpFeaturedId == null
-        }.map {
-            noteAdder.addNoteDtoToDataSource(getAccount.invoke(), it, instanceType = info).id
+        return noteAdder.addNoteDtoListToDataSource(
+            getAccount.invoke(),
+            list.filter {
+                it.promotionId == null || it.tmpFeaturedId == null
+            },
+            instanceType = info
+        ).map {
+            it.id
         }
     }
 
