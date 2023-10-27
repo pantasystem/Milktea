@@ -7,7 +7,7 @@ import net.pantasystem.milktea.data.converters.FilePropertyDTOEntityConverter
 import net.pantasystem.milktea.data.converters.NoteDTOEntityConverter
 import net.pantasystem.milktea.data.converters.TootDTOEntityConverter
 import net.pantasystem.milktea.data.converters.UserDTOEntityConverter
-import net.pantasystem.milktea.data.infrastructure.NoteRelationEntities
+import net.pantasystem.milktea.data.infrastructure.NoteDTOUnpacked
 import net.pantasystem.milktea.data.infrastructure.toEntities
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.drive.FileProperty
@@ -45,7 +45,7 @@ class NoteDataSourceAdder @Inject constructor(
         noteDTOs: List<NoteDTO>,
         skipExists: Boolean = false,
         instanceType: InstanceInfoType? = null
-    ): List<Note> {
+    ): List<Note.Id> {
         val info = instanceType?.takeIf {
             it.uri == account.normalizedInstanceUri
         } ?: instanceInfoService.find(account.normalizedInstanceUri).getOrNull()
@@ -53,11 +53,14 @@ class NoteDataSourceAdder @Inject constructor(
             it.toEntities(
                 account,
                 userDTOEntityConverter,
-                noteDTOEntityConverter,
                 filePropertyDTOEntityConverter,
                 info,
             )
-
+        }
+        val notes = entities.flatMap {
+            it.notes
+        } + entities.map {
+            it.note
         }
         if (skipExists) {
             userDataSource.addAll(
@@ -70,11 +73,13 @@ class NoteDataSourceAdder @Inject constructor(
                 logger.error("UserDataSourceへの追加に失敗", it)
             }
             noteDataSource.addAll(
-                entities.flatMap {
-                    it.notes
-                }.filterNot {
-                    noteDataSource.exists(it.id)
-                }
+                noteDTOEntityConverter.convertAll(
+                    account,
+                    notes.filterNot {
+                        noteDataSource.exists(Note.Id(account.accountId, it.id))
+                    },
+                    info,
+                )
             ).onFailure {
                 logger.error("NoteDataSourceへの追加に失敗", it)
             }
@@ -93,9 +98,11 @@ class NoteDataSourceAdder @Inject constructor(
             }).onFailure {
                 logger.error("UserDataSourceへの追加に失敗", it)
             }
-            noteDataSource.addAll(entities.flatMap {
-                it.notes
-            }).onFailure {
+            noteDataSource.addAll(noteDTOEntityConverter.convertAll(
+                account,
+                notes,
+                info,
+            )).onFailure {
                 logger.error("NoteDataSourceへの追加に失敗", it)
             }
             filePropertyDataSource.addAll(entities.flatMap {
@@ -105,7 +112,7 @@ class NoteDataSourceAdder @Inject constructor(
             }
         }
         return entities.map {
-            it.note
+            Note.Id(account.accountId, it.note.id)
         }
     }
 
@@ -122,10 +129,10 @@ class NoteDataSourceAdder @Inject constructor(
             noteDTO.toEntities(
                 account,
                 userDTOEntityConverter,
-                noteDTOEntityConverter,
                 filePropertyDTOEntityConverter,
                 info,
             )
+        val willReturnNote = noteDTOEntityConverter.convert(account, entities.note)
         if (skipExists) {
             userDataSource.addAll(
                 entities.users.filterNot {
@@ -135,14 +142,17 @@ class NoteDataSourceAdder @Inject constructor(
                 logger.error("UserDataSourceへの追加に失敗", it)
             }
             noteDataSource.addAll(
-                entities.notes.filterNot {
-                    noteDataSource.exists(it.id)
-                }
+                noteDTOEntityConverter.convertAll(
+                    account,
+                    entities.notes.filterNot {
+                        noteDataSource.exists(Note.Id(account.accountId, it.id))
+                    }
+                )
             ).onFailure {
                 logger.error("NoteDataSourceへの追加に失敗", it)
             }
-            if (!noteDataSource.exists(entities.note.id)) {
-                noteDataSource.add(entities.note).onFailure {
+            if (!noteDataSource.exists(Note.Id(account.accountId, entities.note.id))) {
+                noteDataSource.add(willReturnNote).onFailure {
                     logger.error("NoteDataSourceへの追加に失敗", it)
                 }
             }
@@ -157,7 +167,10 @@ class NoteDataSourceAdder @Inject constructor(
             userDataSource.addAll(entities.users).onFailure {
                 logger.error("UserDataSourceへの追加に失敗", it)
             }
-            noteDataSource.addAll(entities.notes).onFailure {
+            noteDataSource.addAll(noteDTOEntityConverter.convertAll(
+                account,
+                entities.notes
+            )).onFailure {
                 logger.error("NoteDataSourceへの追加に失敗", it)
             }
             filePropertyDataSource.addAll(entities.files).onFailure {
@@ -165,7 +178,7 @@ class NoteDataSourceAdder @Inject constructor(
             }
         }
 
-        return entities.note
+        return willReturnNote
     }
 
     suspend fun addTootStatusDtoIntoDataSource(
@@ -223,10 +236,9 @@ class NoteDataSourceAdder @Inject constructor(
 suspend fun NoteDTO.toEntities(
     account: Account,
     userDTOEntityConverter: UserDTOEntityConverter,
-    noteDTOEntityConverter: NoteDTOEntityConverter,
     filePropertyDTOEntityConverter: FilePropertyDTOEntityConverter,
     instanceType: InstanceInfoType?,
-): NoteRelationEntities {
+): NoteDTOUnpacked {
     val dtoList = mutableListOf<NoteDTO>()
     dtoList.add(this)
 
@@ -239,9 +251,8 @@ suspend fun NoteDTO.toEntities(
         dtoList.add(reNote!!)
     }
 
-    val note = noteDTOEntityConverter.convert(account, this, instanceType)
     val users = mutableListOf<User>()
-    val notes = mutableListOf<Note>()
+    val notes = mutableListOf<NoteDTO>()
     val files = mutableListOf<FileProperty>()
 
     pickEntities(
@@ -250,12 +261,11 @@ suspend fun NoteDTO.toEntities(
         users,
         files,
         userDTOEntityConverter,
-        noteDTOEntityConverter,
         filePropertyDTOEntityConverter,
         instanceType,
     )
-    return NoteRelationEntities(
-        note = note,
+    return NoteDTOUnpacked(
+        note = this,
         notes = notes,
         users = users,
         files = files
@@ -264,19 +274,16 @@ suspend fun NoteDTO.toEntities(
 
 private suspend fun NoteDTO.pickEntities(
     account: Account,
-    notes: MutableList<Note>,
+    notes: MutableList<NoteDTO>,
     users: MutableList<User>,
     files: MutableList<FileProperty>,
     userDTOEntityConverter: UserDTOEntityConverter,
-    noteDTOEntityConverter: NoteDTOEntityConverter,
     filePropertyDTOEntityConverter: FilePropertyDTOEntityConverter,
     instanceType: InstanceInfoType?,
 ) {
     val (note, user) = this.toNoteAndUser(
         account,
         userDTOEntityConverter,
-        noteDTOEntityConverter,
-        instanceType,
     )
     notes.add(note)
     users.add(user)
@@ -292,7 +299,6 @@ private suspend fun NoteDTO.pickEntities(
             users,
             files,
             userDTOEntityConverter,
-            noteDTOEntityConverter,
             filePropertyDTOEntityConverter,
             instanceType,
         )
@@ -305,7 +311,6 @@ private suspend fun NoteDTO.pickEntities(
             users,
             files,
             userDTOEntityConverter,
-            noteDTOEntityConverter,
             filePropertyDTOEntityConverter,
             instanceType,
         )
@@ -315,11 +320,8 @@ private suspend fun NoteDTO.pickEntities(
 suspend fun NoteDTO.toNoteAndUser(
     account: Account,
     userDTOEntityConverter: UserDTOEntityConverter,
-    noteDTOEntityConverter: NoteDTOEntityConverter,
-    instanceType: InstanceInfoType?,
-): Pair<Note, User> {
-    val note = noteDTOEntityConverter.convert(account, this, instanceType)
+): Pair<NoteDTO, User> {
     val user = userDTOEntityConverter.convert(account, user, false)
-    return note to user
+    return this to user
 }
 

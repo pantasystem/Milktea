@@ -2,6 +2,7 @@ package net.pantasystem.milktea.data.infrastructure
 
 import net.pantasystem.milktea.api.misskey.groups.GroupDTO
 import net.pantasystem.milktea.api.misskey.list.UserListDTO
+import net.pantasystem.milktea.api.misskey.notes.NoteDTO
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.drive.FileProperty
 import net.pantasystem.milktea.model.group.Group
@@ -39,6 +40,13 @@ fun GroupDTO.toGroup(accountId: Long): Group {
 data class NoteRelationEntities(
     val note: Note,
     val notes: List<Note>,
+    val users: List<User>,
+    val files: List<FileProperty>
+)
+
+data class NoteDTOUnpacked(
+    val note: NoteDTO,
+    val notes: List<NoteDTO>,
     val users: List<User>,
     val files: List<FileProperty>
 )

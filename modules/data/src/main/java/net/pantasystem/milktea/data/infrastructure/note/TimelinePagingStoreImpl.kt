@@ -110,9 +110,7 @@ internal class TimelinePagingStoreImpl(
                 it.promotionId == null || it.tmpFeaturedId == null
             },
             instanceType = info
-        ).map {
-            it.id
-        }
+        )
     }
 
     override fun getState(): PageableState<List<Note.Id>> {
