@@ -340,14 +340,26 @@ object MFMDecorator {
                     null -> height
                     else -> height * aspectRatio
                 }
+                val windowWidthSize = textView.resources.displayMetrics.widthPixels
+                val finalEmojiWidth: Int
+                val finalEmojiHeight: Int
+                if ((width * customEmojiScale).toInt() > windowWidthSize && windowWidthSize > 0) {
+                    val scale = (windowWidthSize.toFloat() / (width * customEmojiScale))
+                    finalEmojiWidth = windowWidthSize
+                    finalEmojiHeight = (height * customEmojiScale * scale).toInt()
+                } else {
+                    finalEmojiWidth = (width * customEmojiScale).toInt()
+                    finalEmojiHeight = (height * customEmojiScale).toInt()
+                }
+
                 GlideApp.with(textView)
                     .load(emojiElement.emoji.cachePath)
                     .error(
                         GlideApp.with(textView)
                             .load(emojiElement.emoji.url ?: emojiElement.emoji.uri)
-                            .override((width * customEmojiScale).toInt(), (height * customEmojiScale).toInt())
+                            .override(finalEmojiWidth, finalEmojiHeight)
                     )
-                    .override((width * customEmojiScale).toInt(), (height * customEmojiScale).toInt())
+                    .override(finalEmojiWidth, finalEmojiHeight)
                     .into(emojiSpan.target)
             }
         }
