@@ -30,6 +30,9 @@ abstract class UserDao {
     abstract suspend fun insertUserInstanceInfo(info: UserInstanceInfoRecord): Long
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
+    abstract suspend fun insertUserInstanceInfoList(info: List<UserInstanceInfoRecord>): List<Long>
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     abstract suspend fun insertUserProfileFields(fields: List<UserProfileFieldRecord>): List<Long>
 
     @Query("delete from pinned_note_id where userId = :userId")

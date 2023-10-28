@@ -170,11 +170,82 @@ class MediatorUserDataSource @Inject constructor(
 
     override suspend fun addAll(users: List<User>): Result<Map<User.Id, AddResult>> =
         runCancellableCatching {
-            users.associate { user ->
-                user.id to add(user).getOrElse {
-                    AddResult.Canceled
+            val existsUsersInMemory = users.associate {
+                it.id to memCache.get(it.id)
+            }
+            val existsRecordIdMap = users.filter {
+                existsUsersInMemory[it.id] == null
+            }.groupBy {
+                it.id.accountId
+            }.flatMap { entry ->
+                userDao.getInServerIds(entry.key, entry.value.map { it.id.id })
+            }.associateBy {
+                User.Id(it.user.accountId, it.user.serverId)
+            }
+
+            val requireInserts = users.filter {
+                existsUsersInMemory[it.id] == null && existsRecordIdMap[it.id] == null
+            }
+            val insertedDbIds = userDao.insertAll(requireInserts.map {
+                UserRecord.from(it)
+            })
+
+            val userIdDbIdMap = requireInserts.mapIndexed { index, user ->
+                user.id to insertedDbIds[index]
+            }.toMap() + existsRecordIdMap.map {
+                it.key to it.value.user.id
+            }
+
+            // 更新処理
+            users.forEach { user ->
+                val record = existsRecordIdMap[user.id]
+                val dbId = userIdDbIdMap[user.id] ?: return@forEach
+                if (record != null && record.toSimpleModel() != user) {
+                    userDao.update(
+                        UserRecord.from(user).copy(id = record.user.id)
+                    )
+                }
+                replaceEmojisIfNeed(dbId, user, record)
+                if (user is User.Detail) {
+                    userDao.insert(
+                        UserInfoStateRecord.from(dbId, user.info)
+                    )
+                    when (val related = user.related) {
+                        null -> {}
+                        else -> {
+                            userDao.insert(
+                                UserRelatedStateRecord.from(dbId, related)
+                            )
+                        }
+                    }
+
+                    val detailModel = record?.toModel() as? User.Detail?
+                    // NOTE: 更新の必要性を判定
+                    replacePinnedNoteIdsIfNeed(dbId, user, record, detailModel)
+                    replaceFieldsIfNeed(dbId, user, record, detailModel)
                 }
             }
+
+            // save instance info
+            userDao.insertUserInstanceInfoList(
+                users.mapNotNull {
+                    userIdDbIdMap[it.id]?.let { dbId ->
+                        it.instance?.let { instance ->
+                            UserInstanceInfoRecord.from(dbId, instance)
+                        }
+                    }
+
+                }
+            )
+
+
+            users.mapNotNull { user ->
+                existsUsersInMemory[user.id]?.let {
+                    it.id to AddResult.Canceled
+                } ?: userIdDbIdMap[user.id]?.let { dbId ->
+                    user.id to (if (dbId in insertedDbIds) AddResult.Created else AddResult.Updated)
+                }
+            }.toMap()
         }
 
     override suspend fun remove(user: User): Result<Boolean> = runCancellableCatching {
