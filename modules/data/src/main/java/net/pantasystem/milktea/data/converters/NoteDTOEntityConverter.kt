@@ -81,10 +81,11 @@ class NoteDTOEntityConverter @Inject constructor(
         }).associateBy {
             it.sourceUrl
         }
+        val info = instanceInfoType ?: instanceInfoService.find(account.normalizedInstanceUri).getOrNull()
         return convert(
             account = account,
             noteDTO = noteDTO,
-            instanceInfoType = instanceInfoType,
+            instanceInfoType = info,
             aspects = aspects,
             fileCaches = fileCaches
         )
