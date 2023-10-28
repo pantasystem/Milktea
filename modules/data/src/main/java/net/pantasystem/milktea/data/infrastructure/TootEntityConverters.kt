@@ -7,7 +7,6 @@ import net.pantasystem.milktea.api.mastodon.notification.MstNotificationDTO
 import net.pantasystem.milktea.api.mastodon.poll.TootPollDTO
 import net.pantasystem.milktea.api.mastodon.status.StatusVisibilityType
 import net.pantasystem.milktea.api.mastodon.status.TootStatusDTO
-import net.pantasystem.milktea.data.converters.TootDTOEntityConverter
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.drive.FileProperty
 import net.pantasystem.milktea.model.instance.MastodonInstanceInfo
@@ -64,13 +63,12 @@ fun TootMediaAttachment.toFileProperty(account: Account, isSensitive: Boolean): 
 
 
 fun TootStatusDTO.toEntities(
-    converter: TootDTOEntityConverter,
     account: Account,
 ): TootDTOUnpacked {
     val users = mutableListOf<User>()
     val notes = mutableListOf<TootStatusDTO>()
     val files = mutableListOf<FileProperty>()
-    pickEntities(converter, account, notes, users, files)
+    pickEntities(account, notes, users, files)
     return TootDTOUnpacked(
         this,
         files = files,
@@ -80,7 +78,6 @@ fun TootStatusDTO.toEntities(
 }
 
 fun TootStatusDTO.pickEntities(
-    converter: TootDTOEntityConverter,
     account: Account,
     notes: MutableList<TootStatusDTO>,
     users: MutableList<User>,
@@ -94,8 +91,8 @@ fun TootStatusDTO.pickEntities(
             it.toFileProperty(account, sensitive)
         }
     )
-    this.reblog?.pickEntities(converter, account, notes, users, files)
-    this.quote?.pickEntities(converter, account, notes, users, files)
+    this.reblog?.pickEntities(account, notes, users, files)
+    this.quote?.pickEntities(account, notes, users, files)
 }
 
 fun MastodonAccountRelationshipDTO.toUserRelated(): User.Related {
