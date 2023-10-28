@@ -23,6 +23,7 @@ import net.pantasystem.milktea.data.infrastructure.user.db.UserInfoStateRecord
 import net.pantasystem.milktea.data.infrastructure.user.db.UserInstanceInfoRecord
 import net.pantasystem.milktea.data.infrastructure.user.db.UserProfileFieldRecord
 import net.pantasystem.milktea.data.infrastructure.user.db.UserRecord
+import net.pantasystem.milktea.data.infrastructure.user.db.UserRelated
 import net.pantasystem.milktea.data.infrastructure.user.db.UserRelatedStateRecord
 import net.pantasystem.milktea.data.infrastructure.user.db.isEqualToModels
 import net.pantasystem.milktea.model.AddResult
@@ -126,17 +127,7 @@ class MediatorUserDataSource @Inject constructor(
 
             // NOTE: 新たに追加される予定のオブジェクトと既にキャッシュしているオブジェクトの絵文字リストを比較している
             // NOTE: 比較した上で同一でなければキャッシュの更新処理を行う
-            if (!record?.emojis.isEqualToModels(user.emojis)) {
-                // NOTE: 既にキャッシュに存在していた場合一度全て剥がす
-                if (record != null) {
-                    userDao.detachAllUserEmojis(dbId)
-                }
-                userDao.insertEmojis(
-                    user.emojis.map {
-                        UserEmojiRecord.from(dbId, it)
-                    }
-                )
-            }
+            replaceEmojisIfNeed(dbId, user, record)
 
             if (user is User.Detail) {
                 userDao.insert(
@@ -152,29 +143,8 @@ class MediatorUserDataSource @Inject constructor(
                 }
 
                 // NOTE: 更新の必要性を判定
-                if ((record?.toModel() as? User.Detail?)?.info?.pinnedNoteIds?.toSet() != user.info.pinnedNoteIds?.toSet()) {
-                    // NOTE: 更新系の場合は一度削除する
-                    if (record != null) {
-                        userDao.detachAllPinnedNoteIds(dbId)
-                    }
-
-                    if (!user.info.pinnedNoteIds.isNullOrEmpty()) {
-                        userDao.insertPinnedNoteIds(user.info.pinnedNoteIds!!.map {
-                            PinnedNoteIdRecord(it.noteId, userId = dbId, 0L)
-                        })
-                    }
-
-                }
-                if ((record?.toModel() as? User.Detail?)?.info?.fields?.toSet() != user.info.fields.toSet()) {
-                    if (record != null) {
-                        userDao.detachUserFields(dbId)
-                    }
-                    if (user.info.fields.isNotEmpty()) {
-                        userDao.insertUserProfileFields(user.info.fields.map {
-                            UserProfileFieldRecord(it.name, it.value, dbId)
-                        })
-                    }
-                }
+                replacePinnedNoteIdsIfNeed(dbId, user, record)
+                replaceFieldsIfNeed(dbId, user, record)
             }
             when (val instance = user.instance) {
                 null -> Unit
@@ -326,4 +296,46 @@ class MediatorUserDataSource @Inject constructor(
         }
     }
 
+    private suspend fun replaceEmojisIfNeed(dbId: Long, user: User, record: UserRelated?) {
+        if (!record?.emojis.isEqualToModels(user.emojis)) {
+            // NOTE: 既にキャッシュに存在していた場合一度全て剥がす
+            if (record != null) {
+                userDao.detachAllUserEmojis(dbId)
+            }
+            userDao.insertEmojis(
+                user.emojis.map {
+                    UserEmojiRecord.from(dbId, it)
+                }
+            )
+        }
+    }
+
+    private suspend fun replacePinnedNoteIdsIfNeed(dbId: Long, user: User.Detail, record: UserRelated?) {
+        if ((record?.toModel() as? User.Detail?)?.info?.pinnedNoteIds?.toSet() != user.info.pinnedNoteIds?.toSet()) {
+            // NOTE: 更新系の場合は一度削除する
+            if (record != null) {
+                userDao.detachAllPinnedNoteIds(dbId)
+            }
+
+            if (!user.info.pinnedNoteIds.isNullOrEmpty()) {
+                userDao.insertPinnedNoteIds(user.info.pinnedNoteIds!!.map {
+                    PinnedNoteIdRecord(it.noteId, userId = dbId, 0L)
+                })
+            }
+
+        }
+    }
+
+    private suspend fun replaceFieldsIfNeed(dbId: Long, user: User.Detail, record: UserRelated?) {
+        if ((record?.toModel() as? User.Detail?)?.info?.fields?.toSet() != user.info.fields.toSet()) {
+            if (record != null) {
+                userDao.detachUserFields(dbId)
+            }
+            if (user.info.fields.isNotEmpty()) {
+                userDao.insertUserProfileFields(user.info.fields.map {
+                    UserProfileFieldRecord(it.name, it.value, dbId)
+                })
+            }
+        }
+    }
 }
