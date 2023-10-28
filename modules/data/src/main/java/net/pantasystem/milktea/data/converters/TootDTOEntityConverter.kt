@@ -5,7 +5,9 @@ import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.data.infrastructure.toPoll
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.drive.FileProperty
+import net.pantasystem.milktea.model.image.ImageCache
 import net.pantasystem.milktea.model.image.ImageCacheRepository
+import net.pantasystem.milktea.model.instance.MastodonInstanceInfo
 import net.pantasystem.milktea.model.instance.MastodonInstanceInfoRepository
 import net.pantasystem.milktea.model.nodeinfo.NodeInfo
 import net.pantasystem.milktea.model.nodeinfo.NodeInfoRepository
@@ -27,6 +29,28 @@ class TootDTOEntityConverter @Inject constructor(
         loggerFactory.create("TootDTOEntityConverter")
     }
 
+    suspend fun convertAll(account: Account, statusDTOs: List<TootStatusDTO>): List<Note> {
+        val nodeInfo = nodeInfoRepository.find(account.getHost()).getOrNull()
+        val instanceInfo = instanceInfoRepository.find(account.normalizedInstanceUri)
+        val isReactionAvailable = (instanceInfo.onFailure {
+            logger.error("Failed to find instance info", it)
+        }.getOrNull()?.isReactionAvailable ?: false) || nodeInfo?.type is NodeInfo.SoftwareType.Mastodon.Fedibird
+
+        val urls = statusDTOs.flatMap { statusDTO ->
+            (statusDTO.emojiReactions?.mapNotNull {
+                it.url
+            }?: emptyList()) + (statusDTO.emojiReactions?.mapNotNull {
+                it.url
+            }?: emptyList())
+        }
+        val imageCaches = imageCacheRepository.findBySourceUrls(urls).associateBy {
+            it.sourceUrl
+        }
+        return statusDTOs.map {
+            convert(account, it, instanceInfo, isReactionAvailable, imageCaches)
+        }
+    }
+
     suspend fun convert(statusDTO: TootStatusDTO, account: Account): Note {
         val nodeInfo = nodeInfoRepository.find(account.getHost()).getOrNull()
         val instanceInfoResult = instanceInfoRepository.find(account.normalizedInstanceUri)
@@ -45,6 +69,22 @@ class TootDTOEntityConverter @Inject constructor(
         val imageCaches = imageCacheRepository.findBySourceUrls(urls).associateBy {
             it.sourceUrl
         }
+        return convert(
+            account = account,
+            statusDTO = statusDTO,
+            instanceInfoResult = instanceInfoResult,
+            isReactionAvailable = isReactionAvailable,
+            imageCaches = imageCaches,
+        )
+    }
+
+    private fun convert(
+        account: Account,
+        statusDTO: TootStatusDTO,
+        instanceInfoResult: Result<MastodonInstanceInfo>,
+        isReactionAvailable: Boolean,
+        imageCaches: Map<String, ImageCache>,
+    ): Note {
         return with(statusDTO) {
             Note(
                 id = Note.Id(account.accountId, id),
@@ -111,6 +151,5 @@ class TootDTOEntityConverter @Inject constructor(
                 ),
             )
         }
-
     }
 }
