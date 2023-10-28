@@ -8,6 +8,7 @@ import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.channel.Channel
 import net.pantasystem.milktea.model.drive.FileProperty
 import net.pantasystem.milktea.model.emoji.CustomEmojiAspectRatioDataSource
+import net.pantasystem.milktea.model.image.ImageCache
 import net.pantasystem.milktea.model.image.ImageCacheRepository
 import net.pantasystem.milktea.model.instance.InstanceInfoService
 import net.pantasystem.milktea.model.instance.InstanceInfoType
@@ -26,15 +27,17 @@ class NoteDTOEntityConverter @Inject constructor(
     private val instanceInfoService: InstanceInfoService,
 ) {
 
-    suspend fun convert(account: Account, noteDTO: NoteDTO, instanceInfoType: InstanceInfoType? = null): Note {
-        val emojis = (noteDTO.emojiList + (noteDTO.reactionEmojiList))
-
+    suspend fun convertAll(
+        account: Account,
+        noteDTOs: List<NoteDTO>,
+        instanceInfoType: InstanceInfoType? = null
+    ): List<Note> {
+        val emojis = noteDTOs.flatMap {
+            it.emojiList + (it.reactionEmojiList)
+        }
         val instanceInfo = instanceInfoType?.takeIf {
             it.uri == account.normalizedInstanceUri
         } ?: instanceInfoService.find(account.normalizedInstanceUri).getOrNull()
-
-        val isRequireNyaize = (instanceInfo?.isRequirePerformNyaizeFrontend ?: false)
-                && (noteDTO.user.isCat ?: false)
         val aspects = customEmojiAspectRatioDataSource.findIn(emojis.mapNotNull {
             it.url ?: it.uri
         }).getOrElse {
@@ -47,6 +50,57 @@ class NoteDTOEntityConverter @Inject constructor(
         }).associateBy {
             it.sourceUrl
         }
+
+        return noteDTOs.map {
+            convert(
+                account = account,
+                noteDTO = it,
+                instanceInfoType = instanceInfo,
+                aspects = aspects,
+                fileCaches = fileCaches
+            )
+        }
+    }
+
+    suspend fun convert(
+        account: Account,
+        noteDTO: NoteDTO,
+        instanceInfoType: InstanceInfoType? = null
+    ): Note {
+        val emojis = noteDTO.emojiList
+
+        val aspects = customEmojiAspectRatioDataSource.findIn(emojis.mapNotNull {
+            it.url ?: it.uri
+        }).getOrElse {
+            emptyList()
+        }.associate {
+            it.uri to it.aspectRatio
+        }
+        val fileCaches = imageCacheRepository.findBySourceUrls(emojis.mapNotNull {
+            it.url ?: it.uri
+        }).associateBy {
+            it.sourceUrl
+        }
+        val info = instanceInfoType ?: instanceInfoService.find(account.normalizedInstanceUri).getOrNull()
+        return convert(
+            account = account,
+            noteDTO = noteDTO,
+            instanceInfoType = info,
+            aspects = aspects,
+            fileCaches = fileCaches
+        )
+    }
+
+    private fun convert(
+        account: Account,
+        noteDTO: NoteDTO,
+        instanceInfoType: InstanceInfoType? = null,
+        aspects: Map<String, Float>,
+        fileCaches: Map<String, ImageCache>
+    ): Note {
+        val emojis = noteDTO.emojiList
+        val isRequireNyaize = (instanceInfoType?.isRequirePerformNyaizeFrontend ?: false)
+                && (noteDTO.user.isCat ?: false)
         val visibility = Visibility(
             noteDTO.visibility ?: NoteVisibilityType.Public,
             isLocalOnly = noteDTO.localOnly ?: false,

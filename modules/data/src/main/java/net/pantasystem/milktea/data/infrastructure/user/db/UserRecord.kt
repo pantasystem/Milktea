@@ -145,7 +145,27 @@ data class UserInfoStateRecord(
     @ColumnInfo(name = "userId")
     @PrimaryKey(autoGenerate = false)
     val userId: Long
-)
+) {
+    companion object {
+        fun from(dbId: Long, info: User.Info): UserInfoStateRecord {
+            return UserInfoStateRecord(
+                bannerUrl = info.bannerUrl,
+                isLocked = info.isLocked,
+                description = info.description,
+                followersCount = info.followersCount,
+                followingCount = info.followingCount,
+                hostLower = info.hostLower,
+                notesCount = info.notesCount,
+                url = info.url,
+                userId = dbId,
+                birthday = info.birthday,
+                createdAt = info.createdAt,
+                updatedAt = info.updatedAt,
+                publicReactions = info.isPublicReactions
+            )
+        }
+    }
+}
 
 @Entity(
     tableName = "user_related_state",
@@ -186,7 +206,23 @@ data class UserRelatedStateRecord(
 
     @ColumnInfo(name = "userId")
     @PrimaryKey(autoGenerate = false) val userId: Long
-)
+) {
+
+    companion object {
+        fun from(dbId: Long, related: User.Related): UserRelatedStateRecord {
+            return UserRelatedStateRecord(
+                isMuting = related.isMuting,
+                isBlocking = related.isBlocking,
+                isFollower = related.isFollower,
+                isFollowing = related.isFollowing,
+                hasPendingFollowRequestToYou = related.hasPendingFollowRequestToYou,
+                hasPendingFollowRequestFromYou = related.hasPendingFollowRequestFromYou,
+                isNotify = related.isNotify,
+                userId = dbId,
+            )
+        }
+    }
+}
 
 @Entity(
     tableName = "user_detailed_state",
@@ -302,6 +338,20 @@ data class UserEmojiRecord(
     @ColumnInfo(name = "id")
     @PrimaryKey(autoGenerate = true) val id: Long = 0L,
 ) {
+
+    companion object {
+        fun from(dbId: Long, mode: CustomEmoji): UserEmojiRecord {
+            return UserEmojiRecord(
+                name = mode.name,
+                url = mode.url,
+                uri = mode.uri,
+                aspectRatio = mode.aspectRatio,
+                cachePath = mode.cachePath,
+                userId = dbId,
+            )
+        }
+    }
+
     fun toModel(): CustomEmoji {
         return CustomEmoji(
             name = name,
@@ -369,7 +419,21 @@ data class UserInstanceInfoRecord(
 
     @ColumnInfo(name = "userId")
     @PrimaryKey(autoGenerate = false) val userId: Long
-)
+) {
+    companion object {
+        fun from(dbId: Long, instance: User.InstanceInfo): UserInstanceInfoRecord {
+            return UserInstanceInfoRecord(
+                faviconUrl = instance.faviconUrl,
+                iconUrl = instance.iconUrl,
+                name = instance.name,
+                softwareVersion = instance.softwareVersion,
+                softwareName = instance.softwareName,
+                themeColor = instance.themeColor,
+                userId = dbId
+            )
+        }
+    }
+}
 
 @Entity(
     tableName = "pinned_note_id",
@@ -659,5 +723,42 @@ data class UserRelated(
                 }
             )
         }
+    }
+
+    fun toSimpleModel(): User.Simple {
+        val instanceInfo = instance?.let {
+            User.InstanceInfo(
+                faviconUrl = it.faviconUrl,
+                iconUrl = it.iconUrl,
+                name = it.name,
+                softwareName = it.softwareName,
+                softwareVersion = it.softwareVersion,
+                themeColor = it.themeColor
+            )
+        }
+        return User.Simple(
+            id = User.Id(
+                user.accountId,
+                user.serverId,
+            ),
+            userName = user.userName,
+            avatarUrl = user.avatarUrl,
+            emojis = emojis.map {
+                it.toModel()
+            },
+            host = user.host,
+            isBot = user.isBot,
+            isCat = user.isCat,
+            isSameHost = user.isSameHost,
+            name = user.name,
+            nickname = user.nickname?.let {
+                UserNickname(
+                    id = UserNickname.Id(user.userName, user.host),
+                    name = user.nickname
+                )
+            },
+            instance = instanceInfo,
+            avatarBlurhash = user.avatarBlurhash,
+        )
     }
 }

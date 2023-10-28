@@ -1,5 +1,6 @@
 package net.pantasystem.milktea.data.infrastructure.note.impl.db
 
+import io.objectbox.annotation.ConflictStrategy
 import io.objectbox.annotation.Entity
 import io.objectbox.annotation.Id
 import io.objectbox.annotation.Index
@@ -26,7 +27,7 @@ data class NoteRecord(
     @Index
     var noteId: String = "",
 
-    @Unique
+    @Unique(onConflict = ConflictStrategy.REPLACE)
     @Index
     var accountIdAndNoteId: String = "",
 
