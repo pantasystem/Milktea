@@ -44,9 +44,7 @@ internal class MastodonTimelineStorePagingStoreImpl(
 
     override suspend fun convertAll(list: List<TootStatusDTO>): List<Note.Id> {
         val account = getAccount()
-        return list.map {
-            noteAdder.addTootStatusDtoIntoDataSource(account, it).id
-        }
+        return noteAdder.addTootStatusDtoListIntoDataSource(account, list)
     }
 
     override suspend fun loadFuture(): Result<List<TootStatusDTO>> = runCancellableCatching {

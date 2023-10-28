@@ -98,11 +98,13 @@ class NoteDataSourceAdder @Inject constructor(
             }).onFailure {
                 logger.error("UserDataSourceへの追加に失敗", it)
             }
-            noteDataSource.addAll(noteDTOEntityConverter.convertAll(
-                account,
-                notes,
-                info,
-            )).onFailure {
+            noteDataSource.addAll(
+                noteDTOEntityConverter.convertAll(
+                    account,
+                    notes,
+                    info,
+                )
+            ).onFailure {
                 logger.error("NoteDataSourceへの追加に失敗", it)
             }
             filePropertyDataSource.addAll(entities.flatMap {
@@ -167,10 +169,12 @@ class NoteDataSourceAdder @Inject constructor(
             userDataSource.addAll(entities.users).onFailure {
                 logger.error("UserDataSourceへの追加に失敗", it)
             }
-            noteDataSource.addAll(noteDTOEntityConverter.convertAll(
-                account,
-                entities.notes
-            )).onFailure {
+            noteDataSource.addAll(
+                noteDTOEntityConverter.convertAll(
+                    account,
+                    entities.notes
+                )
+            ).onFailure {
                 logger.error("NoteDataSourceへの追加に失敗", it)
             }
             filePropertyDataSource.addAll(entities.files).onFailure {
@@ -181,12 +185,86 @@ class NoteDataSourceAdder @Inject constructor(
         return willReturnNote
     }
 
+    suspend fun addTootStatusDtoListIntoDataSource(
+        account: Account,
+        statuses: List<TootStatusDTO>,
+        skipExists: Boolean = false
+    ): List<Note.Id> {
+        val entities = statuses.map {
+            it.toEntities(
+                account,
+            )
+        }
+        val notes = entities.flatMap {
+            it.toots
+        } + entities.map {
+            it.toot
+        }
+        val users = entities.flatMap {
+            it.users
+        }
+        val files = entities.flatMap {
+            it.files
+        }
+
+        if (skipExists) {
+            userDataSource.addAll(
+                users.filterNot {
+                    userDataSource.get(it.id).isSuccess
+                }
+            ).onFailure {
+                logger.error("UserDataSourceへの追加に失敗", it)
+            }
+            noteDataSource.addAll(
+                tootDTOEntityConverter.convertAll(
+                    account,
+                    notes.filterNot {
+                        noteDataSource.exists(Note.Id(account.accountId, it.id))
+                    }
+                )
+            ).onFailure {
+                logger.error("NoteDataSourceへの追加に失敗", it)
+            }
+            filePropertyDataSource.addAll(
+                files.filterNot {
+                    filePropertyDataSource.find(it.id).isSuccess
+                }
+            ).onFailure {
+                logger.error("FilePropertyDataSourceへの追加に失敗", it)
+            }
+
+        } else {
+            userDataSource.addAll(users).onFailure {
+                logger.error("UserDataSourceへの追加に失敗", it)
+            }
+            noteDataSource.addAll(
+                tootDTOEntityConverter.convertAll(
+                    account,
+                    notes
+                )
+            ).onFailure {
+                logger.error("NoteDataSourceへの追加に失敗", it)
+            }
+            filePropertyDataSource.addAll(files).onFailure {
+                logger.error("FilePropertyDataSourceへの追加に失敗", it)
+            }
+        }
+        return entities.map {
+            Note.Id(
+                account.accountId,
+                it.toot.id
+            )
+        }
+    }
+
     suspend fun addTootStatusDtoIntoDataSource(
         account: Account,
         status: TootStatusDTO,
         skipExists: Boolean = false
     ): Note {
-        val entities = status.toEntities(tootDTOEntityConverter, account)
+        val entities = status.toEntities(account)
+        val willReturnNote = tootDTOEntityConverter.convert(entities.toot, account)
+        noteDataSource.add(willReturnNote)
         if (skipExists) {
             userDataSource.addAll(
                 entities.users.filterNot {
@@ -196,14 +274,17 @@ class NoteDataSourceAdder @Inject constructor(
                 logger.error("UserDataSourceへの追加に失敗", it)
             }
             noteDataSource.addAll(
-                entities.notes.filterNot {
-                    noteDataSource.exists(it.id)
-                }
+                tootDTOEntityConverter.convertAll(
+                    account,
+                    entities.toots.filterNot {
+                        noteDataSource.exists(Note.Id(account.accountId, it.id))
+                    }
+                )
             ).onFailure {
                 logger.error("NoteDataSourceへの追加に失敗", it)
             }
-            if (!noteDataSource.exists(entities.note.id)) {
-                noteDataSource.add(entities.note).onFailure {
+            if (!noteDataSource.exists(Note.Id(account.accountId, entities.toot.id))) {
+                noteDataSource.add(willReturnNote).onFailure {
                     logger.error("NoteDataSourceへの追加に失敗", it)
                 }
             }
@@ -218,10 +299,15 @@ class NoteDataSourceAdder @Inject constructor(
             userDataSource.addAll(entities.users).onFailure {
                 logger.error("UserDataSourceへの追加に失敗", it)
             }
-            noteDataSource.addAll(entities.notes).onFailure {
+            noteDataSource.addAll(
+                tootDTOEntityConverter.convertAll(
+                    account,
+                    entities.toots,
+                )
+            ).onFailure {
                 logger.error("NoteDataSourceへの追加に失敗", it)
             }
-            noteDataSource.add(entities.note).onFailure {
+            noteDataSource.add(willReturnNote).onFailure {
                 logger.error("NoteDataSourceへの追加に失敗", it)
             }
             filePropertyDataSource.addAll(entities.files).onFailure {
@@ -229,7 +315,7 @@ class NoteDataSourceAdder @Inject constructor(
             }
         }
 
-        return entities.note
+        return willReturnNote
     }
 }
 
