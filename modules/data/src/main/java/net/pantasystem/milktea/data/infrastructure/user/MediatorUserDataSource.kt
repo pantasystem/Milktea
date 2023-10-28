@@ -133,14 +133,7 @@ class MediatorUserDataSource @Inject constructor(
                 }
                 userDao.insertEmojis(
                     user.emojis.map {
-                        UserEmojiRecord(
-                            userId = dbId,
-                            name = it.name,
-                            uri = it.uri,
-                            url = it.url,
-                            aspectRatio = it.aspectRatio,
-                            cachePath = it.cachePath
-                        )
+                        UserEmojiRecord.from(dbId, it)
                     }
                 )
             }
@@ -187,15 +180,7 @@ class MediatorUserDataSource @Inject constructor(
                 null -> Unit
                 else -> {
                     userDao.insertUserInstanceInfo(
-                        UserInstanceInfoRecord(
-                            faviconUrl = instance.faviconUrl,
-                            iconUrl = instance.iconUrl,
-                            name = instance.name,
-                            softwareVersion = instance.softwareVersion,
-                            softwareName = instance.softwareName,
-                            themeColor = instance.themeColor,
-                            userId = dbId
-                        )
+                        UserInstanceInfoRecord.from(dbId, instance)
                     )
                 }
             }

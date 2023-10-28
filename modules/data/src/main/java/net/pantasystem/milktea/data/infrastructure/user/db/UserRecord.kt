@@ -338,6 +338,20 @@ data class UserEmojiRecord(
     @ColumnInfo(name = "id")
     @PrimaryKey(autoGenerate = true) val id: Long = 0L,
 ) {
+
+    companion object {
+        fun from(dbId: Long, mode: CustomEmoji): UserEmojiRecord {
+            return UserEmojiRecord(
+                name = mode.name,
+                url = mode.url,
+                uri = mode.uri,
+                aspectRatio = mode.aspectRatio,
+                cachePath = mode.cachePath,
+                userId = dbId,
+            )
+        }
+    }
+
     fun toModel(): CustomEmoji {
         return CustomEmoji(
             name = name,
@@ -405,7 +419,21 @@ data class UserInstanceInfoRecord(
 
     @ColumnInfo(name = "userId")
     @PrimaryKey(autoGenerate = false) val userId: Long
-)
+) {
+    companion object {
+        fun from(dbId: Long, instance: User.InstanceInfo): UserInstanceInfoRecord {
+            return UserInstanceInfoRecord(
+                faviconUrl = instance.faviconUrl,
+                iconUrl = instance.iconUrl,
+                name = instance.name,
+                softwareVersion = instance.softwareVersion,
+                softwareName = instance.softwareName,
+                themeColor = instance.themeColor,
+                userId = dbId
+            )
+        }
+    }
+}
 
 @Entity(
     tableName = "pinned_note_id",
