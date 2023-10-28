@@ -147,43 +147,16 @@ class MediatorUserDataSource @Inject constructor(
 
             if (user is User.Detail) {
                 userDao.insert(
-                    UserInfoStateRecord(
-                        bannerUrl = user.info.bannerUrl,
-
-                        isLocked = user.info.isLocked,
-
-                        description = user.info.description,
-                        followersCount = user.info.followersCount,
-                        followingCount = user.info.followingCount,
-
-                        hostLower = user.info.hostLower,
-                        notesCount = user.info.notesCount,
-                        url = user.info.url,
-                        userId = dbId,
-                        birthday = user.info.birthday,
-                        createdAt = user.info.createdAt,
-                        updatedAt = user.info.updatedAt,
-                        publicReactions = user.info.isPublicReactions
-                    )
+                    UserInfoStateRecord.from(dbId, user.info)
                 )
                 when (val related = user.related) {
                     null -> {}
                     else -> {
                         userDao.insert(
-                            UserRelatedStateRecord(
-                                isMuting = related.isMuting,
-                                isBlocking = related.isBlocking,
-                                isFollower = related.isFollower,
-                                isFollowing = related.isFollowing,
-                                hasPendingFollowRequestToYou = related.hasPendingFollowRequestToYou,
-                                hasPendingFollowRequestFromYou = related.hasPendingFollowRequestFromYou,
-                                isNotify = related.isNotify,
-                                userId = dbId,
-                            )
+                            UserRelatedStateRecord.from(dbId, related)
                         )
                     }
                 }
-
 
                 // NOTE: 更新の必要性を判定
                 if ((record?.toModel() as? User.Detail?)?.info?.pinnedNoteIds?.toSet() != user.info.pinnedNoteIds?.toSet()) {

@@ -145,7 +145,27 @@ data class UserInfoStateRecord(
     @ColumnInfo(name = "userId")
     @PrimaryKey(autoGenerate = false)
     val userId: Long
-)
+) {
+    companion object {
+        fun from(dbId: Long, info: User.Info): UserInfoStateRecord {
+            return UserInfoStateRecord(
+                bannerUrl = info.bannerUrl,
+                isLocked = info.isLocked,
+                description = info.description,
+                followersCount = info.followersCount,
+                followingCount = info.followingCount,
+                hostLower = info.hostLower,
+                notesCount = info.notesCount,
+                url = info.url,
+                userId = dbId,
+                birthday = info.birthday,
+                createdAt = info.createdAt,
+                updatedAt = info.updatedAt,
+                publicReactions = info.isPublicReactions
+            )
+        }
+    }
+}
 
 @Entity(
     tableName = "user_related_state",
@@ -186,7 +206,23 @@ data class UserRelatedStateRecord(
 
     @ColumnInfo(name = "userId")
     @PrimaryKey(autoGenerate = false) val userId: Long
-)
+) {
+
+    companion object {
+        fun from(dbId: Long, related: User.Related): UserRelatedStateRecord {
+            return UserRelatedStateRecord(
+                isMuting = related.isMuting,
+                isBlocking = related.isBlocking,
+                isFollower = related.isFollower,
+                isFollowing = related.isFollowing,
+                hasPendingFollowRequestToYou = related.hasPendingFollowRequestToYou,
+                hasPendingFollowRequestFromYou = related.hasPendingFollowRequestFromYou,
+                isNotify = related.isNotify,
+                userId = dbId,
+            )
+        }
+    }
+}
 
 @Entity(
     tableName = "user_detailed_state",
