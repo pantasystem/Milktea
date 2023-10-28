@@ -168,8 +168,10 @@ class MediatorUserDataSource @Inject constructor(
         }
     }
 
-    override suspend fun addAll(users: List<User>): Result<Map<User.Id, AddResult>> =
-        runCancellableCatching {
+    override suspend fun addAll(
+        users: List<User>
+    ): Result<Map<User.Id, AddResult>> = runCancellableCatching {
+        withContext(ioDispatcher) {
             val existsUsersInMemory = users.associate {
                 it.id to memCache.get(it.id)
             }
@@ -247,6 +249,8 @@ class MediatorUserDataSource @Inject constructor(
                 }
             }.toMap()
         }
+
+    }
 
     override suspend fun remove(user: User): Result<Boolean> = runCancellableCatching {
         runCancellableCatching {
@@ -391,8 +395,13 @@ class MediatorUserDataSource @Inject constructor(
         }
     }
 
-    private suspend fun replacePinnedNoteIdsIfNeed(dbId: Long, user: User.Detail, record: UserRelated?, recordToDetailed: User.Detail? = (record?.toModel() as? User.Detail?)) {
-        val recordDetail = recordToDetailed?: (record?.toModel() as? User.Detail?)
+    private suspend fun replacePinnedNoteIdsIfNeed(
+        dbId: Long,
+        user: User.Detail,
+        record: UserRelated?,
+        recordToDetailed: User.Detail? = (record?.toModel() as? User.Detail?)
+    ) {
+        val recordDetail = recordToDetailed ?: (record?.toModel() as? User.Detail?)
         if (recordDetail?.info?.pinnedNoteIds?.toSet() != user.info.pinnedNoteIds?.toSet()) {
             // NOTE: 更新系の場合は一度削除する
             if (record != null) {
@@ -408,8 +417,13 @@ class MediatorUserDataSource @Inject constructor(
         }
     }
 
-    private suspend fun replaceFieldsIfNeed(dbId: Long, user: User.Detail, record: UserRelated?, recordToDetailed: User.Detail? = (record?.toModel() as? User.Detail?)) {
-        val recordDetail = recordToDetailed?: (record?.toModel() as? User.Detail?)
+    private suspend fun replaceFieldsIfNeed(
+        dbId: Long,
+        user: User.Detail,
+        record: UserRelated?,
+        recordToDetailed: User.Detail? = (record?.toModel() as? User.Detail?)
+    ) {
+        val recordDetail = recordToDetailed ?: (record?.toModel() as? User.Detail?)
         if (recordDetail?.info?.fields?.toSet() != user.info.fields.toSet()) {
             if (record != null) {
                 userDao.detachUserFields(dbId)
