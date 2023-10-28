@@ -21,6 +21,9 @@ abstract class UserDao {
     abstract suspend fun insert(related: UserRelatedStateRecord): Long
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
+    abstract suspend fun insertAll(users: List<UserRecord>): List<Long>
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     abstract suspend fun insertEmojis(emojis: List<UserEmojiRecord>): List<Long>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)

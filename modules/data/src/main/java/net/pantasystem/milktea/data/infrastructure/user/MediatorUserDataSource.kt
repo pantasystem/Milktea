@@ -168,10 +168,10 @@ class MediatorUserDataSource @Inject constructor(
         }
     }
 
-    override suspend fun addAll(users: List<User>): Result<List<AddResult>> =
+    override suspend fun addAll(users: List<User>): Result<Map<User.Id, AddResult>> =
         runCancellableCatching {
-            users.map {
-                add(it).getOrElse {
+            users.associate { user ->
+                user.id to add(user).getOrElse {
                     AddResult.Canceled
                 }
             }

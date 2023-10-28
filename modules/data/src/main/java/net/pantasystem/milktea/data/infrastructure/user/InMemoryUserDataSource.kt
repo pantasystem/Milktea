@@ -1,7 +1,12 @@
 package net.pantasystem.milktea.data.infrastructure.user
 
 
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import net.pantasystem.milktea.common.runCancellableCatching
@@ -36,10 +41,10 @@ class InMemoryUserDataSource @Inject constructor(
 
     }
 
-    override suspend fun addAll(users: List<User>): Result<List<AddResult>> =
+    override suspend fun addAll(users: List<User>): Result<Map<User.Id, AddResult>> =
         runCancellableCatching {
-            users.map {
-                add(it).getOrElse {
+            users.associate {
+                it.id to add(it).getOrElse {
                     AddResult.Canceled
                 }
             }

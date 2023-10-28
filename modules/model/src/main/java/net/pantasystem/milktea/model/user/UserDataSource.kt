@@ -27,7 +27,7 @@ interface UserDataSource {
 
     suspend fun add(user: User): Result<AddResult>
 
-    suspend fun addAll(users: List<User>): Result<List<AddResult>>
+    suspend fun addAll(users: List<User>): Result<Map<User.Id, AddResult>>
 
     suspend fun remove(user: User): Result<Boolean>
 
