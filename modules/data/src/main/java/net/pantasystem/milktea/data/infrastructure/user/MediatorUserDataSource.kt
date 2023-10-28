@@ -117,6 +117,16 @@ class MediatorUserDataSource @Inject constructor(
 
             val newRecord = UserRecord.from(user)
             val record = userDao.get(user.id.accountId, user.id.id)
+            val recordToDetailed = (record?.toModel() as? User.Detail?)
+            val recordToSimpled = record?.toSimpleModel()
+            if (user == recordToDetailed) {
+                return@withContext AddResult.Canceled
+            }
+
+            if (user is User.Simple && recordToSimpled == user) {
+                return@withContext AddResult.Canceled
+            }
+
             val result = if (record == null) AddResult.Created else AddResult.Updated
             val dbId = if (record == null) {
                 userDao.insert(newRecord)
@@ -143,8 +153,8 @@ class MediatorUserDataSource @Inject constructor(
                 }
 
                 // NOTE: 更新の必要性を判定
-                replacePinnedNoteIdsIfNeed(dbId, user, record)
-                replaceFieldsIfNeed(dbId, user, record)
+                replacePinnedNoteIdsIfNeed(dbId, user, record, recordToDetailed)
+                replaceFieldsIfNeed(dbId, user, record, recordToDetailed)
             }
             when (val instance = user.instance) {
                 null -> Unit
@@ -310,8 +320,9 @@ class MediatorUserDataSource @Inject constructor(
         }
     }
 
-    private suspend fun replacePinnedNoteIdsIfNeed(dbId: Long, user: User.Detail, record: UserRelated?) {
-        if ((record?.toModel() as? User.Detail?)?.info?.pinnedNoteIds?.toSet() != user.info.pinnedNoteIds?.toSet()) {
+    private suspend fun replacePinnedNoteIdsIfNeed(dbId: Long, user: User.Detail, record: UserRelated?, recordToDetailed: User.Detail? = (record?.toModel() as? User.Detail?)) {
+        val recordDetail = recordToDetailed?: (record?.toModel() as? User.Detail?)
+        if (recordDetail?.info?.pinnedNoteIds?.toSet() != user.info.pinnedNoteIds?.toSet()) {
             // NOTE: 更新系の場合は一度削除する
             if (record != null) {
                 userDao.detachAllPinnedNoteIds(dbId)
@@ -326,8 +337,9 @@ class MediatorUserDataSource @Inject constructor(
         }
     }
 
-    private suspend fun replaceFieldsIfNeed(dbId: Long, user: User.Detail, record: UserRelated?) {
-        if ((record?.toModel() as? User.Detail?)?.info?.fields?.toSet() != user.info.fields.toSet()) {
+    private suspend fun replaceFieldsIfNeed(dbId: Long, user: User.Detail, record: UserRelated?, recordToDetailed: User.Detail? = (record?.toModel() as? User.Detail?)) {
+        val recordDetail = recordToDetailed?: (record?.toModel() as? User.Detail?)
+        if (recordDetail?.info?.fields?.toSet() != user.info.fields.toSet()) {
             if (record != null) {
                 userDao.detachUserFields(dbId)
             }

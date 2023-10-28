@@ -724,4 +724,41 @@ data class UserRelated(
             )
         }
     }
+
+    fun toSimpleModel(): User.Simple {
+        val instanceInfo = instance?.let {
+            User.InstanceInfo(
+                faviconUrl = it.faviconUrl,
+                iconUrl = it.iconUrl,
+                name = it.name,
+                softwareName = it.softwareName,
+                softwareVersion = it.softwareVersion,
+                themeColor = it.themeColor
+            )
+        }
+        return User.Simple(
+            id = User.Id(
+                user.accountId,
+                user.serverId,
+            ),
+            userName = user.userName,
+            avatarUrl = user.avatarUrl,
+            emojis = emojis.map {
+                it.toModel()
+            },
+            host = user.host,
+            isBot = user.isBot,
+            isCat = user.isCat,
+            isSameHost = user.isSameHost,
+            name = user.name,
+            nickname = user.nickname?.let {
+                UserNickname(
+                    id = UserNickname.Id(user.userName, user.host),
+                    name = user.nickname
+                )
+            },
+            instance = instanceInfo,
+            avatarBlurhash = user.avatarBlurhash,
+        )
+    }
 }
