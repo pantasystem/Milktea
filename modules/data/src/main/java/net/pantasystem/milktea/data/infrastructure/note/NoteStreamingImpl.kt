@@ -45,49 +45,49 @@ class NoteStreamingImpl @Inject constructor(
             when (pageable) {
                 is Pageable.GlobalTimeline -> {
                     requireNotNull(channelAPIProvider.get(ac)).connect(ChannelAPI.Type.Global)
-                        .convertToNote(getAccount, pageable)
+                        .convertToNote(ac, pageable)
                 }
                 is Pageable.HybridTimeline -> {
                     requireNotNull(channelAPIProvider.get(ac)).connect(ChannelAPI.Type.Hybrid)
-                        .convertToNote(getAccount, pageable)
+                        .convertToNote(ac, pageable)
                 }
                 is Pageable.LocalTimeline -> {
                     requireNotNull(channelAPIProvider.get(ac)).connect(ChannelAPI.Type.Local)
-                        .convertToNote(getAccount, pageable)
+                        .convertToNote(ac, pageable)
                 }
                 is Pageable.HomeTimeline -> {
                     requireNotNull(channelAPIProvider.get(ac)).connect(ChannelAPI.Type.Home)
-                        .convertToNote(getAccount, pageable)
+                        .convertToNote(ac, pageable)
                 }
                 is Pageable.UserListTimeline -> {
                     requireNotNull(channelAPIProvider.get(ac))
                         .connect(ChannelAPI.Type.UserList(userListId = pageable.listId))
-                        .convertToNote(getAccount, pageable)
+                        .convertToNote(ac, pageable)
                 }
                 is Pageable.Antenna -> {
                     requireNotNull(channelAPIProvider.get(ac))
                         .connect(ChannelAPI.Type.Antenna(antennaId = pageable.antennaId))
-                        .convertToNote(getAccount, pageable)
+                        .convertToNote(ac, pageable)
                 }
                 is Pageable.UserTimeline -> {
                     requireNotNull(channelAPIProvider.get(ac))
-                        .connectUserTimeline(pageable.userId).convertToNote(getAccount, pageable)
+                        .connectUserTimeline(pageable.userId).convertToNote(ac, pageable)
                 }
                 is Pageable.ChannelTimeline -> {
                     requireNotNull(channelAPIProvider.get(ac))
                         .connect(ChannelAPI.Type.Channel(channelId = pageable.channelId))
-                        .convertToNote(getAccount, pageable)
+                        .convertToNote(ac, pageable)
                 }
                 is Pageable.CalckeyRecommendedTimeline -> {
                     requireNotNull(channelAPIProvider.get(ac))
                         .connect(ChannelAPI.Type.RecommendedTimeline)
-                        .convertToNote(getAccount, pageable)
+                        .convertToNote(ac, pageable)
                 }
                 is Pageable.Mastodon -> {
                     when (pageable) {
                         is Pageable.Mastodon.HashTagTimeline -> {
                             requireNotNull(streamingAPIProvider.get(ac)).connectHashTag(pageable.hashtag)
-                                .convertToNoteFromStatus(getAccount, pageable)
+                                .convertToNoteFromStatus(ac, pageable)
                         }
                         is Pageable.Mastodon.HomeTimeline -> {
                             requireNotNull(streamingAPIProvider.get(ac)).connectUser()
@@ -97,17 +97,17 @@ class NoteStreamingImpl @Inject constructor(
                             streamingAPIProvider.get(
                                 ac
                             )
-                        ).connectUserList(pageable.listId).convertToNoteFromStatus(getAccount, pageable)
+                        ).connectUserList(pageable.listId).convertToNoteFromStatus(ac, pageable)
                         is Pageable.Mastodon.LocalTimeline -> requireNotNull(
                             streamingAPIProvider.get(
                                 ac
                             )
-                        ).connectLocalPublic().convertToNoteFromStatus(getAccount, pageable)
+                        ).connectLocalPublic().convertToNoteFromStatus(ac, pageable)
                         is Pageable.Mastodon.PublicTimeline -> requireNotNull(
                             streamingAPIProvider.get(
                                 ac
                             )
-                        ).connectPublic().convertToNoteFromStatus(getAccount, pageable)
+                        ).connectPublic().convertToNoteFromStatus(ac, pageable)
                         else -> throw IllegalStateException("Global, Hybrid, Local, Homeは以外のStreamは対応していません。")
                     }
                 }
@@ -116,7 +116,7 @@ class NoteStreamingImpl @Inject constructor(
         }
     }
 
-    private fun Flow<ChannelBody>.convertToNote(getAccount: suspend () -> Account, pageable: Pageable): Flow<Note> {
+    private fun Flow<ChannelBody>.convertToNote(account: Account, pageable: Pageable): Flow<Note> {
         return mapNotNull {
             it as? ChannelBody.ReceiveNote
         }.filter {
@@ -130,11 +130,11 @@ class NoteStreamingImpl @Inject constructor(
                 true
             }
         }.map {
-            noteDataSourceAdder.addNoteDtoToDataSource(getAccount(), it.body)
+            noteDataSourceAdder.addNoteDtoToDataSource(account, it.body)
         }
     }
 
-    private fun Flow<TootStatusDTO>.convertToNoteFromStatus(getAccount: suspend () -> Account, pageable: Pageable): Flow<Note> {
+    private fun Flow<TootStatusDTO>.convertToNoteFromStatus(account: Account, pageable: Pageable): Flow<Note> {
         return filter {
             if (pageable is CanOnlyMedia<*>) {
                 if (pageable.getOnlyMedia()) {
@@ -146,7 +146,7 @@ class NoteStreamingImpl @Inject constructor(
                 true
             }
         }.map {
-            noteDataSourceAdder.addTootStatusDtoIntoDataSource(getAccount(), it)
+            noteDataSourceAdder.addTootStatusDtoIntoDataSource(account, it)
         }
     }
 
