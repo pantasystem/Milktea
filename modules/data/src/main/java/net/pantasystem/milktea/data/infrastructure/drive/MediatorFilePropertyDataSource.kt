@@ -32,7 +32,9 @@ class MediatorFilePropertyDataSource @Inject constructor(
     val cache = LRUCache<FileProperty.Id, FileProperty>(25)
 
 
-    override suspend fun add(fileProperty: FileProperty): Result<AddResult> = runCancellableCatching {
+    override suspend fun add(
+        fileProperty: FileProperty
+    ): Result<AddResult> = runCancellableCatching {
         withContext(ioDispatcher) {
             cache.put(fileProperty.id, fileProperty)
             val record = runCancellableCatching {
@@ -56,7 +58,9 @@ class MediatorFilePropertyDataSource @Inject constructor(
         }
     }
 
-    override suspend fun addAll(list: List<FileProperty>): Result<List<AddResult>> = runCancellableCatching {
+    override suspend fun addAll(
+        list: List<FileProperty>
+    ): Result<List<AddResult>> = runCancellableCatching {
         withContext(ioDispatcher) {
             if (list.isEmpty()) {
                 return@withContext emptyList()
@@ -73,7 +77,7 @@ class MediatorFilePropertyDataSource @Inject constructor(
                 insertResults[index] == -1L
             }
 
-            logger.debug("insert結果:$insertResults")
+            logger.debug { "insert結果:$insertResults" }
             if (ignored.isEmpty()) {
                 return@withContext list.map {
                     AddResult.Created
@@ -96,7 +100,7 @@ class MediatorFilePropertyDataSource @Inject constructor(
                 }
             }
 
-            logger.debug("必要更新件数:${needUpdates.size}")
+            logger.debug { "必要更新件数:${needUpdates.size}" }
             // NOTE: 内容に変更があった場合更新をする
             needUpdates.map { record ->
                 driveFileRecordDao.update(record.update(idAndFileMap.getValue(record.toFilePropertyId())))
@@ -114,7 +118,9 @@ class MediatorFilePropertyDataSource @Inject constructor(
         }
     }
 
-    override suspend fun find(filePropertyId: FileProperty.Id): Result<FileProperty> = runCancellableCatching {
+    override suspend fun find(
+        filePropertyId: FileProperty.Id
+    ): Result<FileProperty> = runCancellableCatching {
         withContext(ioDispatcher) {
             var result = cache.get(filePropertyId)
             if (result != null) {
@@ -129,7 +135,9 @@ class MediatorFilePropertyDataSource @Inject constructor(
         }
     }
 
-    override suspend fun remove(fileProperty: FileProperty): Result<Boolean> = runCancellableCatching {
+    override suspend fun remove(
+        fileProperty: FileProperty
+    ): Result<Boolean> = runCancellableCatching {
         withContext(ioDispatcher) {
             try {
                 driveFileRecordDao.delete(fileProperty.id.accountId, fileProperty.id.fileId)
@@ -183,7 +191,9 @@ class MediatorFilePropertyDataSource @Inject constructor(
         }.flowOn(ioDispatcher)
     }
 
-    override suspend fun findIn(ids: List<FileProperty.Id>): Result<List<FileProperty>> = runCancellableCatching {
+    override suspend fun findIn(
+        ids: List<FileProperty.Id>
+    ): Result<List<FileProperty>> = runCancellableCatching {
         withContext(ioDispatcher) {
             val inMemories = ids.mapNotNull {
                 cache.get(it)

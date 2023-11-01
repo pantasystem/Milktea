@@ -56,24 +56,25 @@ class ObjectBoxNoteDataSource @Inject constructor(
     }
 
 
-    override suspend fun getIn(noteIds: List<Note.Id>): Result<List<Note>> =
-        runCancellableCatching {
-            if (noteIds.isEmpty()) {
-                return@runCancellableCatching emptyList()
+    override suspend fun getIn(
+        noteIds: List<Note.Id>
+    ): Result<List<Note>> = runCancellableCatching {
+        if (noteIds.isEmpty()) {
+            return@runCancellableCatching emptyList()
+        }
+        withContext(ioDispatcher) {
+            val ids = noteIds.map {
+                NoteRecord.generateAccountAndNoteId(it)
             }
-            withContext(ioDispatcher) {
-                val ids = noteIds.map {
-                    NoteRecord.generateAccountAndNoteId(it)
-                }
-                noteBox.query().inValues(
-                    NoteRecord_.accountIdAndNoteId,
-                    ids.toTypedArray(),
-                    QueryBuilder.StringOrder.CASE_INSENSITIVE
-                ).build().find().map {
-                    it.toModel()
-                }
+            noteBox.query().inValues(
+                NoteRecord_.accountIdAndNoteId,
+                ids.toTypedArray(),
+                QueryBuilder.StringOrder.CASE_INSENSITIVE
+            ).build().find().map {
+                it.toModel()
             }
         }
+    }
 
     override suspend fun get(noteId: Note.Id): Result<Note> = runCancellableCatching {
         if (deleteNoteIds.contains(noteId)) {
@@ -88,7 +89,9 @@ class ObjectBoxNoteDataSource @Inject constructor(
         }
     }
 
-    override suspend fun getWithState(noteId: Note.Id): Result<NoteResult> = runCancellableCatching {
+    override suspend fun getWithState(
+        noteId: Note.Id
+    ): Result<NoteResult> = runCancellableCatching {
         if (deleteNoteIds.contains(noteId)) {
             return@runCancellableCatching NoteResult.Deleted
         }
@@ -99,7 +102,7 @@ class ObjectBoxNoteDataSource @Inject constructor(
                 QueryBuilder.StringOrder.CASE_INSENSITIVE
             ).build().findFirst()?.toModel()
         }
-        when(note) {
+        when (note) {
             null -> NoteResult.NotFound
             else -> NoteResult.Success(note)
         }
@@ -176,6 +179,7 @@ class ObjectBoxNoteDataSource @Inject constructor(
                     onAdded(note)
                     publish(NoteDataSource.Event.Created(note.id, note))
                 }
+
                 AddResult.Updated -> publish(NoteDataSource.Event.Updated(note.id, note))
             }
         }
@@ -183,37 +187,38 @@ class ObjectBoxNoteDataSource @Inject constructor(
 
     }
 
-    override suspend fun addAll(notes: List<Note>): Result<List<AddResult>> =
-        runCancellableCatching {
-            withContext(ioDispatcher) {
-                boxStore.awaitCallInTx {
-                    val existsNotes = noteBox.query().inValues(
-                        NoteRecord_.accountIdAndNoteId,
-                        notes.map {
-                            NoteRecord.generateAccountAndNoteId(it.id)
-                        }.toTypedArray(),
-                        QueryBuilder.StringOrder.CASE_INSENSITIVE
-                    ).build().find().associateBy {
-                        it.noteId
-                    }
-                    val willSave = notes.map {
-                        val exists = existsNotes[it.id.noteId]
-                        if (exists == null) {
-                            NoteRecord.from(it) to AddResult.Created
-                        } else {
-                            exists.applyModel(it)
-                            exists to AddResult.Updated
-                        }
-                    }
-                    noteBox.put(willSave.map {
-                        it.first
-                    })
-                    willSave.map {
-                        it.second
+    override suspend fun addAll(
+        notes: List<Note>
+    ): Result<List<AddResult>> = runCancellableCatching {
+        withContext(ioDispatcher) {
+            boxStore.awaitCallInTx {
+                val existsNotes = noteBox.query().inValues(
+                    NoteRecord_.accountIdAndNoteId,
+                    notes.map {
+                        NoteRecord.generateAccountAndNoteId(it.id)
+                    }.toTypedArray(),
+                    QueryBuilder.StringOrder.CASE_INSENSITIVE
+                ).build().find().associateBy {
+                    it.noteId
+                }
+                val willSave = notes.map {
+                    val exists = existsNotes[it.id.noteId]
+                    if (exists == null) {
+                        NoteRecord.from(it) to AddResult.Created
+                    } else {
+                        exists.applyModel(it)
+                        exists to AddResult.Updated
                     }
                 }
-            }?: emptyList()
-        }
+                noteBox.put(willSave.map {
+                    it.first
+                })
+                willSave.map {
+                    it.second
+                }
+            }
+        } ?: emptyList()
+    }
 
     override suspend fun deleteByUserId(userId: User.Id): Result<Int> = runCancellableCatching {
         withContext(ioDispatcher) {
@@ -296,13 +301,17 @@ class ObjectBoxNoteDataSource @Inject constructor(
         }
     }
 
-    override suspend fun clearNoteThreadContext(noteId: Note.Id): Result<Unit> = runCancellableCatching{
+    override suspend fun clearNoteThreadContext(
+        noteId: Note.Id
+    ): Result<Unit> = runCancellableCatching {
         withContext(ioDispatcher) {
             noteThreadRecordDAO.clearRelation(noteId)
         }
     }
 
-    override suspend fun findNoteThreadContext(noteId: Note.Id): Result<NoteThreadContext> = runCancellableCatching {
+    override suspend fun findNoteThreadContext(
+        noteId: Note.Id
+    ): Result<NoteThreadContext> = runCancellableCatching {
         withContext(ioDispatcher) {
             noteThreadRecordDAO.findBy(noteId)?.let { record ->
                 NoteThreadContext(
