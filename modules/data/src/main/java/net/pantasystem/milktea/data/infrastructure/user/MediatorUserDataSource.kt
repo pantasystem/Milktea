@@ -140,22 +140,7 @@ class MediatorUserDataSource @Inject constructor(
             // NOTE: 新たに追加される予定のオブジェクトと既にキャッシュしているオブジェクトの絵文字リストを比較している
             // NOTE: 比較した上で同一でなければキャッシュの更新処理を行う
             replaceEmojisIfNeed(dbId, user, record)
-
-            if (!record?.badgeRoles.isEqualToBadgeRoleModels(user.badgeRoles)) {
-                if (record != null) {
-                    userDao.detachAllUserBadgeRoles(dbId)
-                }
-                userDao.insertUserBadgeRoles(
-                    user.badgeRoles.map {
-                        BadgeRoleRecord(
-                            userId = dbId,
-                            name = it.name,
-                            iconUrl = it.iconUri,
-                            displayOrder = it.displayOrder,
-                        )
-                    }
-                )
-            }
+            replaceUserRolesIfNeed(dbId, user, record)
 
             if (user is User.Detail) {
                 userDao.insert(
@@ -226,6 +211,7 @@ class MediatorUserDataSource @Inject constructor(
                     )
                 }
                 replaceEmojisIfNeed(dbId, user, record)
+                replaceUserRolesIfNeed(dbId, user, record)
                 if (user is User.Detail) {
                     userDao.insert(
                         UserInfoStateRecord.from(dbId, user.info)
@@ -408,6 +394,24 @@ class MediatorUserDataSource @Inject constructor(
             userDao.insertEmojis(
                 user.emojis.map {
                     UserEmojiRecord.from(dbId, it)
+                }
+            )
+        }
+    }
+
+    private suspend fun replaceUserRolesIfNeed(dbId: Long, user: User, record: UserRelated?) {
+        if (!record?.badgeRoles.isEqualToBadgeRoleModels(user.badgeRoles)) {
+            if (record != null) {
+                userDao.detachAllUserBadgeRoles(dbId)
+            }
+            userDao.insertUserBadgeRoles(
+                user.badgeRoles.map {
+                    BadgeRoleRecord(
+                        userId = dbId,
+                        name = it.name,
+                        iconUrl = it.iconUri,
+                        displayOrder = it.displayOrder,
+                    )
                 }
             )
         }
