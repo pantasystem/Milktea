@@ -83,8 +83,17 @@ class MediatorUserDataSource @Inject constructor(
         keepInOrder: Boolean,
         isSimple: Boolean
     ): Result<List<User>> = runCancellableCatching {
-        withContext(ioDispatcher) {
-            val list = serverIds.distinct().chunked(100).map { chunkedIds ->
+        val inMemUsers = serverIds.mapNotNull {
+            memCache.get(User.Id(accountId, it))
+        }
+        val inMemUsersMap = inMemUsers.associateBy {
+            it.id.id
+        }
+        val notExistsServerIds = serverIds.filter {
+            inMemUsersMap[it] == null
+        }
+        val list = withContext(ioDispatcher) {
+            notExistsServerIds.distinct().chunked(100).map { chunkedIds ->
                 if (isSimple) {
                     userDao.getSimplesInServerIds(accountId, chunkedIds)
                 } else {
@@ -97,13 +106,15 @@ class MediatorUserDataSource @Inject constructor(
                     memCache.put(it.key, it.value)
                 }
             }
-            if (!keepInOrder) {
-                list
-            } else {
-                val hash = list.associateBy { it.id.id }
-                serverIds.mapNotNull {
-                    hash[it]
-                }
+
+        }
+
+        if (!keepInOrder) {
+            list + inMemUsers
+        } else {
+            val hash = list.associateBy { it.id.id }
+            serverIds.mapNotNull {
+                inMemUsersMap[it] ?: hash[it]
             }
         }
     }
