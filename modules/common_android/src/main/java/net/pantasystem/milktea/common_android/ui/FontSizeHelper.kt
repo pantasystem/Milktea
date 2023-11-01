@@ -13,7 +13,11 @@ object FontSizeHelper {
     }
 
     fun TextView.setMemoFontSpSize(fontSize: Float) {
-        val baseHeightPx = context.resources.displayMetrics.scaledDensity * fontSize
+        val baseHeightPx = TypedValue.applyDimension(
+            TypedValue.COMPLEX_UNIT_SP,
+            fontSize,
+            this.resources.displayMetrics
+        )
         setMemoFontPxSize(baseHeightPx)
     }
 
