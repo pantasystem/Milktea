@@ -11,7 +11,7 @@ import com.google.android.flexbox.FlexboxLayout
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import net.pantasystem.milktea.common_android.ui.FontSizeHelper.specialPointToPixel
+import net.pantasystem.milktea.common_android.ui.FontSizeUnitConverter.specialPointToPixel
 import net.pantasystem.milktea.note.databinding.ItemHasReplyToNoteBinding
 import net.pantasystem.milktea.note.databinding.ItemNoteBinding
 import net.pantasystem.milktea.note.databinding.ItemTimelineEmptyBinding

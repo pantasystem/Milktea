@@ -4,7 +4,7 @@ import android.content.Context
 import android.util.TypedValue
 import android.widget.TextView
 
-object FontSizeHelper {
+object FontSizeUnitConverter {
     fun TextView.setMemoFontPxSize(fontSize: Float) {
         if (this.textSize == fontSize) {
             return
