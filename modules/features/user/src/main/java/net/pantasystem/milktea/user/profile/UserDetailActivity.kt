@@ -11,9 +11,12 @@ import android.view.Menu
 import android.view.MenuItem
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.core.app.TaskStackBuilder
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.*
+import com.google.android.material.composethemeadapter.MdcTheme
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import dagger.hilt.android.AndroidEntryPoint
@@ -45,6 +48,8 @@ import net.pantasystem.milktea.user.databinding.ActivityUserDetailBinding
 import net.pantasystem.milktea.user.followlist.FollowFollowerActivity
 import net.pantasystem.milktea.user.nickname.EditNicknameDialog
 import net.pantasystem.milktea.user.profile.mute.SpecifyMuteExpiredAtDialog
+import net.pantasystem.milktea.user.profile.view.ProfileBadgeRoleData
+import net.pantasystem.milktea.user.profile.view.ProfileBadgeRoles
 import net.pantasystem.milktea.user.profile.viewmodel.UserDetailViewModel
 import net.pantasystem.milktea.user.qrshare.QRShareDialog
 import javax.inject.Inject
@@ -164,6 +169,24 @@ class UserDetailActivity : AppCompatActivity() {
         )
         binding.lifecycleOwner = this
         binding.userViewModel = mViewModel
+
+        binding.badgeRoles.apply {
+            setContent {
+                val userDetail by mViewModel.userState.collectAsState()
+                MdcTheme {
+                    ProfileBadgeRoles(
+                        (userDetail?.badgeRoles ?: emptyList()).map {
+                            ProfileBadgeRoleData(
+                                name = it.name,
+                                iconUri = it.iconUri,
+                                displayOrder = it.displayOrder
+                            )
+                        }
+                    )
+                }
+            }
+        }
+
         setSupportActionBar(binding.userDetailToolbar)
 
         supportActionBar?.setDisplayHomeAsUpEnabled(true)

@@ -82,10 +82,21 @@
             android:maxLines="1"
             android:textSize="@dimen/note_author_info_text_size"
             android:textStyle="italic"
-            app:layout_constraintEnd_toStartOf="@id/elapsedTime"
+            app:layout_constraintEnd_toStartOf="@id/badgeRoles"
             app:layout_constraintStart_toEndOf="@id/mainName"
             app:layout_constraintTop_toTopOf="parent"
             tools:text="ユーザー名awefawefawefawefawefawefwaefwef" />
+
+        <androidx.compose.ui.platform.ComposeView
+            android:id="@+id/badgeRoles"
+            android:layout_width="wrap_content"
+            android:layout_height="0dp"
+            android:layout_marginStart="4dp"
+            android:padding="1dp"
+            app:layout_constraintBottom_toBottomOf="@+id/subName"
+            app:layout_constraintEnd_toStartOf="@id/elapsedTime"
+            app:layout_constraintStart_toEndOf="@id/subName"
+            app:layout_constraintTop_toTopOf="@+id/subName" />
 
         <TextView
             android:id="@+id/elapsedTime"
@@ -96,7 +107,7 @@
             android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"
             android:layout_marginStart="4dp"
-            android:layout_toEndOf="@id/subName"
+            android:layout_toEndOf="@id/badgeRoles"
             android:ellipsize="end"
 
             android:gravity="end"

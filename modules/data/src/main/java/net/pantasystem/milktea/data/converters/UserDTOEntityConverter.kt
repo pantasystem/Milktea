@@ -60,6 +60,22 @@ class UserDTOEntityConverter @Inject constructor(
             it.name to it.host to it.url to it.uri
         }
 
+        val badgeRoles = if (!userDTO.badgeRoles.isNullOrEmpty()) {
+            userDTO.badgeRoles!!.map { role ->
+                val iconUrl = role.iconUrl?.let {
+                    imageCacheRepository.save(it)
+                }
+
+                User.BadgeRole(
+                    name = role.name,
+                    iconUri = iconUrl?.cachePath,
+                    displayOrder = role.displayOrder
+                )
+            }
+        } else {
+            emptyList()
+        }
+
         if (isDetail) {
             return User.Detail(
                 id = User.Id(account.accountId, userDTO.id),
@@ -105,7 +121,8 @@ class UserDTOEntityConverter @Inject constructor(
                     isNotify = userDTO.notifyState?.let {
                         userDTO.notifyState == "normal"
                     }
-                )
+                ),
+                badgeRoles = badgeRoles
             )
         } else {
             return User.Simple(
@@ -120,7 +137,8 @@ class UserDTOEntityConverter @Inject constructor(
                 nickname = null,
                 isSameHost = userDTO.host == null,
                 instance = instanceInfo,
-                avatarBlurhash = userDTO.avatarBlurhash
+                avatarBlurhash = userDTO.avatarBlurhash,
+                badgeRoles = badgeRoles
             )
         }
     }

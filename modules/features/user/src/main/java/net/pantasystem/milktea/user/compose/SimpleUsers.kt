@@ -94,6 +94,7 @@ fun PreviewItemSimpleUser() {
         isSameHost = true,
         instance = null,
         avatarBlurhash = null,
+        badgeRoles = emptyList(),
     ), onSelected = {}, accountHost = "misskey.io"
     )
 }

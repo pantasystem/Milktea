@@ -20,6 +20,7 @@ import com.bumptech.glide.RequestBuilder
 import com.bumptech.glide.integration.recyclerview.RecyclerViewPreloader
 import com.bumptech.glide.util.FixedPreloadSizeProvider
 import com.google.android.flexbox.FlexboxLayout
+import com.google.android.material.composethemeadapter.MdcTheme
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -34,6 +35,8 @@ import net.pantasystem.milktea.note.databinding.ItemTimelineEmptyBinding
 import net.pantasystem.milktea.note.databinding.ItemTimelineErrorBinding
 import net.pantasystem.milktea.note.reaction.ReactionViewData
 import net.pantasystem.milktea.note.timeline.viewmodel.TimelineListItem
+import net.pantasystem.milktea.note.view.NoteBadgeRoleData
+import net.pantasystem.milktea.note.view.NoteBadgeRoles
 import net.pantasystem.milktea.note.view.NoteCardAction
 import net.pantasystem.milktea.note.view.NoteCardActionListenerAdapter
 import net.pantasystem.milktea.note.viewmodel.HasReplyToNoteViewData
@@ -186,7 +189,21 @@ class TimelineListAdapter(
         override fun onBind(note: PlaneNoteViewData) {
             binding.note = note
             binding.noteCardActionListener = noteCardActionListenerAdapter
-
+            binding.simpleNote.badgeRoles.apply {
+                setContent {
+                    MdcTheme {
+                        NoteBadgeRoles(
+                            badgeRoles = note.note.user.badgeRoles.map {
+                                NoteBadgeRoleData(
+                                    name = it.name,
+                                    iconUri = it.iconUri,
+                                    displayOrder = it.displayOrder
+                                )
+                            }
+                        )
+                    }
+                }
+            }
         }
 
 
@@ -209,9 +226,22 @@ class TimelineListAdapter(
         override fun onBind(note: PlaneNoteViewData) {
             if (note is HasReplyToNoteViewData) {
                 binding.hasReplyToNote = note
-
                 binding.noteCardActionListener = noteCardActionListenerAdapter
-
+                binding.simpleNote.badgeRoles.apply {
+                    setContent {
+                        MdcTheme {
+                            NoteBadgeRoles(
+                                badgeRoles = note.note.user.badgeRoles.map {
+                                    NoteBadgeRoleData(
+                                        name = it.name,
+                                        iconUri = it.iconUri,
+                                        displayOrder = it.displayOrder
+                                    )
+                                }
+                            )
+                        }
+                    }
+                }
             }
         }
 

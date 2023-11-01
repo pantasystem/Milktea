@@ -100,6 +100,7 @@ data class MastodonAccountDTO(
                 description = note,
             ),
             related = related,
+            badgeRoles = emptyList(),
         )
     }
 }

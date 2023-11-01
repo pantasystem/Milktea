@@ -16,6 +16,7 @@ import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.common.collection.LRUCache
 import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.common_android.hilt.IODispatcher
+import net.pantasystem.milktea.data.infrastructure.user.db.BadgeRoleRecord
 import net.pantasystem.milktea.data.infrastructure.user.db.PinnedNoteIdRecord
 import net.pantasystem.milktea.data.infrastructure.user.db.UserDao
 import net.pantasystem.milktea.data.infrastructure.user.db.UserEmojiRecord
@@ -25,6 +26,7 @@ import net.pantasystem.milktea.data.infrastructure.user.db.UserProfileFieldRecor
 import net.pantasystem.milktea.data.infrastructure.user.db.UserRecord
 import net.pantasystem.milktea.data.infrastructure.user.db.UserRelated
 import net.pantasystem.milktea.data.infrastructure.user.db.UserRelatedStateRecord
+import net.pantasystem.milktea.data.infrastructure.user.db.isEqualToBadgeRoleModels
 import net.pantasystem.milktea.data.infrastructure.user.db.isEqualToModels
 import net.pantasystem.milktea.model.AddResult
 import net.pantasystem.milktea.model.user.Acct
@@ -138,6 +140,22 @@ class MediatorUserDataSource @Inject constructor(
             // NOTE: 新たに追加される予定のオブジェクトと既にキャッシュしているオブジェクトの絵文字リストを比較している
             // NOTE: 比較した上で同一でなければキャッシュの更新処理を行う
             replaceEmojisIfNeed(dbId, user, record)
+
+            if (!record?.badgeRoles.isEqualToBadgeRoleModels(user.badgeRoles)) {
+                if (record != null) {
+                    userDao.detachAllUserBadgeRoles(dbId)
+                }
+                userDao.insertUserBadgeRoles(
+                    user.badgeRoles.map {
+                        BadgeRoleRecord(
+                            userId = dbId,
+                            name = it.name,
+                            iconUrl = it.iconUri,
+                            displayOrder = it.displayOrder,
+                        )
+                    }
+                )
+            }
 
             if (user is User.Detail) {
                 userDao.insert(

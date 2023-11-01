@@ -32,6 +32,7 @@ sealed interface User : Entity {
     val instance: InstanceInfo?
     val avatarBlurhash: String?
     val parsedResult: CustomEmojiParsedResult
+    val badgeRoles: List<BadgeRole>
 
 
     class Id(
@@ -79,7 +80,8 @@ sealed interface User : Entity {
         override val nickname: UserNickname?,
         override val isSameHost: Boolean,
         override val instance: InstanceInfo?,
-        override val avatarBlurhash: String?
+        override val avatarBlurhash: String?,
+        override val badgeRoles: List<BadgeRole>
     ) : User {
         companion object;
         override val parsedResult: CustomEmojiParsedResult = try {
@@ -104,6 +106,7 @@ sealed interface User : Entity {
         override val avatarBlurhash: String?,
         override val isSameHost: Boolean,
         override val instance: InstanceInfo?,
+        override val badgeRoles: List<BadgeRole>,
         val info: Info,
         val related: Related?,
     ) : User {
@@ -190,6 +193,12 @@ sealed interface User : Entity {
         val value: String,
     )
 
+    data class BadgeRole(
+        val name: String,
+        val iconUri: String?,
+        val displayOrder: Int,
+    )
+
     val displayUserName: String
         get() = "@" + this.userName + if (isSameHost) {
             ""
@@ -241,6 +250,7 @@ sealed interface User : Entity {
                     isPublicReactions = false,
                 ),
                 related = null,
+                badgeRoles = badgeRoles,
             )
         }
     }
@@ -263,6 +273,7 @@ fun User.Simple.Companion.make(
     isSameHost: Boolean? = null,
     instance: User.InstanceInfo? = null,
     avatarBlurhash: String? = null,
+    badgeRoles: List<User.BadgeRole> = emptyList(),
 ): User.Simple {
     return User.Simple(
         id,
@@ -276,7 +287,8 @@ fun User.Simple.Companion.make(
         nickname = nickname,
         isSameHost = isSameHost ?: false,
         instance = instance,
-        avatarBlurhash = avatarBlurhash
+        avatarBlurhash = avatarBlurhash,
+        badgeRoles = badgeRoles,
     )
 }
 
@@ -315,6 +327,7 @@ fun User.Detail.Companion.make(
     isPublicReactions: Boolean = false,
     avatarBlurhash: String? = null,
     isNotify: Boolean = false,
+    badgeRoles: List<User.BadgeRole> = emptyList(),
 ): User.Detail {
     return User.Detail(
         id,
@@ -353,6 +366,7 @@ fun User.Detail.Companion.make(
             hasPendingFollowRequestFromYou = hasPendingFollowRequestFromYou,
             hasPendingFollowRequestToYou = hasPendingFollowRequestToYou,
             isNotify = isNotify,
-        )
+        ),
+        badgeRoles = badgeRoles,
     )
 }

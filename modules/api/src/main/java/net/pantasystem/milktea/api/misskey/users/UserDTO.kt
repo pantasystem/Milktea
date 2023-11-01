@@ -121,6 +121,9 @@ data class UserDTO(
 
     @SerialName("notify")
     val notifyState: String? = null,
+
+    @SerialName("badgeRoles")
+    val badgeRoles: List<BadgeRoleDTO>? = null
 ) : Serializable {
 
     @kotlinx.serialization.Serializable
@@ -161,4 +164,15 @@ data class UserDTO(
         @SerialName("value")
         val value: String)
 
+    @kotlinx.serialization.Serializable
+    data class BadgeRoleDTO(
+        @SerialName("name")
+        val name: String,
+
+        @SerialName("iconUrl")
+        val iconUrl: String?,
+
+        @SerialName("displayOrder")
+        val displayOrder: Int,
+    )
 }
