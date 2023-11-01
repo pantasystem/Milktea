@@ -24,6 +24,7 @@ class UserTest {
             isSameHost = true,
             instance = null,
             avatarBlurhash = null,
+            badgeRoles = emptyList(),
         )
 
         val profileUrl = user.getProfileUrl(
@@ -54,6 +55,7 @@ class UserTest {
             isSameHost = false,
             instance = null,
             avatarBlurhash = null,
+            badgeRoles = emptyList(),
         )
 
         val profileUrl = user.getProfileUrl(

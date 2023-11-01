@@ -840,6 +840,13 @@ data class UserRelated(
             },
             instance = instanceInfo,
             avatarBlurhash = user.avatarBlurhash,
+            badgeRoles = badgeRoles.map {
+                User.BadgeRole(
+                    name = it.name,
+                    iconUri = it.iconUrl,
+                    displayOrder = it.displayOrder,
+                )
+            },
         )
     }
 }

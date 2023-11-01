@@ -4,11 +4,14 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -27,19 +30,27 @@ import coil.request.ImageRequest
 
 private val defaultSvgDecoderFactory = SvgDecoder.Factory()
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun ProfileBadgeRoles(
     badgeRoles: List<ProfileBadgeRoleData>
 ) {
     val sortedBadgeRoles = badgeRoles.sortedBy { it.displayOrder }
 
-    Surface {
-        Row(
+    Surface(
+        color = MaterialTheme.colors.primary,
+    ) {
+        FlowRow(
             horizontalArrangement = Arrangement.spacedBy(4.dp),
             verticalAlignment = Alignment.CenterVertically,
+
         ) {
             for (it in sortedBadgeRoles) {
-                ProfileBadgeRole(it)
+                Box(
+                    Modifier.padding(bottom = 2.dp)
+                ) {
+                    ProfileBadgeRole(it)
+                }
             }
         }
     }
