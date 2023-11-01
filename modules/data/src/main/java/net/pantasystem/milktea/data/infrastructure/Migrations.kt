@@ -115,10 +115,3 @@ val MIGRATION_51_52 = object : Migration(51, 52) {
         database.execSQL("DROP TABLE IF EXISTS 'emoji_table'")
     }
 }
-
-val MIGRATION_56_57 = object : Migration(56, 57) {
-    override fun migrate(database: SupportSQLiteDatabase) {
-        database.execSQL("CREATE TABLE IF NOT EXISTS 'user_badge_role' ('name' TEXT NOT NULL, 'iconUrl' TEXT NULL, 'displayOrder' INTEGER NOT NULL, 'userId' INTEGER NOT NULL, 'id' INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL)")
-        database.execSQL("CREATE INDEX IF NOT EXISTS 'index_user_badge_role' ON 'user_badge_role' ('userId')")
-    }
-}
