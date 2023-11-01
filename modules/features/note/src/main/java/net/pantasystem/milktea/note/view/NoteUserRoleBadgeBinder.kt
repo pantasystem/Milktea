@@ -19,6 +19,7 @@ object NoteUserRoleBadgeBinder {
         while((this.referencedIds?.size ?: 0) > badges.size) {
             val id = this.referencedIds?.lastOrNull() ?: break
             this.removeView(parentView.findViewById(id))
+            parentView.removeView(parentView.findViewById(id))
         }
 
         badges.forEachIndexed { index, badgeRole ->
@@ -31,6 +32,9 @@ object NoteUserRoleBadgeBinder {
                     iconSizePx,
                     iconSizePx,
                 )
+
+                // padding
+                this.setPadding(4, 0, 4, 0)
             }
 
             GlideApp.with(parentView.context)

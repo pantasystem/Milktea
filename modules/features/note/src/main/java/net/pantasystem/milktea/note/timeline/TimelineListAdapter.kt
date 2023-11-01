@@ -25,6 +25,7 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import net.pantasystem.milktea.common.glide.GlideApp
 import net.pantasystem.milktea.common.glide.GlideUtils
+import net.pantasystem.milktea.common_android.ui.FontSizeHelper.specialPointToPixel
 import net.pantasystem.milktea.model.setting.DefaultConfig
 import net.pantasystem.milktea.model.setting.LocalConfigRepository
 import net.pantasystem.milktea.note.R
@@ -187,9 +188,9 @@ class TimelineListAdapter(
         override fun onBind(note: PlaneNoteViewData) {
             binding.note = note
             binding.noteCardActionListener = noteCardActionListenerAdapter
-            val headerFontSize = (note.config.value.noteHeaderFontSize * binding.root.context.resources.displayMetrics.density).toInt()
+            val badgeIconSize = binding.root.context.specialPointToPixel(note.config.value.noteHeaderFontSize).toInt()
             binding.simpleNote.badgeRoles.apply {
-                setUserRoleBadge(binding.simpleNote.noteLayout, note.toShowNote.user.iconBadgeRoles, headerFontSize)
+                setUserRoleBadge(binding.simpleNote.noteLayout, note.toShowNote.user.iconBadgeRoles, badgeIconSize)
             }
         }
 
@@ -215,8 +216,8 @@ class TimelineListAdapter(
                 binding.hasReplyToNote = note
                 binding.noteCardActionListener = noteCardActionListenerAdapter
                 binding.simpleNote.badgeRoles.apply {
-                    val headerFontSize = (note.config.value.noteHeaderFontSize * context.resources.displayMetrics.density).toInt()
-                    setUserRoleBadge(binding.simpleNote.noteLayout, note.toShowNote.user.iconBadgeRoles, headerFontSize)
+                    val badgeIconSize = context.specialPointToPixel(note.config.value.noteHeaderFontSize).toInt()
+                    setUserRoleBadge(binding.simpleNote.noteLayout, note.toShowNote.user.iconBadgeRoles, badgeIconSize)
                 }
             }
         }
