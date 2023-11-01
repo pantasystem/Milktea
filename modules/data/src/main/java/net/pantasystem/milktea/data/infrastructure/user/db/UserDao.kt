@@ -29,6 +29,9 @@ abstract class UserDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     abstract suspend fun insertUserProfileFields(fields: List<UserProfileFieldRecord>): List<Long>
 
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    abstract suspend fun insertUserBadgeRoles(fields: List<BadgeRoleRecord>): List<Long>
+
     @Query("delete from pinned_note_id where userId = :userId")
     abstract suspend fun detachAllPinnedNoteIds(userId: Long)
 
@@ -37,6 +40,9 @@ abstract class UserDao {
 
     @Query("delete from user_profile_field where userId = :userId")
     abstract suspend fun detachUserFields(userId: Long)
+
+    @Query("delete from user_badge_role where userId = :userId")
+    abstract suspend fun detachAllUserBadgeRoles(userId: Long)
 
     @Update
     abstract suspend fun update(user: UserRecord)

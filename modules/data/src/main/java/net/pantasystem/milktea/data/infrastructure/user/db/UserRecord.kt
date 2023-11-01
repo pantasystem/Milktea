@@ -333,6 +333,18 @@ fun List<UserEmojiRecord>?.isEqualToModels(models: List<CustomEmoji>): Boolean {
     }
 }
 
+fun List<BadgeRoleRecord>?.isEqualToBadgeRoleModels(models: List<User.BadgeRole>): Boolean {
+    if (this == null && models.isEmpty()) return true
+    if (this == null) return false
+    if (size != models.size) return false
+    val records = this.toSet()
+    return models.all {  model ->
+        records.any { record ->
+            record.isEqualToModel(model)
+        }
+    }
+}
+
 @Entity(
     tableName = "user_instance_info",
     foreignKeys = [
@@ -469,6 +481,44 @@ data class UserView(
     val avatarBlurhash: String?
 )
 
+@Entity(
+    tableName = "user_badge_role",
+    foreignKeys = [
+        ForeignKey(
+            parentColumns = ["id"],
+            childColumns = ["userId"],
+            entity = UserRecord::class,
+            onUpdate = ForeignKey.CASCADE,
+            onDelete = ForeignKey.CASCADE,
+        )
+    ],
+    indices = [
+        Index("userId")
+    ]
+)
+data class BadgeRoleRecord(
+    @ColumnInfo("name")
+    val name: String,
+
+    @ColumnInfo("iconUrl")
+    val iconUrl: String?,
+
+    @ColumnInfo("displayOrder")
+    val displayOrder: Int,
+
+    @ColumnInfo("userId")
+    val userId: Long,
+
+    @ColumnInfo(name = "id")
+    @PrimaryKey(autoGenerate = true) val id: Long = 0,
+) {
+    fun isEqualToModel(model: User.BadgeRole): Boolean {
+        return name == model.name &&
+                iconUrl == model.iconUri &&
+                displayOrder == model.displayOrder
+    }
+}
+
 interface HasUserModel {
     fun toModel(): User
 }
@@ -485,6 +535,11 @@ data class UserSimpleRelated(
         entityColumn = "userId"
     )
     val instance: UserInstanceInfoRecord?,
+    @Relation(
+        parentColumn = "id",
+        entityColumn = "userId"
+    )
+    val badgeRoles: List<BadgeRoleRecord>,
 ) : HasUserModel {
     override fun toModel(): User.Simple {
         val instanceInfo = instance?.let {
@@ -520,6 +575,13 @@ data class UserSimpleRelated(
             },
             instance = instanceInfo,
             avatarBlurhash = user.avatarBlurhash,
+            badgeRoles = badgeRoles.map {
+                User.BadgeRole(
+                    name = it.name,
+                    iconUri = it.iconUrl,
+                    displayOrder = it.displayOrder,
+                )
+            }
         )
     }
 }
@@ -561,8 +623,13 @@ data class UserRelated(
         parentColumn = "id",
         entityColumn = "userId",
     )
-    val fields: List<UserProfileFieldRecord>?
+    val fields: List<UserProfileFieldRecord>?,
 
+    @Relation(
+        parentColumn = "id",
+        entityColumn = "userId"
+    )
+    val badgeRoles: List<BadgeRoleRecord>,
 ) : HasUserModel {
     override fun toModel(): User {
         val instanceInfo = instance?.let {
@@ -599,6 +666,13 @@ data class UserRelated(
                 },
                 instance = instanceInfo,
                 avatarBlurhash = user.avatarBlurhash,
+                badgeRoles = badgeRoles.map {
+                    User.BadgeRole(
+                        name = it.name,
+                        iconUri = it.iconUrl,
+                        displayOrder = it.displayOrder,
+                    )
+                }
             )
         } else {
             return User.Detail(
@@ -655,6 +729,13 @@ data class UserRelated(
                         hasPendingFollowRequestFromYou = related.hasPendingFollowRequestFromYou,
                         hasPendingFollowRequestToYou = related.hasPendingFollowRequestToYou,
                         isNotify = related.isNotify ?: false,
+                    )
+                },
+                badgeRoles = badgeRoles.map {
+                    User.BadgeRole(
+                        name = it.name,
+                        iconUri = it.iconUrl,
+                        displayOrder = it.displayOrder,
                     )
                 }
             )

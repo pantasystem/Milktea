@@ -132,7 +132,8 @@ fun Preview_FollowRequestItem() {
             nickname = null,
             isSameHost = false,
             instance = null,
-            avatarBlurhash = null
+            avatarBlurhash = null,
+            badgeRoles = emptyList(),
         ), onAccept = {}, onReject = {}, onAvatarClicked = {}
     )
 }
