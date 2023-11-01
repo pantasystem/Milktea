@@ -46,7 +46,11 @@ fun ProfileBadgeRoles(
 
         ) {
             for (it in sortedBadgeRoles) {
-                ProfileBadgeRole(it)
+                Box(
+                    Modifier.padding(bottom = 2.dp)
+                ) {
+                    ProfileBadgeRole(it)
+                }
             }
         }
     }
