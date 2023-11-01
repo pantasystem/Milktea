@@ -67,7 +67,7 @@
             android:textSize="@dimen/note_author_info_text_size"
             android:textStyle="bold"
             app:layout_constrainedWidth="true"
-            app:layout_constraintEnd_toStartOf="@id/elapsedTime"
+            app:layout_constraintEnd_toStartOf="@id/badgeRoles"
             app:layout_constraintHorizontal_bias="0"
             app:layout_constraintStart_toEndOf="@id/avatarIcon"
             app:layout_constraintTop_toTopOf="parent"
@@ -91,7 +91,7 @@
         <androidx.constraintlayout.helper.widget.Flow
             android:id="@+id/badgeRoles"
             android:layout_width="wrap_content"
-            android:layout_height="0dp"
+            android:layout_height="wrap_content"
             android:layout_marginStart="4dp"
             android:padding="2dp"
             app:layout_constraintBottom_toBottomOf="@+id/subName"
