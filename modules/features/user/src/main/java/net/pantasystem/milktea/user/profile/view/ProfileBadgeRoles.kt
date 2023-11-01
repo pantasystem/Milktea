@@ -4,6 +4,8 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.padding
@@ -28,6 +30,7 @@ import coil.request.ImageRequest
 
 private val defaultSvgDecoderFactory = SvgDecoder.Factory()
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun ProfileBadgeRoles(
     badgeRoles: List<ProfileBadgeRoleData>
@@ -37,9 +40,10 @@ fun ProfileBadgeRoles(
     Surface(
         color = MaterialTheme.colors.primary,
     ) {
-        Row(
+        FlowRow(
             horizontalArrangement = Arrangement.spacedBy(4.dp),
             verticalAlignment = Alignment.CenterVertically,
+
         ) {
             for (it in sortedBadgeRoles) {
                 ProfileBadgeRole(it)
