@@ -116,7 +116,7 @@ object DefaultConfig {
         reactionPickerType = ReactionPickerType.LIST,
         backgroundImagePath = null,
         isClassicUI = false,
-        isUserNameDefault = true,
+        isUserNameDefault = false,
         isPostButtonAtTheBottom = true,
         noteExpandedHeightSize = 300,
         theme = Theme.White,
