@@ -146,26 +146,19 @@ class MediatorUserDataSource @Inject constructor(
                 userDao.insert(
                     UserInfoStateRecord.from(dbId, user.info)
                 )
-                when (val related = user.related) {
-                    null -> {}
-                    else -> {
-                        userDao.insert(
-                            UserRelatedStateRecord.from(dbId, related)
-                        )
-                    }
+                user.related?.let {
+                    userDao.insert(
+                        UserRelatedStateRecord.from(dbId, it)
+                    )
                 }
 
-                // NOTE: 更新の必要性を判定
                 replacePinnedNoteIdsIfNeed(dbId, user, record, recordToDetailed)
                 replaceFieldsIfNeed(dbId, user, record, recordToDetailed)
             }
-            when (val instance = user.instance) {
-                null -> Unit
-                else -> {
-                    userDao.insertUserInstanceInfo(
-                        UserInstanceInfoRecord.from(dbId, instance)
-                    )
-                }
+            user.instance?.let {
+                userDao.insertUserInstanceInfo(
+                    UserInstanceInfoRecord.from(dbId, it)
+                )
             }
             return@withContext result
         }
@@ -216,13 +209,10 @@ class MediatorUserDataSource @Inject constructor(
                     userDao.insert(
                         UserInfoStateRecord.from(dbId, user.info)
                     )
-                    when (val related = user.related) {
-                        null -> {}
-                        else -> {
-                            userDao.insert(
-                                UserRelatedStateRecord.from(dbId, related)
-                            )
-                        }
+                    user.related?.let {
+                        userDao.insert(
+                            UserRelatedStateRecord.from(dbId, it)
+                        )
                     }
 
                     val detailModel = record?.toModel() as? User.Detail?
