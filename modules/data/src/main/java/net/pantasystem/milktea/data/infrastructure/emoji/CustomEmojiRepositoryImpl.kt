@@ -170,6 +170,18 @@ internal class CustomEmojiRepositoryImpl @Inject constructor(
         return customEmojiCache.getMap(host)
     }
 
+    override suspend fun findAndConvertToMap(
+        host: String
+    ): Result<Map<String, CustomEmoji>> = runCancellableCatching{
+        val cached = customEmojiCache.getMap(host)
+        if (cached.isNullOrEmpty()) {
+            findBy(host).getOrThrow()
+        } else {
+            return@runCancellableCatching cached
+        }
+        customEmojiCache.getMap(host) ?: emptyMap()
+    }
+
     override fun observeWithSearch(host: String, keyword: String): Flow<List<CustomEmoji>> {
         return customEmojiDAO.observeAndSearch(host, keyword).map { list ->
             convertToModel(list)

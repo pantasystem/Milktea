@@ -35,7 +35,6 @@ private val defaultSvgDecoderFactory = SvgDecoder.Factory()
 fun ProfileBadgeRoles(
     badgeRoles: List<ProfileBadgeRoleData>
 ) {
-    val sortedBadgeRoles = badgeRoles.sortedBy { it.displayOrder }
 
     Surface(
         color = MaterialTheme.colors.primary,
@@ -45,7 +44,7 @@ fun ProfileBadgeRoles(
             verticalAlignment = Alignment.CenterVertically,
 
         ) {
-            for (it in sortedBadgeRoles) {
+            for (it in badgeRoles) {
                 Box(
                     Modifier.padding(bottom = 2.dp)
                 ) {
