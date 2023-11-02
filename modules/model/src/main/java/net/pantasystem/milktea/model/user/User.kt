@@ -90,7 +90,7 @@ sealed interface User : Entity {
             CustomEmojiParsedResult(displayName, emptyList())
         }
 
-        override val iconBadgeRoles: List<BadgeRole> = badgeRoles.filter { it.iconUri != null }.sortedBy {
+        override val iconBadgeRoles: List<BadgeRole> = badgeRoles.filter { it.iconUri != null }.sortedByDescending {
             it.displayOrder
         }
 
@@ -144,7 +144,7 @@ sealed interface User : Entity {
             CustomEmojiParsedResult(displayName, emptyList())
         }
 
-        override val iconBadgeRoles: List<BadgeRole> = badgeRoles.filter { it.iconUri != null }.sortedBy {
+        override val iconBadgeRoles: List<BadgeRole> = badgeRoles.filter { it.iconUri != null }.sortedByDescending {
             it.displayOrder
         }
     }
