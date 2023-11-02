@@ -90,26 +90,28 @@ app.post('/webpushcallback', rawBodyMiddlware, decodeBodyMiddleware, parseJsonMi
     }
 
 
+    const msgData = {
+        title: convertedNotification.title,
+        body: convertedNotification.body,
+        type: convertedNotification.type,
+        notificationId: req.decodeJson.body.id,
+        accountId: accountId
+    }
+    
     const message = {
         token: deviceToken,
         notification: {
             title: convertedNotification.title,
             body: convertedNotification.body
-        },
-        data: {
-            title: convertedNotification.title,
-            body: convertedNotification.body,
-            type: convertedNotification.type,
-            notificationId: req.decodeJson.body.id,
-            accountId: accountId
         }
     };
     if(req.decodeJson.body.note != null) {
-        message.data.noteId = req.decodeJson.body.note.id;
+        msgData.noteId = req.decodeJson.body.note.id;
     }
     if(req.decodeJson.body.userId != null) {
-        message.data.userId = req.decodeJson.body.userId;
+        msgData.userId = req.decodeJson.body.userId;
     }
+    message.data = JSON.stringify(msgData);
     console.log(message);
     try {
         await messaging.send(message);
