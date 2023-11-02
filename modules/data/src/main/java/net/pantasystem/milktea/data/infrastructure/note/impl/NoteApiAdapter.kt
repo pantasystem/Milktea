@@ -9,6 +9,7 @@ import net.pantasystem.milktea.api.mastodon.status.TootStatusDTO
 import net.pantasystem.milktea.api.misskey.notes.DeleteNote
 import net.pantasystem.milktea.api.misskey.notes.NoteDTO
 import net.pantasystem.milktea.api.misskey.notes.NoteRequest
+import net.pantasystem.milktea.api.misskey.notes.Vote
 import net.pantasystem.milktea.api.misskey.notes.mute.ToggleThreadMuteRequest
 import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.common.mapCancellableCatching
@@ -26,7 +27,6 @@ import net.pantasystem.milktea.model.note.CreateNote
 import net.pantasystem.milktea.model.note.Note
 import net.pantasystem.milktea.model.note.NoteState
 import net.pantasystem.milktea.model.note.poll.Poll
-import net.pantasystem.milktea.api.misskey.notes.Vote
 import net.pantasystem.milktea.model.note.type4Mastodon
 import javax.inject.Inject
 
@@ -156,7 +156,8 @@ private class NoteApiAdapterMisskeyPattern(
             CreateNote(
                 author = account, renoteId = target.id,
                 text = null,
-                visibility = target.visibility
+                visibility = target.visibility,
+                channelId = target.channelId,
             )
         )
     }
