@@ -5,6 +5,7 @@ import com.bumptech.glide.load.Options
 import com.bumptech.glide.load.ResourceDecoder
 import com.bumptech.glide.load.engine.Resource
 import com.bumptech.glide.load.resource.SimpleResource
+import com.bumptech.glide.request.target.Target
 import com.caverock.androidsvg.SVG
 import com.caverock.androidsvg.SVGParseException
 import java.io.InputStream
@@ -36,6 +37,13 @@ class SvgDecoder : ResourceDecoder<InputStream, SVG>{
     ): Resource<SVG>? {
         return try {
             val svg = SVG.getFromInputStream(source)
+            if (width != Target.SIZE_ORIGINAL) {
+                svg.documentWidth = width.toFloat()
+            }
+            if (height != Target.SIZE_ORIGINAL) {
+                svg.documentHeight = height.toFloat()
+            }
+            Log.d("SvgDecoder", "width: $width, height: $height")
             SimpleResource(svg)
         }catch(e: SVGParseException){
             Log.e("SvgDecoder", "error", e)
