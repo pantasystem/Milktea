@@ -111,7 +111,7 @@ app.post('/webpushcallback', rawBodyMiddlware, decodeBodyMiddleware, parseJsonMi
     if(req.decodeJson.body.userId != null) {
         msgData.userId = req.decodeJson.body.userId;
     }
-    message.data = JSON.stringify(msgData);
+    message.data = msgData;
     console.log(message);
     try {
         await messaging.send(message);
