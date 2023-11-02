@@ -62,13 +62,9 @@ class UserDTOEntityConverter @Inject constructor(
 
         val badgeRoles = if (!userDTO.badgeRoles.isNullOrEmpty()) {
             userDTO.badgeRoles!!.map { role ->
-                val iconUrl = role.iconUrl?.let {
-                    imageCacheRepository.save(it)
-                }
-
                 User.BadgeRole(
                     name = role.name,
-                    iconUri = iconUrl?.cachePath,
+                    iconUri = role.iconUrl,
                     displayOrder = role.displayOrder
                 )
             }
