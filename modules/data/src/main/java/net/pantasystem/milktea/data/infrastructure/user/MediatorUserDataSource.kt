@@ -205,6 +205,41 @@ class MediatorUserDataSource @Inject constructor(
                 it.key to it.value.user.id
             }
 
+            // User.emojisのinsertまたはupdateの必要性のあるものを抽出
+            val requireEmojisUpdateUsers = users.filter {
+                existsRecordIdMap[it.id] == null || existsRecordIdMap[it.id]?.emojis.isEqualToModels(it.emojis)
+            }
+            // 一度全て剥がす
+            userDao.detachAllUserEmojis(
+                requireEmojisUpdateUsers.mapNotNull { userIdDbIdMap[it.id] }
+            )
+            userDao.insertEmojis(
+                requireEmojisUpdateUsers.flatMap { user ->
+                    user.emojis.map {
+                        UserEmojiRecord.from(userIdDbIdMap[user.id]!!, it)
+                    }
+                }
+            )
+
+            val requireUpdateUserRoleUsers = users.filter {
+                existsRecordIdMap[it.id] == null || existsRecordIdMap[it.id]?.badgeRoles.isEqualToBadgeRoleModels(it.badgeRoles)
+            }
+            userDao.detachAllUserBadgeRoles(
+                requireUpdateUserRoleUsers.mapNotNull { userIdDbIdMap[it.id] }
+            )
+            userDao.insertUserBadgeRoles(
+                requireUpdateUserRoleUsers.flatMap { user ->
+                    user.badgeRoles.map {
+                        BadgeRoleRecord(
+                            userId = userIdDbIdMap[user.id]!!,
+                            name = it.name,
+                            iconUrl = it.iconUri,
+                            displayOrder = it.displayOrder,
+                        )
+                    }
+                }
+            )
+
             // 更新処理
             users.forEach { user ->
                 val record = existsRecordIdMap[user.id]
@@ -214,8 +249,6 @@ class MediatorUserDataSource @Inject constructor(
                         UserRecord.from(user).copy(id = record.user.id)
                     )
                 }
-                replaceEmojisIfNeed(dbId, user, record)
-                replaceUserRolesIfNeed(dbId, user, record)
                 if (user is User.Detail) {
                     userDao.insert(
                         UserInfoStateRecord.from(dbId, user.info)
