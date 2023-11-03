@@ -495,8 +495,11 @@ class MediatorUserDataSource @Inject constructor(
         )
         userDao.insertEmojis(
             requireEmojisUpdateUsers.flatMap { user ->
-                user.emojis.map {
-                    UserEmojiRecord.from(userIdDbIdMap[user.id]!!, it)
+                user.emojis.mapNotNull { emoji ->
+                    userIdDbIdMap[user.id]?.let { userId ->
+                        UserEmojiRecord.from(userId, emoji)
+                    }
+
                 }
             }
         )
@@ -522,13 +525,16 @@ class MediatorUserDataSource @Inject constructor(
         )
         userDao.insertUserBadgeRoles(
             requireUpdateUserRoleUsers.flatMap { user ->
-                user.badgeRoles.map {
-                    BadgeRoleRecord(
-                        userId = userIdDbIdMap[user.id]!!,
-                        name = it.name,
-                        iconUrl = it.iconUri,
-                        displayOrder = it.displayOrder,
-                    )
+                user.badgeRoles.mapNotNull { role ->
+                    userIdDbIdMap[user.id]?.let { userId ->
+                        BadgeRoleRecord(
+                            userId = userId,
+                            name = role.name,
+                            iconUrl = role.iconUri,
+                            displayOrder = role.displayOrder,
+                        )
+                    }
+
                 }
             }
         )
