@@ -200,6 +200,8 @@ class MediatorUserDataSource @Inject constructor(
                 UserRecord.from(it)
             })
 
+            // NOTE: User.idとDBのIDのマップ
+            // NOTE: insertされた時に生成されたIDとすでにDB上に存在しているレコードのIDを結合している
             val userIdDbIdMap = requireInserts.mapIndexed { index, user ->
                 user.id to insertedDbIds[index]
             }.toMap() + existsRecordIdMap.map {
@@ -230,7 +232,6 @@ class MediatorUserDataSource @Inject constructor(
                     }
 
                     val detailModel = record?.toModel() as? User.Detail?
-                    // NOTE: 更新の必要性を判定
                     replacePinnedNoteIdsIfNeed(dbId, user, record, detailModel)
                     replaceFieldsIfNeed(dbId, user, record, detailModel)
                 }
@@ -391,6 +392,13 @@ class MediatorUserDataSource @Inject constructor(
         }
     }
 
+    /**
+     * User.badgeRolesのinsertまたはupdateの必要性のあるものを抽出し、
+     * 更新の必要性がある場合は一度全て剥がしてからinsertする
+     * @param dbId 更新対象のUserに対応するDBのID
+     * @param user 更新対象のUser
+     * @param record すでにDB上に存在しているレコード
+     */
     private suspend fun replaceUserRolesIfNeed(dbId: Long, user: User, record: UserRelated?) {
         if (!record?.badgeRoles.isEqualToBadgeRoleModels(user.badgeRoles)) {
             if (record != null) {
@@ -409,6 +417,14 @@ class MediatorUserDataSource @Inject constructor(
         }
     }
 
+    /**
+     * User.pinnedNoteIdsのinsertまたはupdateの必要性のあるものを抽出し、
+     * 更新の必要性がある場合は一度全て剥がしてからinsertする。
+     * @param dbId 更新対象のUserに対応するDBのID
+     * @param user 更新対象のUser
+     * @param record すでにDB上に存在しているレコード
+     * @param recordToDetailed すでにDB上に存在しているレコードをUser.Detailに変換したもの
+     */
     private suspend fun replacePinnedNoteIdsIfNeed(
         dbId: Long,
         user: User.Detail,
@@ -431,6 +447,13 @@ class MediatorUserDataSource @Inject constructor(
         }
     }
 
+    /**
+     * User.info.fieldsのinsertまたはupdateの必要性のあるものを抽出し、
+     * 更新の必要性がある場合は一度全て剥がしてからinsertする
+     * @param dbId 更新対象のUserに対応するDBのID
+     * @param user 更新対象のUser
+     * @param record すでにDB上に存在しているレコード
+     */
     private suspend fun replaceFieldsIfNeed(
         dbId: Long,
         user: User.Detail,
@@ -511,6 +534,13 @@ class MediatorUserDataSource @Inject constructor(
         )
     }
 
+    /**
+     * User.instanceのinsertまたはupdateの必要性のあるものを抽出し、
+     * 更新の必要性がある場合は一括でupInsertする
+     * @param users 更新対象のUserリスト
+     * @param userIdDbIdMap User.IdとDBのIDのマップ
+     * @param existsRecordIdMap User.IdとすでにDB上に存在しているレコードのマップ
+     */
     private suspend fun replaceUsersInstanceInfo(
         users: List<User>,
         userIdDbIdMap: Map<User.Id, Long>,
