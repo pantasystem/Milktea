@@ -183,9 +183,7 @@ class MediatorUserDataSource @Inject constructor(
             val existsUsersInMemory = users.associate {
                 it.id to memCache.get(it.id)
             }
-            val existsRecordIdMap = users.filter {
-                existsUsersInMemory[it.id] == null
-            }.groupBy {
+            val existsRecordIdMap = users.groupBy {
                 it.id.accountId
             }.flatMap { entry ->
                 userDao.getInServerIds(entry.key, entry.value.map { it.id.id })
