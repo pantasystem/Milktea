@@ -208,6 +208,7 @@ class MediatorUserDataSource @Inject constructor(
 
             replaceUsersEmojisIfNeeds(users, userIdDbIdMap, existsRecordIdMap,)
             replaceUsersRolesIfNeeds(users, userIdDbIdMap, existsRecordIdMap)
+            replaceUsersInstanceInfo(users, userIdDbIdMap, existsRecordIdMap)
 
             // 更新処理
             users.forEach { user ->
@@ -234,19 +235,6 @@ class MediatorUserDataSource @Inject constructor(
                     replaceFieldsIfNeed(dbId, user, record, detailModel)
                 }
             }
-
-            // save instance info
-            userDao.insertUserInstanceInfoList(
-                users.filter {
-                    existsRecordIdMap[it.id] == null || !existsRecordIdMap[it.id]?.instance.isEqualToModel(it.instance)
-                }.mapNotNull {
-                    userIdDbIdMap[it.id]?.let { dbId ->
-                        it.instance?.let { instance ->
-                            UserInstanceInfoRecord.from(dbId, instance)
-                        }
-                    }
-                }
-            )
 
 
             users.mapNotNull { user ->
@@ -521,5 +509,24 @@ class MediatorUserDataSource @Inject constructor(
                 }
             }
         )
+    }
+
+    private suspend fun replaceUsersInstanceInfo(
+        users: List<User>,
+        userIdDbIdMap: Map<User.Id, Long>,
+        existsRecordIdMap: Map<User.Id, UserRelated?>,
+    ) {
+        userDao.insertUserInstanceInfoList(
+            users.filter {
+                existsRecordIdMap[it.id] == null || !existsRecordIdMap[it.id]?.instance.isEqualToModel(it.instance)
+            }.mapNotNull {
+                userIdDbIdMap[it.id]?.let { dbId ->
+                    it.instance?.let { instance ->
+                        UserInstanceInfoRecord.from(dbId, instance)
+                    }
+                }
+            }
+        )
+
     }
 }
