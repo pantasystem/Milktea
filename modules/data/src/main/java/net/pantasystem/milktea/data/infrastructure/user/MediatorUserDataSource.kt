@@ -27,6 +27,7 @@ import net.pantasystem.milktea.data.infrastructure.user.db.UserRecord
 import net.pantasystem.milktea.data.infrastructure.user.db.UserRelated
 import net.pantasystem.milktea.data.infrastructure.user.db.UserRelatedStateRecord
 import net.pantasystem.milktea.data.infrastructure.user.db.isEqualToBadgeRoleModels
+import net.pantasystem.milktea.data.infrastructure.user.db.isEqualToModel
 import net.pantasystem.milktea.data.infrastructure.user.db.isEqualToModels
 import net.pantasystem.milktea.model.AddResult
 import net.pantasystem.milktea.model.user.Acct
@@ -236,13 +237,14 @@ class MediatorUserDataSource @Inject constructor(
 
             // save instance info
             userDao.insertUserInstanceInfoList(
-                users.mapNotNull {
+                users.filter {
+                    existsRecordIdMap[it.id] == null || !existsRecordIdMap[it.id]?.instance.isEqualToModel(it.instance)
+                }.mapNotNull {
                     userIdDbIdMap[it.id]?.let { dbId ->
                         it.instance?.let { instance ->
                             UserInstanceInfoRecord.from(dbId, instance)
                         }
                     }
-
                 }
             )
 

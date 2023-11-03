@@ -447,6 +447,17 @@ data class UserInstanceInfoRecord(
     }
 }
 
+fun UserInstanceInfoRecord?.isEqualToModel(model: User.InstanceInfo?): Boolean {
+    if (model == null) return false
+    if (this == null) return false
+    return faviconUrl == model.faviconUrl &&
+            iconUrl == model.iconUrl &&
+            name == model.name &&
+            softwareName == model.softwareName &&
+            softwareVersion == model.softwareVersion &&
+            themeColor == model.themeColor
+}
+
 @Entity(
     tableName = "pinned_note_id",
     foreignKeys = [
