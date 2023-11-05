@@ -10,11 +10,11 @@ import android.view.View
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.Toast
-import androidx.core.view.isVisible
 import androidx.databinding.BindingAdapter
 import com.bumptech.glide.Glide
 import dagger.hilt.android.EntryPointAccessors
 import dagger.hilt.android.internal.managers.FragmentComponentManager
+import net.pantasystem.milktea.common_android.ui.VisibilityHelper.setMemoVisibility
 import net.pantasystem.milktea.common_android_ui.NavigationEntryPointForBinding
 import net.pantasystem.milktea.common_navigation.MediaNavigationArgs
 import net.pantasystem.milktea.note.R
@@ -27,8 +27,8 @@ object UrlPreviewHelper {
     @JvmStatic
     @BindingAdapter("previewList")
     fun LinearLayout.setUrlPreviewList(previewList: List<Preview>?) {
-        this.visibility = View.GONE
         if (previewList.isNullOrEmpty()) {
+            this.setMemoVisibility(View.GONE)
             return
         }
 
@@ -45,8 +45,8 @@ object UrlPreviewHelper {
 
             when(preview) {
                 is Preview.FileWrapper -> {
-                    view.urlPreviewView.isVisible = false
-                    view.filePreviewView.isVisible = true
+                    view.urlPreviewView.setMemoVisibility(View.GONE)
+                    view.filePreviewView.setMemoVisibility(View.VISIBLE)
                     view.filePreviewView.setOtherFile(preview.file)
 
                     view.filePreviewView.setOnClickListener { v ->
@@ -85,8 +85,8 @@ object UrlPreviewHelper {
                     }
                 }
                 is Preview.UrlWrapper -> {
-                    view.urlPreviewView.isVisible = true
-                    view.filePreviewView.isVisible = false
+                    view.urlPreviewView.setMemoVisibility(View.VISIBLE)
+                    view.filePreviewView.setMemoVisibility(View.GONE)
                     view.urlPreviewView.setUrlPreview(preview.urlPreview)
 
 
