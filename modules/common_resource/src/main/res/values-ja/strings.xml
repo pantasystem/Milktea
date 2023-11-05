@@ -23,7 +23,9 @@
     <string name="following">フォロー中</string>
     <string name="follower">フォロワー</string>
     <string name="renote">リポスト</string>
+    <string name="renote_in_channel">チャンネル内にリポスト</string>
     <string name="quote_renote">引用</string>
+    <string name="quote_renote_in_channel">チャンネル内に引用</string>
     <string name="discovery">discovery</string>
     <string name="renote_was">リポストしました</string>
     <string name="input_custom_emoji">絵文字/カスタム絵文字を入力</string>

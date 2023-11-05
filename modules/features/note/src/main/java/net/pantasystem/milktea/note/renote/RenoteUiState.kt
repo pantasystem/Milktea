@@ -13,6 +13,8 @@ data class RenoteViewModelUiState(
     ),
     val accounts: List<AccountInfo> = emptyList(),
     val canQuote: Boolean = true,
+    val isRenoteButtonVisible: Boolean = true,
+    val isChannelRenoteButtonVisible: Boolean = false,
 )
 
 data class RenoteViewModelTargetNoteState(

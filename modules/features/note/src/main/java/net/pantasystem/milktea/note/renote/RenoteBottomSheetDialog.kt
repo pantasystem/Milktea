@@ -65,7 +65,6 @@ class RenoteBottomSheetDialog : BottomSheetDialogFragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-
         return ComposeView(requireContext()).apply {
             setContent {
                 MilkteaStyleConfigApplyAndTheme(configRepository = configRepository) {
@@ -81,14 +80,23 @@ class RenoteBottomSheetDialog : BottomSheetDialogFragment() {
                             viewModel.renote()
                             dismiss()
                         },
+                        onQuoteRenoteButtonClicked = {
+                            notesViewModel.showQuoteNoteEditor(noteId, false)
+                            dismiss()
+                        },
+                        onRenoteInChannelButtonClicked = {
+                            viewModel.renote(inChannel = true)
+                            dismiss()
+                        },
+                        onQuoteInChannelRenoteButtonClicked = {
+                            notesViewModel.showQuoteNoteEditor(noteId, true)
+                            dismiss()
+                        },
                         onDeleteRenoteButtonCLicked = {
                             viewModel.unRenote()
                             dismiss()
                         },
-                        onQuoteRenoteButtonClicked = {
-                            notesViewModel.showQuoteNoteEditor(noteId)
-                            dismiss()
-                        })
+                    )
                 }
             }
         }

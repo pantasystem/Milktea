@@ -9,7 +9,7 @@ interface NoteRepository {
 
     suspend fun create(createNote: CreateNote): Result<Note>
 
-    suspend fun renote(noteId: Note.Id): Result<Note>
+    suspend fun renote(noteId: Note.Id, inChannel: Boolean): Result<Note>
 
     suspend fun unrenote(noteId: Note.Id): Result<Unit>
 

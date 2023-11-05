@@ -41,11 +41,11 @@ class NoteRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun renote(noteId: Note.Id): Result<Note> = runCancellableCatching {
+    override suspend fun renote(noteId: Note.Id, inChannel: Boolean): Result<Note> = runCancellableCatching {
         withContext(ioDispatcher) {
             val account = getAccount.get(noteId.accountId)
             val n = find(noteId).getOrThrow()
-            convertAndAdd(account, noteApiAdapterFactory.create(account).renote(n))
+            convertAndAdd(account, noteApiAdapterFactory.create(account).renote(n, inChannel))
         }
     }
 

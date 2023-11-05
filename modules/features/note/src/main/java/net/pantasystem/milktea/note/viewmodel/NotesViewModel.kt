@@ -55,7 +55,7 @@ class NotesViewModel @Inject constructor(
     private val _statusMessage = MutableSharedFlow<StringSource>(onBufferOverflow = BufferOverflow.DROP_OLDEST, extraBufferCapacity = 10)
     val statusMessage = _statusMessage.asSharedFlow()
 
-    val quoteRenoteTarget = MutableSharedFlow<Note>(onBufferOverflow = BufferOverflow.DROP_OLDEST, extraBufferCapacity = 10)
+    val quoteRenoteTarget = MutableSharedFlow<QuoteRenoteData>(onBufferOverflow = BufferOverflow.DROP_OLDEST, extraBufferCapacity = 10)
 
     val confirmDeletionEvent = MutableSharedFlow<NoteRelation?>(onBufferOverflow = BufferOverflow.DROP_OLDEST, extraBufferCapacity = 10)
 
@@ -66,11 +66,11 @@ class NotesViewModel @Inject constructor(
     private val _openNoteEditorEvent = MutableSharedFlow<DraftNote?>(onBufferOverflow = BufferOverflow.DROP_OLDEST, extraBufferCapacity = 10)
     val openNoteEditorEvent = _openNoteEditorEvent.asSharedFlow()
 
-    fun showQuoteNoteEditor(noteId: Note.Id) {
+    fun showQuoteNoteEditor(noteId: Note.Id, isRenoteToChannel: Boolean) {
         viewModelScope.launch {
             recursiveSearchHasContentNote(noteId).onSuccess { note ->
                 withContext(Dispatchers.Main) {
-                    quoteRenoteTarget.tryEmit(note)
+                    quoteRenoteTarget.tryEmit(QuoteRenoteData(note, isRenoteToChannel))
                 }
             }
 

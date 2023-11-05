@@ -10,8 +10,10 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import net.pantasystem.milktea.common.ResultState
+import net.pantasystem.milktea.common.coroutines.combine
 import net.pantasystem.milktea.common.initialState
 import net.pantasystem.milktea.model.account.Account
+import net.pantasystem.milktea.model.channel.Channel
 import net.pantasystem.milktea.model.instance.InstanceInfoService
 import net.pantasystem.milktea.model.instance.InstanceInfoType
 import net.pantasystem.milktea.model.note.Note
@@ -30,6 +32,7 @@ class RenoteUiStateBuilder @Inject constructor(
     fun buildState(
         targetNoteIdFlow: StateFlow<Note.Id?>,
         noteFlow: Flow<NoteRelation?>,
+        channelFlow: Flow<Channel?>,
         noteSyncState: Flow<ResultState<Unit>>,
         selectedAccountIds: Flow<List<Long>>,
         accountsFlow: Flow<List<Account>>,
@@ -106,17 +109,24 @@ class RenoteUiStateBuilder @Inject constructor(
             emptyList()
         )
 
+        val isRenoteButtonVisibleFlow = channelFlow.map { it?.allowRenoteToExternal ?: true }
+        val isChannelRenoteButtonVisibleFlow = channelFlow.map { it != null }
+
         return combine(
             targetNoteIdFlow,
             noteState,
             accountWithUsers,
             currentAccountInstanceInfo,
-        ) { noteId, syncState, accounts, instanceInfo ->
+            isRenoteButtonVisibleFlow,
+            isChannelRenoteButtonVisibleFlow,
+        ) { noteId, syncState, accounts, instanceInfo, isRenoteButtonVisible, isChannelRenoteButtonVisible ->
             RenoteViewModelUiState(
                 targetNoteId = noteId,
                 noteState = syncState,
                 accounts = accounts,
-                canQuote = instanceInfo?.canQuote ?: false
+                canQuote = instanceInfo?.canQuote ?: false,
+                isRenoteButtonVisible = isRenoteButtonVisible,
+                isChannelRenoteButtonVisible = isChannelRenoteButtonVisible,
             )
         }
     }

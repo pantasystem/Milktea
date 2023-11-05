@@ -23,7 +23,9 @@
     <string name="following">Following</string>
     <string name="follower">Followers</string>
     <string name="renote">Renote</string>
+    <string name="renote_in_channel">Renote in channel</string>
     <string name="quote_renote">Quote renote</string>
+    <string name="quote_renote_in_channel">Quote renote in channel</string>
     <string name="discovery">Discovery</string>
     <string name="renote_was">Renote</string>
     <string name="input_custom_emoji">Emoji</string>

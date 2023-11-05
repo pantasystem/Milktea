@@ -43,7 +43,7 @@ interface NoteApiAdapter {
     suspend fun delete(noteId: Note.Id): DeleteNoteResultType
     suspend fun createThreadMute(noteId: Note.Id): ToggleThreadMuteResultType
     suspend fun deleteThreadMute(noteId: Note.Id): ToggleThreadMuteResultType
-    suspend fun renote(target: Note): RenoteResultType
+    suspend fun renote(target: Note, inChannel: Boolean): RenoteResultType
 
     suspend fun vote(noteId: Note.Id, choice: Poll.Choice, target: Note)
 
@@ -59,9 +59,9 @@ internal class NoteApiAdapterFactoryImpl @Inject constructor(
     private val uploader: FileUploaderProvider,
     private val filePropertyDataSource: FilePropertyDataSource,
     private val loggerFactory: Logger.Factory,
-): NoteApiAdapter.Factory {
+) : NoteApiAdapter.Factory {
     override suspend fun create(account: Account): NoteApiAdapter {
-        return when(account.instanceType) {
+        return when (account.instanceType) {
             Account.InstanceType.MISSKEY, Account.InstanceType.FIREFISH -> NoteApiAdapterMisskeyPattern(
                 accountRepository = accountRepository,
                 misskeyAPIProvider = misskeyAPIProvider,
@@ -69,6 +69,7 @@ internal class NoteApiAdapterFactoryImpl @Inject constructor(
                 uploader = uploader,
                 loggerFactory = loggerFactory,
             )
+
             Account.InstanceType.MASTODON, Account.InstanceType.PLEROMA -> NoteApiAdapterMastodonPattern(
                 uploader = uploader,
                 mastodonAPIProvider = mastodonAPIProvider,
@@ -77,6 +78,7 @@ internal class NoteApiAdapterFactoryImpl @Inject constructor(
         }
     }
 }
+
 private class NoteApiAdapterMisskeyPattern(
     val accountRepository: AccountRepository,
     val misskeyAPIProvider: MisskeyAPIProvider,
@@ -150,11 +152,17 @@ private class NoteApiAdapterMisskeyPattern(
         return ToggleThreadMuteResultType.Misskey
     }
 
-    override suspend fun renote(target: Note): RenoteResultType {
+    override suspend fun renote(target: Note, inChannel: Boolean): RenoteResultType {
         val account = accountRepository.get(target.id.accountId).getOrThrow()
         return create(
             CreateNote(
-                author = account, renoteId = target.id,
+                author = account,
+                renoteId = target.id,
+                channelId = if (inChannel) {
+                    target.channelId
+                } else {
+                    null
+                },
                 text = null,
                 visibility = target.visibility
             )
@@ -212,6 +220,7 @@ private class NoteApiAdapterMastodonPattern(
                             uploader.get(createNote.author)
                                 .upload(UploadSource.LocalFile(appFile), false).id
                         }
+
                         is AppFile.Remote -> appFile.id
                     }
                 }
@@ -275,7 +284,7 @@ private class NoteApiAdapterMastodonPattern(
         return ToggleThreadMuteResultType.Mastodon(requireNotNull(body))
     }
 
-    override suspend fun renote(target: Note): RenoteResultType {
+    override suspend fun renote(target: Note, inChannel: Boolean): RenoteResultType {
         val account = accountRepository.get(target.id.accountId).getOrThrow()
         val toot = mastodonAPIProvider.get(account).reblog(target.id.noteId)
             .throwIfHasError()

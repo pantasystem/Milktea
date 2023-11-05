@@ -21,6 +21,7 @@ class CreateRenoteMultipleAccountUseCase @Inject constructor(
     suspend operator fun invoke(
         noteId: Note.Id,
         accountIds: List<Long>,
+        inChannel: Boolean,
     ): Result<List<Result<Note>>> = runCancellableCatching {
         coroutineScope {
             val accounts = accountIds.map {
@@ -28,12 +29,16 @@ class CreateRenoteMultipleAccountUseCase @Inject constructor(
             }
             val note = recursiveSearchHasContentNote(noteId).getOrThrow()
             accounts.map {
-                resolveAndRenote(note, it.accountId)
+                resolveAndRenote(note, it.accountId, inChannel)
             }
         }
     }
 
-    private suspend fun resolveAndRenote(sourceNote: Note, accountId: Long): Result<Note> =
+    private suspend fun resolveAndRenote(
+        sourceNote: Note,
+        accountId: Long,
+        inChannel: Boolean,
+    ): Result<Note> =
         runCancellableCatching {
             val account = accountRepository.get(accountId).getOrThrow()
             val relatedSourceNoteAccount =
@@ -44,17 +49,17 @@ class CreateRenoteMultipleAccountUseCase @Inject constructor(
                 noteRepository.find(Note.Id(account.accountId, sourceNote.id.noteId)).getOrThrow()
             }
 
-            renote(relatedNote).getOrThrow()
+            renote(relatedNote, inChannel).getOrThrow()
         }
 
 
-    private suspend fun renote(note: Note): Result<Note> =
+    private suspend fun renote(note: Note, inChannel: Boolean): Result<Note> =
         runCancellableCatching {
             if (checkCanRepostService
                     .canRepost(note.id)
                     .getOrElse { false }
             ) {
-                noteRepository.renote(note.id).getOrThrow()
+                noteRepository.renote(note.id, inChannel).getOrThrow()
             } else {
                 throw IllegalArgumentException()
             }
