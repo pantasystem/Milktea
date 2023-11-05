@@ -1,5 +1,3 @@
-@file:Suppress("DEPRECATION")
-
 package net.pantasystem.milktea.data.infrastructure
 
 import androidx.room.migration.Migration
