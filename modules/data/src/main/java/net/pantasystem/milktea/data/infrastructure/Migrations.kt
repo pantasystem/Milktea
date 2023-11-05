@@ -117,7 +117,7 @@ val MIGRATION_51_52 = object : Migration(51, 52) {
 val MIGRATION_57_58 = object : Migration(57, 58) {
     override fun migrate(database: SupportSQLiteDatabase) {
         database.execSQL("DROP TABLE IF EXISTS 'connection_information'")
-        database.execSQL("DROP TABLE IF EXISTS 'account'")
         database.execSQL("DROP TABLE IF EXISTS 'page'")
+        database.execSQL("DROP TABLE IF EXISTS 'account'")
     }
 }
