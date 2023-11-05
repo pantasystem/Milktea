@@ -20,7 +20,6 @@ import net.pantasystem.milktea.common_navigation.MediaNavigationArgs
 import net.pantasystem.milktea.common_resource.R
 import net.pantasystem.milktea.note.databinding.ItemFilePreviewBinding
 import net.pantasystem.milktea.note.databinding.ItemUrlPreviewBinding
-import net.pantasystem.milktea.note.url.UrlPreviewHelper.setSiteIcon
 import net.pantasystem.milktea.note.url.UrlPreviewHelper.setUrlPreviewThumbnail
 import net.pantasystem.milktea.note.viewmodel.Preview
 
@@ -53,12 +52,7 @@ class PreviewListAdapter : ListAdapter<Preview, RecyclerView.ViewHolder>(ItemCal
             }
 
             binding.urlPreviewView.setCircleOutline(7)
-            binding.siteThumbnailView.setUrlPreviewThumbnail(preview.urlPreview.thumbnail)
-            binding.siteTitleView.text = preview.urlPreview.title
-            binding.siteDescription.text = preview.urlPreview.description
-            binding.siteIconView.setSiteIcon(preview.urlPreview.icon)
-            binding.siteNameView.text = preview.urlPreview.siteName
-
+            binding.urlPreviewView.setUrlPreview(preview.urlPreview)
         }
     }
     class FilePreviewViewHolder(val binding: ItemFilePreviewBinding) : BaseHolder<Preview.FileWrapper>(binding.root){
