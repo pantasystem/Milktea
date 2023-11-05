@@ -12,8 +12,6 @@ import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.core.view.isVisible
 import androidx.databinding.BindingAdapter
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import dagger.hilt.android.EntryPointAccessors
 import dagger.hilt.android.internal.managers.FragmentComponentManager
@@ -24,30 +22,6 @@ import net.pantasystem.milktea.note.databinding.ItemUrlOrFilePreviewBinding
 import net.pantasystem.milktea.note.viewmodel.Preview
 
 object UrlPreviewHelper {
-
-    @JvmStatic
-    @BindingAdapter("previewList")
-    fun RecyclerView.setUrlPreviewList(previewList: List<Preview>?){
-
-        if(previewList.isNullOrEmpty()){
-            this.visibility = View.GONE
-
-        }else{
-            this.isNestedScrollingEnabled = false
-            this.visibility = View.VISIBLE
-            val adapter = (this.adapter as? PreviewListAdapter)?: PreviewListAdapter().also {
-                adapter = it
-            }
-
-            val lm = (this.layoutManager as? LinearLayoutManager) ?: LinearLayoutManager(this.context).also {
-                layoutManager = it
-            }
-            lm.recycleChildrenOnDetach = true
-            adapter.submitList(previewList)
-
-        }
-
-    }
 
     @SuppressLint("IntentReset")
     @JvmStatic
@@ -75,10 +49,10 @@ object UrlPreviewHelper {
                     view.filePreviewView.isVisible = true
                     view.filePreviewView.setOtherFile(preview.file)
 
-                    view.filePreviewView.setOnClickListener {
+                    view.filePreviewView.setOnClickListener { v ->
 
                         if (preview.file.type.startsWith("audio")) {
-                            val activity = FragmentComponentManager.findActivity(view.root.context)
+                            val activity = FragmentComponentManager.findActivity(v.context)
                             if (activity is Activity) {
                                 val accessor = EntryPointAccessors.fromActivity(
                                     activity,
@@ -89,11 +63,11 @@ object UrlPreviewHelper {
                                         preview.file
                                     )
                                 )
-                                context?.startActivity(intent)
+                                v.context?.startActivity(intent)
                             }
                         } else {
                             try {
-                                context?.startActivity(
+                                v.context?.startActivity(
                                     Intent().apply {
                                         data = Uri.parse(preview.file.path)
                                         type = preview.file.type
@@ -101,7 +75,7 @@ object UrlPreviewHelper {
                                 )
                             } catch (e: ActivityNotFoundException) {
                                 Toast.makeText(
-                                    context,
+                                    v.context,
                                     context.getString(net.pantasystem.milktea.common_resource.R.string.no_app_available_to_open_this_file),
                                     Toast.LENGTH_SHORT
                                 ).show()
