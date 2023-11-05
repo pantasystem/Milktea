@@ -165,7 +165,6 @@ private class NoteApiAdapterMisskeyPattern(
                 },
                 text = null,
                 visibility = target.visibility,
-                channelId = target.channelId,
             )
         )
     }
