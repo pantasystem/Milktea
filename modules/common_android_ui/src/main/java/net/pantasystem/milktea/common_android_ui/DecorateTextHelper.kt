@@ -145,7 +145,8 @@ object DecorateTextHelper {
             }
             is TextType.Misskey -> {
                 this.movementMethod = LinkMovementMethod.getInstance()
-                this.text = MFMDecorator.decorate(this, textType.lazyDecorateResult, emojiScale)
+                val spanned = MFMDecorator.decorate(this, textType.lazyDecorateResult, emojiScale)
+                this.setText(spanned, TextView.BufferType.SPANNABLE)
             }
         }
 

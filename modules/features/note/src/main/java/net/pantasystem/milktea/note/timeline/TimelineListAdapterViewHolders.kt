@@ -1,5 +1,7 @@
 package net.pantasystem.milktea.note.timeline
 
+import android.text.Spannable
+import android.text.SpannableString
 import android.view.View
 import androidx.core.view.isVisible
 import androidx.databinding.ViewDataBinding
@@ -115,12 +117,35 @@ class NoteViewHolder(
     override val flexboxLayout: FlexboxLayout
         get() = binding.simpleNote.reactionView
 
+
+
+    init {
+        listOf(
+            binding.simpleNote.text,
+            binding.simpleNote.cw,
+            binding.simpleNote.mainName,
+            binding.simpleNote.subName,
+
+            binding.simpleNote.subNoteText,
+            binding.simpleNote.subCw,
+            binding.simpleNote.subNoteSubName,
+            binding.simpleNote.subNoteMainName,
+        ).forEach {
+            it.setSpannableFactory(spannableFactory)
+        }
+    }
+
     override fun onBind(note: PlaneNoteViewData) {
         binding.note = note
         binding.noteCardActionListener = noteCardActionListenerAdapter
-        val badgeIconSize = binding.root.context.specialPointToPixel(note.config.value.noteHeaderFontSize).toInt()
+        val badgeIconSize =
+            binding.root.context.specialPointToPixel(note.config.value.noteHeaderFontSize).toInt()
         binding.simpleNote.badgeRoles.apply {
-            setUserRoleBadge(binding.simpleNote.noteLayout, note.toShowNote.user.iconBadgeRoles, badgeIconSize)
+            setUserRoleBadge(
+                binding.simpleNote.noteLayout,
+                note.toShowNote.user.iconBadgeRoles,
+                badgeIconSize
+            )
         }
     }
 
@@ -137,16 +162,43 @@ class HasReplyToNoteViewHolder(
     override val flexboxLayout: FlexboxLayout
         get() = binding.simpleNote.reactionView
 
+    init {
+        listOf(
+            binding.simpleNote.text,
+            binding.simpleNote.cw,
+            binding.simpleNote.mainName,
+            binding.simpleNote.subName,
+
+            binding.simpleNote.subNoteText,
+            binding.simpleNote.subCw,
+            binding.simpleNote.subNoteSubName,
+            binding.simpleNote.subNoteMainName,
+        ).forEach {
+            it.setSpannableFactory(spannableFactory)
+        }
+    }
+
 
     override fun onBind(note: PlaneNoteViewData) {
         if (note is HasReplyToNoteViewData) {
             binding.hasReplyToNote = note
             binding.noteCardActionListener = noteCardActionListenerAdapter
             binding.simpleNote.badgeRoles.apply {
-                val badgeIconSize = context.specialPointToPixel(note.config.value.noteHeaderFontSize).toInt()
-                setUserRoleBadge(binding.simpleNote.noteLayout, note.toShowNote.user.iconBadgeRoles, badgeIconSize)
+                val badgeIconSize =
+                    context.specialPointToPixel(note.config.value.noteHeaderFontSize).toInt()
+                setUserRoleBadge(
+                    binding.simpleNote.noteLayout,
+                    note.toShowNote.user.iconBadgeRoles,
+                    badgeIconSize
+                )
             }
         }
     }
 
+}
+
+private val spannableFactory = object : Spannable.Factory() {
+    override fun newSpannable(source: CharSequence?): Spannable {
+        return (source as? Spannable?) ?: SpannableString.valueOf("")
+    }
 }
