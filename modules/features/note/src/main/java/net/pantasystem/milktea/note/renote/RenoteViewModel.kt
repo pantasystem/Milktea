@@ -38,7 +38,14 @@ class RenoteViewModel @Inject constructor(
 
     val logger = loggerFactory.create("RenoteDialogViewModel")
 
-    private var _targetNoteId = MutableStateFlow<Note.Id?>(null)
+    private val _targetNoteId = MutableStateFlow<Note.Id?>(null)
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    private val _targetNote = _targetNoteId.filterNotNull().flatMapLatest {
+        noteRepository.observeOne(it).filterNotNull().map { note ->
+            noteRelationGetter.get(note).getOrNull()
+        }
+    }
 
     private val _resultEvents = MutableSharedFlow<RenoteActionResultEvent>(
         onBufferOverflow = BufferOverflow.DROP_OLDEST,
@@ -47,22 +54,16 @@ class RenoteViewModel @Inject constructor(
 
     val resultEvents = _resultEvents.asSharedFlow()
 
-
-    @OptIn(ExperimentalCoroutinesApi::class)
-    val note = _targetNoteId.filterNotNull().flatMapLatest {
-        noteRepository.observeOne(it).filterNotNull().map { note ->
-            noteRelationGetter.get(note).getOrNull()
-        }
-    }.stateIn(
+    val note = _targetNote.stateIn(
         viewModelScope,
         SharingStarted.WhileSubscribed(5_000),
         null
     )
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    val channel = note.filterNotNull()
-        .mapNotNull { it.note.channelId }
-        .flatMapLatest { flowOf(channelRepository.findOne(it).getOrNull()) }
+    val channel = note
+        .map { it?.note?.channelId }
+        .flatMapLatest { flowOf(it?.let { ch -> channelRepository.findOne(ch).getOrNull() }) }
         .stateIn(
             viewModelScope,
             SharingStarted.WhileSubscribed(5_000),
