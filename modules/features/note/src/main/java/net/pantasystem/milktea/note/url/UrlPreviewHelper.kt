@@ -75,34 +75,46 @@ object UrlPreviewHelper {
                     view.filePreviewView.isVisible = true
                     view.filePreviewView.setOtherFile(preview.file)
 
-                    if(preview.file.type.startsWith("audio")){
-                        val activity = FragmentComponentManager.findActivity(view.root.context)
-                        if (activity is Activity) {
-                            val accessor = EntryPointAccessors.fromActivity(activity, NavigationEntryPointForBinding::class.java)
-                            val intent = accessor.mediaNavigation().newIntent(
-                                MediaNavigationArgs.AFile(
-                                preview.file
-                            ))
-                            context?.startActivity(intent)
-                        }
-                    }else{
-                        try {
-                            context?.startActivity(
-                                Intent().apply{
-                                    data = Uri.parse(preview.file.path)
-                                    type = preview.file.type
-                                }
-                            )
-                        } catch (e: ActivityNotFoundException) {
-                            Toast.makeText(context, context.getString(net.pantasystem.milktea.common_resource.R.string.no_app_available_to_open_this_file), Toast.LENGTH_SHORT).show()
-                        }
+                    view.filePreviewView.setOnClickListener {
 
+                        if (preview.file.type.startsWith("audio")) {
+                            val activity = FragmentComponentManager.findActivity(view.root.context)
+                            if (activity is Activity) {
+                                val accessor = EntryPointAccessors.fromActivity(
+                                    activity,
+                                    NavigationEntryPointForBinding::class.java
+                                )
+                                val intent = accessor.mediaNavigation().newIntent(
+                                    MediaNavigationArgs.AFile(
+                                        preview.file
+                                    )
+                                )
+                                context?.startActivity(intent)
+                            }
+                        } else {
+                            try {
+                                context?.startActivity(
+                                    Intent().apply {
+                                        data = Uri.parse(preview.file.path)
+                                        type = preview.file.type
+                                    }
+                                )
+                            } catch (e: ActivityNotFoundException) {
+                                Toast.makeText(
+                                    context,
+                                    context.getString(net.pantasystem.milktea.common_resource.R.string.no_app_available_to_open_this_file),
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            }
+
+                        }
                     }
                 }
                 is Preview.UrlWrapper -> {
                     view.urlPreviewView.isVisible = true
                     view.filePreviewView.isVisible = false
                     view.urlPreviewView.setUrlPreview(preview.urlPreview)
+
 
                     view.urlPreviewView.setOnClickListener {
                         context?.startActivity(
