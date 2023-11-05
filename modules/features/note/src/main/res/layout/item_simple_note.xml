@@ -267,14 +267,15 @@
                         android:orientation="vertical"
                         />
 
-                    <androidx.recyclerview.widget.RecyclerView
+                    <LinearLayout
                         android:id="@+id/url_preview_list"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
                         app:previewList="@{note.previews}"
-                        tools:itemCount="1"
-                        tools:listitem="@layout/item_url_preview" />
+                        android:orientation="vertical"
+                        tools:listitem="@layout/item_url_preview"
+                        />
 
 
                     <androidx.constraintlayout.widget.ConstraintLayout
