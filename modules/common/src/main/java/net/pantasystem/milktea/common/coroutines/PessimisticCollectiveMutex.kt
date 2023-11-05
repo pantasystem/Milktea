@@ -9,12 +9,12 @@ class PessimisticCollectiveMutex<Key> {
     var locks: Map<Key, Mutex> = mapOf()
     private val lock = Mutex()
 
-    suspend fun<T> withLock(host: Key, block: suspend () -> T): T {
+    suspend fun<T> withLock(key: Key, block: suspend () -> T): T {
         val l = lock.withLock {
-            var l = locks[host]
+            var l = locks[key]
             if (l == null) {
                 l = Mutex()
-                locks = locks + (host to l)
+                locks = locks + (key to l)
             }
             l
         }
