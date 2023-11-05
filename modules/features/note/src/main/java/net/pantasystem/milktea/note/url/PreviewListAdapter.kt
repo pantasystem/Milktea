@@ -20,7 +20,6 @@ import net.pantasystem.milktea.common_navigation.MediaNavigationArgs
 import net.pantasystem.milktea.common_resource.R
 import net.pantasystem.milktea.note.databinding.ItemFilePreviewBinding
 import net.pantasystem.milktea.note.databinding.ItemUrlPreviewBinding
-import net.pantasystem.milktea.note.url.UrlPreviewHelper.setUrlPreviewThumbnail
 import net.pantasystem.milktea.note.viewmodel.Preview
 
 class PreviewListAdapter : ListAdapter<Preview, RecyclerView.ViewHolder>(ItemCallback()){
@@ -58,8 +57,8 @@ class PreviewListAdapter : ListAdapter<Preview, RecyclerView.ViewHolder>(ItemCal
     class FilePreviewViewHolder(val binding: ItemFilePreviewBinding) : BaseHolder<Preview.FileWrapper>(binding.root){
         @SuppressLint("IntentReset")
         override fun bind(preview: Preview.FileWrapper) {
-            val context = this.binding.filePropertyView.context
-            binding.filePropertyView.setOnClickListener {
+            val context = this.binding.root.context
+            binding.root.setOnClickListener {
                 if(preview.file.type.startsWith("audio")){
                     val activity = FragmentComponentManager.findActivity(binding.root.context)
                     if (activity is Activity) {
@@ -85,10 +84,7 @@ class PreviewListAdapter : ListAdapter<Preview, RecyclerView.ViewHolder>(ItemCal
                 }
 
             }
-
-            binding.fileThumbnailView.setUrlPreviewThumbnail(preview.file.thumbnailUrl)
-            binding.fileNameView.text = preview.file.name
-            binding.fileTypeView.text = preview.file.type
+            binding.root.setOtherFile(preview.file)
 
         }
     }
