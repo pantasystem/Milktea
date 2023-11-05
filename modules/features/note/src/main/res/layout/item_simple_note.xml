@@ -22,6 +22,7 @@
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/noteLayout"
         isUserNameDefault="@{note.config.isUserNameDefault}"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -66,7 +67,7 @@
             android:textSize="@dimen/note_author_info_text_size"
             android:textStyle="bold"
             app:layout_constrainedWidth="true"
-            app:layout_constraintEnd_toStartOf="@id/elapsedTime"
+            app:layout_constraintEnd_toStartOf="@id/badgeRoles"
             app:layout_constraintHorizontal_bias="0"
             app:layout_constraintStart_toEndOf="@id/avatarIcon"
             app:layout_constraintTop_toTopOf="parent"
@@ -87,16 +88,19 @@
             app:layout_constraintTop_toTopOf="parent"
             tools:text="ユーザー名awefawefawefawefawefawefwaefwef" />
 
-        <androidx.compose.ui.platform.ComposeView
+        <androidx.constraintlayout.helper.widget.Flow
             android:id="@+id/badgeRoles"
             android:layout_width="wrap_content"
-            android:layout_height="0dp"
+            android:layout_height="wrap_content"
             android:layout_marginStart="4dp"
-            android:padding="1dp"
+            android:padding="2dp"
             app:layout_constraintBottom_toBottomOf="@+id/subName"
             app:layout_constraintEnd_toStartOf="@id/elapsedTime"
             app:layout_constraintStart_toEndOf="@id/subName"
-            app:layout_constraintTop_toTopOf="@+id/subName" />
+            app:layout_constraintTop_toTopOf="@+id/subName"
+            android:orientation="horizontal"
+            app:flow_wrapMode="none"
+            />
 
         <TextView
             android:id="@+id/elapsedTime"

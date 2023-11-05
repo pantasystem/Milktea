@@ -38,6 +38,7 @@ class UpdateNicknameUseCaseTest {
                 isSameHost = true,
                 instance = null,
                 avatarBlurhash = null,
+                badgeRoles = emptyList(),
             )
             userDataSource.add(user)
 

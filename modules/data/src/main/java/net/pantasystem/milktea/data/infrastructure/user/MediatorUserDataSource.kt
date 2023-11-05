@@ -27,6 +27,7 @@ import net.pantasystem.milktea.data.infrastructure.user.db.UserRecord
 import net.pantasystem.milktea.data.infrastructure.user.db.UserRelated
 import net.pantasystem.milktea.data.infrastructure.user.db.UserRelatedStateRecord
 import net.pantasystem.milktea.data.infrastructure.user.db.isEqualToBadgeRoleModels
+import net.pantasystem.milktea.data.infrastructure.user.db.isEqualToModel
 import net.pantasystem.milktea.data.infrastructure.user.db.isEqualToModels
 import net.pantasystem.milktea.model.AddResult
 import net.pantasystem.milktea.model.user.Acct
@@ -83,8 +84,17 @@ class MediatorUserDataSource @Inject constructor(
         keepInOrder: Boolean,
         isSimple: Boolean
     ): Result<List<User>> = runCancellableCatching {
-        withContext(ioDispatcher) {
-            val list = serverIds.distinct().chunked(100).map { chunkedIds ->
+        val inMemUsers = serverIds.mapNotNull {
+            memCache.get(User.Id(accountId, it))
+        }
+        val inMemUsersMap = inMemUsers.associateBy {
+            it.id.id
+        }
+        val notExistsServerIds = serverIds.filter {
+            inMemUsersMap[it] == null
+        }
+        val list = withContext(ioDispatcher) {
+            notExistsServerIds.distinct().chunked(100).map { chunkedIds ->
                 if (isSimple) {
                     userDao.getSimplesInServerIds(accountId, chunkedIds)
                 } else {
@@ -97,13 +107,15 @@ class MediatorUserDataSource @Inject constructor(
                     memCache.put(it.key, it.value)
                 }
             }
-            if (!keepInOrder) {
-                list
-            } else {
-                val hash = list.associateBy { it.id.id }
-                serverIds.mapNotNull {
-                    hash[it]
-                }
+
+        }
+
+        if (!keepInOrder) {
+            list + inMemUsers
+        } else {
+            val hash = list.associateBy { it.id.id }
+            serverIds.mapNotNull {
+                inMemUsersMap[it] ?: hash[it]
             }
         }
     }
@@ -140,47 +152,25 @@ class MediatorUserDataSource @Inject constructor(
             // NOTE: 新たに追加される予定のオブジェクトと既にキャッシュしているオブジェクトの絵文字リストを比較している
             // NOTE: 比較した上で同一でなければキャッシュの更新処理を行う
             replaceEmojisIfNeed(dbId, user, record)
-
-            if (!record?.badgeRoles.isEqualToBadgeRoleModels(user.badgeRoles)) {
-                if (record != null) {
-                    userDao.detachAllUserBadgeRoles(dbId)
-                }
-                userDao.insertUserBadgeRoles(
-                    user.badgeRoles.map {
-                        BadgeRoleRecord(
-                            userId = dbId,
-                            name = it.name,
-                            iconUrl = it.iconUri,
-                            displayOrder = it.displayOrder,
-                        )
-                    }
-                )
-            }
+            replaceUserRolesIfNeed(dbId, user, record)
 
             if (user is User.Detail) {
                 userDao.insert(
                     UserInfoStateRecord.from(dbId, user.info)
                 )
-                when (val related = user.related) {
-                    null -> {}
-                    else -> {
-                        userDao.insert(
-                            UserRelatedStateRecord.from(dbId, related)
-                        )
-                    }
+                user.related?.let {
+                    userDao.insert(
+                        UserRelatedStateRecord.from(dbId, it)
+                    )
                 }
 
-                // NOTE: 更新の必要性を判定
                 replacePinnedNoteIdsIfNeed(dbId, user, record, recordToDetailed)
                 replaceFieldsIfNeed(dbId, user, record, recordToDetailed)
             }
-            when (val instance = user.instance) {
-                null -> Unit
-                else -> {
-                    userDao.insertUserInstanceInfo(
-                        UserInstanceInfoRecord.from(dbId, instance)
-                    )
-                }
+            user.instance?.let {
+                userDao.insertUserInstanceInfo(
+                    UserInstanceInfoRecord.from(dbId, it)
+                )
             }
             return@withContext result
         }
@@ -193,9 +183,7 @@ class MediatorUserDataSource @Inject constructor(
             val existsUsersInMemory = users.associate {
                 it.id to memCache.get(it.id)
             }
-            val existsRecordIdMap = users.filter {
-                existsUsersInMemory[it.id] == null
-            }.groupBy {
+            val existsRecordIdMap = users.groupBy {
                 it.id.accountId
             }.flatMap { entry ->
                 userDao.getInServerIds(entry.key, entry.value.map { it.id.id })
@@ -210,11 +198,17 @@ class MediatorUserDataSource @Inject constructor(
                 UserRecord.from(it)
             })
 
+            // NOTE: User.idとDBのIDのマップ
+            // NOTE: insertされた時に生成されたIDとすでにDB上に存在しているレコードのIDを結合している
             val userIdDbIdMap = requireInserts.mapIndexed { index, user ->
                 user.id to insertedDbIds[index]
             }.toMap() + existsRecordIdMap.map {
                 it.key to it.value.user.id
             }
+
+            replaceUsersEmojisIfNeeds(users, userIdDbIdMap, existsRecordIdMap,)
+            replaceUsersRolesIfNeeds(users, userIdDbIdMap, existsRecordIdMap)
+            replaceUsersInstanceInfo(users, userIdDbIdMap, existsRecordIdMap)
 
             // 更新処理
             users.forEach { user ->
@@ -225,38 +219,21 @@ class MediatorUserDataSource @Inject constructor(
                         UserRecord.from(user).copy(id = record.user.id)
                     )
                 }
-                replaceEmojisIfNeed(dbId, user, record)
                 if (user is User.Detail) {
                     userDao.insert(
                         UserInfoStateRecord.from(dbId, user.info)
                     )
-                    when (val related = user.related) {
-                        null -> {}
-                        else -> {
-                            userDao.insert(
-                                UserRelatedStateRecord.from(dbId, related)
-                            )
-                        }
+                    user.related?.let {
+                        userDao.insert(
+                            UserRelatedStateRecord.from(dbId, it)
+                        )
                     }
 
                     val detailModel = record?.toModel() as? User.Detail?
-                    // NOTE: 更新の必要性を判定
                     replacePinnedNoteIdsIfNeed(dbId, user, record, detailModel)
                     replaceFieldsIfNeed(dbId, user, record, detailModel)
                 }
             }
-
-            // save instance info
-            userDao.insertUserInstanceInfoList(
-                users.mapNotNull {
-                    userIdDbIdMap[it.id]?.let { dbId ->
-                        it.instance?.let { instance ->
-                            UserInstanceInfoRecord.from(dbId, instance)
-                        }
-                    }
-
-                }
-            )
 
 
             users.mapNotNull { user ->
@@ -413,6 +390,39 @@ class MediatorUserDataSource @Inject constructor(
         }
     }
 
+    /**
+     * User.badgeRolesのinsertまたはupdateの必要性のあるものを抽出し、
+     * 更新の必要性がある場合は一度全て剥がしてからinsertする
+     * @param dbId 更新対象のUserに対応するDBのID
+     * @param user 更新対象のUser
+     * @param record すでにDB上に存在しているレコード
+     */
+    private suspend fun replaceUserRolesIfNeed(dbId: Long, user: User, record: UserRelated?) {
+        if (!record?.badgeRoles.isEqualToBadgeRoleModels(user.badgeRoles)) {
+            if (record != null) {
+                userDao.detachAllUserBadgeRoles(dbId)
+            }
+            userDao.insertUserBadgeRoles(
+                user.badgeRoles.map {
+                    BadgeRoleRecord(
+                        userId = dbId,
+                        name = it.name,
+                        iconUrl = it.iconUri,
+                        displayOrder = it.displayOrder,
+                    )
+                }
+            )
+        }
+    }
+
+    /**
+     * User.pinnedNoteIdsのinsertまたはupdateの必要性のあるものを抽出し、
+     * 更新の必要性がある場合は一度全て剥がしてからinsertする。
+     * @param dbId 更新対象のUserに対応するDBのID
+     * @param user 更新対象のUser
+     * @param record すでにDB上に存在しているレコード
+     * @param recordToDetailed すでにDB上に存在しているレコードをUser.Detailに変換したもの
+     */
     private suspend fun replacePinnedNoteIdsIfNeed(
         dbId: Long,
         user: User.Detail,
@@ -435,6 +445,13 @@ class MediatorUserDataSource @Inject constructor(
         }
     }
 
+    /**
+     * User.info.fieldsのinsertまたはupdateの必要性のあるものを抽出し、
+     * 更新の必要性がある場合は一度全て剥がしてからinsertする
+     * @param dbId 更新対象のUserに対応するDBのID
+     * @param user 更新対象のUser
+     * @param record すでにDB上に存在しているレコード
+     */
     private suspend fun replaceFieldsIfNeed(
         dbId: Long,
         user: User.Detail,
@@ -452,5 +469,98 @@ class MediatorUserDataSource @Inject constructor(
                 })
             }
         }
+    }
+
+    /**
+     * User.emojisのinsertまたはupdateの必要性のあるものを抽出し、
+     * 更新の必要性がある場合は一度全て剥がしてからinsertする
+     * @param users 更新対象のUserリスト
+     * @param userIdDbIdMap User.IdとDBのIDのマップ
+     * @param existsRecordIdMap User.IdとすでにDB上に存在しているレコードのマップ
+     */
+    private suspend fun replaceUsersEmojisIfNeeds(
+        users: List<User>,
+        userIdDbIdMap: Map<User.Id, Long>,
+        existsRecordIdMap: Map<User.Id, UserRelated?>,
+    ) {
+        // User.emojisのinsertまたはupdateの必要性のあるものを抽出
+        val requireEmojisUpdateUsers = users.filter {
+            existsRecordIdMap[it.id] == null || !existsRecordIdMap[it.id]?.emojis.isEqualToModels(it.emojis)
+        }
+        // 一度全て剥がす
+        userDao.detachAllUserEmojis(
+            requireEmojisUpdateUsers.mapNotNull { userIdDbIdMap[it.id] }
+        )
+        userDao.insertEmojis(
+            requireEmojisUpdateUsers.flatMap { user ->
+                user.emojis.mapNotNull { emoji ->
+                    userIdDbIdMap[user.id]?.let { userId ->
+                        UserEmojiRecord.from(userId, emoji)
+                    }
+
+                }
+            }
+        )
+    }
+
+    /**
+     * User.badgeRolesのinsertまたはupdateの必要性のあるものを抽出し、
+     * 更新の必要性がある場合は一度全て剥がしてからinsertする
+     * @param users 更新対象のUserリスト
+     * @param userIdDbIdMap User.IdとDBのIDのマップ
+     * @param existsRecordIdMap User.IdとすでにDB上に存在しているレコードのマップ
+     */
+    private suspend fun replaceUsersRolesIfNeeds(
+        users: List<User>,
+        userIdDbIdMap: Map<User.Id, Long>,
+        existsRecordIdMap: Map<User.Id, UserRelated?>,
+    ) {
+        val requireUpdateUserRoleUsers = users.filter {
+            existsRecordIdMap[it.id] == null || !existsRecordIdMap[it.id]?.badgeRoles.isEqualToBadgeRoleModels(it.badgeRoles)
+        }
+        userDao.detachAllUserBadgeRoles(
+            requireUpdateUserRoleUsers.mapNotNull { userIdDbIdMap[it.id] }
+        )
+        userDao.insertUserBadgeRoles(
+            requireUpdateUserRoleUsers.flatMap { user ->
+                user.badgeRoles.mapNotNull { role ->
+                    userIdDbIdMap[user.id]?.let { userId ->
+                        BadgeRoleRecord(
+                            userId = userId,
+                            name = role.name,
+                            iconUrl = role.iconUri,
+                            displayOrder = role.displayOrder,
+                        )
+                    }
+
+                }
+            }
+        )
+    }
+
+    /**
+     * User.instanceのinsertまたはupdateの必要性のあるものを抽出し、
+     * 更新の必要性がある場合は一括でupInsertする
+     * @param users 更新対象のUserリスト
+     * @param userIdDbIdMap User.IdとDBのIDのマップ
+     * @param existsRecordIdMap User.IdとすでにDB上に存在しているレコードのマップ
+     */
+    private suspend fun replaceUsersInstanceInfo(
+        users: List<User>,
+        userIdDbIdMap: Map<User.Id, Long>,
+        existsRecordIdMap: Map<User.Id, UserRelated?>,
+    ) {
+        userDao.insertUserInstanceInfoList(
+            users.filter {
+                existsRecordIdMap[it.id] == null || !existsRecordIdMap[it.id]?.instance.isEqualToModel(it.instance)
+            }.mapNotNull {
+                userIdDbIdMap[it.id]?.let { dbId ->
+                    it.instance?.let { instance ->
+                        UserInstanceInfoRecord.from(dbId, instance)
+                    }
+                }
+            }
+        )
+
     }
 }

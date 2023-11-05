@@ -70,7 +70,7 @@ internal class BlurHashTransCoder(val context: Context) : ResourceTranscoder<Blu
         return SimpleResource(BitmapDrawable(context.resources, bitmap))
     }
     private fun scaleToMax(width: Int, height: Int): Pair<Int, Int> {
-        val smallWidth = min(480, min(width, height))
+        val smallWidth = min(480, min(width, height)) / 4
         val scale = smallWidth.toDouble() / width
         val smallHeight = scale * height
         return smallWidth to smallHeight.toInt()

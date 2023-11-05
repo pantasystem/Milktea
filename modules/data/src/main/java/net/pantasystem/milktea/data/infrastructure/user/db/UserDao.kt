@@ -44,11 +44,17 @@ abstract class UserDao {
     @Query("delete from user_emoji where userId = :userId")
     abstract suspend fun detachAllUserEmojis(userId: Long)
 
+    @Query("delete from user_emoji where userId in (:userIds)")
+    abstract suspend fun detachAllUserEmojis(userIds: List<Long>)
+
     @Query("delete from user_profile_field where userId = :userId")
     abstract suspend fun detachUserFields(userId: Long)
 
     @Query("delete from user_badge_role where userId = :userId")
     abstract suspend fun detachAllUserBadgeRoles(userId: Long)
+
+    @Query("delete from user_badge_role where userId in (:userIds)")
+    abstract suspend fun detachAllUserBadgeRoles(userIds: List<Long>)
 
     @Update
     abstract suspend fun update(user: UserRecord)

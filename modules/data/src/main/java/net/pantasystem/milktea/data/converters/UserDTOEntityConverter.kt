@@ -53,28 +53,22 @@ class UserDTOEntityConverter @Inject constructor(
             userDTO.host ?: account.getHost(),
             emojis,
             userDTO.name ?: userDTO.userName,
-            customEmojiRepository.getAndConvertToMap(account.getHost()),
+            customEmojiRepository.findAndConvertToMap(account.getHost()).getOrNull(),
         ).emojis.mapNotNull {
             (it.result as? EmojiResolvedType.Resolved)?.emoji
         }).distinctBy {
             it.name to it.host to it.url to it.uri
         }
 
-        val badgeRoles = if (!userDTO.badgeRoles.isNullOrEmpty()) {
-            userDTO.badgeRoles!!.map { role ->
-                val iconUrl = role.iconUrl?.let {
-                    imageCacheRepository.save(it)
-                }
-
-                User.BadgeRole(
-                    name = role.name,
-                    iconUri = iconUrl?.cachePath,
-                    displayOrder = role.displayOrder
-                )
-            }
-        } else {
-            emptyList()
-        }
+        val badgeRoles = userDTO.badgeRoles?.map { role ->
+            User.BadgeRole(
+                name = role.name,
+                iconUri = role.iconUrl,
+                displayOrder = role.displayOrder
+            )
+        }?.sortedByDescending {
+            it.displayOrder
+        } ?: emptyList()
 
         if (isDetail) {
             return User.Detail(
