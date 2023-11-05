@@ -65,7 +65,6 @@ class TimelineListAdapter(
         cardActionListener.onReactionCountAction(it)
     }
 
-    private val urlPreviewListRecyclerViewPool = RecyclerView.RecycledViewPool()
     private val manyFilePreviewListViewRecyclerViewPool = RecyclerView.RecycledViewPool()
 
     enum class ViewHolderType {
@@ -141,7 +140,7 @@ class TimelineListAdapter(
                     false
                 )
 //                binding.simpleNote.reactionView.setRecycledViewPool(reactionCounterRecyclerViewPool)
-                binding.simpleNote.urlPreviewList.setRecycledViewPool(urlPreviewListRecyclerViewPool)
+//                binding.simpleNote.urlPreviewList.setRecycledViewPool(urlPreviewListRecyclerViewPool)
                 binding.simpleNote.manyFilePreviewListView.setRecycledViewPool(
                     manyFilePreviewListViewRecyclerViewPool
                 )
@@ -160,7 +159,7 @@ class TimelineListAdapter(
                     false
                 )
 //                binding.simpleNote.reactionView.setRecycledViewPool(reactionCounterRecyclerViewPool)
-                binding.simpleNote.urlPreviewList.setRecycledViewPool(urlPreviewListRecyclerViewPool)
+//                binding.simpleNote.urlPreviewList.setRecycledViewPool(urlPreviewListRecyclerViewPool)
                 binding.simpleNote.manyFilePreviewListView.setRecycledViewPool(
                     manyFilePreviewListViewRecyclerViewPool
                 )

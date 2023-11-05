@@ -5,6 +5,7 @@ import android.util.AttributeSet
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
+import net.pantasystem.milktea.common_android.ui.CircleOutlineHelper.setCircleOutline
 import net.pantasystem.milktea.model.url.UrlPreview
 import net.pantasystem.milktea.note.R
 import net.pantasystem.milktea.note.url.UrlPreviewHelper.setSiteIcon
@@ -29,6 +30,7 @@ class UrlPreviewView @JvmOverloads constructor(
         siteDescription = findViewById(R.id.siteDescription)
         siteIconView = findViewById(R.id.siteIconView)
         siteNameView = findViewById(R.id.siteNameView)
+        this.setCircleOutline(7)
     }
 
     fun setUrlPreview(urlPreview: UrlPreview) {

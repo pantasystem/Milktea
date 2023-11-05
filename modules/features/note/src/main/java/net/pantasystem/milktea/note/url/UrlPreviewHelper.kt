@@ -1,12 +1,16 @@
 package net.pantasystem.milktea.note.url
 
+import android.view.LayoutInflater
 import android.view.View
 import android.widget.ImageView
+import android.widget.LinearLayout
+import androidx.core.view.isVisible
 import androidx.databinding.BindingAdapter
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import net.pantasystem.milktea.note.R
+import net.pantasystem.milktea.note.databinding.ItemUrlOrFilePreviewBinding
 import net.pantasystem.milktea.note.viewmodel.Preview
 
 object UrlPreviewHelper {
@@ -33,6 +37,46 @@ object UrlPreviewHelper {
 
         }
 
+    }
+
+    @JvmStatic
+    @BindingAdapter("previewList")
+    fun LinearLayout.setUrlPreviewList(previewList: List<Preview>?) {
+        this.visibility = View.GONE
+        if (previewList.isNullOrEmpty()) {
+            return
+        }
+
+        while(this.childCount > previewList.size){
+            this.removeViewAt(this.childCount - 1)
+        }
+
+        previewList.forEachIndexed { index, preview ->
+            val existsView: ItemUrlOrFilePreviewBinding? = this.getChildAt(index)?.let {
+                ItemUrlOrFilePreviewBinding.bind(it)
+            }
+
+            val view = existsView ?: ItemUrlOrFilePreviewBinding.inflate(LayoutInflater.from(this.context), this, false)
+
+            when(preview) {
+                is Preview.FileWrapper -> {
+                    view.urlPreviewView.isVisible = false
+                    view.filePreviewView.isVisible = true
+                    view.filePreviewView.setOtherFile(preview.file)
+                }
+                is Preview.UrlWrapper -> {
+                    view.urlPreviewView.isVisible = true
+                    view.filePreviewView.isVisible = false
+                    view.urlPreviewView.setUrlPreview(preview.urlPreview)
+                }
+            }
+
+            if(existsView == null){
+                this.addView(view.root)
+            }
+        }
+
+        this.visibility = View.VISIBLE
     }
 
     @JvmStatic

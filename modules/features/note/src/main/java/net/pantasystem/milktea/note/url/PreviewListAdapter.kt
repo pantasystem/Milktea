@@ -14,7 +14,6 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import dagger.hilt.android.EntryPointAccessors
 import dagger.hilt.android.internal.managers.FragmentComponentManager
-import net.pantasystem.milktea.common_android.ui.CircleOutlineHelper.setCircleOutline
 import net.pantasystem.milktea.common_android_ui.NavigationEntryPointForBinding
 import net.pantasystem.milktea.common_navigation.MediaNavigationArgs
 import net.pantasystem.milktea.common_resource.R
@@ -50,7 +49,7 @@ class PreviewListAdapter : ListAdapter<Preview, RecyclerView.ViewHolder>(ItemCal
                 )
             }
 
-            binding.urlPreviewView.setCircleOutline(7)
+//            binding.urlPreviewView.setCircleOutline(7)
             binding.urlPreviewView.setUrlPreview(preview.urlPreview)
         }
     }
