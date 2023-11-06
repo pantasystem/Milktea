@@ -57,14 +57,20 @@ object UserTextHelper {
         }
         name?.let {
             DecorateTextHelper.stopDrawableAnimations(it)
-            name.text = CustomEmojiDecorator().decorate(
-                accountHost = account?.getHost(),
-                result = user.parsedResult,
-                name
+            name.setText(
+                CustomEmojiDecorator().decorate(
+                    accountHost = account?.getHost(),
+                    result = user.parsedResult,
+                    name
+                ),
+                TextView.BufferType.SPANNABLE,
             )
         }
         userName?.let {
-            userName.text = user.displayUserName
+            userName.setText(
+                user.displayUserName,
+                TextView.BufferType.SPANNABLE,
+            )
         }
     }
 }
