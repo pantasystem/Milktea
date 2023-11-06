@@ -60,10 +60,8 @@ class RenoteViewModel @Inject constructor(
         null
     )
 
-    @OptIn(ExperimentalCoroutinesApi::class)
-    val channel = note
-        .map { it?.note?.channelId }
-        .flatMapLatest { flowOf(it?.let { ch -> channelRepository.findOne(ch).getOrNull() }) }
+    val channel = _targetNote
+        .map { it?.note?.channelId?.let { id -> channelRepository.findOne(id).getOrNull() } }
         .stateIn(
             viewModelScope,
             SharingStarted.WhileSubscribed(5_000),
