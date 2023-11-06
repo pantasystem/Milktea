@@ -199,6 +199,6 @@ class HasReplyToNoteViewHolder(
 
 private val spannableFactory = object : Spannable.Factory() {
     override fun newSpannable(source: CharSequence?): Spannable {
-        return (source as? Spannable?) ?: SpannableString.valueOf("")
+        return (source as? Spannable?) ?: SpannableString.valueOf(source)
     }
 }

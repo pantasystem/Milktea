@@ -1,5 +1,6 @@
 package net.pantasystem.milktea.common_android_ui.user
 
+import android.text.SpannableString
 import android.view.View
 import android.widget.TextView
 import androidx.databinding.BindingAdapter
@@ -68,7 +69,7 @@ object UserTextHelper {
         }
         userName?.let {
             userName.setText(
-                user.displayUserName,
+                SpannableString.valueOf(user.displayUserName),
                 TextView.BufferType.SPANNABLE,
             )
         }
