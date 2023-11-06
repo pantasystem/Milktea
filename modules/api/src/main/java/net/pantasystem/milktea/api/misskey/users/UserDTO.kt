@@ -173,6 +173,6 @@ data class UserDTO(
         val iconUrl: String?,
 
         @SerialName("displayOrder")
-        val displayOrder: Int,
+        val displayOrder: Int? = null,
     )
 }

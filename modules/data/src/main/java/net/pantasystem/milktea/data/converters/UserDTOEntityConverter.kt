@@ -60,11 +60,11 @@ class UserDTOEntityConverter @Inject constructor(
             it.name to it.host to it.url to it.uri
         }
 
-        val badgeRoles = userDTO.badgeRoles?.map { role ->
+        val badgeRoles = userDTO.badgeRoles?.mapIndexed { index, role ->
             User.BadgeRole(
                 name = role.name,
                 iconUri = role.iconUrl,
-                displayOrder = role.displayOrder
+                displayOrder = role.displayOrder ?: ((userDTO.badgeRoles?.size ?: 0) - index)
             )
         }?.sortedByDescending {
             it.displayOrder
