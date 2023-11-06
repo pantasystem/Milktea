@@ -3,12 +3,10 @@ package net.pantasystem.milktea.note.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import net.pantasystem.milktea.app_store.notes.NoteTranslationStore
 import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.common_android.resource.StringSource
@@ -69,11 +67,8 @@ class NotesViewModel @Inject constructor(
     fun showQuoteNoteEditor(noteId: Note.Id, isRenoteToChannel: Boolean) {
         viewModelScope.launch {
             recursiveSearchHasContentNote(noteId).onSuccess { note ->
-                withContext(Dispatchers.Main) {
-                    quoteRenoteTarget.tryEmit(QuoteRenoteData(note, isRenoteToChannel))
-                }
+                quoteRenoteTarget.tryEmit(QuoteRenoteData(note, isRenoteToChannel))
             }
-
         }
     }
 
