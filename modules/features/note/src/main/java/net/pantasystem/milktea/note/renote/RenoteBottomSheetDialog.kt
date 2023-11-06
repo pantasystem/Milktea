@@ -81,15 +81,15 @@ class RenoteBottomSheetDialog : BottomSheetDialogFragment() {
                             dismiss()
                         },
                         onQuoteRenoteButtonClicked = {
-                            notesViewModel.showQuoteNoteEditor(noteId, false)
+                            notesViewModel.showQuoteNoteEditor(noteId)
                             dismiss()
                         },
                         onRenoteInChannelButtonClicked = {
-                            viewModel.renote(inChannel = true)
+                            viewModel.renoteToChannel()
                             dismiss()
                         },
                         onQuoteInChannelRenoteButtonClicked = {
-                            notesViewModel.showQuoteNoteEditor(noteId, true)
+                            notesViewModel.showQuoteToChannelNoteEditor(noteId)
                             dismiss()
                         },
                         onDeleteRenoteButtonCLicked = {

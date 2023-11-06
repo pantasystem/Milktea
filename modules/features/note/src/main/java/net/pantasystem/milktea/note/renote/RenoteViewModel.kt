@@ -29,7 +29,7 @@ class RenoteViewModel @Inject constructor(
     private val channelRepository: ChannelRepository,
     val accountStore: AccountStore,
     val userDataSource: UserDataSource,
-    val renoteUseCase: CreateRenoteMultipleAccountUseCase,
+    private val renoteUseCase: CreateRenoteMultipleAccountUseCase,
     val noteRelationGetter: NoteRelationGetter,
     private val instanceInfoService: InstanceInfoService,
     renoteUiStateBuilder: RenoteUiStateBuilder,
@@ -134,11 +134,22 @@ class RenoteViewModel @Inject constructor(
         }
     }
 
-    fun renote(inChannel: Boolean = false) {
+    fun renote() {
         val noteId = _targetNoteId.value ?: return
         val accountIds = _selectedAccountIds.value
         viewModelScope.launch {
-            val result = renoteUseCase(noteId, accountIds, inChannel)
+            val result = renoteUseCase.renote(noteId, accountIds)
+            _resultEvents.tryEmit(
+                RenoteActionResultEvent.Renote(result, noteId, accountIds)
+            )
+        }
+    }
+
+    fun renoteToChannel() {
+        val noteId = _targetNoteId.value ?: return
+        val accountIds = _selectedAccountIds.value
+        viewModelScope.launch {
+            val result = renoteUseCase.renoteToChannel(noteId, accountIds)
             _resultEvents.tryEmit(
                 RenoteActionResultEvent.Renote(result, noteId, accountIds)
             )

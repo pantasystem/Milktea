@@ -27,6 +27,7 @@ import net.pantasystem.milktea.model.note.CreateNote
 import net.pantasystem.milktea.model.note.Note
 import net.pantasystem.milktea.model.note.NoteState
 import net.pantasystem.milktea.model.note.poll.Poll
+import net.pantasystem.milktea.model.note.repost.CreateRenote
 import net.pantasystem.milktea.model.note.type4Mastodon
 import javax.inject.Inject
 
@@ -43,7 +44,7 @@ interface NoteApiAdapter {
     suspend fun delete(noteId: Note.Id): DeleteNoteResultType
     suspend fun createThreadMute(noteId: Note.Id): ToggleThreadMuteResultType
     suspend fun deleteThreadMute(noteId: Note.Id): ToggleThreadMuteResultType
-    suspend fun renote(target: Note, inChannel: Boolean): RenoteResultType
+    suspend fun renote(createRenote: CreateRenote): RenoteResultType
 
     suspend fun vote(noteId: Note.Id, choice: Poll.Choice, target: Note)
 
@@ -152,19 +153,14 @@ private class NoteApiAdapterMisskeyPattern(
         return ToggleThreadMuteResultType.Misskey
     }
 
-    override suspend fun renote(target: Note, inChannel: Boolean): RenoteResultType {
-        val account = accountRepository.get(target.id.accountId).getOrThrow()
+    override suspend fun renote(createRenote: CreateRenote): RenoteResultType {
         return create(
             CreateNote(
-                author = account,
-                renoteId = target.id,
-                channelId = if (inChannel) {
-                    target.channelId
-                } else {
-                    null
-                },
+                author = createRenote.author,
+                renoteId = createRenote.renoteId,
+                channelId = createRenote.channelId,
                 text = null,
-                visibility = target.visibility,
+                visibility = createRenote.visibility,
             )
         )
     }
@@ -284,9 +280,9 @@ private class NoteApiAdapterMastodonPattern(
         return ToggleThreadMuteResultType.Mastodon(requireNotNull(body))
     }
 
-    override suspend fun renote(target: Note, inChannel: Boolean): RenoteResultType {
-        val account = accountRepository.get(target.id.accountId).getOrThrow()
-        val toot = mastodonAPIProvider.get(account).reblog(target.id.noteId)
+    override suspend fun renote(createRenote: CreateRenote): RenoteResultType {
+        val account = accountRepository.get(createRenote.author.accountId).getOrThrow()
+        val toot = mastodonAPIProvider.get(account).reblog(createRenote.renoteId.noteId)
             .throwIfHasError()
             .body()
         return NoteResultType.Mastodon(requireNotNull(toot))

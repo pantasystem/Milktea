@@ -25,6 +25,7 @@ import net.pantasystem.milktea.model.note.poll.Poll
 import net.pantasystem.milktea.model.note.poll.VoteUseCase
 import net.pantasystem.milktea.model.note.reaction.DeleteReactionsUseCase
 import net.pantasystem.milktea.model.note.reaction.ToggleReactionUseCase
+import net.pantasystem.milktea.model.note.repost.QuoteRenoteData
 import net.pantasystem.milktea.model.user.report.Report
 import net.pantasystem.milktea.note.R
 import javax.inject.Inject
@@ -64,10 +65,24 @@ class NotesViewModel @Inject constructor(
     private val _openNoteEditorEvent = MutableSharedFlow<DraftNote?>(onBufferOverflow = BufferOverflow.DROP_OLDEST, extraBufferCapacity = 10)
     val openNoteEditorEvent = _openNoteEditorEvent.asSharedFlow()
 
-    fun showQuoteNoteEditor(noteId: Note.Id, isRenoteToChannel: Boolean) {
+    fun showQuoteNoteEditor(noteId: Note.Id) {
         viewModelScope.launch {
-            recursiveSearchHasContentNote(noteId).onSuccess { note ->
-                quoteRenoteTarget.tryEmit(QuoteRenoteData(note, isRenoteToChannel))
+            // 引用リノートしようとしたノートが第三者によりリノートされたものである可能性もあるので、
+            // リノートIDを辿って大本のノートを探し出す
+            recursiveSearchHasContentNote(noteId).onSuccess {
+                quoteRenoteTarget.tryEmit(
+                    QuoteRenoteData.ofTimeline(it.id)
+                )
+            }
+        }
+    }
+
+    fun showQuoteToChannelNoteEditor(noteId: Note.Id) {
+        viewModelScope.launch {
+            recursiveSearchHasContentNote(noteId).onSuccess {
+                quoteRenoteTarget.tryEmit(
+                    QuoteRenoteData.ofChannel(it.id, requireNotNull(it.channelId))
+                )
             }
         }
     }

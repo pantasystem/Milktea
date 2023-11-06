@@ -2,6 +2,7 @@ package net.pantasystem.milktea.model.note
 
 import kotlinx.coroutines.flow.Flow
 import net.pantasystem.milktea.model.note.poll.Poll
+import net.pantasystem.milktea.model.note.repost.CreateRenote
 
 interface NoteRepository {
 
@@ -9,7 +10,7 @@ interface NoteRepository {
 
     suspend fun create(createNote: CreateNote): Result<Note>
 
-    suspend fun renote(noteId: Note.Id, inChannel: Boolean): Result<Note>
+    suspend fun renote(createRenote: CreateRenote): Result<Note>
 
     suspend fun unrenote(noteId: Note.Id): Result<Unit>
 

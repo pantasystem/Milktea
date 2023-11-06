@@ -23,6 +23,7 @@ import net.pantasystem.milktea.model.note.NoteResult
 import net.pantasystem.milktea.model.note.NoteState
 import net.pantasystem.milktea.model.note.NoteThreadContext
 import net.pantasystem.milktea.model.note.poll.Poll
+import net.pantasystem.milktea.model.note.repost.CreateRenote
 import javax.inject.Inject
 
 class NoteRepositoryImpl @Inject constructor(
@@ -41,11 +42,9 @@ class NoteRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun renote(noteId: Note.Id, inChannel: Boolean): Result<Note> = runCancellableCatching {
+    override suspend fun renote(createRenote: CreateRenote): Result<Note> = runCancellableCatching {
         withContext(ioDispatcher) {
-            val account = getAccount.get(noteId.accountId)
-            val n = find(noteId).getOrThrow()
-            convertAndAdd(account, noteApiAdapterFactory.create(account).renote(n, inChannel))
+            convertAndAdd(createRenote.author, noteApiAdapterFactory.create(createRenote.author).renote(createRenote))
         }
     }
 

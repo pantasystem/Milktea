@@ -35,12 +35,8 @@ class NoteActionHandler(
             .onEach {
                 val intent = NoteEditorActivity.newBundle(
                     context,
-                    quoteTo = it.note.id,
-                    channelId = if (it.isRenoteToChannel) {
-                        it.note.channelId
-                    } else {
-                        null
-                    }
+                    quoteTo = it.noteId,
+                    channelId = it.channelId
                 )
                 context.startActivity(intent)
             }
