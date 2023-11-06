@@ -36,7 +36,10 @@ object DecorateTextHelper {
         this.movementMethod = LinkMovementMethod.getInstance()
         stopDrawableAnimations(this)
         val lazy = MFMDecorator.decorate(node, LazyDecorateSkipElementsHolder())
-        this.text = MFMDecorator.decorate(this, lazy)
+        this.setText(
+            MFMDecorator.decorate(this, lazy),
+            TextView.BufferType.SPANNABLE,
+        )
     }
 
     fun stopDrawableAnimations(textView: TextView) {
@@ -88,7 +91,10 @@ object DecorateTextHelper {
                     this,
                     emojiScale,
                 )
-                this.text = decoratedText
+                this.setText(
+                    decoratedText,
+                    TextView.BufferType.SPANNABLE,
+                )
                 this.movementMethod = ClickListenableLinkMovementMethod { url ->
 
                     // NOTE: クリックしたURLを探している
