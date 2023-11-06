@@ -13,6 +13,7 @@ import net.pantasystem.milktea.common.ResultState
 import net.pantasystem.milktea.common.asLoadingStateFlow
 import net.pantasystem.milktea.common.initialState
 import net.pantasystem.milktea.model.account.AccountRepository
+import net.pantasystem.milktea.model.channel.ChannelRepository
 import net.pantasystem.milktea.model.instance.InstanceInfoService
 import net.pantasystem.milktea.model.note.*
 import net.pantasystem.milktea.model.note.repost.CreateRenoteMultipleAccountUseCase
@@ -25,9 +26,10 @@ class RenoteViewModel @Inject constructor(
     val noteRepository: NoteRepository,
     val accountRepository: AccountRepository,
     val userRepository: UserRepository,
+    private val channelRepository: ChannelRepository,
     val accountStore: AccountStore,
     val userDataSource: UserDataSource,
-    val renoteUseCase: CreateRenoteMultipleAccountUseCase,
+    private val renoteUseCase: CreateRenoteMultipleAccountUseCase,
     val noteRelationGetter: NoteRelationGetter,
     private val instanceInfoService: InstanceInfoService,
     renoteUiStateBuilder: RenoteUiStateBuilder,
@@ -36,8 +38,14 @@ class RenoteViewModel @Inject constructor(
 
     val logger = loggerFactory.create("RenoteDialogViewModel")
 
-    private var _targetNoteId = MutableStateFlow<Note.Id?>(null)
+    private val _targetNoteId = MutableStateFlow<Note.Id?>(null)
 
+    @OptIn(ExperimentalCoroutinesApi::class)
+    private val _targetNote = _targetNoteId.filterNotNull().flatMapLatest {
+        noteRepository.observeOne(it).filterNotNull().map { note ->
+            noteRelationGetter.get(note).getOrNull()
+        }
+    }
 
     private val _resultEvents = MutableSharedFlow<RenoteActionResultEvent>(
         onBufferOverflow = BufferOverflow.DROP_OLDEST,
@@ -46,17 +54,19 @@ class RenoteViewModel @Inject constructor(
 
     val resultEvents = _resultEvents.asSharedFlow()
 
-
-    @OptIn(ExperimentalCoroutinesApi::class)
-    val note = _targetNoteId.filterNotNull().flatMapLatest {
-        noteRepository.observeOne(it).filterNotNull().map { note ->
-            noteRelationGetter.get(note).getOrNull()
-        }
-    }.stateIn(
+    val note = _targetNote.stateIn(
         viewModelScope,
         SharingStarted.WhileSubscribed(5_000),
         null
     )
+
+    val channel = _targetNote
+        .map { it?.note?.channelId?.let { id -> channelRepository.findOne(id).getOrNull() } }
+        .stateIn(
+            viewModelScope,
+            SharingStarted.WhileSubscribed(5_000),
+            null
+        )
 
     private val _selectedAccountIds = MutableStateFlow<List<Long>>(emptyList())
     private val accounts = accountStore.observeAccounts.stateIn(
@@ -90,6 +100,7 @@ class RenoteViewModel @Inject constructor(
     val uiState = renoteUiStateBuilder.buildState(
         targetNoteIdFlow = _targetNoteId,
         noteFlow = note,
+        channelFlow = channel,
         noteSyncState = _syncState,
         selectedAccountIds = _selectedAccountIds,
         accountsFlow = accounts,
@@ -124,11 +135,21 @@ class RenoteViewModel @Inject constructor(
     }
 
     fun renote() {
-        val noteId = _targetNoteId.value
-            ?: return
+        val noteId = _targetNoteId.value ?: return
         val accountIds = _selectedAccountIds.value
         viewModelScope.launch {
-            val result = renoteUseCase(noteId, accountIds)
+            val result = renoteUseCase.renote(noteId, accountIds)
+            _resultEvents.tryEmit(
+                RenoteActionResultEvent.Renote(result, noteId, accountIds)
+            )
+        }
+    }
+
+    fun renoteToChannel() {
+        val noteId = _targetNoteId.value ?: return
+        val accountIds = _selectedAccountIds.value
+        viewModelScope.launch {
+            val result = renoteUseCase.renoteToChannel(noteId, accountIds)
             _resultEvents.tryEmit(
                 RenoteActionResultEvent.Renote(result, noteId, accountIds)
             )

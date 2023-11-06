@@ -31,10 +31,16 @@ class NoteActionHandler(
         }.flowWithLifecycle(lifecycleOwner.lifecycle, Lifecycle.State.RESUMED)
             .launchIn(lifecycleOwner.lifecycleScope)
 
-        notesViewModel.quoteRenoteTarget.onEach {
-            val intent = NoteEditorActivity.newBundle(context, quoteTo = it.id)
-            context.startActivity(intent)
-        }.flowWithLifecycle(lifecycleOwner.lifecycle, Lifecycle.State.RESUMED)
+        notesViewModel.quoteRenoteTarget
+            .onEach {
+                val intent = NoteEditorActivity.newBundle(
+                    context,
+                    quoteTo = it.noteId,
+                    channelId = it.channelId
+                )
+                context.startActivity(intent)
+            }
+            .flowWithLifecycle(lifecycleOwner.lifecycle, Lifecycle.State.RESUMED)
             .launchIn(lifecycleOwner.lifecycleScope)
 
         notesViewModel.openNoteEditorEvent.filterNotNull().onEach { note ->

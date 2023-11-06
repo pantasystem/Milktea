@@ -46,6 +46,10 @@ data class ChannelDTO(
 
     @SerialName("isFollowing")
     val isFollowing: Boolean? = null,
+
+    // この値が含まれていなかった時は合わせてtrueにする（本体側のDB定義側はデフォルト値がtrueになっている）
+    @SerialName("allowRenoteToExternal")
+    val allowRenoteToExternal: Boolean = true
 ) {
     fun toModel(account: Account): Channel {
         return Channel(
@@ -59,7 +63,8 @@ data class ChannelDTO(
             usersCount = usersCount,
             userId = userId?.let { User.Id(account.accountId, it) },
             hasUnreadNote = hasUnreadNote,
-            isFollowing = isFollowing
+            isFollowing = isFollowing,
+            allowRenoteToExternal = allowRenoteToExternal,
         )
     }
 }

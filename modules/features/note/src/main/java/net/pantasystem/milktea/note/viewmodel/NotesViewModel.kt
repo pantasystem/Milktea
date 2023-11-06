@@ -3,12 +3,10 @@ package net.pantasystem.milktea.note.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import net.pantasystem.milktea.app_store.notes.NoteTranslationStore
 import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.common_android.resource.StringSource
@@ -27,6 +25,7 @@ import net.pantasystem.milktea.model.note.poll.Poll
 import net.pantasystem.milktea.model.note.poll.VoteUseCase
 import net.pantasystem.milktea.model.note.reaction.DeleteReactionsUseCase
 import net.pantasystem.milktea.model.note.reaction.ToggleReactionUseCase
+import net.pantasystem.milktea.model.note.repost.QuoteRenoteData
 import net.pantasystem.milktea.model.user.report.Report
 import net.pantasystem.milktea.note.R
 import javax.inject.Inject
@@ -55,7 +54,7 @@ class NotesViewModel @Inject constructor(
     private val _statusMessage = MutableSharedFlow<StringSource>(onBufferOverflow = BufferOverflow.DROP_OLDEST, extraBufferCapacity = 10)
     val statusMessage = _statusMessage.asSharedFlow()
 
-    val quoteRenoteTarget = MutableSharedFlow<Note>(onBufferOverflow = BufferOverflow.DROP_OLDEST, extraBufferCapacity = 10)
+    val quoteRenoteTarget = MutableSharedFlow<QuoteRenoteData>(onBufferOverflow = BufferOverflow.DROP_OLDEST, extraBufferCapacity = 10)
 
     val confirmDeletionEvent = MutableSharedFlow<NoteRelation?>(onBufferOverflow = BufferOverflow.DROP_OLDEST, extraBufferCapacity = 10)
 
@@ -68,12 +67,23 @@ class NotesViewModel @Inject constructor(
 
     fun showQuoteNoteEditor(noteId: Note.Id) {
         viewModelScope.launch {
-            recursiveSearchHasContentNote(noteId).onSuccess { note ->
-                withContext(Dispatchers.Main) {
-                    quoteRenoteTarget.tryEmit(note)
-                }
+            // 引用リノートしようとしたノートが第三者によりリノートされたものである可能性もあるので、
+            // リノートIDを辿って大本のノートを探し出す
+            recursiveSearchHasContentNote(noteId).onSuccess {
+                quoteRenoteTarget.tryEmit(
+                    QuoteRenoteData.ofTimeline(it.id)
+                )
             }
+        }
+    }
 
+    fun showQuoteToChannelNoteEditor(noteId: Note.Id) {
+        viewModelScope.launch {
+            recursiveSearchHasContentNote(noteId).onSuccess {
+                quoteRenoteTarget.tryEmit(
+                    QuoteRenoteData.ofChannel(it.id, requireNotNull(it.channelId))
+                )
+            }
         }
     }
 

@@ -27,6 +27,7 @@ import net.pantasystem.milktea.model.note.CreateNote
 import net.pantasystem.milktea.model.note.Note
 import net.pantasystem.milktea.model.note.NoteState
 import net.pantasystem.milktea.model.note.poll.Poll
+import net.pantasystem.milktea.model.note.repost.CreateRenote
 import net.pantasystem.milktea.model.note.type4Mastodon
 import javax.inject.Inject
 
@@ -43,7 +44,7 @@ interface NoteApiAdapter {
     suspend fun delete(noteId: Note.Id): DeleteNoteResultType
     suspend fun createThreadMute(noteId: Note.Id): ToggleThreadMuteResultType
     suspend fun deleteThreadMute(noteId: Note.Id): ToggleThreadMuteResultType
-    suspend fun renote(target: Note): RenoteResultType
+    suspend fun renote(createRenote: CreateRenote): RenoteResultType
 
     suspend fun vote(noteId: Note.Id, choice: Poll.Choice, target: Note)
 
@@ -59,9 +60,9 @@ internal class NoteApiAdapterFactoryImpl @Inject constructor(
     private val uploader: FileUploaderProvider,
     private val filePropertyDataSource: FilePropertyDataSource,
     private val loggerFactory: Logger.Factory,
-): NoteApiAdapter.Factory {
+) : NoteApiAdapter.Factory {
     override suspend fun create(account: Account): NoteApiAdapter {
-        return when(account.instanceType) {
+        return when (account.instanceType) {
             Account.InstanceType.MISSKEY, Account.InstanceType.FIREFISH -> NoteApiAdapterMisskeyPattern(
                 accountRepository = accountRepository,
                 misskeyAPIProvider = misskeyAPIProvider,
@@ -69,6 +70,7 @@ internal class NoteApiAdapterFactoryImpl @Inject constructor(
                 uploader = uploader,
                 loggerFactory = loggerFactory,
             )
+
             Account.InstanceType.MASTODON, Account.InstanceType.PLEROMA -> NoteApiAdapterMastodonPattern(
                 uploader = uploader,
                 mastodonAPIProvider = mastodonAPIProvider,
@@ -77,6 +79,7 @@ internal class NoteApiAdapterFactoryImpl @Inject constructor(
         }
     }
 }
+
 private class NoteApiAdapterMisskeyPattern(
     val accountRepository: AccountRepository,
     val misskeyAPIProvider: MisskeyAPIProvider,
@@ -150,14 +153,14 @@ private class NoteApiAdapterMisskeyPattern(
         return ToggleThreadMuteResultType.Misskey
     }
 
-    override suspend fun renote(target: Note): RenoteResultType {
-        val account = accountRepository.get(target.id.accountId).getOrThrow()
+    override suspend fun renote(createRenote: CreateRenote): RenoteResultType {
         return create(
             CreateNote(
-                author = account, renoteId = target.id,
+                author = createRenote.author,
+                renoteId = createRenote.renoteId,
+                channelId = createRenote.channelId,
                 text = null,
-                visibility = target.visibility,
-                channelId = target.channelId,
+                visibility = createRenote.visibility,
             )
         )
     }
@@ -213,6 +216,7 @@ private class NoteApiAdapterMastodonPattern(
                             uploader.get(createNote.author)
                                 .upload(UploadSource.LocalFile(appFile), false).id
                         }
+
                         is AppFile.Remote -> appFile.id
                     }
                 }
@@ -276,9 +280,9 @@ private class NoteApiAdapterMastodonPattern(
         return ToggleThreadMuteResultType.Mastodon(requireNotNull(body))
     }
 
-    override suspend fun renote(target: Note): RenoteResultType {
-        val account = accountRepository.get(target.id.accountId).getOrThrow()
-        val toot = mastodonAPIProvider.get(account).reblog(target.id.noteId)
+    override suspend fun renote(createRenote: CreateRenote): RenoteResultType {
+        val account = accountRepository.get(createRenote.author.accountId).getOrThrow()
+        val toot = mastodonAPIProvider.get(account).reblog(createRenote.renoteId.noteId)
             .throwIfHasError()
             .body()
         return NoteResultType.Mastodon(requireNotNull(toot))

@@ -88,7 +88,8 @@ class ChannelStateTest {
             lastNotedAt = null,
             notesCount = 0,
             usersCount = 0,
-            userId = User.Id(id.accountId, "userId")
+            userId = User.Id(id.accountId, "userId"),
+            allowRenoteToExternal = true,
         )
     }
 

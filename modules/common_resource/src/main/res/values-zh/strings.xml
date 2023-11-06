@@ -23,7 +23,9 @@
     <string name="following">关注中</string>
     <string name="follower">关注者</string>
     <string name="renote">转发</string>
+    <string name="renote_in_channel">频道内转发</string>
     <string name="quote_renote">引用转发</string>
+    <string name="quote_renote_in_channel">频道内引用转发</string>
     <string name="discovery">发现</string>
     <string name="renote_was">转发</string>
     <string name="input_custom_emoji">自定义表情</string>

@@ -225,7 +225,8 @@ fun PreviewChannelCard() {
                     userId = User.Id(0, "userId"),
                     usersCount = 4,
                     isFollowing = true,
-                    hasUnreadNote = true
+                    hasUnreadNote = true,
+                    allowRenoteToExternal = true,
                 ),
                 isPaged = true,
             )
@@ -243,7 +244,8 @@ fun PreviewChannelCard() {
                     userId = User.Id(0, "userId"),
                     usersCount = 4,
                     isFollowing = false,
-                    hasUnreadNote = false
+                    hasUnreadNote = false,
+                    allowRenoteToExternal = true,
                 ), isPaged = false
             )
         }
@@ -260,7 +262,8 @@ fun PreviewChannelCard() {
                     userId = User.Id(0, "userId"),
                     usersCount = 4,
                     isFollowing = false,
-                    hasUnreadNote = false
+                    hasUnreadNote = false,
+                    allowRenoteToExternal = true,
                 ), isPaged = false
             )
         }
