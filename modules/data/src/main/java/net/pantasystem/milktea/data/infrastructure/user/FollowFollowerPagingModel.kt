@@ -159,7 +159,7 @@ class FollowFollowerPagingModelImpl(
                 }
             }
         }
-        userDataSource.addAll(users)
+        userDataSource.addAll(users).getOrThrow()
         return list.map {
             it.toUserIdAndNextId(account.accountId)
         }
