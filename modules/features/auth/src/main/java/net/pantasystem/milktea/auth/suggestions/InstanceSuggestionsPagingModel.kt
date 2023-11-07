@@ -76,11 +76,8 @@ class InstanceSuggestionsPagingModel @Inject constructor(
 
     override val mutex: Mutex = Mutex()
 
-    private val previousPagingController = PreviousPagingController(
+    private val previousPagingController = PreviousPagingController.create(
         this,
-        this,
-        this,
-        this
     )
 
     fun onLoadNext(scope: CoroutineScope) {

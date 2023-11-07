@@ -2,9 +2,11 @@ package net.pantasystem.milktea.data.infrastructure.note
 
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.BufferOverflow
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.withLock
 import net.pantasystem.milktea.app_store.notes.InitialLoadQuery
@@ -20,35 +22,32 @@ import net.pantasystem.milktea.data.api.mastodon.MastodonAPIProvider
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.page.Pageable
+import net.pantasystem.milktea.model.instance.InstanceInfoService
 import net.pantasystem.milktea.model.nodeinfo.NodeInfoRepository
 import net.pantasystem.milktea.model.note.Note
-import net.pantasystem.milktea.model.note.NoteDataSource
-import net.pantasystem.milktea.model.note.NoteRelation
-import net.pantasystem.milktea.model.note.NoteRelationGetter
 import javax.inject.Inject
 
 
 const val LIMIT = 10
+const val REMOVE_DIFF_COUNT = 20
 
 class TimelineStoreImpl(
     private val pageableTimeline: Pageable,
     private val noteAdder: NoteDataSourceAdder,
-    noteDataSource: NoteDataSource,
     private val getAccount: suspend () -> Account,
     private val misskeyAPIProvider: MisskeyAPIProvider,
     coroutineScope: CoroutineScope,
-    private val noteRelationGetter: NoteRelationGetter,
     private val mastodonAPIProvider: MastodonAPIProvider,
     private val nodeInfoRepository: NodeInfoRepository,
+    private val instanceInfoService: InstanceInfoService,
 ) : TimelineStore {
 
     class Factory @Inject constructor(
         private val noteAdder: NoteDataSourceAdder,
-        private val noteDataSource: NoteDataSource,
         private val misskeyAPIProvider: MisskeyAPIProvider,
-        private val noteRelationGetter: NoteRelationGetter,
         private val mastodonAPIProvider: MastodonAPIProvider,
-        private val nodeInfoRepository: NodeInfoRepository
+        private val nodeInfoRepository: NodeInfoRepository,
+        private val instanceInfoService: InstanceInfoService,
     ) : TimelineStore.Factory {
         override fun create(
             pageable: Pageable,
@@ -58,13 +57,12 @@ class TimelineStoreImpl(
             return TimelineStoreImpl(
                 pageable,
                 noteAdder,
-                noteDataSource,
                 getAccount,
                 misskeyAPIProvider,
                 coroutineScope,
-                noteRelationGetter,
                 mastodonAPIProvider,
-                nodeInfoRepository = nodeInfoRepository
+                nodeInfoRepository = nodeInfoRepository,
+                instanceInfoService = instanceInfoService
             )
         }
     }
@@ -89,17 +87,22 @@ class TimelineStoreImpl(
                 MastodonTimelineStorePagingStoreImpl(
                     pageableTimeline = pageableTimeline,
                     mastodonAPIProvider = mastodonAPIProvider,
-                    getAccount,
-                    noteAdder,
-                    nodeInfoRepository
+                    getAccount = getAccount,
+                    noteAdder = noteAdder,
+                    nodeInfoRepository = nodeInfoRepository
                 )
             }
             else -> TimelinePagingStoreImpl(
-                pageableTimeline, noteAdder, getAccount,
-                {
+                pageableTimeline = pageableTimeline,
+                noteAdder = noteAdder,
+                getAccount = getAccount,
+                getCurrentInstanceInfo = {
+                    instanceInfoService.find(it).getOrNull()
+                },
+                getInitialLoadQuery = {
                     initialLoadQuery
                 },
-                misskeyAPIProvider,
+                misskeyAPIProvider = misskeyAPIProvider,
             )
         }
     }
@@ -121,42 +124,21 @@ class TimelineStoreImpl(
         }
     }
 
-
-    @OptIn(ExperimentalCoroutinesApi::class)
-    override val relatedNotes: Flow<PageableState<List<NoteRelation>>> = timelineState.flatMapLatest { pageableState ->
-        val ids = (pageableState.content as? StateContent.Exist)?.rawContent ?: emptyList()
-        noteDataSource.observeIn(ids).map {
-            pageableState.suspendConvert { ids ->
-                noteRelationGetter.getIn(ids)
-            }
-        }
-    }.distinctUntilChanged()
-
-
     override suspend fun loadFuture(): Result<Unit> {
         return runCancellableCatching<Unit> {
             val addedCount = when (val store = pageableStore) {
                 is TimelinePagingStoreImpl -> {
-                    FuturePagingController(
-                        store,
-                        store,
-                        store,
+                    FuturePagingController.create(
                         store,
                     ).loadFuture()
                 }
                 is FavoriteNoteTimelinePagingStoreImpl -> {
-                    FuturePagingController(
-                        store,
-                        store,
-                        store,
+                    FuturePagingController.create(
                         store,
                     ).loadFuture()
                 }
                 is MastodonTimelineStorePagingStoreImpl -> {
-                    FuturePagingController(
-                        store,
-                        store,
-                        store,
+                    FuturePagingController.create(
                         store,
                     ).loadFuture()
                 }
@@ -173,26 +155,17 @@ class TimelineStoreImpl(
         return runCancellableCatching<Unit> {
             when (val store = pageableStore) {
                 is TimelinePagingStoreImpl -> {
-                    PreviousPagingController(
-                        store,
-                        store,
-                        store,
+                    PreviousPagingController.create(
                         store,
                     ).loadPrevious()
                 }
                 is FavoriteNoteTimelinePagingStoreImpl -> {
-                    PreviousPagingController(
-                        store,
-                        store,
-                        store,
+                    PreviousPagingController.create(
                         store,
                     ).loadPrevious()
                 }
                 is MastodonTimelineStorePagingStoreImpl -> {
-                    PreviousPagingController(
-                        store,
-                        store,
-                        store,
+                    PreviousPagingController.create(
                         store,
                     ).loadPrevious()
                 }
@@ -267,47 +240,15 @@ class TimelineStoreImpl(
     }
 
     override suspend fun releaseUnusedPages(position: Int, offset: Int) {
+        releaseUnusedPage(pageableStore, position, offset, REMOVE_DIFF_COUNT)
         if (pageableStore.mutex.isLocked) {
             return
-        }
-
-        pageableStore.mutex.withLock {
-            val state = pageableStore.getState()
-            val notes = when(val content = state.content) {
-                is StateContent.Exist -> content.rawContent
-                is StateContent.NotExist -> return@withLock
-            }
-
-            // 末端の削除位置を求める
-            var end = position + offset
-            if (end >= notes.size) {
-                end = notes.size
-            }
-            var diffCount = notes.size - end
-
-            // 先頭の削除位置を求める
-            var start = position - offset
-            if (start < 0) {
-                start = 0
-            }
-
-            diffCount += start
-
-            // 削除件数が20件未満の時は削除しない
-            if (diffCount < 20) {
-                return@withLock
-            }
-
-            // 削除し状態に反映する
-            pageableStore.setState(
-                state.convert {
-                    notes.subList(start, end)
-                }
-            )
         }
     }
 
 }
+
+
 
 internal sealed interface TimelinePagingBase : PaginationState<Note.Id>, StateLocker
 

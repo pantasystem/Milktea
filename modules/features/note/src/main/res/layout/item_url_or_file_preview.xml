@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingTop="4dp">
+
+    <net.pantasystem.milktea.note.url.UrlPreviewView
+        android:id="@+id/urlPreviewView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <net.pantasystem.milktea.note.url.OtherFileView
+        android:id="@+id/filePreviewView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+</FrameLayout>

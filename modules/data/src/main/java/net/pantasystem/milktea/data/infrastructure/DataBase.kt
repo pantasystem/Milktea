@@ -1,5 +1,3 @@
-@file:Suppress("DEPRECATION")
-
 package net.pantasystem.milktea.data.infrastructure
 
 import androidx.room.AutoMigration
@@ -12,7 +10,6 @@ import net.pantasystem.milktea.data.infrastructure.account.db.AccountRecord
 import net.pantasystem.milktea.data.infrastructure.account.page.db.PageDAO
 import net.pantasystem.milktea.data.infrastructure.account.page.db.PageRecord
 import net.pantasystem.milktea.data.infrastructure.account.page.db.TimelinePageTypeConverter
-import net.pantasystem.milktea.data.infrastructure.core.*
 import net.pantasystem.milktea.data.infrastructure.drive.DriveFileRecord
 import net.pantasystem.milktea.data.infrastructure.drive.DriveFileRecordDao
 import net.pantasystem.milktea.data.infrastructure.emoji.CustomEmojiAliasRecord
@@ -24,14 +21,26 @@ import net.pantasystem.milktea.data.infrastructure.group.GroupDao
 import net.pantasystem.milktea.data.infrastructure.group.GroupMemberIdRecord
 import net.pantasystem.milktea.data.infrastructure.group.GroupMemberView
 import net.pantasystem.milktea.data.infrastructure.group.GroupRecord
-import net.pantasystem.milktea.data.infrastructure.instance.db.*
+import net.pantasystem.milktea.data.infrastructure.instance.db.FedibirdCapabilitiesRecord
+import net.pantasystem.milktea.data.infrastructure.instance.db.InstanceInfoDao
+import net.pantasystem.milktea.data.infrastructure.instance.db.InstanceInfoRecord
+import net.pantasystem.milktea.data.infrastructure.instance.db.MastodonInstanceInfoDAO
+import net.pantasystem.milktea.data.infrastructure.instance.db.MastodonInstanceInfoRecord
+import net.pantasystem.milktea.data.infrastructure.instance.db.MetaDAO
+import net.pantasystem.milktea.data.infrastructure.instance.db.MetaDTO
+import net.pantasystem.milktea.data.infrastructure.instance.db.PleromaMetadataFeatures
 import net.pantasystem.milktea.data.infrastructure.list.UserListDao
 import net.pantasystem.milktea.data.infrastructure.list.UserListMemberIdRecord
 import net.pantasystem.milktea.data.infrastructure.list.UserListMemberView
 import net.pantasystem.milktea.data.infrastructure.list.UserListRecord
 import net.pantasystem.milktea.data.infrastructure.nodeinfo.db.NodeInfoDao
 import net.pantasystem.milktea.data.infrastructure.nodeinfo.db.NodeInfoRecord
-import net.pantasystem.milktea.data.infrastructure.note.draft.db.*
+import net.pantasystem.milktea.data.infrastructure.note.draft.db.DraftFileJunctionRef
+import net.pantasystem.milktea.data.infrastructure.note.draft.db.DraftLocalFile
+import net.pantasystem.milktea.data.infrastructure.note.draft.db.DraftNoteDTO
+import net.pantasystem.milktea.data.infrastructure.note.draft.db.DraftNoteDao
+import net.pantasystem.milktea.data.infrastructure.note.draft.db.PollChoiceDTO
+import net.pantasystem.milktea.data.infrastructure.note.draft.db.UserIdDTO
 import net.pantasystem.milktea.data.infrastructure.note.reaction.impl.history.ReactionHistoryDao
 import net.pantasystem.milktea.data.infrastructure.note.reaction.impl.history.ReactionHistoryRecord
 import net.pantasystem.milktea.data.infrastructure.note.reaction.impl.usercustom.ReactionUserSetting
@@ -50,17 +59,24 @@ import net.pantasystem.milktea.data.infrastructure.url.db.UrlPreviewDAO
 import net.pantasystem.milktea.data.infrastructure.url.db.UrlPreviewRecord
 import net.pantasystem.milktea.data.infrastructure.user.UserNicknameDAO
 import net.pantasystem.milktea.data.infrastructure.user.UserNicknameDTO
-import net.pantasystem.milktea.data.infrastructure.user.db.*
+import net.pantasystem.milktea.data.infrastructure.user.db.BadgeRoleRecord
+import net.pantasystem.milktea.data.infrastructure.user.db.PinnedNoteIdRecord
+import net.pantasystem.milktea.data.infrastructure.user.db.UserDao
+import net.pantasystem.milktea.data.infrastructure.user.db.UserDetailedStateRecord
+import net.pantasystem.milktea.data.infrastructure.user.db.UserEmojiRecord
+import net.pantasystem.milktea.data.infrastructure.user.db.UserInfoStateRecord
+import net.pantasystem.milktea.data.infrastructure.user.db.UserInstanceInfoRecord
+import net.pantasystem.milktea.data.infrastructure.user.db.UserProfileFieldRecord
+import net.pantasystem.milktea.data.infrastructure.user.db.UserRecord
+import net.pantasystem.milktea.data.infrastructure.user.db.UserRelatedStateRecord
+import net.pantasystem.milktea.data.infrastructure.user.db.UserView
 import net.pantasystem.milktea.data.infrastructure.user.renote.mute.db.RenoteMuteDao
 import net.pantasystem.milktea.data.infrastructure.user.renote.mute.db.RenoteMuteRecord
 
 @Database(
     entities = [
-        EncryptedConnectionInformation::class,
         ReactionHistoryRecord::class,
-        Account::class,
         ReactionUserSetting::class,
-        Page::class,
         PollChoiceDTO::class,
         UserIdDTO::class,
         DraftNoteDTO::class,
@@ -92,6 +108,7 @@ import net.pantasystem.milktea.data.infrastructure.user.renote.mute.db.RenoteMut
         UserListRecord::class,
         UserListMemberIdRecord::class,
         InstanceInfoRecord::class,
+        BadgeRoleRecord::class,
 
         SearchHistoryRecord::class,
         UserInfoStateRecord::class,
@@ -116,7 +133,7 @@ import net.pantasystem.milktea.data.infrastructure.user.renote.mute.db.RenoteMut
         CustomEmojiRecord::class,
         CustomEmojiAliasRecord::class,
     ],
-    version = 54,
+    version = 58,
     exportSchema = true,
     autoMigrations = [
         AutoMigration(from = 11, to = 12),
@@ -161,6 +178,9 @@ import net.pantasystem.milktea.data.infrastructure.user.renote.mute.db.RenoteMut
         AutoMigration(from = 50, to = 51),
         AutoMigration(from = 52, to = 53),
         AutoMigration(from = 53, to = 54),
+        AutoMigration(from = 54, to = 55),
+        AutoMigration(from = 55, to = 56),
+        AutoMigration(from = 56, to = 57),
     ],
     views = [UserView::class, GroupMemberView::class, UserListMemberView::class]
 )
@@ -174,16 +194,10 @@ import net.pantasystem.milktea.data.infrastructure.user.renote.mute.db.RenoteMut
 )
 abstract class DataBase : RoomDatabase() {
     //abstract fun connectionInstanceDao(): ConnectionInstanceDao
-    @Deprecated("pageDaoへ移行")
-    abstract fun connectionInformationDao(): ConnectionInformationDao
 
-    @Deprecated("accountDAOへ移行")
-    abstract fun accountDao(): AccountDao
     abstract fun reactionHistoryDao(): ReactionHistoryDao
     abstract fun reactionUserSettingDao(): ReactionUserSettingDao
 
-    @Deprecated("pageDaoへ移行")
-    abstract fun pageDao(): PageDao
     abstract fun draftNoteDao(): DraftNoteDao
 
     abstract fun urlPreviewDAO(): UrlPreviewDAO

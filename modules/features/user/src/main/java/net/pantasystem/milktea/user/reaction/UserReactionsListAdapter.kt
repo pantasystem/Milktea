@@ -14,7 +14,6 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import net.pantasystem.milktea.model.setting.DefaultConfig
 import net.pantasystem.milktea.model.setting.LocalConfigRepository
-import net.pantasystem.milktea.note.reaction.ReactionCountAdapter
 import net.pantasystem.milktea.note.timeline.NoteFontSizeBinder
 import net.pantasystem.milktea.note.timeline.ReactionCountItemsFlexboxLayoutBinder
 import net.pantasystem.milktea.note.timeline.ViewRecycler

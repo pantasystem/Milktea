@@ -7,14 +7,22 @@ import net.pantasystem.milktea.api.mastodon.notification.MstNotificationDTO
 import net.pantasystem.milktea.api.mastodon.poll.TootPollDTO
 import net.pantasystem.milktea.api.mastodon.status.StatusVisibilityType
 import net.pantasystem.milktea.api.mastodon.status.TootStatusDTO
-import net.pantasystem.milktea.data.converters.TootDTOEntityConverter
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.drive.FileProperty
 import net.pantasystem.milktea.model.instance.MastodonInstanceInfo
 import net.pantasystem.milktea.model.note.Note
 import net.pantasystem.milktea.model.note.Visibility
 import net.pantasystem.milktea.model.note.poll.Poll
-import net.pantasystem.milktea.model.notification.*
+import net.pantasystem.milktea.model.notification.FavoriteNotification
+import net.pantasystem.milktea.model.notification.FollowNotification
+import net.pantasystem.milktea.model.notification.FollowRequestAcceptedNotification
+import net.pantasystem.milktea.model.notification.MentionNotification
+import net.pantasystem.milktea.model.notification.Notification
+import net.pantasystem.milktea.model.notification.PollEndedNotification
+import net.pantasystem.milktea.model.notification.PostNotification
+import net.pantasystem.milktea.model.notification.ReactionNotification
+import net.pantasystem.milktea.model.notification.RenoteNotification
+import net.pantasystem.milktea.model.notification.UnknownNotification
 import net.pantasystem.milktea.model.user.User
 
 fun TootPollDTO?.toPoll(): Poll? {
@@ -54,39 +62,37 @@ fun TootMediaAttachment.toFileProperty(account: Account, isSensitive: Boolean): 
 }
 
 
-suspend fun TootStatusDTO.toEntities(
-    converter: TootDTOEntityConverter,
+fun TootStatusDTO.toEntities(
     account: Account,
-): NoteRelationEntities {
+): TootDTOUnpacked {
     val users = mutableListOf<User>()
-    val notes = mutableListOf<Note>()
+    val notes = mutableListOf<TootStatusDTO>()
     val files = mutableListOf<FileProperty>()
-    pickEntities(converter, account, notes, users, files)
-    return NoteRelationEntities(
-        note = converter.convert(this, account),
+    pickEntities(account, notes, users, files)
+    return TootDTOUnpacked(
+        this,
         files = files,
         users = users,
-        notes = notes,
+        toots = notes,
     )
 }
 
-suspend fun TootStatusDTO.pickEntities(
-    converter: TootDTOEntityConverter,
+fun TootStatusDTO.pickEntities(
     account: Account,
-    notes: MutableList<Note>,
+    notes: MutableList<TootStatusDTO>,
     users: MutableList<User>,
     files: MutableList<FileProperty>,
 ) {
-    val (note, user) = converter.convert(this, account) to this.account.toModel(account)
-    notes.add(note)
+    val user = this.account.toModel(account)
+    notes.add(this)
     users.add(user)
     files.addAll(
         mediaAttachments.map {
             it.toFileProperty(account, sensitive)
         }
     )
-    this.reblog?.pickEntities(converter, account, notes, users, files)
-    this.quote?.pickEntities(converter, account, notes, users, files)
+    this.reblog?.pickEntities(account, notes, users, files)
+    this.quote?.pickEntities(account, notes, users, files)
 }
 
 fun MastodonAccountRelationshipDTO.toUserRelated(): User.Related {
@@ -97,6 +103,7 @@ fun MastodonAccountRelationshipDTO.toUserRelated(): User.Related {
         hasPendingFollowRequestFromYou = requested,
         isMuting = muting,
         hasPendingFollowRequestToYou = false,
+        isNotify = notifying ?: false,
     )
 }
 
@@ -114,7 +121,7 @@ fun MstNotificationDTO.toModel(a: Account, isRead: Boolean): Notification {
             )
         }
         MstNotificationDTO.NotificationType.Status -> {
-            StatusNotification(
+            PostNotification(
                 createdAt = createdAt,
                 id = id,
                 userId = userId,
@@ -165,13 +172,31 @@ fun MstNotificationDTO.toModel(a: Account, isRead: Boolean): Notification {
             )
         }
         MstNotificationDTO.NotificationType.Update -> {
-            TODO("通知種別${type}はまだ実装されていません")
+            UnknownNotification(
+                id = id,
+                createdAt = createdAt,
+                isRead = isRead,
+                rawType = type.name,
+                userId = userId,
+            )
         }
         MstNotificationDTO.NotificationType.AdminSingUp -> {
-            TODO("通知種別${type}はまだ実装されていません")
+            UnknownNotification(
+                id = id,
+                createdAt = createdAt,
+                isRead = isRead,
+                rawType = type.name,
+                userId = userId,
+            )
         }
         MstNotificationDTO.NotificationType.AdminReport -> {
-            TODO("通知種別${type}はまだ実装されていません")
+            UnknownNotification(
+                id = id,
+                createdAt = createdAt,
+                isRead = isRead,
+                rawType = type.name,
+                userId = userId,
+            )
         }
         MstNotificationDTO.NotificationType.EmojiReaction -> {
             ReactionNotification(

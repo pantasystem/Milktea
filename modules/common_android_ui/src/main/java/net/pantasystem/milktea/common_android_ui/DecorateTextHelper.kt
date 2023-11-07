@@ -16,6 +16,7 @@ import com.bumptech.glide.load.resource.gif.GifDrawable
 import com.github.penfeizhou.animation.apng.APNGDrawable
 import dagger.hilt.android.EntryPointAccessors
 import dagger.hilt.android.internal.managers.FragmentComponentManager
+import net.pantasystem.milktea.common_android.html.MastodonHTMLParser
 import net.pantasystem.milktea.common_android.mfm.MFMParser
 import net.pantasystem.milktea.common_android.mfm.Root
 import net.pantasystem.milktea.common_android.ui.text.CustomEmojiDecorator
@@ -35,7 +36,10 @@ object DecorateTextHelper {
         this.movementMethod = LinkMovementMethod.getInstance()
         stopDrawableAnimations(this)
         val lazy = MFMDecorator.decorate(node, LazyDecorateSkipElementsHolder())
-        this.text = MFMDecorator.decorate(this, lazy)
+        this.setText(
+            MFMDecorator.decorate(this, lazy),
+            TextView.BufferType.SPANNABLE,
+        )
     }
 
     fun stopDrawableAnimations(textView: TextView) {
@@ -87,7 +91,10 @@ object DecorateTextHelper {
                     this,
                     emojiScale,
                 )
-                this.text = decoratedText
+                this.setText(
+                    decoratedText,
+                    TextView.BufferType.SPANNABLE,
+                )
                 this.movementMethod = ClickListenableLinkMovementMethod { url ->
 
                     // NOTE: クリックしたURLを探している
@@ -144,7 +151,8 @@ object DecorateTextHelper {
             }
             is TextType.Misskey -> {
                 this.movementMethod = LinkMovementMethod.getInstance()
-                this.text = MFMDecorator.decorate(this, textType.lazyDecorateResult, emojiScale)
+                val spanned = MFMDecorator.decorate(this, textType.lazyDecorateResult, emojiScale)
+                this.setText(spanned, TextView.BufferType.SPANNABLE)
             }
         }
 
@@ -157,11 +165,31 @@ object DecorateTextHelper {
         emojis ?: return
         account ?: return
         host ?: return
-        val node = MFMParser.parse(sourceText, emojis, accountHost = account.getHost(), userHost = host)
-            ?: return
-        this.movementMethod = LinkMovementMethod.getInstance()
-        val lazy = MFMDecorator.decorate(node, LazyDecorateSkipElementsHolder())
-        this.text = MFMDecorator.decorate(this, lazy)
+        when(account.instanceType) {
+            Account.InstanceType.MISSKEY, Account.InstanceType.FIREFISH -> {
+                val node = MFMParser.parse(sourceText, emojis, accountHost = account.getHost(), userHost = host)
+                    ?: return
+                this.movementMethod = LinkMovementMethod.getInstance()
+                val lazy = MFMDecorator.decorate(node, LazyDecorateSkipElementsHolder())
+                this.text = MFMDecorator.decorate(this, lazy)
+            }
+            Account.InstanceType.MASTODON, Account.InstanceType.PLEROMA -> {
+                this.decorate(
+                    TextType.Mastodon(
+                        MastodonHTMLParser.parse(
+                            sourceText,
+                            emojis,
+                            userHost = host,
+                            accountHost = account.getHost()
+                        ),
+                        tags = emptyList(),
+                        mentions = emptyList()
+                    ),
+                    1.0f
+                )
+            }
+        }
+
     }
 }
 

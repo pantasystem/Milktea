@@ -23,7 +23,9 @@
     <string name="following">关注中</string>
     <string name="follower">关注者</string>
     <string name="renote">转发</string>
+    <string name="renote_in_channel">频道内转发</string>
     <string name="quote_renote">引用转发</string>
+    <string name="quote_renote_in_channel">频道内引用转发</string>
     <string name="discovery">发现</string>
     <string name="renote_was">转发</string>
     <string name="input_custom_emoji">自定义表情</string>
@@ -620,6 +622,8 @@
     <string name="alarm_permission_description_message">Scheduled posting uses the mechanism of the alarm function, so it is necessary to grant alarm permission to Milktea from the settings.</string>
     <string name="exclude_replies">Exclude replies</string>
     <string name="exclude_reposts">Exclude reposts</string>
+    <string name="notify_about_new_posts">Notify about new posts</string>
+    <string name="stop_notify_about_new_posts">Stop notify about new posts</string>
     <!-- User -->
 
 </resources>

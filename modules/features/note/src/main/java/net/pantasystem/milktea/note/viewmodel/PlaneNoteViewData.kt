@@ -69,7 +69,9 @@ open class PlaneNoteViewData(
         instanceEmojis = emojiRepository.getAndConvertToMap(account.getHost()),
         userHost = toShowNote.user
             .host,
-        accountHost = account.getHost()
+        accountHost = account.getHost(),
+        isRequireProcessNyaize = (toShowNote.note.type as? Note.Type.Misskey)?.isRequireNyaize
+            ?: false
     )
 
     //true　折り畳み
@@ -85,8 +87,12 @@ open class PlaneNoteViewData(
     )
 
 
-    val textNode =
-        getTextType(account, toShowNote, emojiRepository.getAndConvertToMap(account.getHost()))
+    val textNode = getTextType(
+        account,
+        toShowNote,
+        emojiRepository.getAndConvertToMap(account.getHost()),
+        (toShowNote.note.type as? Note.Type.Misskey)?.isRequireNyaize ?: false
+    )
 
     val translateState: StateFlow<ResultState<Translation?>?> =
         noteTranslationStore.state(toShowNote.note.id).stateIn(
@@ -159,7 +165,10 @@ open class PlaneNoteViewData(
 
     val subNoteAvatarUrl = subNote?.user?.avatarUrl
     val subNoteTextNode = subNote?.let {
-        getTextType(account, it, emojiRepository.getAndConvertToMap(account.getHost()))
+        getTextType(
+            account, it, emojiRepository.getAndConvertToMap(account.getHost()),
+            (it.note.type as? Note.Type.Misskey)?.isRequireNyaize ?: false
+        )
     }
 
     val subCw = subNote?.note?.cw
@@ -168,7 +177,9 @@ open class PlaneNoteViewData(
         emojis = subNote?.note?.emojiNameMap,
         instanceEmojis = emojiRepository.getAndConvertToMap(account.getHost()),
         accountHost = account.getHost(),
-        userHost = subNote?.user?.host
+        userHost = subNote?.user?.host,
+        isRequireProcessNyaize = (toShowNote.note.type as? Note.Type.Misskey)?.isRequireNyaize
+            ?: false
     )
 
     //true　折り畳み

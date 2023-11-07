@@ -21,6 +21,7 @@ data class Channel(
     val userId: User.Id?,
     val isFollowing: Boolean?,
     val hasUnreadNote: Boolean?,
+    val allowRenoteToExternal: Boolean,
 ) {
     companion object;
 

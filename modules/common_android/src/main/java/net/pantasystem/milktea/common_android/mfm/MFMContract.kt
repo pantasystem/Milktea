@@ -1,6 +1,4 @@
-package jp.panta.misskeyandroidclient.mfm
-
-import net.pantasystem.milktea.common_android.mfm.ElementType
+package net.pantasystem.milktea.common_android.mfm
 
 /**
  * タグの判別ロジック、正規表現、判別用データなどをここに実装する

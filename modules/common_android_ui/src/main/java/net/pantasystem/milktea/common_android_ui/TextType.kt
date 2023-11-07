@@ -18,7 +18,7 @@ sealed interface TextType {
     ) : TextType
 }
 
-fun getTextType(account: Account, note: NoteRelation, instanceEmojis: Map<String, CustomEmoji>?): TextType? {
+fun getTextType(account: Account, note: NoteRelation, instanceEmojis: Map<String, CustomEmoji>?, isRequirePerformNyaize: Boolean = false): TextType? {
     return when (account.instanceType) {
         Account.InstanceType.MISSKEY, Account.InstanceType.FIREFISH -> {
             val root = MFMParser.parse(
@@ -27,7 +27,8 @@ fun getTextType(account: Account, note: NoteRelation, instanceEmojis: Map<String
                 instanceEmojis,
                 userHost = note.user
                     .host,
-                accountHost = account.getHost()
+                accountHost = account.getHost(),
+                isRequireProcessNyaize = isRequirePerformNyaize,
             )
             note.note.text?.let {
                 TextType.Misskey(

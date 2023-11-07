@@ -7,7 +7,8 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import dagger.hilt.android.EntryPointAccessors
 import net.pantasystem.milktea.common.glide.GlideApp
-import net.pantasystem.milktea.common_android.ui.FontSizeHelper.setMemoFontPxSize
+import net.pantasystem.milktea.common_android.ui.FontSizeUnitConverter.setMemoFontPxSize
+import net.pantasystem.milktea.common_android.ui.FontSizeUnitConverter.specialPointToPixel
 import net.pantasystem.milktea.common_android.ui.VisibilityHelper.setMemoVisibility
 import net.pantasystem.milktea.common_android_ui.BindingProvider
 import net.pantasystem.milktea.model.note.reaction.LegacyReaction
@@ -31,7 +32,7 @@ object NoteReactionViewHelper {
 
         val emoji = reaction.emoji
 
-        val baseHeightPx = context.resources.displayMetrics.scaledDensity * reactionBaseSizeSp
+        val baseHeightPx = context.specialPointToPixel(reactionBaseSizeSp)
 
 
         if (emoji == null) {

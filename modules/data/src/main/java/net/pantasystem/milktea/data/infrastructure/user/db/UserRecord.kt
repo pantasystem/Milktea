@@ -1,6 +1,13 @@
 package net.pantasystem.milktea.data.infrastructure.user.db
 
-import androidx.room.*
+import androidx.room.ColumnInfo
+import androidx.room.DatabaseView
+import androidx.room.Embedded
+import androidx.room.Entity
+import androidx.room.ForeignKey
+import androidx.room.Index
+import androidx.room.PrimaryKey
+import androidx.room.Relation
 import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDate
 import net.pantasystem.milktea.data.infrastructure.account.db.AccountRecord
@@ -138,7 +145,27 @@ data class UserInfoStateRecord(
     @ColumnInfo(name = "userId")
     @PrimaryKey(autoGenerate = false)
     val userId: Long
-)
+) {
+    companion object {
+        fun from(dbId: Long, info: User.Info): UserInfoStateRecord {
+            return UserInfoStateRecord(
+                bannerUrl = info.bannerUrl,
+                isLocked = info.isLocked,
+                description = info.description,
+                followersCount = info.followersCount,
+                followingCount = info.followingCount,
+                hostLower = info.hostLower,
+                notesCount = info.notesCount,
+                url = info.url,
+                userId = dbId,
+                birthday = info.birthday,
+                createdAt = info.createdAt,
+                updatedAt = info.updatedAt,
+                publicReactions = info.isPublicReactions
+            )
+        }
+    }
+}
 
 @Entity(
     tableName = "user_related_state",
@@ -174,9 +201,28 @@ data class UserRelatedStateRecord(
     @ColumnInfo(name = "hasPendingFollowRequestToYou")
     val hasPendingFollowRequestToYou: Boolean,
 
+    @ColumnInfo(name = "isNotify")
+    val isNotify: Boolean? = null,
+
     @ColumnInfo(name = "userId")
     @PrimaryKey(autoGenerate = false) val userId: Long
-)
+) {
+
+    companion object {
+        fun from(dbId: Long, related: User.Related): UserRelatedStateRecord {
+            return UserRelatedStateRecord(
+                isMuting = related.isMuting,
+                isBlocking = related.isBlocking,
+                isFollower = related.isFollower,
+                isFollowing = related.isFollowing,
+                hasPendingFollowRequestToYou = related.hasPendingFollowRequestToYou,
+                hasPendingFollowRequestFromYou = related.hasPendingFollowRequestFromYou,
+                isNotify = related.isNotify,
+                userId = dbId,
+            )
+        }
+    }
+}
 
 @Entity(
     tableName = "user_detailed_state",
@@ -292,6 +338,20 @@ data class UserEmojiRecord(
     @ColumnInfo(name = "id")
     @PrimaryKey(autoGenerate = true) val id: Long = 0L,
 ) {
+
+    companion object {
+        fun from(dbId: Long, mode: CustomEmoji): UserEmojiRecord {
+            return UserEmojiRecord(
+                name = mode.name,
+                url = mode.url,
+                uri = mode.uri,
+                aspectRatio = mode.aspectRatio,
+                cachePath = mode.cachePath,
+                userId = dbId,
+            )
+        }
+    }
+
     fun toModel(): CustomEmoji {
         return CustomEmoji(
             name = name,
@@ -312,6 +372,18 @@ data class UserEmojiRecord(
 }
 
 fun List<UserEmojiRecord>?.isEqualToModels(models: List<CustomEmoji>): Boolean {
+    if (this == null && models.isEmpty()) return true
+    if (this == null) return false
+    if (size != models.size) return false
+    val records = this.toSet()
+    return models.all {  model ->
+        records.any { record ->
+            record.isEqualToModel(model)
+        }
+    }
+}
+
+fun List<BadgeRoleRecord>?.isEqualToBadgeRoleModels(models: List<User.BadgeRole>): Boolean {
     if (this == null && models.isEmpty()) return true
     if (this == null) return false
     if (size != models.size) return false
@@ -359,7 +431,32 @@ data class UserInstanceInfoRecord(
 
     @ColumnInfo(name = "userId")
     @PrimaryKey(autoGenerate = false) val userId: Long
-)
+) {
+    companion object {
+        fun from(dbId: Long, instance: User.InstanceInfo): UserInstanceInfoRecord {
+            return UserInstanceInfoRecord(
+                faviconUrl = instance.faviconUrl,
+                iconUrl = instance.iconUrl,
+                name = instance.name,
+                softwareVersion = instance.softwareVersion,
+                softwareName = instance.softwareName,
+                themeColor = instance.themeColor,
+                userId = dbId
+            )
+        }
+    }
+}
+
+fun UserInstanceInfoRecord?.isEqualToModel(model: User.InstanceInfo?): Boolean {
+    if (model == null) return false
+    if (this == null) return false
+    return faviconUrl == model.faviconUrl &&
+            iconUrl == model.iconUrl &&
+            name == model.name &&
+            softwareName == model.softwareName &&
+            softwareVersion == model.softwareVersion &&
+            themeColor == model.themeColor
+}
 
 @Entity(
     tableName = "pinned_note_id",
@@ -459,6 +556,44 @@ data class UserView(
     val avatarBlurhash: String?
 )
 
+@Entity(
+    tableName = "user_badge_role",
+    foreignKeys = [
+        ForeignKey(
+            parentColumns = ["id"],
+            childColumns = ["userId"],
+            entity = UserRecord::class,
+            onUpdate = ForeignKey.CASCADE,
+            onDelete = ForeignKey.CASCADE,
+        )
+    ],
+    indices = [
+        Index("userId")
+    ]
+)
+data class BadgeRoleRecord(
+    @ColumnInfo("name")
+    val name: String,
+
+    @ColumnInfo("iconUrl")
+    val iconUrl: String?,
+
+    @ColumnInfo("displayOrder")
+    val displayOrder: Int,
+
+    @ColumnInfo("userId")
+    val userId: Long,
+
+    @ColumnInfo(name = "id")
+    @PrimaryKey(autoGenerate = true) val id: Long = 0,
+) {
+    fun isEqualToModel(model: User.BadgeRole): Boolean {
+        return name == model.name &&
+                iconUrl == model.iconUri &&
+                displayOrder == model.displayOrder
+    }
+}
+
 interface HasUserModel {
     fun toModel(): User
 }
@@ -475,6 +610,11 @@ data class UserSimpleRelated(
         entityColumn = "userId"
     )
     val instance: UserInstanceInfoRecord?,
+    @Relation(
+        parentColumn = "id",
+        entityColumn = "userId"
+    )
+    val badgeRoles: List<BadgeRoleRecord>,
 ) : HasUserModel {
     override fun toModel(): User.Simple {
         val instanceInfo = instance?.let {
@@ -510,6 +650,13 @@ data class UserSimpleRelated(
             },
             instance = instanceInfo,
             avatarBlurhash = user.avatarBlurhash,
+            badgeRoles = badgeRoles.map {
+                User.BadgeRole(
+                    name = it.name,
+                    iconUri = it.iconUrl,
+                    displayOrder = it.displayOrder,
+                )
+            }
         )
     }
 }
@@ -551,8 +698,13 @@ data class UserRelated(
         parentColumn = "id",
         entityColumn = "userId",
     )
-    val fields: List<UserProfileFieldRecord>?
+    val fields: List<UserProfileFieldRecord>?,
 
+    @Relation(
+        parentColumn = "id",
+        entityColumn = "userId"
+    )
+    val badgeRoles: List<BadgeRoleRecord>,
 ) : HasUserModel {
     override fun toModel(): User {
         val instanceInfo = instance?.let {
@@ -589,6 +741,13 @@ data class UserRelated(
                 },
                 instance = instanceInfo,
                 avatarBlurhash = user.avatarBlurhash,
+                badgeRoles = badgeRoles.map {
+                    User.BadgeRole(
+                        name = it.name,
+                        iconUri = it.iconUrl,
+                        displayOrder = it.displayOrder,
+                    )
+                }
             )
         } else {
             return User.Detail(
@@ -644,9 +803,61 @@ data class UserRelated(
                         isMuting = related.isMuting,
                         hasPendingFollowRequestFromYou = related.hasPendingFollowRequestFromYou,
                         hasPendingFollowRequestToYou = related.hasPendingFollowRequestToYou,
+                        isNotify = related.isNotify ?: false,
+                    )
+                },
+                badgeRoles = badgeRoles.map {
+                    User.BadgeRole(
+                        name = it.name,
+                        iconUri = it.iconUrl,
+                        displayOrder = it.displayOrder,
                     )
                 }
             )
         }
+    }
+
+    fun toSimpleModel(): User.Simple {
+        val instanceInfo = instance?.let {
+            User.InstanceInfo(
+                faviconUrl = it.faviconUrl,
+                iconUrl = it.iconUrl,
+                name = it.name,
+                softwareName = it.softwareName,
+                softwareVersion = it.softwareVersion,
+                themeColor = it.themeColor
+            )
+        }
+        return User.Simple(
+            id = User.Id(
+                user.accountId,
+                user.serverId,
+            ),
+            userName = user.userName,
+            avatarUrl = user.avatarUrl,
+            emojis = emojis.map {
+                it.toModel()
+            },
+            host = user.host,
+            isBot = user.isBot,
+            isCat = user.isCat,
+            isSameHost = user.isSameHost,
+            name = user.name,
+            nickname = user.nickname?.let {
+                UserNickname(
+                    id = UserNickname.Id(user.userName, user.host),
+                    name = user.nickname
+                )
+            },
+            instance = instanceInfo,
+            avatarBlurhash = user.avatarBlurhash,
+            badgeRoles = badgeRoles.map {
+                User.BadgeRole(
+                    name = it.name,
+                    iconUri = it.iconUrl,
+                    displayOrder = it.displayOrder,
+                )
+            },
+        )
     }
 }

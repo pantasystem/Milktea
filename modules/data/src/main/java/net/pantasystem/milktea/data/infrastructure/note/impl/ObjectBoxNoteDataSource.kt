@@ -56,24 +56,25 @@ class ObjectBoxNoteDataSource @Inject constructor(
     }
 
 
-    override suspend fun getIn(noteIds: List<Note.Id>): Result<List<Note>> =
-        runCancellableCatching {
-            if (noteIds.isEmpty()) {
-                return@runCancellableCatching emptyList()
+    override suspend fun getIn(
+        noteIds: List<Note.Id>
+    ): Result<List<Note>> = runCancellableCatching {
+        if (noteIds.isEmpty()) {
+            return@runCancellableCatching emptyList()
+        }
+        withContext(ioDispatcher) {
+            val ids = noteIds.map {
+                NoteRecord.generateAccountAndNoteId(it)
             }
-            withContext(ioDispatcher) {
-                val ids = noteIds.map {
-                    NoteRecord.generateAccountAndNoteId(it)
-                }
-                noteBox.query().inValues(
-                    NoteRecord_.accountIdAndNoteId,
-                    ids.toTypedArray(),
-                    QueryBuilder.StringOrder.CASE_SENSITIVE
-                ).build().find().map {
-                    it.toModel()
-                }
+            noteBox.query().inValues(
+                NoteRecord_.accountIdAndNoteId,
+                ids.toTypedArray(),
+                QueryBuilder.StringOrder.CASE_INSENSITIVE
+            ).build().find().map {
+                it.toModel()
             }
         }
+    }
 
     override suspend fun get(noteId: Note.Id): Result<Note> = runCancellableCatching {
         if (deleteNoteIds.contains(noteId)) {
@@ -83,12 +84,14 @@ class ObjectBoxNoteDataSource @Inject constructor(
             noteBox.query().equal(
                 NoteRecord_.accountIdAndNoteId,
                 NoteRecord.generateAccountAndNoteId(noteId),
-                QueryBuilder.StringOrder.CASE_SENSITIVE
+                QueryBuilder.StringOrder.CASE_INSENSITIVE
             ).build().findFirst()?.toModel() ?: throw NoteNotFoundException(noteId)
         }
     }
 
-    override suspend fun getWithState(noteId: Note.Id): Result<NoteResult> = runCancellableCatching {
+    override suspend fun getWithState(
+        noteId: Note.Id
+    ): Result<NoteResult> = runCancellableCatching {
         if (deleteNoteIds.contains(noteId)) {
             return@runCancellableCatching NoteResult.Deleted
         }
@@ -96,10 +99,10 @@ class ObjectBoxNoteDataSource @Inject constructor(
             noteBox.query().equal(
                 NoteRecord_.accountIdAndNoteId,
                 NoteRecord.generateAccountAndNoteId(noteId),
-                QueryBuilder.StringOrder.CASE_SENSITIVE
+                QueryBuilder.StringOrder.CASE_INSENSITIVE
             ).build().findFirst()?.toModel()
         }
-        when(note) {
+        when (note) {
             null -> NoteResult.NotFound
             else -> NoteResult.Success(note)
         }
@@ -110,7 +113,7 @@ class ObjectBoxNoteDataSource @Inject constructor(
             noteBox.query().equal(
                 NoteRecord_.replyId,
                 id.noteId,
-                QueryBuilder.StringOrder.CASE_SENSITIVE,
+                QueryBuilder.StringOrder.CASE_INSENSITIVE,
             ).and().equal(
                 NoteRecord_.accountId,
                 id.accountId
@@ -124,7 +127,7 @@ class ObjectBoxNoteDataSource @Inject constructor(
         return noteBox.query().equal(
             NoteRecord_.accountIdAndNoteId,
             NoteRecord.generateAccountAndNoteId(noteId),
-            QueryBuilder.StringOrder.CASE_SENSITIVE
+            QueryBuilder.StringOrder.CASE_INSENSITIVE
         ).build().findFirst()?.let {
             return true
         } ?: false
@@ -136,7 +139,7 @@ class ObjectBoxNoteDataSource @Inject constructor(
                 noteBox.query().equal(
                     NoteRecord_.accountIdAndNoteId,
                     NoteRecord.generateAccountAndNoteId(noteId),
-                    QueryBuilder.StringOrder.CASE_SENSITIVE
+                    QueryBuilder.StringOrder.CASE_INSENSITIVE
                 ).build().remove()
             }?.let {
                 it > 0
@@ -158,7 +161,7 @@ class ObjectBoxNoteDataSource @Inject constructor(
                 val exists = noteBox.query().equal(
                     NoteRecord_.accountIdAndNoteId,
                     NoteRecord.generateAccountAndNoteId(note.id),
-                    QueryBuilder.StringOrder.CASE_SENSITIVE
+                    QueryBuilder.StringOrder.CASE_INSENSITIVE
                 ).build().findFirst()
                 if (exists == null) {
                     noteBox.put(NoteRecord.from(note))
@@ -176,6 +179,7 @@ class ObjectBoxNoteDataSource @Inject constructor(
                     onAdded(note)
                     publish(NoteDataSource.Event.Created(note.id, note))
                 }
+
                 AddResult.Updated -> publish(NoteDataSource.Event.Updated(note.id, note))
             }
         }
@@ -183,20 +187,44 @@ class ObjectBoxNoteDataSource @Inject constructor(
 
     }
 
-    override suspend fun addAll(notes: List<Note>): Result<List<AddResult>> =
-        runCancellableCatching {
-            notes.map {
-                add(it)
-            }.map {
-                it.getOrElse { AddResult.Canceled }
+    override suspend fun addAll(
+        notes: List<Note>
+    ): Result<List<AddResult>> = runCancellableCatching {
+        withContext(ioDispatcher) {
+            boxStore.awaitCallInTx {
+                val existsNotes = noteBox.query().inValues(
+                    NoteRecord_.accountIdAndNoteId,
+                    notes.map {
+                        NoteRecord.generateAccountAndNoteId(it.id)
+                    }.toTypedArray(),
+                    QueryBuilder.StringOrder.CASE_INSENSITIVE
+                ).build().find().associateBy {
+                    it.noteId
+                }
+                val willSave = notes.map {
+                    val exists = existsNotes[it.id.noteId]
+                    if (exists == null) {
+                        NoteRecord.from(it) to AddResult.Created
+                    } else {
+                        exists.applyModel(it)
+                        exists to AddResult.Updated
+                    }
+                }
+                noteBox.put(willSave.map {
+                    it.first
+                })
+                willSave.map {
+                    it.second
+                }
             }
-        }
+        } ?: emptyList()
+    }
 
     override suspend fun deleteByUserId(userId: User.Id): Result<Int> = runCancellableCatching {
         withContext(ioDispatcher) {
             boxStore.awaitCallInTx {
                 noteBox.query()
-                    .equal(NoteRecord_.userId, userId.id, QueryBuilder.StringOrder.CASE_SENSITIVE)
+                    .equal(NoteRecord_.userId, userId.id, QueryBuilder.StringOrder.CASE_INSENSITIVE)
                     .and().equal(NoteRecord_.accountId, userId.accountId)
                     .build().remove().toInt()
             } ?: 0
@@ -220,7 +248,7 @@ class ObjectBoxNoteDataSource @Inject constructor(
         return noteBox.query().inValues(
             NoteRecord_.accountIdAndNoteId,
             ids.toTypedArray(),
-            QueryBuilder.StringOrder.CASE_SENSITIVE
+            QueryBuilder.StringOrder.CASE_INSENSITIVE
         ).build().subscribe().toFlow().flowOn(ioDispatcher).map { list ->
             list.mapNotNull {
                 it?.toModel()
@@ -233,7 +261,7 @@ class ObjectBoxNoteDataSource @Inject constructor(
         return noteBox.query().equal(
             NoteRecord_.accountIdAndNoteId,
             NoteRecord.generateAccountAndNoteId(noteId),
-            QueryBuilder.StringOrder.CASE_SENSITIVE
+            QueryBuilder.StringOrder.CASE_INSENSITIVE
         ).build().subscribe().toFlow().flowOn(ioDispatcher).map {
             it.firstOrNull()?.toModel()
         }.flowOn(defaultDispatcher).catch {
@@ -273,13 +301,17 @@ class ObjectBoxNoteDataSource @Inject constructor(
         }
     }
 
-    override suspend fun clearNoteThreadContext(noteId: Note.Id): Result<Unit> = runCancellableCatching{
+    override suspend fun clearNoteThreadContext(
+        noteId: Note.Id
+    ): Result<Unit> = runCancellableCatching {
         withContext(ioDispatcher) {
             noteThreadRecordDAO.clearRelation(noteId)
         }
     }
 
-    override suspend fun findNoteThreadContext(noteId: Note.Id): Result<NoteThreadContext> = runCancellableCatching {
+    override suspend fun findNoteThreadContext(
+        noteId: Note.Id
+    ): Result<NoteThreadContext> = runCancellableCatching {
         withContext(ioDispatcher) {
             noteThreadRecordDAO.findBy(noteId)?.let { record ->
                 NoteThreadContext(
@@ -321,7 +353,7 @@ class ObjectBoxNoteDataSource @Inject constructor(
             NoteRecord_.accountIdAndNoteId, noteIds.map {
                 NoteRecord.generateAccountAndNoteId(it)
             }.toTypedArray(),
-            QueryBuilder.StringOrder.CASE_SENSITIVE
+            QueryBuilder.StringOrder.CASE_INSENSITIVE
         ).build().find()
     }
 }

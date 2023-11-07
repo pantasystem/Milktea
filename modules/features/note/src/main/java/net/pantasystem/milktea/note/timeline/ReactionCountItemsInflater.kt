@@ -4,7 +4,7 @@ import android.view.LayoutInflater
 import android.view.View
 import com.bumptech.glide.Glide
 import com.google.android.flexbox.FlexboxLayout
-import net.pantasystem.milktea.common_android.ui.FontSizeHelper.setMemoFontSpSize
+import net.pantasystem.milktea.common_android.ui.FontSizeUnitConverter.setMemoFontSpSize
 import net.pantasystem.milktea.common_android.ui.VisibilityHelper.setMemoVisibility
 import net.pantasystem.milktea.note.databinding.ItemReactionBinding
 import net.pantasystem.milktea.note.reaction.NoteReactionViewHelper.bindReactionCount

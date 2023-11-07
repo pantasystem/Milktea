@@ -7,11 +7,17 @@ import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 import net.pantasystem.milktea.api.misskey.OkHttpClientProvider
 import net.pantasystem.milktea.api.misskey.drive.FilePropertyDTO
+import net.pantasystem.milktea.common.APIError
+import net.pantasystem.milktea.common.ErrorType
+import net.pantasystem.milktea.common.formatter
+import net.pantasystem.milktea.common.runCancellableCatching
+import net.pantasystem.milktea.common.throwErrorFromStatusCode
 import net.pantasystem.milktea.data.converters.FilePropertyDTOEntityConverter
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.drive.FileProperty
 import net.pantasystem.milktea.model.drive.FilePropertyDataSource
 import net.pantasystem.milktea.model.file.AppFile
+import net.pantasystem.milktea.model.file.FileUploadFailedException
 import okhttp3.MultipartBody
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -89,11 +95,22 @@ class MisskeyOkHttpDriveFileUploader(
             if (response.isSuccessful) {
                 json.decodeFromString<FilePropertyDTO>(response.body!!.string())
             } else {
+                val body = response.body?.string()
+                val error = try {
+                    throwErrorFromStatusCode(response.code, body?.let {
+                        runCancellableCatching {
+                            ErrorType.Misskey(formatter.decodeFromString(it))
+                        }.getOrNull() ?: ErrorType.Raw(it)
+                    })
+                    null
+                } catch (e: APIError) {
+                    e
+                }
                 throw FileUploadFailedException(
                     AppFile.Remote(fileProperty.id),
-                    null,
+                    error,
                     response.code,
-                    response.body?.string()
+                    body,
                 )
             }
         } catch (e: Throwable) {
@@ -154,10 +171,19 @@ class MisskeyOkHttpDriveFileUploader(
                 json.decodeFromString<FilePropertyDTO>(response.body!!.string())
             } else {
                 val resBody = response.body?.string()
-                Log.d("OkHttpConnection", "code: $code, error$resBody")
+                val error = try {
+                    throwErrorFromStatusCode(code, resBody?.let {
+                        runCancellableCatching {
+                            ErrorType.Misskey(formatter.decodeFromString(it))
+                        }.getOrNull() ?: ErrorType.Raw(it)
+                    })
+                    null
+                } catch (e: APIError) {
+                    e
+                }
                 throw FileUploadFailedException(
                     file,
-                    null,
+                    error,
                     code,
                     resBody,
                 )

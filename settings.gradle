@@ -29,6 +29,7 @@ dependencyResolutionManagement {
             library("accompanist-pager", "com.google.accompanist:accompanist-pager:0.14.0")
             library("accompanist-pager-indicators", "com.google.accompanist:accompanist-pager-indicators:0.14.0")
             library("coil-compose", "io.coil-kt:coil-compose:2.4.0")
+            library("coil-svg", "io.coil-kt:coil-svg:2.4.0")
             library("compose-constraintlayout", "androidx.constraintlayout:constraintlayout-compose:1.0.1")
 
             library("hilt-android", "com.google.dagger:hilt-android:2.45")
@@ -57,7 +58,7 @@ dependencyResolutionManagement {
             library('glide-glide', 'com.github.bumptech.glide:glide:4.14.2')
             library('glide-compiler', 'com.github.bumptech.glide:compiler:4.14.2')
             library('accompanist-glide', 'com.google.accompanist:accompanist-glide:0.14.0')
-            library('animation-apng', 'com.github.penfeizhou.android.animation:apng:2.23.0')
+            library('animation-apng', 'com.github.penfeizhou.android.animation:apng:2.24.0')
 
             library('wada811-databinding', 'com.github.wada811:DataBinding-ktx:5.0.2')
 

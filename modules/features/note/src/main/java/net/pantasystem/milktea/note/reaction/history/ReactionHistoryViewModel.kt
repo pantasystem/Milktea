@@ -12,8 +12,8 @@ import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.common_android.emoji.V13EmojiUrlResolver
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.AccountRepository
-import net.pantasystem.milktea.model.emoji.CustomEmojiRepository
 import net.pantasystem.milktea.model.emoji.CustomEmoji
+import net.pantasystem.milktea.model.emoji.CustomEmojiRepository
 import net.pantasystem.milktea.model.note.Note
 import net.pantasystem.milktea.model.note.NoteRepository
 import net.pantasystem.milktea.model.note.reaction.*
@@ -82,10 +82,13 @@ class ReactionHistoryViewModel @AssistedInject constructor(
         users,
         account,
     ) { noteInfo, emojis, loading, users, a ->
+        val emojiMap = emojis.associateBy {
+            it.name
+        }
         ReactionHistoryUiState(
             items = listOfNotNull(
                 type?.let { type ->
-                    EmojiType.from(emojis + (noteInfo.note?.emojis ?: emptyList()), type)
+                    EmojiType.from(emojiMap + (noteInfo.note?.emojiNameMap ?: emptyMap()), type)
                         ?: EmojiType.CustomEmoji(
                             CustomEmoji(
                                 name = type,
@@ -101,7 +104,7 @@ class ReactionHistoryViewModel @AssistedInject constructor(
                                 )
                             )
                         )
-                    EmojiType.from(emojis + (noteInfo.note?.emojis ?: emptyList()), type)?.let {
+                    EmojiType.from(emojiMap + (noteInfo.note?.emojiNameMap ?: emptyMap()), type)?.let {
                         ReactionHistoryListType.Header(it)
                     }
                 }

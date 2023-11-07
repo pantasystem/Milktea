@@ -2,6 +2,7 @@ package net.pantasystem.milktea.model.note
 
 import net.pantasystem.milktea.common.mapCancellableCatching
 import net.pantasystem.milktea.common.runCancellableCatching
+import net.pantasystem.milktea.model.drive.FileProperty
 import net.pantasystem.milktea.model.drive.FilePropertyDataSource
 import net.pantasystem.milktea.model.user.User
 import net.pantasystem.milktea.model.user.UserDataSource
@@ -22,6 +23,7 @@ class NoteRelationGetter @Inject constructor(
         deep: Boolean = true,
         usersMap: Map<User.Id, User> = emptyMap(),
         notesMap: Map<Note.Id, Note> = emptyMap(),
+        filesMap: Map<FileProperty.Id, FileProperty> = emptyMap(),
         skipIfNotExistsInCache: Boolean = false,
     ): Result<NoteRelation?> {
         return runCancellableCatching {
@@ -38,7 +40,8 @@ class NoteRelationGetter @Inject constructor(
                 it,
                 deep,
                 usersMap = usersMap,
-                notesMap = notesMap
+                notesMap = notesMap,
+                filesMap = filesMap,
             ).getOrThrow()
         }
     }
@@ -57,12 +60,20 @@ class NoteRelationGetter @Inject constructor(
             it.id
         }
         val noteMap = notes.associateBy { it.id }
+        val files = filePropertyDataSource.findIn(
+            notes.mapNotNull { it.fileIds }.flatten()
+        ).getOrElse {
+            emptyList()
+        }.let { files ->
+            files.associateBy { it.id }
+        }
         return notes.mapNotNull {
             get(
                 it,
                 true,
                 usersMap = users,
-                notesMap = noteMap
+                notesMap = noteMap,
+                filesMap = files,
             ).getOrNull()
         }
     }
@@ -80,6 +91,7 @@ class NoteRelationGetter @Inject constructor(
         deep: Boolean = true,
         usersMap: Map<User.Id, User> = emptyMap(),
         notesMap: Map<Note.Id, Note> = emptyMap(),
+        filesMap: Map<FileProperty.Id, FileProperty> = emptyMap(),
     ): Result<NoteRelation> {
         return runCancellableCatching {
             val user = usersMap.getOrElse(note.userId) {
@@ -98,17 +110,28 @@ class NoteRelationGetter @Inject constructor(
                         false,
                         notesMap = notesMap,
                         usersMap = usersMap,
-                        skipIfNotExistsInCache = true
+                        skipIfNotExistsInCache = true,
+                        filesMap = filesMap,
                     )
                 }
             } else null
+
+            val filesInDb = note.fileIds?.filter {
+                filesMap[it] == null
+            }?.let {
+                filePropertyDataSource.findIn(it).getOrElse {
+                    emptyList()
+                }
+            }?.associateBy { it.id }
 
             return@runCancellableCatching NoteRelation(
                 note = note,
                 user = user,
                 renote = renote?.getOrNull(),
                 reply = reply?.getOrNull(),
-                note.fileIds?.let { filePropertyDataSource.findIn(it).getOrNull() },
+                files = note.fileIds?.mapNotNull {
+                    filesMap[it] ?: filesInDb?.get(it)
+                } ?: emptyList(),
             )
         }
 

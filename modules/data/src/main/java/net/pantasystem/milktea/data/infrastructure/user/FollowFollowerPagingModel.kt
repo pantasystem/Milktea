@@ -74,10 +74,7 @@ class FollowFollowerPagingStoreImpl(
         nodeInfoRepository = nodeInfoRepository,
     )
 
-    private val previousPagingController = PreviousPagingController(
-        loader,
-        loader,
-        loader,
+    private val previousPagingController = PreviousPagingController.create(
         loader,
     )
 
@@ -162,7 +159,7 @@ class FollowFollowerPagingModelImpl(
                 }
             }
         }
-        userDataSource.addAll(users)
+        userDataSource.addAll(users).getOrThrow()
         return list.map {
             it.toUserIdAndNextId(account.accountId)
         }

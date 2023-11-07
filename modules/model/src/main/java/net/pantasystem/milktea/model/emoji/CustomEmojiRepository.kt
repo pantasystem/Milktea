@@ -27,5 +27,7 @@ interface CustomEmojiRepository {
 
     fun getAndConvertToMap(host: String): Map<String, CustomEmoji>?
 
+    suspend fun findAndConvertToMap(host: String): Result<Map<String, CustomEmoji>>
+
 }
 

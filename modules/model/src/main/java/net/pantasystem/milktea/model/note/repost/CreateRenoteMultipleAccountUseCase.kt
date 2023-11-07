@@ -3,6 +3,7 @@ package net.pantasystem.milktea.model.note.repost
 import kotlinx.coroutines.coroutineScope
 import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.model.UseCase
+import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.ap.ApResolverService
 import net.pantasystem.milktea.model.note.Note
@@ -10,6 +11,13 @@ import net.pantasystem.milktea.model.note.NoteRepository
 import javax.inject.Inject
 import javax.inject.Singleton
 
+/**
+ * 複数のアカウントからリノートを行うユースケースです。
+ * Milkteaでは原則としてUseCaseのメソッドは一つとしているが、このユースケースは下記理由によって、
+ * 二つ以上メソッドが公開されていることを例外的に許容しています。
+ * - リノート対象のノートがチャンネル内に投稿されたノートの場合、チャンネル内にリノートするかどうかでメソッドを分ける必要があった
+ * - 微妙にユースケース自体は異なるが、UseCaseを分離するとService層を作り必要が出てきたりしてと複雑度が増してしまうため、一つのUseCaseにまとめています。
+ */
 @Singleton
 class CreateRenoteMultipleAccountUseCase @Inject constructor(
     private val accountRepository: AccountRepository,
@@ -18,47 +26,80 @@ class CreateRenoteMultipleAccountUseCase @Inject constructor(
     private val apResolverService: ApResolverService,
 ) : UseCase {
 
-    suspend operator fun invoke(
-        noteId: Note.Id,
-        accountIds: List<Long>,
+    /**
+     * [targetNoteId]を持つノートをHTL/LTL/STL/GTLへリノートする。
+     * チャンネル内に投稿されたノートの場合、チャンネル内にはリノートされず各種TLへリノートされる。
+     * チャンネル内にリノートしたい場合は[renoteToChannel]を使用する。
+     *
+     * @param targetNoteId リノート対象の[Note.Id]
+     * @param publisherAccountIds このアカウントからリノートを行う
+     */
+    suspend fun renote(
+        targetNoteId: Note.Id,
+        publisherAccountIds: List<Long>,
     ): Result<List<Result<Note>>> = runCancellableCatching {
         coroutineScope {
-            val accounts = accountIds.map {
-                accountRepository.get(it).getOrThrow()
-            }
-            val note = recursiveSearchHasContentNote(noteId).getOrThrow()
-            accounts.map {
-                resolveAndRenote(note, it.accountId)
+            val note = recursiveSearchHasContentNote(targetNoteId).getOrThrow()
+            publisherAccountIds.map {
+                resolveAndRenote(note, it) { a, n ->
+                    CreateRenote.ofTimeline(a, n)
+                }
             }
         }
     }
 
-    private suspend fun resolveAndRenote(sourceNote: Note, accountId: Long): Result<Note> =
-        runCancellableCatching {
-            val account = accountRepository.get(accountId).getOrThrow()
-            val relatedSourceNoteAccount =
-                accountRepository.get(sourceNote.id.accountId).getOrThrow()
-            val relatedNote = if (account.getHost() != relatedSourceNoteAccount.getHost()) {
-                apResolverService.resolve(sourceNote.id, accountId).getOrThrow()
-            } else {
-                noteRepository.find(Note.Id(account.accountId, sourceNote.id.noteId)).getOrThrow()
-            }
-
-            renote(relatedNote).getOrThrow()
-        }
-
-
-    private suspend fun renote(note: Note): Result<Note> =
-        runCancellableCatching {
-            if (checkCanRepostService
-                    .canRepost(note.id)
-                    .getOrElse { false }
-            ) {
-                noteRepository.renote(note.id).getOrThrow()
-            } else {
-                throw IllegalArgumentException()
+    /**
+     * [targetNoteId]を持つノートが投稿されたチャンネルと同じチャンネルにリノートする。
+     * [targetNoteId]がチャンネル外に投稿されたノートの場合、特定のチャンネル内にリノートということにはならず[renote]と同等の挙動となる。
+     * チャンネル外にリノートしたい場合は[renote]を使用する。
+     *
+     * @param targetNoteId リノート対象の[Note.Id]
+     * @param publisherAccountIds このアカウントからリノートを行う
+     */
+    suspend fun renoteToChannel(
+        targetNoteId: Note.Id,
+        publisherAccountIds: List<Long>,
+    ): Result<List<Result<Note>>> = runCancellableCatching {
+        coroutineScope {
+            val note = recursiveSearchHasContentNote(targetNoteId).getOrThrow()
+            publisherAccountIds.map {
+                resolveAndRenote(note, it) { a, n ->
+                    CreateRenote.ofChannel(a, n)
+                }
             }
         }
+    }
+
+    private suspend fun resolveAndRenote(
+        targetNote: Note,
+        publisherAccountId: Long,
+        paramFactory: (Account, Note) -> CreateRenote
+    ): Result<Note> = runCancellableCatching {
+        val publisherAccount = accountRepository.get(publisherAccountId).getOrThrow()
+        val relatedTargetNoteAccount = accountRepository.get(targetNote.id.accountId).getOrThrow()
+
+        val resolvedNote = if (publisherAccount.getHost() != relatedTargetNoteAccount.getHost()) {
+            // リノート発信アカウントと対象ノートのホストが異なる場合、
+            // AP経由でリノート発信アカウントのあるホストに対象ノートを取り寄せ、ホストに複製されたノートをリノートする
+            apResolverService
+                .resolve(targetNote.id, publisherAccountId)
+                .getOrThrow()
+        } else {
+            noteRepository
+                .find(Note.Id(publisherAccount.accountId, targetNote.id.noteId))
+                .getOrThrow()
+        }
+
+        if (!checkCanRepostService.canRepost(resolvedNote.id).getOrElse { false }) {
+            throw IllegalArgumentException()
+        }
+
+        val resolvedAccount = accountRepository.get(resolvedNote.id.accountId).getOrThrow()
+
+        noteRepository
+            .renote(paramFactory.invoke(resolvedAccount, resolvedNote))
+            .getOrThrow()
+    }
 
     private suspend fun recursiveSearchHasContentNote(noteId: Note.Id): Result<Note> =
         runCancellableCatching {

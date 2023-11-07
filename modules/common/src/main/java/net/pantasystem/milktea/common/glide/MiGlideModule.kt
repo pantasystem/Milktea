@@ -25,10 +25,9 @@ import java.nio.ByteBuffer
 class MiGlideModule : AppGlideModule(){
 
     override fun registerComponents(context: Context, glide: Glide, registry: Registry) {
-        val decoder = ByteBufferApngDecoder()
         registry
-            .prepend(InputStream::class.java, FrameSeqDecoder::class.java, StreamApngDecoder(decoder))
-            .prepend(ByteBuffer::class.java, FrameSeqDecoder::class.java, decoder)
+            .prepend(InputStream::class.java, FrameSeqDecoder::class.java, StreamApngDecoder())
+            .prepend(ByteBuffer::class.java, FrameSeqDecoder::class.java, ByteBufferApngDecoder())
             .register(FrameSeqDecoder::class.java, Drawable::class.java, FrameSeqDecoderDrawableTranscoder())
             .register(FrameSeqDecoder::class.java, Bitmap::class.java, FrameSeqDecoderBitmapTranscoder(glide))
             .register(SVG::class.java, BitmapDrawable::class.java, SvgBitmapTransCoder(context))

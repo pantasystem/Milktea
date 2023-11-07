@@ -1,14 +1,18 @@
 package net.pantasystem.milktea.data.infrastructure.note.draft.db
 
-import androidx.room.*
+import androidx.room.Embedded
+import androidx.room.Entity
+import androidx.room.Ignore
+import androidx.room.Junction
+import androidx.room.Relation
 import net.pantasystem.milktea.data.infrastructure.drive.DriveFileRecord
 import net.pantasystem.milktea.model.note.draft.DraftNote
 import net.pantasystem.milktea.model.note.draft.DraftNoteFile
 
 @Entity
-class DraftNoteRelation {
+class DraftNoteRelation(
     @Embedded
-    lateinit var draftNoteDTO: DraftNoteDTO
+    val draftNoteDTO: DraftNoteDTO,
 
 //    @Relation(
 //        parentColumn = "draft_note_id",
@@ -22,17 +26,17 @@ class DraftNoteRelation {
         entityColumn = "draft_note_id",
         entity = UserIdDTO::class
     )
-    var visibilityUserIds: List<UserIdDTO>? = null
+    val visibilityUserIds: List<UserIdDTO>? = null,
 
     @Relation(
         parentColumn = "draft_note_id",
         entityColumn = "draft_note_id",
         entity = PollChoiceDTO::class
     )
-    var pollChoices: List<PollChoiceDTO>? = null
+    val pollChoices: List<PollChoiceDTO>? = null,
 
     @Relation(parentColumn = "draft_note_id", entityColumn = "draftNoteId")
-    var draftNoteJunctionRefs: List<DraftFileJunctionRef>? = null
+    val draftNoteJunctionRefs: List<DraftFileJunctionRef>? = null,
 
     @Relation(
         parentColumn = "draft_note_id",
@@ -42,7 +46,7 @@ class DraftNoteRelation {
             parentColumn = "draftNoteId"
         )
     )
-    var localFiles: List<DraftLocalFile>? = null
+    val localFiles: List<DraftLocalFile>? = null,
 
     @Relation(
         parentColumn = "draft_note_id",
@@ -53,7 +57,9 @@ class DraftNoteRelation {
             entityColumn = "filePropertyId"
         )
     )
-    var driveFileRecords: List<DriveFileRecord>? = null
+    val driveFileRecords: List<DriveFileRecord>? = null
+) {
+
 
     @Ignore
     fun getDraftNoteFiles(): List<DraftNoteFile> {
@@ -86,13 +92,18 @@ class DraftNoteRelation {
                 }
             }
             null
-        }?: emptyList()
+        } ?: emptyList()
     }
 
 
     @Ignore
     fun toDraftNote(accountId: Long): DraftNote {
 
-        return draftNoteDTO.toDraftNote(accountId, visibilityUserIds, pollChoices, getDraftNoteFiles())
+        return draftNoteDTO.toDraftNote(
+            accountId,
+            visibilityUserIds,
+            pollChoices,
+            getDraftNoteFiles()
+        )
     }
 }

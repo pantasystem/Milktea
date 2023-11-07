@@ -2,6 +2,8 @@ package jp.panta.misskeyandroidclient.mfm
 
 import net.pantasystem.milktea.common_android.mfm.ElementType
 import net.pantasystem.milktea.common_android.mfm.MFMParser
+import net.pantasystem.milktea.common_android.mfm.Node
+import net.pantasystem.milktea.common_android.mfm.Text
 import net.pantasystem.milktea.model.emoji.CustomEmoji
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test

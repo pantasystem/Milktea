@@ -99,6 +99,7 @@
                             android:layout_marginTop="-50dp"
                             android:layout_marginStart="16dp"
                             app:imageUrl="@{userViewModel.userState.avatarUrl}"
+                            app:blurhash="@{userViewModel.userState.avatarBlurhash}"
                             app:iconShape="@{userViewModel.config.avatarIconShapeType.value}"
                             tools:srcCompat="@drawable/ic_follow"
                             android:layout_marginBottom="8dp"
@@ -184,27 +185,37 @@
                             android:contentDescription="@string/change_nickname"
                             />
 
+                    <androidx.compose.ui.platform.ComposeView
+                        android:id="@+id/badgeRoles"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="16dp"
+                        android:layout_marginTop="8dp"
+                        android:layout_marginEnd="16dp"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/subName" />
 
                     <TextView
-                            android:id="@+id/profileText"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_alignStart="@id/avatarIcon"
-                            app:sourceText="@{userViewModel.userState.info.description}"
-                            app:account="@{userViewModel.currentAccount}"
-                            app:host="@{userViewModel.userState.host}"
-                            app:emojis="@{userViewModel.userState.emojis}"
-                            tools:text="awoijfoiwaehfoaiwehfoiawjefoiawjefiojawioefjioawhfoiawehfoiawef"
-                            android:layout_marginEnd="16dp"
-                            android:layout_marginTop="8dp"
-                            android:visibility="@{userViewModel.userState.info.description == null ? View.GONE : View.VISIBLE}"
-                            app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toBottomOf="@id/subName"
-                            android:layout_marginStart="16dp"
-                            app:layout_constraintEnd_toEndOf="parent"
+                        android:id="@+id/profileText"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_alignStart="@id/avatarIcon"
+                        android:layout_marginStart="16dp"
+                        android:layout_marginTop="8dp"
+                        android:layout_marginEnd="16dp"
+                        android:visibility="@{userViewModel.userState.info.description == null ? View.GONE : View.VISIBLE}"
+                        app:account="@{userViewModel.currentAccount}"
+                        app:emojis="@{userViewModel.userState.emojis}"
+                        app:host="@{userViewModel.userState.host}"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/badgeRoles"
+                        app:sourceText="@{userViewModel.userState.info.description}"
+                        tools:text="awoijfoiwaehfoaiwehfoiawjefoiawjefiojawioefjioawhfoiawehfoiawef"
 
 
-                            />
+                        />
 
                     <TextView
                             android:layout_width="0dp"

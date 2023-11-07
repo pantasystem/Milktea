@@ -19,6 +19,9 @@ import net.pantasystem.milktea.model.note.NoteDataSource
 import net.pantasystem.milktea.model.note.NoteThreadContext
 import javax.inject.Inject
 
+/**
+ * このインターフェースは、ノートのスレッドを表す構造体のキャッシュと、API上のリソースを同期するための機能を提供します。
+ */
 interface ThreadContextApiAdapter {
     interface Factory {
         suspend fun create(account: Account): ThreadContextApiAdapter
@@ -28,6 +31,10 @@ interface ThreadContextApiAdapter {
     ): Result<Unit>
 }
 
+/**
+ * このクラスは、ThreadContextApiAdapter.Factoryの実装クラスで、
+ * 対応しているAPIに応じて対応しているThreadContextApiAdapterの実装クラスを生成します。
+ */
 class ThreadContextApiAdapterFactoryImpl @Inject constructor(
     private val accountRepository: AccountRepository,
     private val misskeyAPIProvider: MisskeyAPIProvider,
@@ -58,6 +65,10 @@ class ThreadContextApiAdapterFactoryImpl @Inject constructor(
     }
 }
 
+
+/**
+ * このクラスは、Mastodon系のAPIに対応するThreadContextApiAdapterの実装クラスです。
+ */
 class ThreadContextApiAdapterMastodonPattern @Inject constructor(
     private val accountRepository: AccountRepository,
     private val mastodonAPIProvider: MastodonAPIProvider,
@@ -86,6 +97,9 @@ class ThreadContextApiAdapterMastodonPattern @Inject constructor(
     }
 }
 
+/**
+ * このクラスは、Misskey系のAPIに対応するThreadContextApiAdapterの実装クラスです。
+ */
 class ThreadContextApiAdapterMisskeyPattern @Inject constructor(
     private val getAccount: GetAccount,
     private val noteDataSourceAdder: NoteDataSourceAdder,

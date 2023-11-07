@@ -5,7 +5,7 @@
   "entities": [
     {
       "id": "1:4355718382021751829",
-      "lastPropertyId": "54:1696546822899785376",
+      "lastPropertyId": "55:68607803971520561",
       "name": "NoteRecord",
       "properties": [
         {
@@ -286,6 +286,11 @@
           "id": "54:1696546822899785376",
           "name": "customEmojiUrlAndCachePathMap",
           "type": 13
+        },
+        {
+          "id": "55:68607803971520561",
+          "name": "misskeyIsRequireNyaize",
+          "type": 1
         }
       ],
       "relations": []
@@ -443,64 +448,6 @@
         }
       ],
       "relations": []
-    },
-    {
-      "id": "6:5418605338436881136",
-      "lastPropertyId": "9:4598656151033408118",
-      "name": "CustomEmojiRecord",
-      "properties": [
-        {
-          "id": "1:271785103207869909",
-          "name": "id",
-          "type": 6,
-          "flags": 1
-        },
-        {
-          "id": "2:6655539627519293459",
-          "name": "serverId",
-          "type": 9
-        },
-        {
-          "id": "3:211101382978291231",
-          "name": "name",
-          "indexId": "11:3813410665521821846",
-          "type": 9,
-          "flags": 2048
-        },
-        {
-          "id": "4:7927231724161011575",
-          "name": "emojiHost",
-          "indexId": "12:6383965324106330542",
-          "type": 9,
-          "flags": 2048
-        },
-        {
-          "id": "5:2060901050158269776",
-          "name": "url",
-          "type": 9
-        },
-        {
-          "id": "6:1468865394375722898",
-          "name": "uri",
-          "type": 9
-        },
-        {
-          "id": "7:3770123434781396120",
-          "name": "type",
-          "type": 9
-        },
-        {
-          "id": "8:8187355251103755613",
-          "name": "category",
-          "type": 9
-        },
-        {
-          "id": "9:4598656151033408118",
-          "name": "aliases",
-          "type": 30
-        }
-      ],
-      "relations": []
     }
   ],
   "lastEntityId": "6:5418605338436881136",
@@ -509,9 +456,24 @@
   "lastSequenceId": "0:0",
   "modelVersion": 5,
   "modelVersionParserMinimum": 5,
-  "retiredEntityUids": [],
-  "retiredIndexUids": [],
-  "retiredPropertyUids": [],
+  "retiredEntityUids": [
+    5418605338436881136
+  ],
+  "retiredIndexUids": [
+    3813410665521821846,
+    6383965324106330542
+  ],
+  "retiredPropertyUids": [
+    271785103207869909,
+    6655539627519293459,
+    211101382978291231,
+    7927231724161011575,
+    2060901050158269776,
+    1468865394375722898,
+    3770123434781396120,
+    8187355251103755613,
+    4598656151033408118
+  ],
   "retiredRelationUids": [],
   "version": 1
 }

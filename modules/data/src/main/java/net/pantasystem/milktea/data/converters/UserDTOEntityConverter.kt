@@ -53,12 +53,22 @@ class UserDTOEntityConverter @Inject constructor(
             userDTO.host ?: account.getHost(),
             emojis,
             userDTO.name ?: userDTO.userName,
-            customEmojiRepository.getAndConvertToMap(account.getHost()),
+            customEmojiRepository.findAndConvertToMap(account.getHost()).getOrNull(),
         ).emojis.mapNotNull {
             (it.result as? EmojiResolvedType.Resolved)?.emoji
         }).distinctBy {
             it.name to it.host to it.url to it.uri
         }
+
+        val badgeRoles = userDTO.badgeRoles?.mapIndexed { index, role ->
+            User.BadgeRole(
+                name = role.name,
+                iconUri = role.iconUrl,
+                displayOrder = role.displayOrder ?: ((userDTO.badgeRoles?.size ?: 0) - index)
+            )
+        }?.sortedByDescending {
+            it.displayOrder
+        } ?: emptyList()
 
         if (isDetail) {
             return User.Detail(
@@ -102,7 +112,11 @@ class UserDTOEntityConverter @Inject constructor(
                     hasPendingFollowRequestFromYou = userDTO.hasPendingFollowRequestFromYou
                         ?: false,
                     hasPendingFollowRequestToYou = userDTO.hasPendingFollowRequestToYou ?: false,
-                )
+                    isNotify = userDTO.notifyState?.let {
+                        userDTO.notifyState == "normal"
+                    }
+                ),
+                badgeRoles = badgeRoles
             )
         } else {
             return User.Simple(
@@ -117,7 +131,8 @@ class UserDTOEntityConverter @Inject constructor(
                 nickname = null,
                 isSameHost = userDTO.host == null,
                 instance = instanceInfo,
-                avatarBlurhash = userDTO.avatarBlurhash
+                avatarBlurhash = userDTO.avatarBlurhash,
+                badgeRoles = badgeRoles
             )
         }
     }

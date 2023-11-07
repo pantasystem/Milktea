@@ -28,7 +28,7 @@ class PlaneNoteViewDataCache(
     private val getAccount: suspend () -> Account,
     private val noteCaptureAdapter: NoteCaptureAPIAdapter,
     private val translationStore: NoteTranslationStore,
-    private val GetUrlPreviewStore: suspend (Account) -> UrlPreviewStore?,
+    private val getUrlPreviewStore: suspend (Account) -> UrlPreviewStore?,
     private val coroutineScope: CoroutineScope,
     private val noteRelationGetter: NoteRelationGetter,
     private val noteDataSource: NoteDataSource,
@@ -242,7 +242,7 @@ class PlaneNoteViewDataCache(
     private suspend fun loadUrlPreview(note: PlaneNoteViewData) {
         (note.textNode as? TextType.Misskey?)?.root?.getUrls()?.let { urls ->
             UrlPreviewLoadTask(
-                GetUrlPreviewStore.invoke(getAccount.invoke()),
+                getUrlPreviewStore.invoke(getAccount.invoke()),
                 urls,
                 coroutineScope + Dispatchers.IO,
             ).load(note.urlPreviewLoadTaskCallback)

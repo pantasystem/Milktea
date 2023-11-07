@@ -13,6 +13,7 @@ import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.drive.FileProperty
 import net.pantasystem.milktea.model.drive.FilePropertyDataSource
 import net.pantasystem.milktea.model.file.AppFile
+import net.pantasystem.milktea.model.file.FileUploadFailedException
 
 interface FileUploader {
     @Throws(FileUploadFailedException::class)
@@ -27,15 +28,6 @@ sealed interface UploadSource {
     data class LocalFile(val file: AppFile.Local) : UploadSource
 }
 
-class FileUploadFailedException(
-    val file: AppFile,
-    val throwable: Throwable?,
-    statusCode: Int?,
-    errorMessage: String?,
-) : IllegalStateException(
-    "ファイルアップロードに失敗: file:$file, statusCode:$statusCode, message:$errorMessage",
-    throwable
-)
 
 interface FileUploaderProvider {
     fun create(account: Account): FileUploader

@@ -1,5 +1,3 @@
-@file:Suppress("DEPRECATION")
-
 package net.pantasystem.milktea.data.infrastructure
 
 import androidx.room.migration.Migration
@@ -115,3 +113,30 @@ val MIGRATION_51_52 = object : Migration(51, 52) {
         database.execSQL("DROP TABLE IF EXISTS 'emoji_table'")
     }
 }
+
+val MIGRATION_57_58 = object : Migration(57, 58) {
+    override fun migrate(database: SupportSQLiteDatabase) {
+        database.execSQL("DROP TABLE IF EXISTS 'connection_information'")
+        database.execSQL("DROP TABLE IF EXISTS 'page'")
+        database.execSQL("DROP TABLE IF EXISTS 'account'")
+    }
+}
+// account_tableにtokenカラムを追加し、encryptedTokenを複合化してtokenに複合化した値を追加する実装例
+//class Migration58To59(
+//    val encryption: Encryption,
+//) : Migration(58, 59) {
+//    override fun migrate(database: SupportSQLiteDatabase) {
+//        database.execSQL("alter table 'account_table' add column 'token' TEXT")
+//        val cursor = database.query("select * from 'account_table'")
+//        while(cursor.moveToNext()) {
+//            val id = cursor.getLong(cursor.getColumnIndexOrThrow("accountId"))
+//            val encryptedToken = cursor.getString(cursor.getColumnIndexOrThrow("encryptedToken"))
+//            val remoteId = cursor.getString(cursor.getColumnIndexOrThrow("remoteId"))
+//            val token = encryption.decrypt(remoteId, encryptedToken)
+//            val contentValues = ContentValues()
+//
+//            contentValues.put("token", token)
+//            database.update("account_table", SQLiteDatabase.CONFLICT_IGNORE, contentValues, "accountId = ?", arrayOf(id))
+//        }
+//    }
+//}

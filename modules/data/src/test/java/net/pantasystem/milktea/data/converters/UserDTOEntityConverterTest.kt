@@ -17,7 +17,6 @@ import kotlin.time.Duration.Companion.days
 
 class UserDTOEntityConverterTest {
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     @Test
     fun converter_GiveDetailedData() = runTest {
         val converter = UserDTOEntityConverter(
@@ -25,6 +24,9 @@ class UserDTOEntityConverterTest {
                 onBlocking {
                     getAndConvertToMap(any())
                 } doReturn mapOf()
+                onBlocking {
+                    findAndConvertToMap(any())
+                } doReturn Result.success(emptyMap())
             },
             mock() {
                 onBlocking {

@@ -27,15 +27,15 @@ import dagger.hilt.android.internal.managers.FragmentComponentManager
 import jp.panta.misskeyandroidclient.mfm.EmojiElement
 import jp.panta.misskeyandroidclient.mfm.HashTag
 import jp.panta.misskeyandroidclient.mfm.Mention
-import jp.panta.misskeyandroidclient.mfm.Node
-import jp.panta.misskeyandroidclient.mfm.Search
-import jp.panta.misskeyandroidclient.mfm.Text
 import net.pantasystem.milktea.common.glide.GlideApp
 import net.pantasystem.milktea.common_android.mfm.Element
 import net.pantasystem.milktea.common_android.mfm.ElementType
 import net.pantasystem.milktea.common_android.mfm.Leaf
 import net.pantasystem.milktea.common_android.mfm.Link
+import net.pantasystem.milktea.common_android.mfm.Node
 import net.pantasystem.milktea.common_android.mfm.Root
+import net.pantasystem.milktea.common_android.mfm.Search
+import net.pantasystem.milktea.common_android.mfm.Text
 import net.pantasystem.milktea.common_android.ui.Activities
 import net.pantasystem.milktea.common_android.ui.putActivity
 import net.pantasystem.milktea.common_android.ui.text.DrawableEmojiSpan
@@ -340,14 +340,26 @@ object MFMDecorator {
                     null -> height
                     else -> height * aspectRatio
                 }
+                val windowWidthSize = textView.resources.displayMetrics.widthPixels
+                val finalEmojiWidth: Int
+                val finalEmojiHeight: Int
+                if ((width * customEmojiScale).toInt() > windowWidthSize && windowWidthSize > 0) {
+                    val scale = (windowWidthSize.toFloat() / (width * customEmojiScale))
+                    finalEmojiWidth = windowWidthSize
+                    finalEmojiHeight = (height * customEmojiScale * scale).toInt()
+                } else {
+                    finalEmojiWidth = (width * customEmojiScale).toInt()
+                    finalEmojiHeight = (height * customEmojiScale).toInt()
+                }
+
                 GlideApp.with(textView)
                     .load(emojiElement.emoji.cachePath)
                     .error(
                         GlideApp.with(textView)
                             .load(emojiElement.emoji.url ?: emojiElement.emoji.uri)
-                            .override((width * customEmojiScale).toInt(), (height * customEmojiScale).toInt())
+                            .override(finalEmojiWidth, finalEmojiHeight)
                     )
-                    .override((width * customEmojiScale).toInt(), (height * customEmojiScale).toInt())
+                    .override(finalEmojiWidth, finalEmojiHeight)
                     .into(emojiSpan.target)
             }
         }

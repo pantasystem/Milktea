@@ -101,10 +101,7 @@ class ChannelViewModel @Inject constructor(
                 ChannelListType.FEATURED -> featuredChannelPagingModel
             }
             model.clear()
-            PreviousPagingController(
-                model,
-                model,
-                model,
+            PreviousPagingController.create(
                 model,
             ).loadPrevious()
         }

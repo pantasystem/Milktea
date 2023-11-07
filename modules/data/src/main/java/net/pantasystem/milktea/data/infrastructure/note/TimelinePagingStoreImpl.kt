@@ -19,6 +19,7 @@ import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.page.Pageable
 import net.pantasystem.milktea.model.account.page.SincePaginate
 import net.pantasystem.milktea.model.account.page.UntilPaginate
+import net.pantasystem.milktea.model.instance.InstanceInfoType
 import net.pantasystem.milktea.model.note.Note
 import retrofit2.Response
 
@@ -27,6 +28,7 @@ internal class TimelinePagingStoreImpl(
     private val pageableTimeline: Pageable,
     private val noteAdder: NoteDataSourceAdder,
     private val getAccount: suspend () -> Account,
+    private val getCurrentInstanceInfo: suspend (String) -> InstanceInfoType?,
     private val getInitialLoadQuery: () -> InitialLoadQuery?,
     private val misskeyAPIProvider: MisskeyAPIProvider,
 ) : EntityConverter<NoteDTO, Note.Id>, PreviousLoader<NoteDTO>, FutureLoader<NoteDTO>,
@@ -87,16 +89,28 @@ internal class TimelinePagingStoreImpl(
                 limit = LIMIT
             )
             val req = builder.build(NoteRequest.Conditions(sinceId = getSinceId()?.noteId))
-            getStore()!!.invoke(req).throwIfHasError().body()!!
+
+            // MisskeyはsinceIdで取得した場合
+            // [1, 2, 3, 4, 5]という順番で取得されるようになっていた。
+            // しかしアプリ上では[5, 4, 3, 2, 1]という順番で扱えた方が好ましいため、
+            // FuturePagingControllerではasReverseする処理を行っている。
+            // しかしMisskey側の変更によって[5, 4, 3, 2, 1]という順番で取得されるようになったため、
+            // sortedByをして、ソート順が変わっても対応できるようにしている。
+            getStore()!!.invoke(req).throwIfHasError().body()!!.sortedBy {
+                it.id
+            }
         }
     }
 
     override suspend fun convertAll(list: List<NoteDTO>): List<Note.Id> {
-        return list.filter {
-            it.promotionId == null || it.tmpFeaturedId == null
-        }.map {
-            noteAdder.addNoteDtoToDataSource(getAccount.invoke(), it).id
-        }
+        val info = getCurrentInstanceInfo(getAccount().normalizedInstanceUri)
+        return noteAdder.addNoteDtoListToDataSource(
+            getAccount.invoke(),
+            list.filter {
+                it.promotionId == null || it.tmpFeaturedId == null
+            },
+            instanceType = info
+        )
     }
 
     override fun getState(): PageableState<List<Note.Id>> {

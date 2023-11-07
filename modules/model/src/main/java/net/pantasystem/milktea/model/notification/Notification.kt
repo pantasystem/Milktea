@@ -82,7 +82,7 @@ data class MentionNotification(
     }
 }
 
-data class StatusNotification(
+data class PostNotification(
     override val id: Id,
 
     override val createdAt: Instant,

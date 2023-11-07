@@ -49,7 +49,7 @@ class ChannelDTOTest {
         assertEquals(channelDTO.isFollowing, channel.isFollowing)
         assertEquals(channelDTO.hasUnreadNote, channel.hasUnreadNote)
         assertEquals(channelDTO.name, channel.name)
-
+        assertEquals(channelDTO.allowRenoteToExternal, channel.allowRenoteToExternal)
     }
 
     @Test

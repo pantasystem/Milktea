@@ -19,6 +19,6 @@ object ObjectBoxModule {
     fun provideObjectBoxStore(
         @ApplicationContext context: Context
     ): BoxStore {
-        return MyObjectBox.builder().maxReaders(1000).androidContext(context).build()
+        return MyObjectBox.builder().androidContext(context).build()
     }
 }

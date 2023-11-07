@@ -1,5 +1,6 @@
 package net.pantasystem.milktea.common_android_ui.user
 
+import android.text.SpannableString
 import android.view.View
 import android.widget.TextView
 import androidx.databinding.BindingAdapter
@@ -57,14 +58,20 @@ object UserTextHelper {
         }
         name?.let {
             DecorateTextHelper.stopDrawableAnimations(it)
-            name.text = CustomEmojiDecorator().decorate(
-                accountHost = account?.getHost(),
-                result = user.parsedResult,
-                name
+            name.setText(
+                CustomEmojiDecorator().decorate(
+                    accountHost = account?.getHost(),
+                    result = user.parsedResult,
+                    name
+                ),
+                TextView.BufferType.SPANNABLE,
             )
         }
         userName?.let {
-            userName.text = user.displayUserName
+            userName.setText(
+                SpannableString.valueOf(user.displayUserName),
+                TextView.BufferType.SPANNABLE,
+            )
         }
     }
 }

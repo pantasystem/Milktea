@@ -1,5 +1,6 @@
 package net.pantasystem.milktea.data.infrastructure.note.impl.db
 
+import io.objectbox.annotation.ConflictStrategy
 import io.objectbox.annotation.Entity
 import io.objectbox.annotation.Id
 import io.objectbox.annotation.Index
@@ -26,7 +27,7 @@ data class NoteRecord(
     @Index
     var noteId: String = "",
 
-    @Unique
+    @Unique(onConflict = ConflictStrategy.REPLACE)
     @Index
     var accountIdAndNoteId: String = "",
 
@@ -93,6 +94,7 @@ data class NoteRecord(
 
     var customEmojiAspectRatioMap: MutableMap<String, String>? = null,
     var customEmojiUrlAndCachePathMap: MutableMap<String, String?>? = null,
+    var misskeyIsRequireNyaize: Boolean = false,
 ) {
 
     companion object {
@@ -172,6 +174,7 @@ data class NoteRecord(
                 misskeyChannelName = t.channel?.name
                 misskeyIsAcceptingOnlyLikeReaction = t.isAcceptingOnlyLikeReaction
                 misskeyIsNotAcceptingSensitiveReaction = t.isNotAcceptingSensitiveReaction
+                misskeyIsRequireNyaize = t.isRequireNyaize
             }
         }
         customEmojiAspectRatioMap = model.emojis?.mapNotNull {  emoji ->
@@ -241,6 +244,7 @@ data class NoteRecord(
                         },
                         isAcceptingOnlyLikeReaction = misskeyIsAcceptingOnlyLikeReaction,
                         isNotAcceptingSensitiveReaction = misskeyIsNotAcceptingSensitiveReaction,
+                        isRequireNyaize = misskeyIsRequireNyaize,
                     )
                 }
                 "mastodon" -> {

@@ -36,11 +36,8 @@ class UserReactionPagingStoreImpl(
         }
     }
 
-    private val previousPagingController = PreviousPagingController(
+    private val previousPagingController = PreviousPagingController.create(
         pagingImpl,
-        pagingImpl,
-        pagingImpl,
-        pagingImpl
     )
 
     override val state: Flow<PageableState<List<UserReactionRelation>>>

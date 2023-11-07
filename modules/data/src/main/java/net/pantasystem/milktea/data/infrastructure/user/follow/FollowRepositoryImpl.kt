@@ -5,9 +5,11 @@ import kotlinx.coroutines.withContext
 import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.common_android.hilt.IODispatcher
 import net.pantasystem.milktea.data.infrastructure.user.UserCacheUpdaterFromUserActionResult
+import net.pantasystem.milktea.model.user.FollowState
 import net.pantasystem.milktea.model.user.User
 import net.pantasystem.milktea.model.user.UserRepository
 import net.pantasystem.milktea.model.user.follow.FollowRepository
+import net.pantasystem.milktea.model.user.follow.FollowUpdateParams
 import javax.inject.Inject
 
 internal class FollowRepositoryImpl @Inject constructor(
@@ -51,6 +53,23 @@ internal class FollowRepositoryImpl @Inject constructor(
                             hasPendingFollowRequestFromYou = if (u.info.isLocked) false else it.hasPendingFollowRequestFromYou
                         )
                     }
+                )
+            }
+        }
+    }
+
+    override suspend fun update(userId: User.Id, params: FollowUpdateParams): Result<Unit> = runCancellableCatching {
+        val user = userRepository.find(userId, true) as User.Detail
+        if (user.followState != FollowState.FOLLOWING) {
+            throw IllegalStateException("You can't update follow state of user who is not following.")
+        }
+        withContext(coroutineDispatcher) {
+            val result = followApiAdapter.update(userId, params)
+            userCacheUpdaterFromUserActionResult(userId, result) { u ->
+                u.copy(
+                    related = u.related?.copy(
+                        isNotify = params.isNotify ?: false,
+                    )
                 )
             }
         }

@@ -5,6 +5,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.withContext
 import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.common_android.hilt.DefaultDispatcher
@@ -25,6 +26,7 @@ internal class CustomEmojiRepositoryImpl @Inject constructor(
     private val aspectRatioDataSource: CustomEmojiAspectRatioDataSource,
     private val imageCacheRepository: ImageCacheRepository,
     private val customEmojiDAO: CustomEmojiDAO,
+    private val customEmojiInserter: CustomEmojiInserter,
     @IODispatcher private val ioDispatcher: CoroutineDispatcher,
     @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher
 ) : CustomEmojiRepository {
@@ -39,27 +41,10 @@ internal class CustomEmojiRepositoryImpl @Inject constructor(
 
             val emojis =  customEmojiDAO.findByHost(host).ifEmpty {
                 val remoteEmojis = fetch(nodeInfo).getOrThrow()
-                customEmojiDAO.deleteByHost(nodeInfo.host)
-
-                val emojisBeforeInsert = remoteEmojis.map {
-                    CustomEmojiRecord.from(it.emoji, nodeInfo.host)
-                }
-
-                val inserted = emojisBeforeInsert.chunked(500).map { chunkedEmojis ->
-                    val ids = customEmojiDAO.insertAll(chunkedEmojis)
-                    chunkedEmojis.mapIndexed { index, customEmojiRecord ->
-                        customEmojiRecord.copy(id = ids[index])
-                    }
-                }.flatten()
-                insertAliases(
-                    inserted.map {
-                        it.id
-                    },
-                    remoteEmojis.map {
-                        it.aliases ?: emptyList()
-                    }
+                customEmojiInserter.convertAndReplaceAll(
+                    host,
+                    remoteEmojis,
                 )
-                inserted
             }
 
 
@@ -133,17 +118,10 @@ internal class CustomEmojiRepositoryImpl @Inject constructor(
             }
 
             customEmojiCache.put(host, emojis)
-            customEmojiDAO.deleteByHost(nodeInfo.host)
-
-            val ids = remoteEmojis.map {
-                CustomEmojiRecord.from(it.emoji, nodeInfo.host)
-            }.chunked(500).map { chunkedEmojis ->
-                customEmojiDAO.insertAll(chunkedEmojis)
-            }.flatten()
-
-            insertAliases(ids, remoteEmojis.map {
-                it.aliases ?: emptyList()
-            })
+            customEmojiInserter.convertAndReplaceAll(
+                nodeInfo.host,
+                remoteEmojis,
+            )
         }
     }
 
@@ -192,10 +170,28 @@ internal class CustomEmojiRepositoryImpl @Inject constructor(
         return customEmojiCache.getMap(host)
     }
 
+    override suspend fun findAndConvertToMap(
+        host: String
+    ): Result<Map<String, CustomEmoji>> = runCancellableCatching{
+        val cached = customEmojiCache.getMap(host)
+        if (cached.isNullOrEmpty()) {
+            findBy(host).getOrThrow()
+        } else {
+            return@runCancellableCatching cached
+        }
+        customEmojiCache.getMap(host) ?: emptyMap()
+    }
+
     override fun observeWithSearch(host: String, keyword: String): Flow<List<CustomEmoji>> {
         return customEmojiDAO.observeAndSearch(host, keyword).map { list ->
             convertToModel(list)
-        }.flowOn(defaultDispatcher)
+        }.flowOn(defaultDispatcher).onStart {
+            customEmojiCache.get(host)?.filter {
+                it.name.contains(keyword)
+            }?.let {
+                emit(it)
+            }
+        }
     }
 
     override suspend fun search(host: String, keyword: String): Result<List<CustomEmoji>> = runCancellableCatching {

@@ -22,10 +22,12 @@
 <!--    <string name="san">さん</string>-->
     <string name="following">フォロー中</string>
     <string name="follower">フォロワー</string>
-    <string name="renote">リノート</string>
-    <string name="quote_renote">引用リノート</string>
+    <string name="renote">リポスト</string>
+    <string name="renote_in_channel">チャンネル内にリポスト</string>
+    <string name="quote_renote">引用</string>
+    <string name="quote_renote_in_channel">チャンネル内に引用</string>
     <string name="discovery">discovery</string>
-    <string name="renote_was">renoteしました</string>
+    <string name="renote_was">リポストしました</string>
     <string name="input_custom_emoji">絵文字/カスタム絵文字を入力</string>
     <string name="title_activity_settings">Settings</string>
 
@@ -69,20 +71,20 @@
     <string name="media">メディア</string>
     <string name="follow">フォロー</string>
 
-    <string name="include_local_renotes">ローカルの投稿のRenoteをタイムラインに表示する</string>
-    <string name="include_renoted_my_notes">自分の投稿のRenoteをタイムラインに表示する</string>
-    <string name="include_my_renotes">自分の行ったRenoteをタイムラインに表示する</string>
+    <string name="include_local_renotes">ローカルの投稿のリポストをタイムラインに表示する</string>
+    <string name="include_renoted_my_notes">自分の投稿のリポストをタイムラインに表示する</string>
+    <string name="include_my_renotes">自分の行ったリポストをタイムラインに表示する</string>
     <string name="auto_load_timeline">タイムラインを自動で読み込む</string>
     <string name="timeline">タイムライン</string>
 
-    <string name="capture_note_when_stopped">停止時もノートをキャプチャーする</string>
+    <string name="capture_note_when_stopped">停止時も投稿をキャプチャーする</string>
     <string name="auto_load_when_stopped">停止時もタイムラインを自動で読み込む</string>
     <string name="sync">同期</string>
 
     <string name="movement">動き</string>
-    <string name="remove_note">ノートを削除する</string>
+    <string name="remove_note">投稿を削除する</string>
 
-    <string name="hide_removed_note">削除されたノートを非表示にする</string>
+    <string name="hide_removed_note">削除された投稿を非表示にする</string>
 
     <string name="appearance">見た目</string>
     <string name="theme">テーマ</string>
@@ -110,7 +112,7 @@
     <string name="request_follow">%sさんがフォローリクエストしてます</string>
     <string name="mention_by">%sさんにメンションされました</string>
     <string name="reacted_by">%sさんにリアクションされました</string>
-    <string name="renoted_by">%sさんにリノートされました</string>
+    <string name="renoted_by">%sさんにリポストされました</string>
     <string name="follow_requested_by">%sさんにフォローリクエストされました。</string>
     <string name="total_vote_count">計%s票</string>
     <string name="poll_ended">投票が終了</string>
@@ -128,7 +130,7 @@
 
     <string name="detail">詳細</string>
 
-    <string name="instance_domain">インスタンスドメイン</string>
+    <string name="instance_domain">サーバドメイン</string>
     <string name="sign_in">ログイン</string>
     <string name="user_name">ユーザー名</string>
     <string name="password">パスワード</string>
@@ -217,7 +219,7 @@
     <string name="confirm_delete_reaction">リアクション削除の確認</string>
     <string name="delete_reaction">リアクションを削除します</string>
     <string name="user">ユーザー</string>
-    <string name="note_opacity">ノートの不透明度</string>
+    <string name="note_opacity">投稿の不透明度</string>
     <string name="transparent">透明</string>
     <string name="opaque">不透明</string>
     <string name="background_image">背景画像</string>
@@ -248,23 +250,23 @@
     <string name="name">名前</string>
     <string name="receiving_source">受信ソース</string>
 
-    <string name="all_notes">全てのノート</string>
-    <string name="notes_from_following_users">フォローしているユーザーのノート</string>
-    <string name="notes_from_specific_users">指定した一人または複数のユーザーのノート</string>
-    <string name="notes_from_specific_list">指定したリストのノート</string>
-    <string name="notes_from_users_in_the_specified_group">指定したグループのノート</string>
+    <string name="all_notes">全ての投稿</string>
+    <string name="notes_from_following_users">フォローしているユーザーの投稿</string>
+    <string name="notes_from_specific_users">指定した一人または複数のユーザーの投稿</string>
+    <string name="notes_from_specific_list">指定したリストの投稿</string>
+    <string name="notes_from_users_in_the_specified_group">指定したグループの投稿</string>
     <string name="include_replies">返信を含める</string>
     <string name="keywords_to_receive">受信キーワード</string>
     <string name="keyword_input_method">AND条件の場合はスペースで区切ります。 ORの場合は改行で区切ります。</string>
     <string name="keywords_to_exclude">除外キーワード</string>
     <string name="case_sensitive">大文字小文字を区別する</string>
-    <string name="notify_notes">新しいノートを通知する</string>
-    <string name="with_files">ファイルが添付されたノートのみ</string>
+    <string name="notify_notes">新しい投稿を通知する</string>
+    <string name="with_files">ファイルが添付された投稿のみ</string>
     <string name="group">グループ</string>
     <string name="save">保存</string>
-    <string name="unrenote">Renote解除</string>
+    <string name="unrenote">リポスト解除</string>
 
-    <string name="confirm_delete_and_edit_note_description">このノートへのリアクション、Renote、返信も全て削除されます。削除してもう一度編集しますか？</string>
+    <string name="confirm_delete_and_edit_note_description">この投稿へのリアクション、リポスト、返信も全て削除されます。削除してもう一度編集しますか？</string>
     <string name="via">via</string>
     <string name="search_emojis">絵文字を検索</string>
 
@@ -280,10 +282,10 @@
     <string name="trending_tag">人気のタグ</string>
 
     <string name="save_draft">下書き保存</string>
-    <string name="save_the_note_as_a_draft">ノートを下書き保存しますか</string>
-    <string name="draft_notes">下書きノート</string>
+    <string name="save_the_note_as_a_draft">投稿を下書き保存しますか</string>
+    <string name="draft_notes">下書き投稿</string>
     <string name="toggle_content_visibility">コンテンツを表示/非表示</string>
-    <string name="delete_draft_note">下書きノートを削除する</string>
+    <string name="delete_draft_note">下書き投稿を削除する</string>
     <string name="show_remotely">リモートで表示する</string>
     <string name="incomplete_information_for_remote_user">リモートユーザーのため情報が不完全です。</string>
     <string name="local_only">ローカルのみ</string>
@@ -301,7 +303,7 @@
 
     <string name="use_simple_editor">簡易エディターを使う</string>
     <string name="retry">リトライ</string>
-    <string name="failed_to_get_the_note">ノートの取得に失敗しました</string>
+    <string name="failed_to_get_the_note">投稿の取得に失敗しました</string>
 
 
     <string name="refresh">リフレッシュ</string>
@@ -310,7 +312,7 @@
     <string name="show_more">もっと見る(%s)</string>
     <string name="hide">隠す</string>
 
-    <string name="auto_note_folding">ノートの自動折り畳み</string>
+    <string name="auto_note_folding">投稿の自動折り畳み</string>
     <string name="text_length_limit">テキスト数制限(自動的に投稿が折りたたまれます)</string>
     <string name="returns_limit">改行数制限（自動的に投稿が折りたたまれます）</string>
     <string name="height_limit">高さ制限</string>
@@ -320,12 +322,12 @@
     <string name="waiting_4_approval">認可されるのを待っています。</string>
 <!--    <string name="i_have_approved">私は認可をしました</string>-->
 <!--    <string name="waiting_4_u_to_approve">あなたが認可するのを待っています</string>-->
-    <string name="learn_note_visibility">ノートの公開範囲を記憶する</string>
+    <string name="learn_note_visibility">投稿の公開範囲を記憶する</string>
     <string name="accept">承認</string>
     <string name="reject">拒否</string>
     <string name="local">ローカル</string>
     <string name="add_user_list">ユーザーリストを追加する</string>
-    <string name="edit_note">ノートを編集</string>
+    <string name="edit_note">投稿を編集</string>
     <string name="gallery_favorite_button">gallery favorite button</string>
     <string name="popular_posts">人気な投稿</string>
     <string name="gallery">ギャラリー</string>
@@ -342,7 +344,7 @@
     <string name="pick_image">画像を選択</string>
     <string name="pick_image_from_device">ドライブから画像を選択</string>
     <string name="pick_image_from_drive">ドライブから画像を選択</string>
-    <string name="successfully_created_note">ノートの作成に成功しました</string>
+    <string name="successfully_created_note">投稿の作成に成功しました</string>
     <string name="sensitive">センシティブ</string>
 <!--    <string name="authentication_url">認証URL</string>-->
 <!--    <string name="copy_the_url_of_the_authentication_destination_to_the_clipboard">認証先のURLをクリップボードにコピーする-->
@@ -372,14 +374,14 @@
     <string name="warning_s">警告:%s</string>
     <string name="reservation_at">投稿日時</string>
     <string name="warning_reservation_msg">異なる時間に投稿される恐れがあります。</string>
-    <string name="create_mention">メンション付きノートを作成</string>
+    <string name="create_mention">メンション付き投稿を作成</string>
     <string name="change_nickname">ニックネームを変更</string>
     <string name="nickname">ニックネーム</string>
     <string name="delete_nickname">ニックネームを削除</string>
     <string name="suggested_emojis">絵文字の候補</string>
-    <string name="the_remote_emoji_does_not_exist_in_this_instance">そのリモート絵文字はこのインスタンスには存在しません。</string>
+    <string name="the_remote_emoji_does_not_exist_in_this_instance">そのリモート絵文字はこのサーバには存在しません。</string>
     <string name="view_in_browser">ブラウザで表示</string>
-    <string name="note_creation_failure">ノートの作成失敗</string>
+    <string name="note_creation_failure">投稿の作成失敗</string>
     <string name="channel">チャンネル</string>
 <!--    <string name="edit_caption">キャプションを編集</string>-->
 <!--    <string name="input_caption">キャプションを入力</string>-->
@@ -399,7 +401,7 @@
 <!--    <string name="n_posts">%d投稿</string>-->
 <!--    <string name="owned">私の</string>-->
     <string name="groups">グループ一覧</string>
-    <string name="is_enable_instance_ticker">インスタンス情報を表示</string>
+    <string name="is_enable_instance_ticker">サーバ情報を表示</string>
     <string name="successfully_created_schedule_note">スケジュール投稿が正常に作成されました</string>
     <string name="account">アカウント</string>
     <string name="switch_account">アカウント切り替え</string>
@@ -441,23 +443,23 @@
     <string name="auth_find_instance">サーバを見つける</string>
     <string name="auth_find_instance_next_button_text">次へ</string>
     <string name="auth_find_instance_show_in_web_browser_message">ブラウザに登録画面が表示されます。</string>
-    <string name="settings_note">ノート</string>
-    <string name="settings_note_divider">ノートに横区切り線を表示する</string>
+    <string name="settings_note">投稿</string>
+    <string name="settings_note_divider">投稿に横区切り線を表示する</string>
     <string name="auth_qr_code_message">別のデバイスで認証する</string>
 
     <string name="settings_show_bottom_menu">下部メニューを表示</string>
     <string name="settings_app_restart_required">アプリの再起動が必要です</string>
 
     <string name="note_editor_poll_choice_n">候補%d</string>
-    <string name="settings_visible_instance_domain_in_toolbar">ツールバーにインスタンスのドメインを表示する</string>
+    <string name="settings_visible_instance_domain_in_toolbar">ツールバーにサーバのドメインを表示する</string>
     <string name="settings_hide_media_when_mobile_network">モバイル ネットワーク時にメディアを非表示にする</string>
     <string name="notes_media_click_to_load_image">クリックして画像を読み込み</string>
     <string name="notifications_follow_requests">フォローリクエスト</string>
     <string name="content_not_exists_message">何もありません</string>
 
-    <string name="user_detail_mute_renotes">リノートを表示しない</string>
-    <string name="user_detail_unmute_renotes">リノートを表示する</string>
-    <string name="settings_renote_mute_title">リノート非表示ユーザ</string>
+    <string name="user_detail_mute_renotes">リポストを表示しない</string>
+    <string name="user_detail_unmute_renotes">リポストを表示する</string>
+    <string name="settings_renote_mute_title">リポスト非表示ユーザ</string>
     <string name="bookmark">ブックマーク</string>
 
     <string name="milktea_catchphrase">FediverseライフにMilkteaはいかが?</string>
@@ -476,7 +478,7 @@
     <string name="auth_error_s">エラー %s</string>
     <string name="auth_continue_auth">Continue</string>
     <string name="auth_copied_to_clipboard">クリップボードにコピーしました</string>
-    <string name="auth_instance_domain">インスタンスドメイン</string>
+    <string name="auth_instance_domain">サーバドメイン</string>
     <string name="auth_https">https://</string>
     <string name="auth_waiting_4_u_to_approve">あなたが認可するのを待っています</string>
     <string name="auth_i_have_approved">私は認可をしました</string>
@@ -572,10 +574,10 @@
     <string name="inapp_notification_sound">アプリ内通知音を有効にする</string>
     <string name="streaming">自動更新</string>
     <string name="is_stop_timeline_streaming_when_background">バックグラウンドでタイムラインを更新しない</string>
-    <string name="is_stop_note_capture_when_background">バックグラウンドでノートをキャプチャしない</string>
+    <string name="is_stop_note_capture_when_background">バックグラウンドで投稿をキャプチャしない</string>
     <string name="enable_automic_updates">自動更新を有効にする</string>
     <string name="please_login">ログインしてください</string>
-    <string name="settings_edit_tab_only_media">ファイルが添付されたノートのみ表示する</string>
+    <string name="settings_edit_tab_only_media">ファイルが添付された投稿のみ表示する</string>
     <string name="settings_about_milktea">Milkteaについて</string>
     <string name="settings_about_milktea_source_code">ソースコード(GitHub)</string>
     <string name="settings_emoji_picker">絵文字ピッカー</string>
@@ -597,10 +599,10 @@
     <string name="user_mute_specify_time_indefinite_period">無期限</string>
     <string name="view_remotely">リモートで表示</string>
     <string name="follows_you">フォローされています</string>
-    <string name="settings_note_content_font_size">ノートコンテンツ文字サイズ(%fsp)</string>
-    <string name="settings_note_header_font_size">ノートヘッダー文字サイズ(%fsp)</string>
-    <string name="settings_note_reaction_counter_font_size">ノートリアクション件数表示の絵文字および文字サイズ(%fsp, %fps)</string>
-    <string name="settings_note_custom_emoji_scale_size_in_text">ノートの本文中のカスタム絵文字の倍率(%f倍)</string>
+    <string name="settings_note_content_font_size">投稿コンテンツ文字サイズ(%fsp)</string>
+    <string name="settings_note_header_font_size">投稿ヘッダー文字サイズ(%fsp)</string>
+    <string name="settings_note_reaction_counter_font_size">投稿リアクション件数表示の絵文字および文字サイズ(%fsp, %fps)</string>
+    <string name="settings_note_custom_emoji_scale_size_in_text">投稿の本文中のカスタム絵文字の倍率(%f倍)</string>
     <string name="suggestion_users">おすすめユーザ</string>
     <string name="trend_posted_person_count_msg">%d人が投稿</string>
     <string name="notes_confirm_attach_quote_note_by_url">引用として添付しますか?</string>
@@ -609,7 +611,7 @@
     <string name="post_only">投稿のみ</string>
     <string name="settings_display_timestamps_as_absolute_dates">タイムスタンプを絶対表示にする</string>
     <string name="settings_cache_config">キャッシュ設定</string>
-    <string name="settings_note_cache">ノートのキャッシュ</string>
+    <string name="settings_note_cache">投稿のキャッシュ</string>
     <string name="settings_custom_emoji_cache">カスタム絵文字のキャッシュ</string>
     <string name="move_files_here">ここにファイルを移動</string>
     <string name="reaction_acceptance_all">全て</string>
@@ -629,6 +631,8 @@
     <string name="alarm_permission_description_message">予約投稿はアラーム機能の仕組みを利用するため、設定からMilkteaにアラームの権限を付与する必要性があります。</string>
     <string name="exclude_replies">Exclude replies</string>
     <string name="exclude_reposts">Exclude reposts</string>
+    <string name="notify_about_new_posts">投稿の通知を受信する</string>
+    <string name="stop_notify_about_new_posts">投稿の通知をやめる</string>
     <!-- User -->
 
 
