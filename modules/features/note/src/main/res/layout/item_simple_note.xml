@@ -225,23 +225,18 @@
                         app:emojis="@{note.toShowNote.note.emojis}"
                         app:translationState="@{note.translateState}" />
 
-                    <net.pantasystem.milktea.common_android_ui.MediaPreviewAspectLayout
+                    <include
+                        android:id="@+id/mediaPreview"
+
+                        layout="@layout/media_preview"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
+                        android:layout_height="match_parent"
+                        app:media="@{note.media}"
+                        tools:visibility="visible"
                         android:layout_marginTop="2dp"
                         android:visibility="@{note.media.visibleMediaPreviewArea ? View.VISIBLE : View.GONE}"
-                        tools:layout_height="20dp">
-
-                        <include
-                            android:id="@+id/mediaPreview"
-
-                            layout="@layout/media_preview"
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            app:media="@{note.media}"
-                            tools:visibility="visible" />
-
-                    </net.pantasystem.milktea.common_android_ui.MediaPreviewAspectLayout>
+                        tools:layout_height="20dp"
+                        />
 
                     <androidx.recyclerview.widget.RecyclerView
                         android:id="@+id/manyFilePreviewListView"

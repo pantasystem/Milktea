@@ -8,10 +8,11 @@ import androidx.annotation.AttrRes
 import androidx.annotation.StyleRes
 import androidx.core.view.children
 import androidx.core.view.isVisible
+import net.pantasystem.milktea.common_android.R
 
 class MediaLayout : FrameLayout {
 
-    private val spaceMargin = 8
+    private var spaceMargin = 8
     constructor(context: Context) : super(context)
     constructor(context: Context, attrs: AttributeSet?)
             : this(context, attrs, 0)
@@ -24,15 +25,15 @@ class MediaLayout : FrameLayout {
         @AttrRes defStyleAttr: Int,
         @StyleRes defStyleRes: Int
     ) : super(context, attrs, defStyleAttr, defStyleRes) {
-//        val a = context.obtainStyledAttributes(
-//            attrs, R.styleable.AutoCollapsingLayout, defStyleAttr, defStyleRes
-//        )
-//        a.apply {
-//            val buttonId = getResourceId(R.styleable.AutoCollapsingLayout_expandableButton, -1)
-//            expandableButtonId = if (buttonId == -1) null else buttonId
-//        }
-//
-//        a.recycle()
+        val a = context.obtainStyledAttributes(
+            attrs, R.styleable.MediaLayout, defStyleAttr, defStyleRes
+        )
+        a.apply {
+            val spaceSize = getResourceId(R.styleable.MediaLayout_spaceSize, 8)
+            spaceMargin = if (spaceSize != 0) spaceSize / 2 else 0
+        }
+
+        a.recycle()
     }
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {

@@ -18,6 +18,7 @@
             android:baselineAligned="false"
             rect="@{30F}"
             memoVisibility="@{ media.isHideFourMediaPreviewLayout() ? View.GONE : View.VISIBLE }"
+            app:spaceSize="4dp"
         >
         <FrameLayout
             android:id="@+id/baseFrameTopLeft"
