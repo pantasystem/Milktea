@@ -11,6 +11,13 @@ import net.pantasystem.milktea.model.note.NoteRepository
 import javax.inject.Inject
 import javax.inject.Singleton
 
+/**
+ * 複数のアカウントからリノートを行うユースケースです。
+ * Milkteaでは原則としてUseCaseのメソッドは一つとしているが、このユースケースは下記理由によって、
+ * 二つ以上メソッドが公開されていることを例外的に許容しています。
+ * - リノート対象のノートがチャンネル内に投稿されたノートの場合、チャンネル内にリノートするかどうかでメソッドを分ける必要があった
+ * - 微妙にユースケース自体は異なるが、UseCaseを分離するとService層を作り必要が出てきたりしてと複雑度が増してしまうため、一つのUseCaseにまとめています。
+ */
 @Singleton
 class CreateRenoteMultipleAccountUseCase @Inject constructor(
     private val accountRepository: AccountRepository,
