@@ -11,4 +11,7 @@
     <declare-styleable name="AutoCollapsingLayout">
         <attr name="expandableButton" format="reference" />
     </declare-styleable>
+    <declare-styleable name="MediaLayout">
+        <attr name="spaceSize" format="dimension" />
+    </declare-styleable>
 </resources>
