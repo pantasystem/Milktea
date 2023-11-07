@@ -277,7 +277,7 @@
                         />
 
 
-                    <androidx.constraintlayout.widget.ConstraintLayout
+                    <RelativeLayout
                         android:id="@+id/subNote"
                         isUserNameDefault="@{note.config.isUserNameDefault}"
                         memoVisibility='@{note.subNote != null ? View.VISIBLE : View.GONE}'
@@ -302,8 +302,6 @@
                             app:iconShape="@{note.config.avatarIconShapeType.value}"
                             app:imageUrl="@{note.subNoteAvatarUrl}"
                             app:blurhash="@{note.subNote.user.avatarBlurhash}"
-                            app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toTopOf="parent"
                             app:transitionDestinationUser="@{note.subNote.user}" />
 
                         <TextView
@@ -323,7 +321,6 @@
                             app:layout_constraintTop_toTopOf="parent"
                             tools:text="mainName"
 
-
                             />
 
                         <TextView
@@ -335,8 +332,6 @@
                             android:maxLines="1"
                             android:textSize="@dimen/note_author_info_text_size"
                             android:textStyle="italic"
-                            app:layout_constraintStart_toEndOf="@id/subNoteMainName"
-                            app:layout_constraintTop_toTopOf="parent"
                             tools:text="subName"
 
                             />
@@ -346,8 +341,7 @@
                             memoVisibility='@{note.cw == null ? View.GONE : View.VISIBLE}'
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toBottomOf="@id/subNoteMainName"
+                            android:layout_below="@id/subNoteSubName"
                             app:textNode="@{note.subCwNode}"
                             tools:text="cwcwcwwcwcw" />
 
@@ -363,9 +357,7 @@
                             android:onClick="@{ () -> note.changeSubContentFolding() }"
                             android:textColor="?attr/colorAccent"
 
-                            app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toBottomOf="@id/subCw"
-
+                            android:layout_below="@id/subCw"
                             tools:text="展開する" />
 
                         <TextView
@@ -376,8 +368,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:textSize="@dimen/note_content_text_size"
-                            app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toBottomOf="@id/subContentFoldingButton"
+                            android:layout_below="@id/subContentFoldingButton"
                             tools:text="aowjfoiwajehofijawioefjioawejfiowajeiofhawoifahwoiefwaioe" />
 
                         <include
@@ -387,14 +378,14 @@
                             android:layout_height="200dp"
                             android:layout_marginTop="2dp"
                             android:visibility="@{note.isVisibleSubNoteMediaPreview ? View.VISIBLE : View.GONE}"
-                            app:layout_constraintEnd_toEndOf="parent"
-                            app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toBottomOf="@id/subNoteText"
+
+                            android:layout_below="@id/subNoteText"
                             app:media="@{note.subNoteMedia}"
-                            tools:layout_height="20dp" />
+                            tools:layout_height="20dp"
+                            />
 
 
-                    </androidx.constraintlayout.widget.ConstraintLayout>
+                    </RelativeLayout>
                 </LinearLayout>
 
 
