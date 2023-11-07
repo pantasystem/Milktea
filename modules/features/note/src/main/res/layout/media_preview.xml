@@ -24,7 +24,6 @@
             android:id="@+id/baseFrameTopLeft"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_weight="1"
             tools:ignore="NestedWeights"
             thumbnailView="@{thumbnailTopLeft}"
             playButton="@{actionButtonTopLeft}"
@@ -87,7 +86,6 @@
             android:id="@+id/baseFrameTopRight"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_weight="1"
             tools:ignore="NestedWeights"
             thumbnailView="@{thumbnailTopRight}"
 
@@ -150,7 +148,6 @@
             android:id="@+id/baseFrameBottomLeft"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_weight="1"
             thumbnailView="@{thumbnailBottomLeft}"
             playButton="@{actionButtonBottomLeft}"
             previewAbleFileList="@{media.files}"
@@ -214,7 +211,6 @@
             android:id="@+id/baseFrameBottomRight"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_weight="1"
             thumbnailView="@{thumbnailBottomRight}"
 
             playButton="@{actionButtonBottomRight}"
