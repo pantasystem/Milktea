@@ -271,7 +271,6 @@
                         android:id="@+id/url_preview_list"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
                         app:previewList="@{note.previews}"
                         android:orientation="vertical"
                         tools:listitem="@layout/item_url_preview"
