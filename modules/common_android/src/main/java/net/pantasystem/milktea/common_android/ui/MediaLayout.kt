@@ -3,14 +3,14 @@ package net.pantasystem.milktea.common_android.ui
 import android.content.Context
 import android.util.AttributeSet
 import android.view.View
-import android.widget.FrameLayout
+import android.view.ViewGroup
 import androidx.annotation.AttrRes
 import androidx.annotation.StyleRes
 import androidx.core.view.children
 import androidx.core.view.isVisible
 import net.pantasystem.milktea.common_android.R
 
-class MediaLayout : FrameLayout {
+class MediaLayout : ViewGroup {
 
     private var spaceMargin = 8
     constructor(context: Context) : super(context)
