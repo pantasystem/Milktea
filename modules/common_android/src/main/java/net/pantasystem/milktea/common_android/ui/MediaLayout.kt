@@ -59,11 +59,11 @@ class MediaLayout : FrameLayout {
                 val childWidth = width / 2
                 // heightは親と同じサイズ
                 childOne?.measure(
-                    MeasureSpec.makeMeasureSpec(childWidth, MeasureSpec.EXACTLY),
+                    MeasureSpec.makeMeasureSpec(childWidth + spaceMargin, MeasureSpec.EXACTLY),
                     MeasureSpec.makeMeasureSpec(height.toInt(), MeasureSpec.EXACTLY)
                 )
                 childTwo?.measure(
-                    MeasureSpec.makeMeasureSpec(childWidth, MeasureSpec.EXACTLY),
+                    MeasureSpec.makeMeasureSpec(childWidth + spaceMargin, MeasureSpec.EXACTLY),
                     MeasureSpec.makeMeasureSpec(height.toInt(), MeasureSpec.EXACTLY)
                 )
             }
@@ -71,16 +71,16 @@ class MediaLayout : FrameLayout {
                 val childWidth = width / 2
                 val childHeight = height / 2
                 childOne?.measure(
-                    MeasureSpec.makeMeasureSpec(childWidth, MeasureSpec.EXACTLY),
+                    MeasureSpec.makeMeasureSpec(childWidth + spaceMargin, MeasureSpec.EXACTLY),
                     MeasureSpec.makeMeasureSpec(height.toInt(), MeasureSpec.EXACTLY)
                 )
                 childTwo?.measure(
-                    MeasureSpec.makeMeasureSpec(childWidth, MeasureSpec.EXACTLY),
-                    MeasureSpec.makeMeasureSpec(childHeight.toInt(), MeasureSpec.EXACTLY)
+                    MeasureSpec.makeMeasureSpec(childWidth + spaceMargin, MeasureSpec.EXACTLY),
+                    MeasureSpec.makeMeasureSpec(childHeight.toInt() + spaceMargin, MeasureSpec.EXACTLY)
                 )
                 childThree?.measure(
-                    MeasureSpec.makeMeasureSpec(childWidth, MeasureSpec.EXACTLY),
-                    MeasureSpec.makeMeasureSpec(childHeight.toInt(), MeasureSpec.EXACTLY)
+                    MeasureSpec.makeMeasureSpec(childWidth + spaceMargin, MeasureSpec.EXACTLY),
+                    MeasureSpec.makeMeasureSpec(childHeight.toInt() + spaceMargin, MeasureSpec.EXACTLY)
                 )
             }
             4 -> {
@@ -88,8 +88,8 @@ class MediaLayout : FrameLayout {
                 val childHeight = height / 2
                 children.forEach{ view ->
                     view.measure(
-                        MeasureSpec.makeMeasureSpec(childWidth, MeasureSpec.EXACTLY),
-                        MeasureSpec.makeMeasureSpec(childHeight.toInt(), MeasureSpec.EXACTLY)
+                        MeasureSpec.makeMeasureSpec(childWidth + spaceMargin, MeasureSpec.EXACTLY),
+                        MeasureSpec.makeMeasureSpec(childHeight.toInt() + spaceMargin, MeasureSpec.EXACTLY)
                     )
                 }
             }
@@ -112,8 +112,8 @@ class MediaLayout : FrameLayout {
                 val childOne = getChildAt(0)
                 val childTwo = getChildAt(1)
                 val childWidth = width / 2
-                childOne.layout(0, 0, childWidth, height.toInt())
-                childTwo.layout(childWidth, 0, width, height.toInt())
+                childOne.layout(0, 0, childWidth - spaceMargin, height.toInt())
+                childTwo.layout(childWidth + spaceMargin, 0, width, height.toInt())
             }
             3 -> {
                 val childOne = getChildAt(0)
@@ -121,9 +121,9 @@ class MediaLayout : FrameLayout {
                 val childThree = getChildAt(2)
                 val childWidth = width / 2
                 val childHeight = height / 2
-                childOne.layout(0, 0, childWidth, height.toInt())
-                childTwo.layout(childWidth, 0, width, childHeight.toInt())
-                childThree.layout(childWidth, childHeight.toInt(), width, height.toInt())
+                childOne.layout(0, 0, childWidth - spaceMargin, height.toInt())
+                childTwo.layout(childWidth + spaceMargin, 0, width, childHeight.toInt() - spaceMargin)
+                childThree.layout(childWidth + spaceMargin, childHeight.toInt() + spaceMargin, width, height.toInt())
             }
             4 -> {
                 val childOne = getChildAt(0)
@@ -132,10 +132,10 @@ class MediaLayout : FrameLayout {
                 val childFour = getChildAt(3)
                 val childWidth = width / 2
                 val childHeight = height / 2
-                childOne.layout(0, 0, childWidth, childHeight.toInt())
-                childTwo.layout(childWidth, 0, width, childHeight.toInt())
-                childThree.layout(0, childHeight.toInt(), childWidth, height.toInt())
-                childFour.layout(childWidth, childHeight.toInt(), width, height.toInt())
+                childOne.layout(0, 0, childWidth - spaceMargin, childHeight.toInt() - spaceMargin)
+                childTwo.layout(childWidth + spaceMargin, 0, width, childHeight.toInt() - spaceMargin)
+                childThree.layout(0, childHeight.toInt() + spaceMargin, childWidth - spaceMargin, height.toInt())
+                childFour.layout(childWidth + spaceMargin, childHeight.toInt() + spaceMargin, width, height.toInt())
             }
         }
     }
