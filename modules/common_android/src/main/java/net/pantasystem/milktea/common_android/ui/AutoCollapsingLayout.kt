@@ -3,6 +3,7 @@ package net.pantasystem.milktea.common_android.ui
 import android.animation.Animator
 import android.content.Context
 import android.util.AttributeSet
+import android.view.Gravity
 import android.view.View
 import android.widget.FrameLayout
 import androidx.annotation.AttrRes
@@ -30,6 +31,8 @@ class AutoCollapsingLayout : FrameLayout {
 
     private var expandableButtonId: Int? = null
     private var currentAnimator: Animator? = null
+
+    private var isNeedExpandedButtonVisible: Boolean = false
 
     @Inject
     internal lateinit var noteExpandedHeightSize: NoteExpandedHeightSize
@@ -81,10 +84,12 @@ class AutoCollapsingLayout : FrameLayout {
                     expandedButton.isVisible = true
                 }
             }
+            isNeedExpandedButtonVisible = true
         } else {
-            if (expandedButton?.isVisible == true) {
-                expandedButton.isVisible = false
-            }
+            isNeedExpandedButtonVisible = false
+//            if (expandedButton?.isVisible == true) {
+//                expandedButton.isVisible = false
+//            }
         }
 
         setMeasuredDimension(
@@ -108,6 +113,7 @@ class AutoCollapsingLayout : FrameLayout {
 
     fun setExpandedAndInvalidate(value: Boolean) {
         this.isExpanded = value
+        isNeedExpandedButtonVisible = false
 
         invalidate()
         requestLayout()
@@ -138,6 +144,10 @@ class AutoCollapsingLayout : FrameLayout {
 
     }
 
+    override fun onLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int) {
+        layoutChildren(left, top, right, bottom)
+    }
+
 
     fun setCurrentAnimator(animator: Animator) {
         currentAnimator?.cancel()
@@ -152,7 +162,78 @@ class AutoCollapsingLayout : FrameLayout {
     }
 
 
+
+    private fun layoutChildren(left: Int, top: Int, right: Int, bottom: Int) {
+        val count = childCount
+        val parentLeft = 0
+        val parentTop = 0
+        val parentRight = right - left
+        val parentBottom = bottom - top
+
+        for (i in 0 until count) {
+            val child = getChildAt(i)
+            if (child.visibility != View.GONE) {
+                val lp = child.layoutParams as LayoutParams
+                val width = child.measuredWidth
+                val height = child.measuredHeight
+                var childLeft: Int
+                var childTop: Int
+
+                var gravity = lp.gravity
+                if (gravity == -1) {
+                    gravity = DEFAULT_CHILD_GRAVITY
+                }
+                val layoutDirection = this.layoutDirection
+                val absoluteGravity = Gravity.getAbsoluteGravity(gravity, layoutDirection)
+                val verticalGravity = gravity and Gravity.VERTICAL_GRAVITY_MASK
+
+                childLeft = when (absoluteGravity and Gravity.HORIZONTAL_GRAVITY_MASK) {
+                    Gravity.CENTER_HORIZONTAL -> parentLeft + (parentRight - parentLeft - width) / 2 +
+                            lp.leftMargin - lp.rightMargin
+
+                    Gravity.RIGHT -> parentRight - width - lp.rightMargin
+                    Gravity.LEFT -> parentLeft + lp.leftMargin
+                    else -> parentLeft + lp.leftMargin
+                }
+                childTop = when (verticalGravity) {
+                    Gravity.TOP -> parentTop + lp.topMargin
+                    Gravity.CENTER_VERTICAL -> parentTop + (parentBottom - parentTop - height) / 2 +
+                            lp.topMargin - lp.bottomMargin
+
+                    Gravity.BOTTOM -> parentBottom - height - lp.bottomMargin
+                    else -> parentTop + lp.topMargin
+                }
+
+                if (child.id == expandableButtonId) {
+                    if (isNeedExpandedButtonVisible) {
+                        child.layout(
+                            childLeft,
+                            childTop,
+                            childLeft + width,
+                            childTop + height
+                        )
+                    } else {
+                        child.layout(0, 0, 0, 0)
+                    }
+
+                } else {
+                    child.layout(
+                        childLeft,
+                        childTop,
+                        childLeft + width,
+                        childTop + height
+                    )
+                }
+            }
+
+
+        }
+    }
+
+
     companion object {
+        private const val DEFAULT_CHILD_GRAVITY = Gravity.TOP or Gravity.START
+
 
         @JvmStatic
         @BindingAdapter("overflowExpanded")
