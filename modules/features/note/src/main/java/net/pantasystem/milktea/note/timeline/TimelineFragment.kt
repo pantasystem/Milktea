@@ -250,6 +250,9 @@ class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view)
             override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
                 menuInflater.inflate(R.menu.menu_timeline, menu)
                 setMenuTint(requireActivity(), menu)
+                if (mPageable is Pageable.Mastodon) {
+                    menu.findItem(R.id.set_time_machine).isVisible = false
+                }
             }
 
             override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
