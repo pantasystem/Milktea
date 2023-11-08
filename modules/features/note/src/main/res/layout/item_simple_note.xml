@@ -232,7 +232,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         app:media="@{note.media}"
-                        tools:visibility="visible"
+                        tools:visibility="gone"
                         android:layout_marginTop="2dp"
                         android:visibility="@{note.media.visibleMediaPreviewArea ? View.VISIBLE : View.GONE}"
                         tools:layout_height="20dp"
@@ -377,6 +377,7 @@
                             android:layout_below="@id/subNoteText"
                             app:media="@{note.subNoteMedia}"
                             tools:layout_height="20dp"
+                            tools:visibility="gone"
                             />
 
 
@@ -449,182 +450,184 @@
 
             />
 
-        <LinearLayout
-            android:id="@+id/noteActionButtonsBase"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:gravity="center_vertical"
-            app:layout_constraintEnd_toEndOf="parent"
+        <!-- BEGIN 下部コントロールパネル BEGIN -->
+
+        <ImageButton
+            android:id="@+id/replyButton"
+            style="?android:attr/borderlessButtonStyle"
+            android:layout_width="@dimen/note_bottom_action_icon_size"
+            android:layout_height="@dimen/note_bottom_action_icon_size"
+            android:layout_marginStart="8dp"
+            android:contentDescription="@string/reply_title"
+            android:onClick="@{ ()-> noteCardActionListener.onReplyButtonClicked(note)}"
+
+            android:padding="@dimen/note_bottom_action_icon_padding_size"
+            android:scaleType="centerCrop"
+            app:layout_constraintEnd_toStartOf="@+id/replyCountView"
             app:layout_constraintStart_toEndOf="@id/avatarIcon"
             app:layout_constraintTop_toBottomOf="@id/absoluteTimestamp"
+            app:srcCompat="@drawable/ic_reply_black_24dp"
+            app:tint="?attr/normalIconTint"
+            tools:ignore="TouchTargetSizeCheck"
+            />
 
-            >
+        <TextView
+            android:id="@+id/replyCountView"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_weight="1"
+            android:maxLines="1"
+            android:text='@{String.valueOf(SafeUnbox.unbox(note.replyCount))}'
+            android:textSize="@dimen/note_counter_text_size"
+            android:visibility='@{note.replyCount == 0 ? View.INVISIBLE : View.VISIBLE}'
 
-            <ImageButton
-                android:id="@+id/replyButton"
-                style="?android:attr/borderlessButtonStyle"
-                android:layout_width="@dimen/note_bottom_action_icon_size"
-                android:layout_height="@dimen/note_bottom_action_icon_size"
-                android:layout_marginStart="8dp"
-                android:contentDescription="@string/reply_title"
-                android:onClick="@{ ()-> noteCardActionListener.onReplyButtonClicked(note)}"
-
-                android:padding="@dimen/note_bottom_action_icon_padding_size"
-                android:scaleType="centerCrop"
-                app:layout_constraintEnd_toStartOf="@+id/replyCountView"
-                app:layout_constraintStart_toEndOf="@id/avatarIcon"
-                app:layout_constraintTop_toBottomOf="@id/reaction_view"
-                app:srcCompat="@drawable/ic_reply_black_24dp"
-                app:tint="?attr/normalIconTint"
-                tools:ignore="TouchTargetSizeCheck" />
-
-            <TextView
-                android:id="@+id/replyCountView"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical"
-                android:layout_weight="1"
-                android:maxLines="1"
-                android:text='@{String.valueOf(SafeUnbox.unbox(note.replyCount))}'
-                android:textSize="@dimen/note_counter_text_size"
-                android:visibility='@{note.replyCount == 0 ? View.INVISIBLE : View.VISIBLE}'
-
-                app:emojiCompatEnabled="false"
-                app:layout_constraintBottom_toBottomOf="@id/replyButton"
-                app:layout_constraintEnd_toStartOf="@+id/renoteButton"
-                app:layout_constraintStart_toEndOf="@+id/replyButton"
-                app:layout_constraintTop_toBottomOf="@id/reaction_view"
-                app:layout_constraintTop_toTopOf="@id/replyButton"
-                tools:text="99999999999" />
+            app:emojiCompatEnabled="false"
+            app:layout_constraintBottom_toBottomOf="@id/replyButton"
+            app:layout_constraintEnd_toStartOf="@+id/renoteButton"
+            app:layout_constraintStart_toEndOf="@+id/replyButton"
+            app:layout_constraintTop_toBottomOf="@id/absoluteTimestamp"
+            app:layout_constraintTop_toTopOf="@id/replyButton"
+            tools:text="99999999999" />
 
 
-            <ImageButton
-                android:id="@+id/renoteButton"
-                style="?android:attr/borderlessButtonStyle"
-                renoteButtonColor="@{note.currentNote}"
-                android:layout_width="@dimen/note_bottom_action_icon_size"
-                android:layout_height="@dimen/note_bottom_action_icon_size"
-                android:contentDescription="@string/renote"
-                android:padding="@dimen/note_bottom_action_icon_padding_size"
-                android:scaleType="centerCrop"
-                android:visibility="@{ note.canRenote ? View.VISIBLE : View.GONE }"
-                app:clickTargetNote="@{note}"
-                app:layout_constraintEnd_toStartOf="@+id/renoteCountView"
-                app:layout_constraintStart_toEndOf="@id/replyCountView"
-                app:layout_constraintTop_toBottomOf="@id/reaction_view"
-                app:notesViewModelForClickRenote="@{noteCardActionListener}"
-                app:srcCompat="@drawable/ic_re_note"
-                tools:ignore="TouchTargetSizeCheck" />
+        <ImageButton
+            android:id="@+id/renoteButton"
+            style="?android:attr/borderlessButtonStyle"
+            renoteButtonColor="@{note.currentNote}"
+            android:layout_width="@dimen/note_bottom_action_icon_size"
+            android:layout_height="@dimen/note_bottom_action_icon_size"
+            android:contentDescription="@string/renote"
+            android:padding="@dimen/note_bottom_action_icon_padding_size"
+            android:scaleType="centerCrop"
+            android:visibility="@{ note.canRenote ? View.VISIBLE : View.GONE }"
+            app:clickTargetNote="@{note}"
+            app:layout_constraintEnd_toStartOf="@+id/renoteCountView"
+            app:layout_constraintStart_toEndOf="@id/replyCountView"
+            app:layout_constraintTop_toBottomOf="@id/absoluteTimestamp"
+            app:notesViewModelForClickRenote="@{noteCardActionListener}"
+            app:srcCompat="@drawable/ic_re_note"
+            tools:ignore="TouchTargetSizeCheck" />
 
-            <TextView
-                android:id="@+id/renoteCountView"
-                android:layout_width="0dp"
+        <TextView
+            android:id="@+id/renoteCountView"
+            android:layout_width="0dp"
 
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical"
-                android:layout_weight="1"
-                android:maxLines="1"
-                android:text='@{String.valueOf(SafeUnbox.unbox(note.currentNote.renoteCount))}'
-                android:textSize="@dimen/note_counter_text_size"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_weight="1"
+            android:maxLines="1"
+            android:text='@{String.valueOf(SafeUnbox.unbox(note.currentNote.renoteCount))}'
+            android:textSize="@dimen/note_counter_text_size"
 
-                android:visibility='@{note.currentNote.renoteCount == 0 ? View.INVISIBLE : View.VISIBLE}'
-                app:emojiCompatEnabled="false"
-                app:layout_constraintBottom_toBottomOf="@id/renoteButton"
-                app:layout_constraintEnd_toStartOf="@id/toggleReactionButton"
-                app:layout_constraintStart_toEndOf="@id/renoteButton"
-                app:layout_constraintTop_toBottomOf="@id/reaction_view"
-                app:layout_constraintTop_toTopOf="@id/renoteButton"
-                tools:text="10" />
+            android:visibility='@{note.currentNote.renoteCount == 0 ? View.INVISIBLE : View.VISIBLE}'
+            app:emojiCompatEnabled="false"
+            app:layout_constraintEnd_toStartOf="@id/toggleMastodonFavouriteButton"
+            app:layout_constraintStart_toEndOf="@id/renoteButton"
+            app:layout_constraintTop_toTopOf="@id/renoteButton"
+            app:layout_constraintBottom_toBottomOf="@id/renoteButton"
+            tools:text="10" />
 
-            <ImageButton
-                android:id="@+id/toggleMastodonFavouriteButton"
-                style="?android:attr/borderlessButtonStyle"
-                favoriteButtonIcon="@{note.currentNote}"
-                android:layout_width="@dimen/note_bottom_action_icon_size"
-                android:layout_height="@dimen/note_bottom_action_icon_size"
-                android:contentDescription="@string/reaction"
-                android:onClick="@{ () -> noteCardActionListener.onFavoriteButtonClicked(note.currentNote) }"
-                android:padding="@dimen/note_bottom_action_icon_padding_size"
-                android:scaleType="centerCrop"
-                android:src="@drawable/ic_star_black_24dp"
-                app:tint="?attr/normalIconTint"
+        <ImageButton
+            android:id="@+id/toggleMastodonFavouriteButton"
+            style="?android:attr/borderlessButtonStyle"
+            favoriteButtonIcon="@{note.currentNote}"
+            android:layout_width="@dimen/note_bottom_action_icon_size"
+            android:layout_height="@dimen/note_bottom_action_icon_size"
+            android:contentDescription="@string/reaction"
+            android:onClick="@{ () -> noteCardActionListener.onFavoriteButtonClicked(note.currentNote) }"
+            android:padding="@dimen/note_bottom_action_icon_padding_size"
+            android:scaleType="centerCrop"
+            android:src="@drawable/ic_star_black_24dp"
+            app:tint="?attr/normalIconTint"
 
-                tools:ignore="TouchTargetSizeCheck"
-                tools:srcCompat="@drawable/ic_star_black_24dp" />
+            tools:ignore="TouchTargetSizeCheck"
+            tools:srcCompat="@drawable/ic_star_black_24dp"
+            app:layout_constraintStart_toEndOf="@id/renoteCountView"
+            app:layout_constraintEnd_toStartOf="@id/mastodonFavoriteCountView"
+            app:layout_constraintTop_toBottomOf="@id/absoluteTimestamp"
 
-            <TextView
-                android:id="@+id/mastodonFavoriteCountView"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
+            />
 
-                android:layout_gravity="center_vertical"
-                android:layout_weight="1"
-                android:maxLines="1"
-                android:text='@{String.valueOf(SafeUnbox.unbox(note.favoriteCount))}'
-                android:textSize="@dimen/note_counter_text_size"
+        <TextView
+            android:id="@+id/mastodonFavoriteCountView"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
 
-                android:visibility='@{note.currentNote.mastodon ? (note.favoriteCount == null || note.favoriteCount == 0 ? View.INVISIBLE : View.VISIBLE ) : View.GONE }'
-                app:emojiCompatEnabled="false"
-                tools:text="10" />
+            android:layout_gravity="center_vertical"
+            android:layout_weight="1"
+            android:maxLines="1"
+            android:text='@{String.valueOf(SafeUnbox.unbox(note.favoriteCount))}'
+            android:textSize="@dimen/note_counter_text_size"
 
-            <ImageButton
-                android:id="@+id/toggleReactionButton"
-                style="?android:attr/borderlessButtonStyle"
-                isAcceptingOnlyFavoriteReaction="@{note.currentNote.acceptingOnlyLikeReaction}"
-                android:layout_width="@dimen/note_bottom_action_icon_size"
-                android:layout_height="@dimen/note_bottom_action_icon_size"
-                android:contentDescription="@string/reaction"
-                android:onClick="@{ () -> noteCardActionListener.onReactionButtonClicked(note) }"
-                android:padding="@dimen/note_bottom_action_icon_padding_size"
-                android:scaleType="centerCrop"
-                android:visibility="@{note.currentNote.supportEmojiReaction ? View.VISIBLE : View.GONE }"
-                app:isReacted="@{!note.currentNote.canReaction}"
-                app:layout_constraintEnd_toStartOf="@+id/reactionCountView"
-                app:layout_constraintStart_toEndOf="@id/renoteCountView"
+            android:visibility='@{note.currentNote.mastodon ? (note.favoriteCount == null || note.favoriteCount == 0 ? View.INVISIBLE : View.VISIBLE ) : View.GONE }'
+            app:emojiCompatEnabled="false"
+            tools:text="10"
+            app:layout_constraintStart_toEndOf="@id/toggleMastodonFavouriteButton"
+            app:layout_constraintTop_toTopOf="@id/toggleMastodonFavouriteButton"
+            app:layout_constraintBottom_toBottomOf="@id/toggleMastodonFavouriteButton"
+            app:layout_constraintEnd_toStartOf="@id/toggleReactionButton"
+            />
 
-                app:layout_constraintTop_toBottomOf="@id/reaction_view"
-                app:tint="?attr/normalIconTint"
-                tools:ignore="TouchTargetSizeCheck"
-                tools:srcCompat="@drawable/ic_add_black_24dp" />
+        <ImageButton
+            android:id="@+id/toggleReactionButton"
+            style="?android:attr/borderlessButtonStyle"
+            isAcceptingOnlyFavoriteReaction="@{note.currentNote.acceptingOnlyLikeReaction}"
+            android:layout_width="@dimen/note_bottom_action_icon_size"
+            android:layout_height="@dimen/note_bottom_action_icon_size"
+            android:contentDescription="@string/reaction"
+            android:onClick="@{ () -> noteCardActionListener.onReactionButtonClicked(note) }"
+            android:padding="@dimen/note_bottom_action_icon_padding_size"
+            android:scaleType="centerCrop"
+            android:visibility="@{note.currentNote.supportEmojiReaction ? View.VISIBLE : View.GONE }"
+            app:isReacted="@{!note.currentNote.canReaction}"
+            app:layout_constraintStart_toEndOf="@id/mastodonFavoriteCountView"
+            app:layout_constraintTop_toBottomOf="@id/absoluteTimestamp"
+
+            app:layout_constraintEnd_toStartOf="@id/reactionCountView"
+
+            app:tint="?attr/normalIconTint"
+            tools:ignore="TouchTargetSizeCheck"
+            tools:srcCompat="@drawable/ic_add_black_24dp" />
 
 
-            <TextView
-                android:id="@+id/reactionCountView"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
+        <TextView
+            android:id="@+id/reactionCountView"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
 
 
-                android:layout_gravity="center_vertical"
-                android:layout_weight="1"
-                android:maxLines="1"
-                android:text='@{String.valueOf(SafeUnbox.unboxInt(note.currentNote.reactionsCount))}'
-                android:textSize="@dimen/note_counter_text_size"
-                android:visibility="@{note.currentNote.supportEmojiReaction ? SafeUnbox.unboxInt(note.currentNote.reactionsCount) == 0 ? View.INVISIBLE : View.VISIBLE : View.GONE }"
-                app:emojiCompatEnabled="false"
-                app:layout_constraintBottom_toBottomOf="@id/toggleReactionButton"
-                app:layout_constraintEnd_toStartOf="@+id/noteOptionButton"
-                app:layout_constraintStart_toEndOf="@id/toggleReactionButton"
-                app:layout_constraintTop_toBottomOf="@id/reaction_view"
-                app:layout_constraintTop_toTopOf="@id/toggleReactionButton"
-                tools:text="10000" />
+            android:layout_gravity="center_vertical"
+            android:layout_weight="1"
+            android:maxLines="1"
+            android:text='@{String.valueOf(SafeUnbox.unboxInt(note.currentNote.reactionsCount))}'
+            android:textSize="@dimen/note_counter_text_size"
+            android:visibility="@{note.currentNote.supportEmojiReaction ? SafeUnbox.unboxInt(note.currentNote.reactionsCount) == 0 ? View.INVISIBLE : View.VISIBLE : View.GONE }"
+            app:emojiCompatEnabled="false"
+            app:layout_constraintBottom_toBottomOf="@id/toggleReactionButton"
+            app:layout_constraintEnd_toStartOf="@+id/noteOptionButton"
+            app:layout_constraintStart_toEndOf="@id/toggleReactionButton"
+            app:layout_constraintTop_toTopOf="@id/toggleReactionButton"
+            tools:text="10000" />
 
-            <ImageButton
-                android:id="@+id/noteOptionButton"
-                style="?android:attr/borderlessButtonStyle"
-                android:layout_width="@dimen/note_bottom_action_icon_size"
-                android:layout_height="@dimen/note_bottom_action_icon_size"
-                android:contentDescription="@string/more"
-                android:onClick="@{()-> noteCardActionListener.onOptionButtonClicked(note)}"
-                android:padding="@dimen/note_bottom_action_icon_padding_size"
-                android:scaleType="centerCrop"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/reaction_view"
-                app:srcCompat="@drawable/ic_more_horiz_black_24dp"
-                app:tint="?attr/normalIconTint"
-                tools:ignore="TouchTargetSizeCheck" />
+        <ImageButton
+            android:id="@+id/noteOptionButton"
+            style="?android:attr/borderlessButtonStyle"
+            android:layout_width="@dimen/note_bottom_action_icon_size"
+            android:layout_height="@dimen/note_bottom_action_icon_size"
+            android:contentDescription="@string/more"
+            android:onClick="@{()-> noteCardActionListener.onOptionButtonClicked(note)}"
+            android:padding="@dimen/note_bottom_action_icon_padding_size"
+            android:scaleType="centerCrop"
+            app:layout_constraintStart_toEndOf="@id/reactionCountView"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/absoluteTimestamp"
+            app:srcCompat="@drawable/ic_more_horiz_black_24dp"
+            app:tint="?attr/normalIconTint"
+            tools:ignore="TouchTargetSizeCheck"
+            />
 
-        </LinearLayout>
-
+        <!-- END 下部コントロールパネル END -->
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>
