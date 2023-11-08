@@ -5,7 +5,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.animation.doOnCancel
 import androidx.core.animation.doOnEnd
-import androidx.core.view.isVisible
 import androidx.databinding.BindingAdapter
 import net.pantasystem.milktea.common_android.ui.AutoCollapsingLayout
 
@@ -44,7 +43,8 @@ object NoteAutoCollapsingLayoutHelper {
 
                         doOnEnd {
                             isExpanded = true
-                            findExpandButton()?.isVisible = false
+                            hideExpandButton()
+//                            findExpandButton()?.isVisible = false
                             onExpandedChanged?.invoke()
                             setHeightAndInvalidate(ViewGroup.LayoutParams.WRAP_CONTENT)
                         }
