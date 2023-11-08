@@ -9,7 +9,6 @@ import android.widget.FrameLayout
 import androidx.annotation.AttrRes
 import androidx.annotation.StyleRes
 import androidx.core.view.children
-import androidx.core.view.isVisible
 import androidx.databinding.BindingAdapter
 import dagger.hilt.android.AndroidEntryPoint
 import net.pantasystem.milktea.common_android.R
@@ -80,9 +79,9 @@ class AutoCollapsingLayout : FrameLayout {
             maxHeight = limitedMaxPxHeight.toInt()
             if (expandedButton != null) {
                 measureChildWithMargins(expandedButton, widthMeasureSpec, 0, heightMeasureSpec, 0)
-                if (!expandedButton.isVisible) {
-                    expandedButton.isVisible = true
-                }
+//                if (!expandedButton.isVisible) {
+//                    expandedButton.isVisible = true
+//                }
             }
             isNeedExpandedButtonVisible = true
         } else {
@@ -110,6 +109,10 @@ class AutoCollapsingLayout : FrameLayout {
         return children.firstOrNull { it.id == expandableButtonId }
     }
 
+    fun hideExpandButton() {
+        isExpanded = true
+        invalidate()
+    }
 
     fun setExpandedAndInvalidate(value: Boolean) {
         this.isExpanded = value

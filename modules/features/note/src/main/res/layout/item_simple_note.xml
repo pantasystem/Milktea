@@ -140,7 +140,6 @@
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/autoExpandableButton"
-                memoVisibility="@{ note.expanded ? View.GONE : View.VISIBLE}"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal|bottom"
