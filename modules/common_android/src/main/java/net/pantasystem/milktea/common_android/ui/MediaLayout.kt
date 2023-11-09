@@ -125,9 +125,14 @@ class MediaLayout : ViewGroup {
             val childBottom = childTop + childHeight
             val childRight = childLeft + _childWidth
 
-            val hasRightItem = isOddView && !isLast
+            val hasRightItem = !isOddView && !isLast && _visibleChildItemCount > 1
             val hasTopItem = i >= 2
-            val hasBottomItem = i < _visibleChildItemCount - 2
+            val hasBottomItem = if (_visibleChildItemCount > 3) {
+                // 最後から二つ目より前であること
+                i < _visibleChildItemCount - 2
+            } else {
+                _visibleChildItemCount > 2 && i == 1
+            }
             val childTopMargin = if (hasTopItem) +spaceMargin else 0
             val childBottomMargin = if (hasBottomItem) -spaceMargin else 0
             val childLeftMargin = if (isRight) +spaceMargin else 0
