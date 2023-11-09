@@ -188,6 +188,7 @@
                     previewAbleList="@{note.media.files}"
                     tools:visibility="gone"
                     rect="@{30f}"
+                    android:layout_marginTop="2dp"
                     />
 
                 <LinearLayout
