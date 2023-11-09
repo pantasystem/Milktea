@@ -39,21 +39,21 @@ class SyncMetaWorker @AssistedInject constructor(
 
     override suspend fun doWork(): Result {
         return accountRepository.findAll().mapCancellableCatching { accounts ->
+            val domains = accounts.map { it.normalizedInstanceUri }.distinct()
             coroutineScope {
-                accounts.map {
+                domains.map {
                     async {
-                        instanceInfoService.sync(it.normalizedInstanceUri)
+                        instanceInfoService.sync(it)
                     }
                 }.awaitAll()
             }.count { result ->
                 result.onFailure {
                     logger.error("Fetch instance info failed", it)
                 }.isSuccess
-            } == accounts.size
+            } == domains.size
         }.fold(
             onSuccess = {
                 if (it) Result.success() else Result.failure()
-
             },
             onFailure = {
                 Result.failure()
