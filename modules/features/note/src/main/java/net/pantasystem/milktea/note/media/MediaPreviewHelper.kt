@@ -191,9 +191,14 @@ object MediaPreviewHelper {
             return
         }
 
-        while (this.childCount > previewAbleList.size) {
-            this.removeViewAt(this.childCount - 1)
-
+        var count = this.childCount
+        while (count > previewAbleList.size) {
+            if (this.childCount > 4) {
+                this.removeViewAt(this.childCount - 1)
+            } else {
+                this.getChildAt(count - 1).setMemoVisibility(View.GONE)
+            }
+            count --
         }
 
         val inflater = LayoutInflater.from(this.context)
@@ -204,6 +209,7 @@ object MediaPreviewHelper {
             } else {
                 ItemMediaPreviewBinding.bind(existsView)
             }
+            binding.root.setMemoVisibility(View.VISIBLE)
 
             binding.baseFrame.setClickWhenShowMediaActivityListener(
                 binding.thumbnail,
@@ -227,8 +233,6 @@ object MediaPreviewHelper {
 
             if (existsView == null) {
                 this.addView(binding.root)
-            } else {
-//                existsView.setMemoVisibility(View.VISIBLE)
             }
         }
 
