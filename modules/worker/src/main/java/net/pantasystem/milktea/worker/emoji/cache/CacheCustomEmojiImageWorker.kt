@@ -2,9 +2,7 @@ package net.pantasystem.milktea.worker.emoji.cache
 
 import android.app.NotificationChannel
 import android.app.NotificationManager
-import android.app.PendingIntent
 import android.content.Context
-import android.content.Intent
 import android.content.pm.ServiceInfo
 import android.os.Build
 import androidx.annotation.RequiresApi
@@ -16,6 +14,7 @@ import androidx.work.ForegroundInfo
 import androidx.work.NetworkType
 import androidx.work.PeriodicWorkRequest
 import androidx.work.PeriodicWorkRequestBuilder
+import androidx.work.WorkManager
 import androidx.work.WorkerParameters
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
@@ -105,20 +104,9 @@ class CacheCustomEmojiImageWorker @AssistedInject constructor(
             createChannel()
         }
 
-        val cancelPendingIntent = Intent(applicationContext, CancelCacheCustomEmojiImageWorkerReceiver::class.java).let { intent ->
-            val flag = when {
-                Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
-                    PendingIntent.FLAG_MUTABLE
-                        .or(PendingIntent.FLAG_UPDATE_CURRENT)
+        val cancelPendingIntent = WorkManager.getInstance(applicationContext)
+            .createCancelPendingIntent(id)
 
-                }
-                Build.VERSION.SDK_INT >= Build.VERSION_CODES.M -> {
-                    PendingIntent.FLAG_UPDATE_CURRENT
-                }
-                else -> PendingIntent.FLAG_UPDATE_CURRENT
-            }
-            PendingIntent.getBroadcast(applicationContext, 8, intent, flag)
-        }
 
         val notification = NotificationCompat.Builder(applicationContext, NOTIFICATION_CHANNEL_ID)
             .setContentTitle(title)
