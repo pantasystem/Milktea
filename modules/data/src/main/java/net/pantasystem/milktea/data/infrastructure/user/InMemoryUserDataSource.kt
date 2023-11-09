@@ -203,6 +203,19 @@ class InMemoryUserDataSource @Inject constructor(
         publish()
     }
 
+    override suspend fun clear(limit: Int?): Result<Unit> {
+        usersLock.withLock {
+            userMap = userMap.toMutableMap().also { map ->
+                map.clear()
+            }
+        }
+        publish()
+        return Result.success(Unit)
+    }
+
+    override suspend fun count(): Result<Long> {
+        return Result.success(_state.value.usersMap.size.toLong())
+    }
     private fun publish() {
         _state.value = _state.value.copy(
             usersMap = userMap

@@ -198,4 +198,13 @@ abstract class UserDao {
     """)
     @Transaction
     abstract suspend fun searchByNameOrUserNameWithHost(accountId: Long, word: String, limit: Int, host: String): List<UserRelated>
+
+    @Query("""select count(*) from user""")
+    abstract suspend fun count(): Long
+
+    @Query("""delete from user""")
+    abstract suspend fun clear()
+
+    @Query("""delete from user where id in (select id from user order by id asc limit :limit)""")
+    abstract suspend fun clear(limit: Int)
 }

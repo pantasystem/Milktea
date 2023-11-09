@@ -46,7 +46,7 @@ class ObjectBoxNoteDataSource @Inject constructor(
     private val lock = Mutex()
     private var deleteNoteIds = mutableSetOf<Note.Id>()
 
-    private val changedIdFlow = MutableStateFlow<String>("")
+    private val clearStorageLock = Mutex()
 
 
     override fun addEventListener(listener: NoteDataSource.Listener): Unit = runBlocking {
@@ -232,8 +232,13 @@ class ObjectBoxNoteDataSource @Inject constructor(
     }
 
     override suspend fun clear(): Result<Unit> = runCancellableCatching {
-        withContext(ioDispatcher) {
-            noteBox.removeAll()
+        if (clearStorageLock.isLocked) {
+            return@runCancellableCatching
+        }
+        clearStorageLock.withLock {
+            withContext(ioDispatcher) {
+                noteBox.removeAll()
+            }
         }
     }
 
@@ -338,7 +343,6 @@ class ObjectBoxNoteDataSource @Inject constructor(
                 it.on(ev)
             }
         }
-        changedIdFlow.value = UUID.randomUUID().toString()
     }
 
 

@@ -635,5 +635,7 @@
     <string name="stop_notify_about_new_posts">投稿の通知をやめる</string>
     <!-- User -->
 
+    <string name="settings_user_cache">ユーザキャッシュ</string>
+
 
 </resources>

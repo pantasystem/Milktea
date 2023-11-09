@@ -632,6 +632,7 @@
     <string name="exclude_reposts">Exclude reposts</string>
     <string name="notify_about_new_posts">Notify about new posts</string>
     <string name="stop_notify_about_new_posts">Stop notify about new posts</string>
+    <string name="settings_user_cache">User caches</string>
     <!-- reaction-acceptance -->
 
 </resources>

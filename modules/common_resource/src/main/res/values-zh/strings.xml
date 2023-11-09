@@ -625,5 +625,7 @@
     <string name="notify_about_new_posts">Notify about new posts</string>
     <string name="stop_notify_about_new_posts">Stop notify about new posts</string>
     <!-- User -->
+    <string name="settings_user_cache">User caches</string>
+
 
 </resources>

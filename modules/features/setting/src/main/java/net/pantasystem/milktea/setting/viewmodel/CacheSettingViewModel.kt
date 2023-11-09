@@ -11,12 +11,14 @@ import kotlinx.coroutines.launch
 import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.model.image.ImageCacheRepository
 import net.pantasystem.milktea.model.note.NoteDataSource
+import net.pantasystem.milktea.model.user.UserDataSource
 import javax.inject.Inject
 
 @HiltViewModel
 class CacheSettingViewModel @Inject constructor(
     private val imageCacheRepository: ImageCacheRepository,
     private val noteDataSource: NoteDataSource,
+    private val userDataSource: UserDataSource,
     loggerFac: Logger.Factory,
 ) : ViewModel() {
 
@@ -27,7 +29,8 @@ class CacheSettingViewModel @Inject constructor(
     val uiState = _refreshEvent.map {
         CacheSettingUiState(
             imageCacheSize = imageCacheRepository.findCachedFileCount(),
-            noteCacheSize = noteDataSource.findLocalCount().getOrElse { 0L }
+            noteCacheSize = noteDataSource.findLocalCount().getOrElse { 0L },
+            userCacheSize = userDataSource.count().getOrElse { 0L },
         )
     }.stateIn(
         viewModelScope,
@@ -38,9 +41,7 @@ class CacheSettingViewModel @Inject constructor(
 
     fun onClearNoteCache() {
         viewModelScope.launch {
-            try {
-                noteDataSource.clear()
-            } catch (e: Exception) {
+            noteDataSource.clear().onFailure { e ->
                 logger.error("Failed to clear note cache", e)
             }
             _refreshEvent.value = System.currentTimeMillis()
@@ -57,9 +58,19 @@ class CacheSettingViewModel @Inject constructor(
             _refreshEvent.value = System.currentTimeMillis()
         }
     }
+
+    fun onClearUserCache() {
+        viewModelScope.launch {
+            userDataSource.clear().onFailure { e->
+                logger.error("Failed to clear user cache", e)
+            }
+            _refreshEvent.value = System.currentTimeMillis()
+        }
+    }
 }
 
 data class CacheSettingUiState(
     val imageCacheSize: Long = 0L,
     val noteCacheSize: Long = 0L,
+    val userCacheSize: Long = 0L
 )

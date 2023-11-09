@@ -77,6 +77,14 @@ class CacheSettingActivity : AppCompatActivity() {
                                 Text(stringResource(id = R.string.remove))
                             }
                         }
+
+                        SettingTitleTile(stringResource(id = R.string.settings_user_cache))
+                        Column(Modifier.padding(horizontal = 16.dp)) {
+                            Text("Size: ${uiState.userCacheSize}")
+                            TextButton(onClick = viewModel::onClearUserCache) {
+                                Text(stringResource(id = R.string.remove))
+                            }
+                        }
                     }
                 }
             }

@@ -376,6 +376,26 @@ class MediatorUserDataSource @Inject constructor(
         }
     }
 
+    override suspend fun clear(limit: Int?): Result<Unit> {
+        return runCancellableCatching {
+            withContext(ioDispatcher) {
+                if (limit == null) {
+                    userDao.clear()
+                } else {
+                    userDao.clear(limit)
+                }
+            }
+        }
+    }
+
+    override suspend fun count(): Result<Long> {
+        return runCancellableCatching {
+            withContext(ioDispatcher) {
+                userDao.count()
+            }
+        }
+    }
+
     private suspend fun replaceEmojisIfNeed(dbId: Long, user: User, record: UserRelated?) {
         if (!record?.emojis.isEqualToModels(user.emojis)) {
             // NOTE: 既にキャッシュに存在していた場合一度全て剥がす

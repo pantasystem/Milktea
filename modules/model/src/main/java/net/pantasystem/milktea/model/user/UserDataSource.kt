@@ -45,4 +45,8 @@ interface UserDataSource {
         nextId: String? = null,
         host: String? = null
     ): Result<List<User>>
+
+    suspend fun count(): Result<Long>
+
+    suspend fun clear(limit: Int? = null): Result<Unit>
 }
