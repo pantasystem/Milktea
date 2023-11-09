@@ -65,8 +65,6 @@ class TimelineListAdapter(
         cardActionListener.onReactionCountAction(it)
     }
 
-    private val manyFilePreviewListViewRecyclerViewPool = RecyclerView.RecycledViewPool()
-
     enum class ViewHolderType {
         NormalNote, HasReplyToNote, Loading, Empty, Error
     }
@@ -139,11 +137,7 @@ class TimelineListAdapter(
                     p0,
                     false
                 )
-//                binding.simpleNote.reactionView.setRecycledViewPool(reactionCounterRecyclerViewPool)
-//                binding.simpleNote.urlPreviewList.setRecycledViewPool(urlPreviewListRecyclerViewPool)
-                binding.simpleNote.manyFilePreviewListView.setRecycledViewPool(
-                    manyFilePreviewListViewRecyclerViewPool
-                )
+
                 NoteFontSizeBinder.from(binding.simpleNote).bind(
                     headerFontSize = config.noteHeaderFontSize,
                     contentFontSize = config.noteContentFontSize,
@@ -158,11 +152,7 @@ class TimelineListAdapter(
                     p0,
                     false
                 )
-//                binding.simpleNote.reactionView.setRecycledViewPool(reactionCounterRecyclerViewPool)
-//                binding.simpleNote.urlPreviewList.setRecycledViewPool(urlPreviewListRecyclerViewPool)
-                binding.simpleNote.manyFilePreviewListView.setRecycledViewPool(
-                    manyFilePreviewListViewRecyclerViewPool
-                )
+
                 NoteFontSizeBinder.from(binding.simpleNote).bind(
                     headerFontSize = config.noteHeaderFontSize,
                     contentFontSize = config.noteContentFontSize,

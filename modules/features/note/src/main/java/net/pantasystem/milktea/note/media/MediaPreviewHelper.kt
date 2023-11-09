@@ -3,12 +3,16 @@ package net.pantasystem.milktea.note.media
 
 import android.annotation.SuppressLint
 import android.app.Activity
+import android.view.LayoutInflater
 import android.view.View
 import android.widget.FrameLayout
+import android.widget.GridLayout
 import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.core.app.ActivityOptionsCompat
+import androidx.core.view.isVisible
+import androidx.core.view.updateLayoutParams
 import androidx.databinding.BindingAdapter
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -27,6 +31,7 @@ import net.pantasystem.milktea.common_navigation.MediaNavigationArgs
 import net.pantasystem.milktea.model.setting.Config
 import net.pantasystem.milktea.model.setting.MediaDisplayMode
 import net.pantasystem.milktea.note.R
+import net.pantasystem.milktea.note.databinding.ItemMediaPreviewBinding
 import net.pantasystem.milktea.note.media.viewmodel.MediaViewData
 import net.pantasystem.milktea.note.media.viewmodel.PreviewAbleFile
 
@@ -200,6 +205,73 @@ object MediaPreviewHelper {
         this.layoutManager = layoutManager
 
         adapter.submitList(previewAbleList)
+        this.visibility = View.VISIBLE
+
+    }
+
+    @JvmStatic
+    @BindingAdapter("previewAbleList", "mediaViewData")
+    fun GridLayout.setPreviewAbleList(
+        previewAbleList: List<PreviewAbleFile>?,
+        mediaViewData: MediaViewData?
+    ) {
+        if (previewAbleList == null || mediaViewData == null) {
+            this.visibility = View.GONE
+            return
+        }
+
+        if (previewAbleList.isEmpty() || previewAbleList.size <= 4) {
+            this.visibility = View.GONE
+            this.removeAllViews()
+            return
+        }
+
+        while (this.childCount > previewAbleList.size) {
+            this.removeViewAt(this.childCount - 1)
+        }
+
+        val inflater = LayoutInflater.from(this.context)
+        previewAbleList.forEachIndexed { index, previewAbleFile ->
+            val existsView: View? = this.getChildAt(index)
+            val binding = if (existsView == null) {
+                ItemMediaPreviewBinding.inflate(inflater, this, false)
+            } else {
+                ItemMediaPreviewBinding.bind(existsView)
+            }
+            binding.apply {
+                root.updateLayoutParams<GridLayout.LayoutParams> {
+                    rowSpec = GridLayout.spec(index / 2, 1f)
+                    columnSpec = GridLayout.spec(index % 2, 1f)
+                    width = 0
+                }
+            }
+
+            binding.baseFrame.setClickWhenShowMediaActivityListener(
+                binding.thumbnail,
+                binding.actionButton,
+                previewAbleFile,
+                previewAbleList
+            )
+            binding.baseFrame.setOnClickListener {
+                mediaViewData.show(index)
+            }
+
+            binding.thumbnail.setPreview(previewAbleFile, mediaViewData.config)
+
+            binding.actionButton.isVisible = previewAbleFile.isVisiblePlayButton
+            binding.nsfwMessage.isVisible = previewAbleFile.isHiding
+            binding.nsfwMessage.setHideImageMessage(previewAbleFile, mediaViewData.config)
+            binding.actionButton.setImageResource(if (previewAbleFile.isHiding) R.drawable.ic_baseline_image_24 else R.drawable.ic_baseline_hide_image_24)
+            binding.toggleVisibilityButton.setOnClickListener {
+                mediaViewData.toggleVisibility(index)
+            }
+
+            if (existsView == null) {
+                this.addView(binding.root)
+            }
+        }
+
+
         this.visibility = View.VISIBLE
 
     }

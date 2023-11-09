@@ -26,10 +26,10 @@ class PreviewAbleFileListAdapter(
     class ViewHolder(val binding: ItemMediaPreviewBinding) : RecyclerView.ViewHolder(binding.root) {
 
         fun bind(index: Int, fileViewData: PreviewAbleFile, media: MediaViewData) {
-            binding.previewAbleFileIndex = index
-            binding.previewAbleFile = fileViewData
-            binding.mediaViewData = media
-            binding.executePendingBindings()
+//            binding.previewAbleFileIndex = index
+//            binding.previewAbleFile = fileViewData
+//            binding.mediaViewData = media
+//            binding.executePendingBindings()
 
         }
     }
