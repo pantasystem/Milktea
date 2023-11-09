@@ -12,6 +12,9 @@ import net.pantasystem.milktea.common_android.R
 import kotlin.math.max
 import kotlin.math.min
 
+/**
+ * タイムラインの投稿のメディアを配置するためのレイアウト
+ */
 class MediaLayout : ViewGroup {
 
     private var spaceMargin = 8
@@ -136,7 +139,8 @@ class MediaLayout : ViewGroup {
                     i < _visibleChildItemCount - 2
                 }
             } else {
-                _visibleChildItemCount > 2 && i == 1
+                // 3つ以下の場合は、要素数が3かつ2番目の要素であること
+                _visibleChildItemCount == 3 && i == 1
             }
             val childTopMargin = if (hasTopItem) +spaceMargin else 0
             val childBottomMargin = if (hasBottomItem) -spaceMargin else 0
