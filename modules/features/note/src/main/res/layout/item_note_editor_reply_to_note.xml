@@ -222,14 +222,16 @@
                     </net.pantasystem.milktea.common_android_ui.MediaPreviewAspectLayout>
 
 
-                    <androidx.recyclerview.widget.RecyclerView
+                    <GridLayout
                             android:id="@+id/manyFilePreviewListView"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             tools:layout_height="20dp"
                             android:visibility="gone"
                             mediaViewData="@{note.media}"
-                            previewAbleList="@{note.media.files}" />
+                            previewAbleList="@{note.media.files}"
+                            android:columnCount="2"
+                        />
 
 
                     <LinearLayout

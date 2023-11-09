@@ -14,8 +14,6 @@ import androidx.core.app.ActivityOptionsCompat
 import androidx.core.view.isVisible
 import androidx.core.view.updateLayoutParams
 import androidx.databinding.BindingAdapter
-import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.CenterCrop
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -177,37 +175,6 @@ object MediaPreviewHelper {
         }
     }
 
-
-    @JvmStatic
-    @BindingAdapter("previewAbleList", "mediaViewData")
-    fun RecyclerView.setPreviewAbleList(
-        previewAbleList: List<PreviewAbleFile>?,
-        mediaViewData: MediaViewData?
-    ) {
-        if (previewAbleList == null || mediaViewData == null) {
-            this.visibility = View.GONE
-            return
-        }
-
-        if (previewAbleList.isEmpty() || previewAbleList.size <= 4) {
-            this.visibility = View.GONE
-            return
-        }
-        isNestedScrollingEnabled = false
-        this.itemAnimator = null
-
-        val adapter = this.adapter as? PreviewAbleFileListAdapter
-            ?: PreviewAbleFileListAdapter(mediaViewData)
-        this.adapter = adapter
-        val layoutManager = this.layoutManager as? GridLayoutManager
-            ?: GridLayoutManager(context, 2)
-        layoutManager.recycleChildrenOnDetach = true
-        this.layoutManager = layoutManager
-
-        adapter.submitList(previewAbleList)
-        this.visibility = View.VISIBLE
-
-    }
 
     @JvmStatic
     @BindingAdapter("previewAbleList", "mediaViewData")
