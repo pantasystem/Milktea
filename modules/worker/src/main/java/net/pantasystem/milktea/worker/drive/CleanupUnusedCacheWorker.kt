@@ -11,6 +11,7 @@ import dagger.assisted.AssistedInject
 import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.model.drive.FilePropertyDataSource
 import net.pantasystem.milktea.model.note.NoteDataSource
+import net.pantasystem.milktea.model.user.UserDataSource
 
 @HiltWorker
 class CleanupUnusedCacheWorker @AssistedInject constructor(
@@ -18,6 +19,7 @@ class CleanupUnusedCacheWorker @AssistedInject constructor(
     @Assisted params: WorkerParameters,
     private val filePropertyDataSource: FilePropertyDataSource,
     private val noteDataSource: NoteDataSource,
+    private val userDataSource: UserDataSource,
     private val loggerFactory: Logger.Factory
 ) : CoroutineWorker(context, params) {
 
@@ -37,6 +39,9 @@ class CleanupUnusedCacheWorker @AssistedInject constructor(
             }
             filePropertyDataSource.clearUnusedCaches().getOrThrow()
 
+            if (userDataSource.count().getOrThrow() > 10000) {
+                userDataSource.clear(1000).getOrThrow()
+            }
             Result.success()
         } catch (e: Exception) {
             logger.error("Failed to cleanup unused cache", e)
