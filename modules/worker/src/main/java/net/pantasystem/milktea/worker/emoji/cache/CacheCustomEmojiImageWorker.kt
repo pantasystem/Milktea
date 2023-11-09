@@ -18,9 +18,10 @@ import androidx.work.WorkManager
 import androidx.work.WorkerParameters
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.emoji.CustomEmojiRepository
@@ -28,6 +29,7 @@ import net.pantasystem.milktea.model.emoji.SaveCustomEmojiImageUseCase
 import net.pantasystem.milktea.model.image.ImageCacheRepository
 import net.pantasystem.milktea.worker.R
 import java.util.concurrent.TimeUnit
+import kotlin.math.min
 
 @HiltWorker
 class CacheCustomEmojiImageWorker @AssistedInject constructor(
@@ -60,35 +62,32 @@ class CacheCustomEmojiImageWorker @AssistedInject constructor(
     }
 
     override suspend fun doWork(): Result {
+        setForeground(createForegroundInfo())
         try {
-            setForeground(createForegroundInfo())
             val hosts = accountRepository.findAll().getOrThrow().map {
                 it.getHost()
-            }.distinct()
+            }.distinct().shuffled()
             imageCacheRepository.deleteExpiredCaches()
             coroutineScope {
-                hosts.mapNotNull {
-                    customEmojiRepository.findBy(it).getOrNull()
-                }.map { emojis ->
-                    launch {
-                        emojis.chunked(if (emojis.isEmpty()) 0 else ( emojis.size / 4)).forEach { emojis ->
-                            emojis.mapNotNull { emoji ->
-                                (emoji.url ?: emoji.uri)?.let {
-                                    saveCustomEmojiImageUseCase(emoji).onFailure {
-                                        logger.error(
-                                            "Failed to cache emoji image: ${emoji.url ?: emoji.uri}",
-                                            it
-                                        )
-                                    }.getOrNull()
+                hosts.forEach {
+                    // 全てのインスタンスの絵文字を一括でメモリ上に展開すると、メモリの確保が間に合わずOOMになる可能性があるので、
+                    // インスタンスごとにメモリ上に展開されるように実行している
+                    val emojis = customEmojiRepository.findBy(it).getOrElse { emptyList() }
+
+                    // 絵文字の個数分並列で実行すると、ネットワークに負荷がかかりすぎるのと、メモリの消費量が大きくなりすぎるので、3分割して実行する
+                    val chunkedSize = if (emojis.isEmpty()) 0 else min(emojis.size / 3, emojis.size)
+                    emojis.chunked(chunkedSize).map { chunkedEmojis ->
+                        async {
+                            chunkedEmojis.map { emoji ->
+                                saveCustomEmojiImageUseCase(emoji).onFailure { e ->
+                                    logger.error("Failed to cache custom emoji image", e)
                                 }
                             }
                         }
-                    }
+                    }.awaitAll()
                     delay(1000)
                 }
             }
-
-
             return Result.success()
         } catch (e: Exception) {
             logger.error("Failed to cache custom emoji images", e)
