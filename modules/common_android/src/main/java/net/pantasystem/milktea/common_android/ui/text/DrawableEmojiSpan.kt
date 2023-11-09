@@ -8,6 +8,7 @@ import com.bumptech.glide.load.resource.gif.GifDrawable
 import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
 import com.github.penfeizhou.animation.apng.APNGDrawable
+import java.lang.ref.WeakReference
 
 class DrawableEmojiSpan(
     var adapter: EmojiAdapter?,
@@ -77,19 +78,21 @@ class DrawableEmojiSpan(
 }
 
 private class DrawableEmojiTarget(
-    val span: DrawableEmojiSpan,
+    span: DrawableEmojiSpan,
 ) : CustomTarget<Drawable>() {
+
+    private val span = WeakReference(span)
     override fun onResourceReady(
         resource: Drawable,
         transition: Transition<in Drawable>?,
     ) {
-        span.imageDrawable = resource
+        span.get()?.imageDrawable = resource
 
-        val callback = span.imageDrawable?.callback
+        val callback = span.get()?.imageDrawable?.callback
         resource.callback = object : Drawable.Callback {
             override fun invalidateDrawable(who: Drawable) {
                 callback?.invalidateDrawable(who)
-                span.adapter?.update(false)
+                span.get()?.adapter?.update(false)
             }
 
             override fun scheduleDrawable(who: Drawable, what: Runnable, `when`: Long) {
@@ -113,10 +116,10 @@ private class DrawableEmojiTarget(
                     if (resource is AnimatedImageDrawable) {
                         resource.start()
                     } else {
-                        span.adapter?.update()
+                        span.get()?.adapter?.update()
                     }
                 } else {
-                    span.adapter?.update()
+                    span.get()?.adapter?.update()
                 }
             }
         }
