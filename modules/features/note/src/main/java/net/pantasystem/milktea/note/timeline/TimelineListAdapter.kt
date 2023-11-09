@@ -210,15 +210,15 @@ class TimelineListAdapter(
         }
         val imageViews = listOf(
             simpleNote.avatarIcon,
-            simpleNote.mediaPreview.thumbnailTopLeft,
-            simpleNote.mediaPreview.thumbnailTopRight,
-            simpleNote.mediaPreview.thumbnailBottomLeft,
-            simpleNote.mediaPreview.thumbnailBottomRight,
+//            simpleNote.mediaPreview.thumbnailTopLeft,
+//            simpleNote.mediaPreview.thumbnailTopRight,
+//            simpleNote.mediaPreview.thumbnailBottomLeft,
+//            simpleNote.mediaPreview.thumbnailBottomRight,
             simpleNote.subAvatarIcon,
-            simpleNote.subNoteMediaPreview.thumbnailBottomLeft,
-            simpleNote.subNoteMediaPreview.thumbnailBottomRight,
-            simpleNote.subNoteMediaPreview.thumbnailBottomLeft,
-            simpleNote.subNoteMediaPreview.thumbnailBottomRight,
+//            simpleNote.subNoteMediaPreview.ethumbnailBottomLeft,
+//            simpleNote.subNoteMediaPreview.thumbnailBottomRight,
+//            simpleNote.subNoteMediaPreview.thumbnailBottomLeft,
+//            simpleNote.subNoteMediaPreview.thumbnailBottomRight,
 
             )
 //        simpleNote.reactionView.itemAnimator?.endAnimations()

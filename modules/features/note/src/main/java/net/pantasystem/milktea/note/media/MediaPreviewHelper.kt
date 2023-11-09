@@ -23,6 +23,7 @@ import jp.wasabeef.glide.transformations.BlurTransformation
 import net.pantasystem.milktea.common.glide.GlideApp
 import net.pantasystem.milktea.common.glide.blurhash.BlurHashSource
 import net.pantasystem.milktea.common_android.platform.isWifiConnected
+import net.pantasystem.milktea.common_android.ui.MediaLayout
 import net.pantasystem.milktea.common_android.ui.VisibilityHelper.setMemoVisibility
 import net.pantasystem.milktea.common_android_ui.NavigationEntryPointForBinding
 import net.pantasystem.milktea.common_navigation.MediaNavigationArgs
@@ -235,6 +236,68 @@ object MediaPreviewHelper {
 
             if (existsView == null) {
                 this.addView(binding.root)
+            }
+        }
+
+
+        this.visibility = View.VISIBLE
+
+    }
+
+    @JvmStatic
+    @BindingAdapter("previewAbleList", "mediaViewData")
+    fun MediaLayout.setPreviewAbleList(
+        previewAbleList: List<PreviewAbleFile>?,
+        mediaViewData: MediaViewData?
+    ) {
+        if (previewAbleList == null || mediaViewData == null) {
+            this.visibility = View.GONE
+            return
+        }
+
+        if (previewAbleList.isEmpty()) {
+            this.visibility = View.GONE
+            return
+        }
+
+        while (this.childCount > previewAbleList.size) {
+            this.removeViewAt(this.childCount - 1)
+
+        }
+
+        val inflater = LayoutInflater.from(this.context)
+        previewAbleList.forEachIndexed { index, previewAbleFile ->
+            val existsView: View? = this.getChildAt(index)
+            val binding = if (existsView == null) {
+                ItemMediaPreviewBinding.inflate(inflater, this, false)
+            } else {
+                ItemMediaPreviewBinding.bind(existsView)
+            }
+
+            binding.baseFrame.setClickWhenShowMediaActivityListener(
+                binding.thumbnail,
+                binding.actionButton,
+                previewAbleFile,
+                previewAbleList
+            )
+            binding.baseFrame.setOnClickListener {
+                mediaViewData.show(index)
+            }
+
+            binding.thumbnail.setPreview(previewAbleFile, mediaViewData.config)
+
+            binding.actionButton.isVisible = previewAbleFile.isVisiblePlayButton
+            binding.nsfwMessage.isVisible = previewAbleFile.isHiding
+            binding.nsfwMessage.setHideImageMessage(previewAbleFile, mediaViewData.config)
+            binding.actionButton.setImageResource(if (previewAbleFile.isHiding) R.drawable.ic_baseline_image_24 else R.drawable.ic_baseline_hide_image_24)
+            binding.toggleVisibilityButton.setOnClickListener {
+                mediaViewData.toggleVisibility(index)
+            }
+
+            if (existsView == null) {
+                this.addView(binding.root)
+            } else {
+//                existsView.setMemoVisibility(View.VISIBLE)
             }
         }
 
