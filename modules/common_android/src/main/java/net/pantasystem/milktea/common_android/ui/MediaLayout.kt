@@ -2,6 +2,8 @@ package net.pantasystem.milktea.common_android.ui
 
 import android.content.Context
 import android.util.AttributeSet
+import android.util.Log
+import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.AttrRes
 import androidx.annotation.StyleRes
@@ -14,9 +16,14 @@ import kotlin.math.min
 class MediaLayout : ViewGroup {
 
     private var spaceMargin = 8
-    private var visibleChildItemCount = 0
+    private var _visibleChildItemCount = 0
+    private var _visibleChildren = listOf<View>()
 
     private var _height: Int = 0
+    private var _rightElHeight: Double = 0.0
+    private var _leftElHeight: Double = 0.0
+    private var _colCount: Int = 0
+    private var _childWidth: Int = 0
 
     constructor(context: Context) : super(context)
     constructor(context: Context, attrs: AttributeSet?)
@@ -44,41 +51,41 @@ class MediaLayout : ViewGroup {
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec)
-        val visibleViews = children.filter { it.isVisible }.toList()
-        visibleChildItemCount = visibleViews.size
-        if (visibleChildItemCount == 0) {
+        _visibleChildren = children.filter { it.isVisible }.toList()
+        _visibleChildItemCount = _visibleChildren.size
+        if (_visibleChildItemCount == 0) {
             _height = 0
             setMeasuredDimension(0, 0)
             return
         }
 
         // 2列以上表示したくない
-        val colCount = min(visibleChildItemCount, 2)
+        _colCount = min(_visibleChildItemCount, 2)
 
-        val leftElCount = if (colCount == 0) 0 else max(visibleChildItemCount / colCount, 1)
-        val rightElCount = visibleChildItemCount - leftElCount
+        val leftElCount = if (_colCount == 0) 0 else max(_visibleChildItemCount / _colCount, 1)
+        val rightElCount = _visibleChildItemCount - leftElCount
 
         val width = MeasureSpec.getSize(widthMeasureSpec)
 //        val height = width * 10.0 / 16.0
 
-        val childWidth = width / max(colCount, 1)
+        _childWidth = width / max(_colCount, 1)
         val aspectRatio = 16.0 / 10.0
-        val minChildHeight = if (visibleChildItemCount == 2) width / aspectRatio else childWidth / aspectRatio
+        val minChildHeight = if (_visibleChildItemCount == 2) width / aspectRatio else _childWidth / aspectRatio
         val height = minChildHeight * max(rightElCount, leftElCount)
 
-        val rightElHeight = if (rightElCount == 0) 0.0 else height / rightElCount
-        val leftElHeight = if (leftElCount == 0) 0.0 else height / leftElCount
+        _rightElHeight = if (rightElCount == 0) 0.0 else height / rightElCount
+        _leftElHeight = if (leftElCount == 0) 0.0 else height / leftElCount
 
-        for (i in 0 until visibleChildItemCount) {
-            val child = visibleViews[i]
+        for (i in 0 until _visibleChildItemCount) {
+            val child = _visibleChildren[i]
             val isRight = i % 2 == 1
             val childHeight = if (isRight) {
-                rightElHeight
+                _rightElHeight
             } else {
-                leftElHeight
+                _leftElHeight
             }
             child.measure(
-                MeasureSpec.makeMeasureSpec(childWidth, MeasureSpec.EXACTLY),
+                MeasureSpec.makeMeasureSpec(_childWidth, MeasureSpec.EXACTLY),
                 MeasureSpec.makeMeasureSpec(childHeight.toInt(), MeasureSpec.EXACTLY)
             )
         }
@@ -91,56 +98,55 @@ class MediaLayout : ViewGroup {
 
     override fun onLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int) {
         val width = right - left
-        val height = _height
-        when (visibleChildItemCount) {
-            0 -> {}
-            1 -> {
-                val childOne = getChildAt(0)
-                childOne.layout(0, 0, width, height)
+
+        for (i in 0 until _visibleChildItemCount) {
+            val child = _visibleChildren[i]
+
+            val isOdd = _visibleChildItemCount % 2 == 1
+            val isLast = i == _visibleChildItemCount - 1
+            val isRight = if (isOdd) {
+                _visibleChildItemCount > 1 && (isLast || i % 2 == 1)
+            } else {
+                i % 2 == 1
+            }
+            val childHeight = if (isRight) {
+                _rightElHeight
+            } else {
+                _leftElHeight
+            }
+            val childTop = (i / 2) * childHeight
+            val childLeft = if (isRight) {
+                width - _childWidth
+            } else {
+                0
             }
 
-            2 -> {
-                val childOne = getChildAt(0)
-                val childTwo = getChildAt(1)
-                val childWidth = width / 2
-                childOne.layout(0, 0, childWidth - spaceMargin, height)
-                childTwo.layout(childWidth + spaceMargin, 0, width, height)
+            if (i == 2) {
+                Log.d("MediaLayout", "childTop: $childTop, childLeft: $childLeft, childHeight: $childHeight")
             }
 
-            3 -> {
-                val childOne = getChildAt(0)
-                val childTwo = getChildAt(1)
-                val childThree = getChildAt(2)
-                val childWidth = width / 2
-                val childHeight = height / 2
-                childOne.layout(0, 0, childWidth - spaceMargin, height)
-                childTwo.layout(childWidth + spaceMargin, 0, width, childHeight - spaceMargin)
-                childThree.layout(
-                    childWidth + spaceMargin, childHeight + spaceMargin, width,
-                    height
-                )
-            }
+            val childBottom = childTop + childHeight
+            val childRight = childLeft + _childWidth
 
-            4 -> {
-                val childOne = getChildAt(0)
-                val childTwo = getChildAt(1)
-                val childThree = getChildAt(2)
-                val childFour = getChildAt(3)
-                val childWidth = width / 2
-                val childHeight = height / 2
-                childOne.layout(0, 0, childWidth - spaceMargin, childHeight - spaceMargin)
-                childTwo.layout(childWidth + spaceMargin, 0, width, childHeight - spaceMargin)
-                childThree.layout(/* l = */ 0, /* t = */
-                    childHeight + spaceMargin, /* r = */
-                    childWidth - spaceMargin, /* b = */
-                    height
-                )
-                childFour.layout(
-                    childWidth + spaceMargin, childHeight + spaceMargin, width,
-                    height
-                )
-            }
+//            val hasLeftItem = i % 2 == 0 && i > 0
+//            val hasRightItem = i % 2 == 1 && i < _visibleChildItemCount - 1
+//            val hasTopItem = i >= 2
+//            val hasBottomItem = i < _visibleChildItemCount - 2
+//
+//            val childTopMargin = if (hasTopItem) +spaceMargin else 0
+//            val childBottomMargin = if (hasBottomItem) -spaceMargin else 0
+//            val childLeftMargin = if (hasLeftItem) +spaceMargin else 0
+//            val childRightMargin = if (hasRightItem) -spaceMargin else 0
+
+//            child.layout(
+//                childLeft + childLeftMargin,
+//                childTop.toInt() + childTopMargin,
+//                childRight + childRightMargin,
+//                childBottom.toInt() + childBottomMargin
+//            )
+            child.layout(childLeft, childTop.toInt(), childRight, childBottom.toInt())
         }
+
     }
 
 
