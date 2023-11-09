@@ -185,7 +185,6 @@ import net.pantasystem.milktea.data.infrastructure.user.renote.mute.db.RenoteMut
     views = [UserView::class, GroupMemberView::class, UserListMemberView::class]
 )
 @TypeConverters(
-    PageTypeConverter::class,
     DateConverter::class,
     TimelinePageTypeConverter::class,
     AccountInstanceTypeConverter::class,
