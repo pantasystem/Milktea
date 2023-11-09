@@ -9,11 +9,21 @@ import androidx.annotation.StyleRes
 import androidx.core.view.children
 import androidx.core.view.isVisible
 import net.pantasystem.milktea.common_android.R
+import kotlin.math.max
+import kotlin.math.min
 
 class MediaLayout : ViewGroup {
 
     private var spaceMargin = 8
-    private var visibleChildItemCount = 0
+    private var _visibleChildItemCount = 0
+    private var _visibleChildren = listOf<View>()
+    private var _isOddVisibleItemCount = false
+
+    private var _height: Int = 0
+    private var _rightElHeight: Double = 0.0
+    private var _leftElHeight: Double = 0.0
+    private var _colCount: Int = 0
+    private var _childWidth: Int = 0
 
     constructor(context: Context) : super(context)
     constructor(context: Context, attrs: AttributeSet?)
@@ -41,131 +51,101 @@ class MediaLayout : ViewGroup {
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec)
-
-        val childOne: View? = getChildAt(0)
-        val childTwo: View? = getChildAt(1)
-        val childThree: View? = getChildAt(2)
-
-        visibleChildItemCount = children.count { it.isVisible }
-        val width = MeasureSpec.getSize(widthMeasureSpec)
-        val height = width * 10.0 / 16.0
-
-        when (visibleChildItemCount) {
-            0 -> {}
-            1 -> {
-                childOne?.measure(
-                    MeasureSpec.makeMeasureSpec(width, MeasureSpec.EXACTLY),
-                    MeasureSpec.makeMeasureSpec(height.toInt(), MeasureSpec.EXACTLY)
-                )
-            }
-
-            2 -> {
-                // widthを2分割したサイズ
-                val childWidth = width / 2
-                // heightは親と同じサイズ
-                childOne?.measure(
-                    MeasureSpec.makeMeasureSpec(childWidth + spaceMargin, MeasureSpec.EXACTLY),
-                    MeasureSpec.makeMeasureSpec(height.toInt(), MeasureSpec.EXACTLY)
-                )
-                childTwo?.measure(
-                    MeasureSpec.makeMeasureSpec(childWidth + spaceMargin, MeasureSpec.EXACTLY),
-                    MeasureSpec.makeMeasureSpec(height.toInt(), MeasureSpec.EXACTLY)
-                )
-            }
-
-            3 -> {
-                val childWidth = width / 2
-                val childHeight = height / 2
-                childOne?.measure(
-                    MeasureSpec.makeMeasureSpec(childWidth + spaceMargin, MeasureSpec.EXACTLY),
-                    MeasureSpec.makeMeasureSpec(height.toInt(), MeasureSpec.EXACTLY)
-                )
-                childTwo?.measure(
-                    MeasureSpec.makeMeasureSpec(childWidth + spaceMargin, MeasureSpec.EXACTLY),
-                    MeasureSpec.makeMeasureSpec(
-                        childHeight.toInt() + spaceMargin,
-                        MeasureSpec.EXACTLY
-                    )
-                )
-                childThree?.measure(
-                    MeasureSpec.makeMeasureSpec(childWidth + spaceMargin, MeasureSpec.EXACTLY),
-                    MeasureSpec.makeMeasureSpec(
-                        childHeight.toInt() + spaceMargin,
-                        MeasureSpec.EXACTLY
-                    )
-                )
-            }
-
-            4 -> {
-                val childWidth = width / 2
-                val childHeight = height / 2
-                children.forEach { view ->
-                    view.measure(
-                        MeasureSpec.makeMeasureSpec(childWidth + spaceMargin, MeasureSpec.EXACTLY),
-                        MeasureSpec.makeMeasureSpec(
-                            childHeight.toInt() + spaceMargin,
-                            MeasureSpec.EXACTLY
-                        )
-                    )
-                }
-            }
+        _visibleChildren = children.filter { it.isVisible }.toList()
+        _visibleChildItemCount = _visibleChildren.size
+        _isOddVisibleItemCount = _visibleChildItemCount % 2 == 1
+        if (_visibleChildItemCount == 0) {
+            _height = 0
+            setMeasuredDimension(0, 0)
+            return
         }
+
+        // 2列以上表示したくない
+        _colCount = min(_visibleChildItemCount, 2)
+
+        val leftElCount = if (_colCount == 0) 0 else max(_visibleChildItemCount / _colCount, 1)
+        val rightElCount = _visibleChildItemCount - leftElCount
+
+        val width = MeasureSpec.getSize(widthMeasureSpec)
+//        val height = width * 10.0 / 16.0
+
+        _childWidth = width / max(_colCount, 1)
+        val aspectRatio = 16.0 / 10.0
+        val minChildHeight = if (_visibleChildItemCount == 2) width / aspectRatio else _childWidth / aspectRatio
+        val height = minChildHeight * max(rightElCount, leftElCount)
+
+        _rightElHeight = if (rightElCount == 0) 0.0 else height / rightElCount
+        _leftElHeight = if (leftElCount == 0) 0.0 else height / leftElCount
+
+        for (i in 0 until _visibleChildItemCount) {
+            val child = _visibleChildren[i]
+            val isRight = i % 2 == 1
+            val childHeight = if (isRight) {
+                _rightElHeight
+            } else {
+                _leftElHeight
+            }
+            child.measure(
+                MeasureSpec.makeMeasureSpec(_childWidth, MeasureSpec.EXACTLY),
+                MeasureSpec.makeMeasureSpec(childHeight.toInt(), MeasureSpec.EXACTLY)
+            )
+        }
+
+
+        _height = height.toInt()
         setMeasuredDimension(width, height.toInt())
     }
 
 
     override fun onLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int) {
         val width = right - left
-        val height = (width * 10.0 / 16.0).toInt()
-        when (visibleChildItemCount) {
-            0 -> {}
-            1 -> {
-                val childOne = getChildAt(0)
-                childOne.layout(0, 0, width, height)
+
+        for (i in 0 until _visibleChildItemCount) {
+            val child = _visibleChildren[i]
+
+            val isOddView = i % 2 == 1
+            val isLast = i == _visibleChildItemCount - 1
+            val isRight = if (_isOddVisibleItemCount) {
+                _visibleChildItemCount > 1 && (isLast || isOddView)
+            } else {
+                i % 2 == 1
+            }
+            val childHeight = if (isRight) {
+                _rightElHeight
+            } else {
+                _leftElHeight
+            }
+            val childTop = (i / 2) * childHeight
+            val childLeft = if (isRight) {
+                width - _childWidth
+            } else {
+                0
             }
 
-            2 -> {
-                val childOne = getChildAt(0)
-                val childTwo = getChildAt(1)
-                val childWidth = width / 2
-                childOne.layout(0, 0, childWidth - spaceMargin, height)
-                childTwo.layout(childWidth + spaceMargin, 0, width, height)
-            }
+            val childBottom = childTop + childHeight
+            val childRight = childLeft + _childWidth
 
-            3 -> {
-                val childOne = getChildAt(0)
-                val childTwo = getChildAt(1)
-                val childThree = getChildAt(2)
-                val childWidth = width / 2
-                val childHeight = height / 2
-                childOne.layout(0, 0, childWidth - spaceMargin, height)
-                childTwo.layout(childWidth + spaceMargin, 0, width, childHeight - spaceMargin)
-                childThree.layout(
-                    childWidth + spaceMargin, childHeight + spaceMargin, width,
-                    height
-                )
+            val hasRightItem = !isOddView && !isLast && _visibleChildItemCount > 1
+            val hasTopItem = i >= 2
+            val hasBottomItem = if (_visibleChildItemCount > 3) {
+                // 最後から二つ目より前であること
+                i < _visibleChildItemCount - 2
+            } else {
+                _visibleChildItemCount > 2 && i == 1
             }
+            val childTopMargin = if (hasTopItem) +spaceMargin else 0
+            val childBottomMargin = if (hasBottomItem) -spaceMargin else 0
+            val childLeftMargin = if (isRight) +spaceMargin else 0
+            val childRightMargin = if (hasRightItem) -spaceMargin else 0
 
-            4 -> {
-                val childOne = getChildAt(0)
-                val childTwo = getChildAt(1)
-                val childThree = getChildAt(2)
-                val childFour = getChildAt(3)
-                val childWidth = width / 2
-                val childHeight = height / 2
-                childOne.layout(0, 0, childWidth - spaceMargin, childHeight - spaceMargin)
-                childTwo.layout(childWidth + spaceMargin, 0, width, childHeight - spaceMargin)
-                childThree.layout(/* l = */ 0, /* t = */
-                    childHeight + spaceMargin, /* r = */
-                    childWidth - spaceMargin, /* b = */
-                    height
-                )
-                childFour.layout(
-                    childWidth + spaceMargin, childHeight + spaceMargin, width,
-                    height
-                )
-            }
+            child.layout(
+                childLeft + childLeftMargin,
+                childTop.toInt() + childTopMargin,
+                childRight + childRightMargin,
+                childBottom.toInt() + childBottomMargin
+            )
         }
+
     }
 
 

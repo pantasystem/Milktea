@@ -206,30 +206,18 @@
                             android:layout_marginBottom="4dp"
                             android:layout_marginTop="4dp" />
 
-                    <net.pantasystem.milktea.common_android_ui.MediaPreviewAspectLayout
+                    <net.pantasystem.milktea.common_android.ui.MediaLayout
+                        android:id="@+id/manyFilePreviewListView"
+                        mediaViewData="@{note.media}"
+                        previewAbleList="@{note.media.files}"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:visibility="@{note.media.visibleMediaPreviewArea ? View.VISIBLE : View.GONE}"
-                        android:layout_marginTop="2dp"
-                        >
-                        <include
-                            android:id="@+id/mediaPreview"
-                            layout="@layout/media_preview"
-                            app:media="@{note.media}"
-                            android:layout_width="match_parent"
-                            android:layout_height="200dp"
-                            tools:layout_height="20dp" />
-                    </net.pantasystem.milktea.common_android_ui.MediaPreviewAspectLayout>
-
-
-                    <androidx.recyclerview.widget.RecyclerView
-                            android:id="@+id/manyFilePreviewListView"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            tools:layout_height="20dp"
-                            android:visibility="gone"
-                            mediaViewData="@{note.media}"
-                            previewAbleList="@{note.media.files}" />
+                        android:layout_height="match_parent"
+                        android:visibility="gone"
+                        android:columnCount="2"
+                        tools:layout_height="20dp"
+                        rect="@{30f}"
+                        android:layout_marginTop="@dimen/note_media_preview_top_margin_size"
+                        />
 
 
                     <LinearLayout
@@ -362,20 +350,24 @@
                                 app:layout_constraintStart_toStartOf="parent"
                                 android:visibility="@{ note.subContentFolding || note.subNote.note.text == null ? View.GONE : View.VISIBLE }"/>
 
-                        <include
-                                layout="@layout/media_preview"
-                                app:media="@{note.subNoteMedia}"
-                                android:id="@+id/subNoteMediaPreview"
-                                android:layout_width="match_parent"
-                                android:layout_height="200dp"
-                                android:layout_below="@id/subNoteText"
-                                android:visibility="@{note.subContentFolding || note.subNoteFiles.empty || note.subNoteMedia.isOver4Files ? View.GONE : View.VISIBLE}"
-                                tools:layout_height="20dp"
-                                app:layout_constraintStart_toStartOf="parent"
-                                app:layout_constraintEnd_toEndOf="parent"
-                                app:layout_constraintTop_toBottomOf="@id/subNoteText"
-                                android:layout_marginTop="2dp"
-                                />
+                        <net.pantasystem.milktea.common_android.ui.MediaLayout
+                            android:id="@+id/subNoteMediaPreview"
+                            android:layout_width="match_parent"
+                            android:layout_height="200dp"
+                            android:visibility="@{note.isVisibleSubNoteMediaPreview ? View.VISIBLE : View.GONE}"
+
+                            android:layout_below="@id/subNoteText"
+                            mediaViewData="@{note.subNoteMedia}"
+                            previewAbleList="@{note.subNoteMedia.files}"
+                            tools:layout_height="20dp"
+                            tools:visibility="gone"
+                            rect="@{20f}"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintTop_toBottomOf="@id/subNoteText"
+                            android:layout_marginTop="2dp"
+                            />
+
 
 
                     </androidx.constraintlayout.widget.ConstraintLayout>

@@ -3,15 +3,15 @@ package net.pantasystem.milktea.note.media
 
 import android.annotation.SuppressLint
 import android.app.Activity
+import android.view.LayoutInflater
 import android.view.View
 import android.widget.FrameLayout
 import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.core.app.ActivityOptionsCompat
+import androidx.core.view.isVisible
 import androidx.databinding.BindingAdapter
-import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.CenterCrop
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -21,12 +21,14 @@ import jp.wasabeef.glide.transformations.BlurTransformation
 import net.pantasystem.milktea.common.glide.GlideApp
 import net.pantasystem.milktea.common.glide.blurhash.BlurHashSource
 import net.pantasystem.milktea.common_android.platform.isWifiConnected
+import net.pantasystem.milktea.common_android.ui.MediaLayout
 import net.pantasystem.milktea.common_android.ui.VisibilityHelper.setMemoVisibility
 import net.pantasystem.milktea.common_android_ui.NavigationEntryPointForBinding
 import net.pantasystem.milktea.common_navigation.MediaNavigationArgs
 import net.pantasystem.milktea.model.setting.Config
 import net.pantasystem.milktea.model.setting.MediaDisplayMode
 import net.pantasystem.milktea.note.R
+import net.pantasystem.milktea.note.databinding.ItemMediaPreviewBinding
 import net.pantasystem.milktea.note.media.viewmodel.MediaViewData
 import net.pantasystem.milktea.note.media.viewmodel.PreviewAbleFile
 
@@ -175,7 +177,7 @@ object MediaPreviewHelper {
 
     @JvmStatic
     @BindingAdapter("previewAbleList", "mediaViewData")
-    fun RecyclerView.setPreviewAbleList(
+    fun MediaLayout.setPreviewAbleList(
         previewAbleList: List<PreviewAbleFile>?,
         mediaViewData: MediaViewData?
     ) {
@@ -184,22 +186,57 @@ object MediaPreviewHelper {
             return
         }
 
-        if (previewAbleList.isEmpty() || previewAbleList.size <= 4) {
+        if (previewAbleList.isEmpty()) {
             this.visibility = View.GONE
             return
         }
-        isNestedScrollingEnabled = false
-        this.itemAnimator = null
 
-        val adapter = this.adapter as? PreviewAbleFileListAdapter
-            ?: PreviewAbleFileListAdapter(mediaViewData)
-        this.adapter = adapter
-        val layoutManager = this.layoutManager as? GridLayoutManager
-            ?: GridLayoutManager(context, 2)
-        layoutManager.recycleChildrenOnDetach = true
-        this.layoutManager = layoutManager
+        var count = this.childCount
+        while (count > previewAbleList.size) {
+            if (this.childCount > 4) {
+                this.removeViewAt(this.childCount - 1)
+            } else {
+                this.getChildAt(count - 1).setMemoVisibility(View.GONE)
+            }
+            count --
+        }
 
-        adapter.submitList(previewAbleList)
+        val inflater = LayoutInflater.from(this.context)
+        previewAbleList.forEachIndexed { index, previewAbleFile ->
+            val existsView: View? = this.getChildAt(index)
+            val binding = if (existsView == null) {
+                ItemMediaPreviewBinding.inflate(inflater, this, false)
+            } else {
+                ItemMediaPreviewBinding.bind(existsView)
+            }
+            binding.root.setMemoVisibility(View.VISIBLE)
+
+            binding.baseFrame.setClickWhenShowMediaActivityListener(
+                binding.thumbnail,
+                binding.actionButton,
+                previewAbleFile,
+                previewAbleList
+            )
+            binding.baseFrame.setOnClickListener {
+                mediaViewData.show(index)
+            }
+
+            binding.thumbnail.setPreview(previewAbleFile, mediaViewData.config)
+
+            binding.actionButton.isVisible = previewAbleFile.isVisiblePlayButton
+            binding.nsfwMessage.isVisible = previewAbleFile.isHiding
+            binding.nsfwMessage.setHideImageMessage(previewAbleFile, mediaViewData.config)
+            binding.toggleVisibilityButton.setImageResource(if (previewAbleFile.isHiding) R.drawable.ic_baseline_image_24 else R.drawable.ic_baseline_hide_image_24)
+            binding.toggleVisibilityButton.setOnClickListener {
+                mediaViewData.toggleVisibility(index)
+            }
+
+            if (existsView == null) {
+                this.addView(binding.root)
+            }
+        }
+
+
         this.visibility = View.VISIBLE
 
     }
