@@ -220,7 +220,7 @@ object MediaPreviewHelper {
             binding.actionButton.isVisible = previewAbleFile.isVisiblePlayButton
             binding.nsfwMessage.isVisible = previewAbleFile.isHiding
             binding.nsfwMessage.setHideImageMessage(previewAbleFile, mediaViewData.config)
-            binding.actionButton.setImageResource(if (previewAbleFile.isHiding) R.drawable.ic_baseline_image_24 else R.drawable.ic_baseline_hide_image_24)
+            binding.toggleVisibilityButton.setImageResource(if (previewAbleFile.isHiding) R.drawable.ic_baseline_image_24 else R.drawable.ic_baseline_hide_image_24)
             binding.toggleVisibilityButton.setOnClickListener {
                 mediaViewData.toggleVisibility(index)
             }
