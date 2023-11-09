@@ -2,7 +2,6 @@ package net.pantasystem.milktea.common_android.ui
 
 import android.content.Context
 import android.util.AttributeSet
-import android.util.Log
 import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.AttrRes
@@ -18,6 +17,7 @@ class MediaLayout : ViewGroup {
     private var spaceMargin = 8
     private var _visibleChildItemCount = 0
     private var _visibleChildren = listOf<View>()
+    private var _isOddVisibleItemCount = false
 
     private var _height: Int = 0
     private var _rightElHeight: Double = 0.0
@@ -53,6 +53,7 @@ class MediaLayout : ViewGroup {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec)
         _visibleChildren = children.filter { it.isVisible }.toList()
         _visibleChildItemCount = _visibleChildren.size
+        _isOddVisibleItemCount = _visibleChildItemCount % 2 == 1
         if (_visibleChildItemCount == 0) {
             _height = 0
             setMeasuredDimension(0, 0)
@@ -102,10 +103,10 @@ class MediaLayout : ViewGroup {
         for (i in 0 until _visibleChildItemCount) {
             val child = _visibleChildren[i]
 
-            val isOdd = _visibleChildItemCount % 2 == 1
+            val isOddView = i % 2 == 1
             val isLast = i == _visibleChildItemCount - 1
-            val isRight = if (isOdd) {
-                _visibleChildItemCount > 1 && (isLast || i % 2 == 1)
+            val isRight = if (_isOddVisibleItemCount) {
+                _visibleChildItemCount > 1 && (isLast || isOddView)
             } else {
                 i % 2 == 1
             }
@@ -121,30 +122,23 @@ class MediaLayout : ViewGroup {
                 0
             }
 
-            if (i == 2) {
-                Log.d("MediaLayout", "childTop: $childTop, childLeft: $childLeft, childHeight: $childHeight")
-            }
-
             val childBottom = childTop + childHeight
             val childRight = childLeft + _childWidth
 
-//            val hasLeftItem = i % 2 == 0 && i > 0
-//            val hasRightItem = i % 2 == 1 && i < _visibleChildItemCount - 1
-//            val hasTopItem = i >= 2
-//            val hasBottomItem = i < _visibleChildItemCount - 2
-//
-//            val childTopMargin = if (hasTopItem) +spaceMargin else 0
-//            val childBottomMargin = if (hasBottomItem) -spaceMargin else 0
-//            val childLeftMargin = if (hasLeftItem) +spaceMargin else 0
-//            val childRightMargin = if (hasRightItem) -spaceMargin else 0
+            val hasRightItem = isOddView && !isLast
+            val hasTopItem = i >= 2
+            val hasBottomItem = i < _visibleChildItemCount - 2
+            val childTopMargin = if (hasTopItem) +spaceMargin else 0
+            val childBottomMargin = if (hasBottomItem) -spaceMargin else 0
+            val childLeftMargin = if (isRight) +spaceMargin else 0
+            val childRightMargin = if (hasRightItem) -spaceMargin else 0
 
-//            child.layout(
-//                childLeft + childLeftMargin,
-//                childTop.toInt() + childTopMargin,
-//                childRight + childRightMargin,
-//                childBottom.toInt() + childBottomMargin
-//            )
-            child.layout(childLeft, childTop.toInt(), childRight, childBottom.toInt())
+            child.layout(
+                childLeft + childLeftMargin,
+                childTop.toInt() + childTopMargin,
+                childRight + childRightMargin,
+                childBottom.toInt() + childBottomMargin
+            )
         }
 
     }
