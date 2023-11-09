@@ -179,11 +179,12 @@ class MediatorUserDataSource @Inject constructor(
     override suspend fun addAll(
         users: List<User>
     ): Result<Map<User.Id, AddResult>> = runCancellableCatching {
+        val distinctUsers = users.distinctBy { it.id }
         withContext(ioDispatcher) {
-            val existsUsersInMemory = users.associate {
+            val existsUsersInMemory = distinctUsers.associate {
                 it.id to memCache.get(it.id)
             }
-            val existsRecordIdMap = users.groupBy {
+            val existsRecordIdMap = distinctUsers.groupBy {
                 it.id.accountId
             }.flatMap { entry ->
                 userDao.getInServerIds(entry.key, entry.value.map { it.id.id })
@@ -191,7 +192,7 @@ class MediatorUserDataSource @Inject constructor(
                 User.Id(it.user.accountId, it.user.serverId)
             }
 
-            val requireInserts = users.filter {
+            val requireInserts = distinctUsers.filter {
                 existsUsersInMemory[it.id] == null && existsRecordIdMap[it.id] == null
             }
             val insertedDbIds = userDao.insertAll(requireInserts.map {
@@ -206,12 +207,12 @@ class MediatorUserDataSource @Inject constructor(
                 it.key to it.value.user.id
             }
 
-            replaceUsersEmojisIfNeeds(users, userIdDbIdMap, existsRecordIdMap,)
-            replaceUsersRolesIfNeeds(users, userIdDbIdMap, existsRecordIdMap)
-            replaceUsersInstanceInfo(users, userIdDbIdMap, existsRecordIdMap)
+            replaceUsersEmojisIfNeeds(distinctUsers, userIdDbIdMap, existsRecordIdMap,)
+            replaceUsersRolesIfNeeds(distinctUsers, userIdDbIdMap, existsRecordIdMap)
+            replaceUsersInstanceInfo(distinctUsers, userIdDbIdMap, existsRecordIdMap)
 
             // 更新処理
-            users.forEach { user ->
+            distinctUsers.forEach { user ->
                 val record = existsRecordIdMap[user.id]
                 val dbId = userIdDbIdMap[user.id] ?: return@forEach
                 if (record != null && record.toSimpleModel() != user) {
@@ -236,7 +237,7 @@ class MediatorUserDataSource @Inject constructor(
             }
 
 
-            users.mapNotNull { user ->
+            distinctUsers.mapNotNull { user ->
                 existsUsersInMemory[user.id]?.let {
                     it.id to AddResult.Canceled
                 } ?: userIdDbIdMap[user.id]?.let { dbId ->
