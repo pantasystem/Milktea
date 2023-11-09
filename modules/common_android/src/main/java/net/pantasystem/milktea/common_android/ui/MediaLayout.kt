@@ -128,8 +128,13 @@ class MediaLayout : ViewGroup {
             val hasRightItem = !isOddView && !isLast && _visibleChildItemCount > 1
             val hasTopItem = i >= 2
             val hasBottomItem = if (_visibleChildItemCount > 3) {
-                // 最後から二つ目より前であること
-                i < _visibleChildItemCount - 2
+                if (_isOddVisibleItemCount) {
+                    // 最後ではないこと, 最後から二つ目ではないこと
+                    !isLast && i != _visibleChildItemCount - 3
+                } else {
+                    // 最後から二つ目より前であること
+                    i < _visibleChildItemCount - 2
+                }
             } else {
                 _visibleChildItemCount > 2 && i == 1
             }
