@@ -3,7 +3,7 @@ package net.pantasystem.milktea.common.collection
 class LRUCache<K, V>(private val capacity: Int) {
     val cache = linkedMapOf<K, V>()
 
-    fun get(key: K): V? {
+    operator fun get(key: K): V? {
         synchronized(cache) {
             val value = cache[key]
 

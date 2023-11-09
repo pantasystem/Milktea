@@ -117,6 +117,9 @@ class EmojiPickerUiStateService(
         counts,
         settings,
         recentlyUsed ->
+        val map = ac?.getHost()?.let {
+            customEmojiRepository.findAndConvertToMap(it).getOrElse { emptyMap() }
+        }
         EmojiPickerUiState(
             keyword = word,
             account = ac,
@@ -125,9 +128,7 @@ class EmojiPickerUiStateService(
             userSettingReactions = settings,
             recentlyUsedReactions = recentlyUsed,
             filteredEmojis = filtered,
-            customEmojiNameMap = ac?.getHost()?.let {
-                customEmojiRepository.getAndConvertToMap(it)
-            } ?: emptyMap()
+            customEmojiNameMap = map ?: emptyMap()
         )
     }.stateIn(
         coroutineScope,
