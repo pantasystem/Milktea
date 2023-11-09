@@ -3,7 +3,6 @@ package net.pantasystem.milktea.data.infrastructure.image
 import android.content.Context
 import android.graphics.BitmapFactory
 import dagger.hilt.android.qualifiers.ApplicationContext
-import io.objectbox.BoxStore
 import io.objectbox.kotlin.awaitCallInTx
 import io.objectbox.kotlin.inValues
 import io.objectbox.query.QueryBuilder
@@ -13,6 +12,7 @@ import kotlinx.datetime.Clock
 import net.pantasystem.milktea.api.misskey.OkHttpClientProvider
 import net.pantasystem.milktea.common.Hash
 import net.pantasystem.milktea.common_android.hilt.IODispatcher
+import net.pantasystem.milktea.data.infrastructure.BoxStoreHolder
 import net.pantasystem.milktea.model.image.ImageCache
 import net.pantasystem.milktea.model.image.ImageCacheRepository
 import okhttp3.Request
@@ -22,7 +22,7 @@ import kotlin.time.Duration.Companion.days
 
 
 class ImageCacheRepositoryImpl @Inject constructor(
-    private val boxStore: BoxStore,
+    private val boxStoreHolder: BoxStoreHolder,
     private val okHttpClientProvider: OkHttpClientProvider,
     @ApplicationContext val context: Context,
     @IODispatcher val coroutineDispatcher: CoroutineDispatcher,
@@ -35,7 +35,7 @@ class ImageCacheRepositoryImpl @Inject constructor(
     }
 
     private val imageCacheStore by lazy {
-        boxStore.boxFor(ImageCacheRecord::class.java)
+        boxStoreHolder.boxStore.boxFor(ImageCacheRecord::class.java)
     }
 
     override suspend fun save(url: String): ImageCache {
@@ -140,7 +140,7 @@ class ImageCacheRepositoryImpl @Inject constructor(
         val record = ImageCacheRecord.from(
             cache
         )
-        boxStore.awaitCallInTx {
+        boxStoreHolder.boxStore.awaitCallInTx {
             val existsRecord = imageCacheStore.query().equal(
                 ImageCacheRecord_.sourceUrl,
                 cache.sourceUrl,

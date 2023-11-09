@@ -1,7 +1,6 @@
 package net.pantasystem.milktea.data.infrastructure.note.impl
 
 import io.objectbox.Box
-import io.objectbox.BoxStore
 import io.objectbox.kotlin.awaitCallInTx
 import io.objectbox.kotlin.boxFor
 import io.objectbox.kotlin.inValues
@@ -15,6 +14,7 @@ import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.common_android.hilt.DefaultDispatcher
 import net.pantasystem.milktea.common_android.hilt.IODispatcher
+import net.pantasystem.milktea.data.infrastructure.BoxStoreHolder
 import net.pantasystem.milktea.data.infrastructure.note.impl.db.NoteRecord
 import net.pantasystem.milktea.data.infrastructure.note.impl.db.NoteRecord_
 import net.pantasystem.milktea.data.infrastructure.note.impl.db.NoteThreadRecordDAO
@@ -25,7 +25,7 @@ import java.util.*
 import javax.inject.Inject
 
 class ObjectBoxNoteDataSource @Inject constructor(
-    private val boxStore: BoxStore,
+    private val boxStoreHolder: BoxStoreHolder,
     private val noteThreadRecordDAO: NoteThreadRecordDAO,
     @IODispatcher val ioDispatcher: CoroutineDispatcher,
     @DefaultDispatcher val defaultDispatcher: CoroutineDispatcher,
@@ -37,7 +37,7 @@ class ObjectBoxNoteDataSource @Inject constructor(
     }
 
     private val noteBox: Box<NoteRecord> by lazy {
-        boxStore.boxFor()
+        boxStoreHolder.boxStore.boxFor()
     }
 
     private var listeners = setOf<NoteDataSource.Listener>()
@@ -135,7 +135,7 @@ class ObjectBoxNoteDataSource @Inject constructor(
 
     override suspend fun delete(noteId: Note.Id): Result<Boolean> = runCancellableCatching {
         val isDeleted = withContext(ioDispatcher) {
-            boxStore.awaitCallInTx {
+            boxStoreHolder.boxStore.awaitCallInTx {
                 noteBox.query().equal(
                     NoteRecord_.accountIdAndNoteId,
                     NoteRecord.generateAccountAndNoteId(noteId),
@@ -157,7 +157,7 @@ class ObjectBoxNoteDataSource @Inject constructor(
 
     override suspend fun add(note: Note): Result<AddResult> = runCancellableCatching {
         withContext(ioDispatcher) {
-            (boxStore.awaitCallInTx {
+            (boxStoreHolder.boxStore.awaitCallInTx {
                 val exists = noteBox.query().equal(
                     NoteRecord_.accountIdAndNoteId,
                     NoteRecord.generateAccountAndNoteId(note.id),
@@ -191,7 +191,7 @@ class ObjectBoxNoteDataSource @Inject constructor(
         notes: List<Note>
     ): Result<List<AddResult>> = runCancellableCatching {
         withContext(ioDispatcher) {
-            boxStore.awaitCallInTx {
+            boxStoreHolder.boxStore.awaitCallInTx {
                 val existsNotes = noteBox.query().inValues(
                     NoteRecord_.accountIdAndNoteId,
                     notes.map {
@@ -222,7 +222,7 @@ class ObjectBoxNoteDataSource @Inject constructor(
 
     override suspend fun deleteByUserId(userId: User.Id): Result<Int> = runCancellableCatching {
         withContext(ioDispatcher) {
-            boxStore.awaitCallInTx {
+            boxStoreHolder.boxStore.awaitCallInTx {
                 noteBox.query()
                     .equal(NoteRecord_.userId, userId.id, QueryBuilder.StringOrder.CASE_INSENSITIVE)
                     .and().equal(NoteRecord_.accountId, userId.accountId)

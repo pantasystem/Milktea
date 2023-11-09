@@ -1,7 +1,6 @@
 package net.pantasystem.milktea.data.infrastructure.emoji
 
 import io.objectbox.Box
-import io.objectbox.BoxStore
 import io.objectbox.kotlin.awaitCallInTx
 import io.objectbox.kotlin.boxFor
 import io.objectbox.kotlin.inValues
@@ -10,16 +9,17 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.common_android.hilt.IODispatcher
+import net.pantasystem.milktea.data.infrastructure.BoxStoreHolder
 import net.pantasystem.milktea.model.emoji.CustomEmojiAspectRatio
 import net.pantasystem.milktea.model.emoji.CustomEmojiAspectRatioDataSource
 import javax.inject.Inject
 
 class CustomEmojiAspectRatioDataSourceImpl @Inject constructor(
-    private val boxStore: BoxStore,
+    private val boxStoreHolder: BoxStoreHolder,
     @IODispatcher val coroutineDispatcher: CoroutineDispatcher,
 ) : CustomEmojiAspectRatioDataSource {
     private val aspectBox: Box<CustomEmojiAspectRatioRecord> by lazy {
-        boxStore.boxFor()
+        boxStoreHolder.boxStore.boxFor()
     }
 
     override suspend fun findIn(uris: List<String>): Result<List<CustomEmojiAspectRatio>> =
@@ -55,7 +55,7 @@ class CustomEmojiAspectRatioDataSourceImpl @Inject constructor(
 
     override suspend fun save(ratio: CustomEmojiAspectRatio): Result<CustomEmojiAspectRatio> = runCancellableCatching {
         withContext(coroutineDispatcher) {
-            boxStore.awaitCallInTx {
+            boxStoreHolder.boxStore.awaitCallInTx {
                 val exists = aspectBox.query().equal(
                     CustomEmojiAspectRatioRecord_.uri,
                     ratio.uri,

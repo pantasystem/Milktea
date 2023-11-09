@@ -1,28 +1,28 @@
 package net.pantasystem.milktea.data.infrastructure.note.impl.db
 
 import io.objectbox.Box
-import io.objectbox.BoxStore
 import io.objectbox.kotlin.awaitCallInTx
 import io.objectbox.kotlin.boxFor
 import io.objectbox.kotlin.toFlow
 import io.objectbox.query.QueryBuilder
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
+import net.pantasystem.milktea.data.infrastructure.BoxStoreHolder
 import net.pantasystem.milktea.model.note.Note
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
 open class NoteThreadRecordDAO @Inject constructor(
-    private val boxStore: BoxStore,
+    private val boxStoreHolder: BoxStoreHolder,
 ) {
 
     private val noteThreadContextBox: Box<ThreadRecord> by lazy {
-        boxStore.boxFor()
+        boxStoreHolder.boxStore.boxFor()
     }
 
     open suspend fun add(context: ThreadRecord) {
-        boxStore.awaitCallInTx {
+        boxStoreHolder.boxStore.awaitCallInTx {
             val exists = noteThreadContextBox.query().equal(
                 ThreadRecord_.targetNoteIdAndAccountId,
                 context.targetNoteIdAndAccountId,
@@ -37,13 +37,13 @@ open class NoteThreadRecordDAO @Inject constructor(
     }
 
     open suspend fun update(context: ThreadRecord) {
-        boxStore.awaitCallInTx {
+        boxStoreHolder.boxStore.awaitCallInTx {
             noteThreadContextBox.put(context)
         }
     }
 
     open suspend fun appendBlank(noteId: Note.Id): ThreadRecord {
-        return boxStore.awaitCallInTx {
+        return boxStoreHolder.boxStore.awaitCallInTx {
             val exists = noteThreadContextBox.query().equal(
                 ThreadRecord_.targetNoteIdAndAccountId,
                 NoteRecord.generateAccountAndNoteId(noteId),
@@ -66,7 +66,7 @@ open class NoteThreadRecordDAO @Inject constructor(
 
 
     open suspend fun clearRelation(targetNote: Note.Id) {
-        boxStore.awaitCallInTx {
+        boxStoreHolder.boxStore.awaitCallInTx {
             findBy(targetNote)?.also {
                 it.ancestors.clear()
                 it.descendants.clear()

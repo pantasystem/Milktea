@@ -1,24 +1,24 @@
 package net.pantasystem.milktea.data.infrastructure.note.reaction.impl
 
 import io.objectbox.Box
-import io.objectbox.BoxStore
 import io.objectbox.kotlin.boxFor
 import io.objectbox.kotlin.toFlow
 import io.objectbox.query.QueryBuilder
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import net.pantasystem.milktea.data.infrastructure.BoxStoreHolder
 import net.pantasystem.milktea.model.note.Note
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
 class ReactionUserDAO @Inject constructor(
-    private val boxStore: BoxStore,
+    private val boxStoreHolder: BoxStoreHolder,
 ) {
 
     private val reactionBox: Box<ReactionUsersRecord> by lazy {
-        boxStore.boxFor()
+        boxStoreHolder.boxStore.boxFor()
     }
 
     fun findBy(noteId: Note.Id, reaction: String?): ReactionUsersRecord? {

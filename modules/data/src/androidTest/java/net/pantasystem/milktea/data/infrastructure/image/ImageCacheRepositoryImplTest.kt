@@ -7,7 +7,7 @@ import io.objectbox.kotlin.boxFor
 import kotlinx.coroutines.runBlocking
 import kotlinx.datetime.Clock
 import net.pantasystem.milktea.api.misskey.DefaultOkHttpClientProvider
-import net.pantasystem.milktea.data.infrastructure.emoji.MyObjectBox
+import net.pantasystem.milktea.data.infrastructure.BoxStoreHolder
 import net.pantasystem.milktea.model.image.ImageCache
 import org.junit.Assert
 import org.junit.Before
@@ -22,9 +22,10 @@ class ImageCacheRepositoryImplTest {
     @Before
     fun setup() {
         val context = ApplicationProvider.getApplicationContext<Context>()
-        store = MyObjectBox.builder().androidContext(context).buildDefault()
+        val storeHolder = BoxStoreHolder(context)
+        store = storeHolder.boxStore
         repository = ImageCacheRepositoryImpl(
-            boxStore = store,
+            boxStoreHolder = storeHolder,
             okHttpClientProvider = DefaultOkHttpClientProvider(),
             context = context,
             coroutineDispatcher = kotlinx.coroutines.Dispatchers.Default
