@@ -7,7 +7,6 @@ import android.view.ViewGroup
 import androidx.annotation.AttrRes
 import androidx.annotation.StyleRes
 import androidx.core.view.children
-import androidx.core.view.isVisible
 import net.pantasystem.milktea.common_android.R
 import kotlin.math.max
 import kotlin.math.min
@@ -67,7 +66,7 @@ class MediaLayout : ViewGroup {
 
     private var spaceMargin = 8
     private var _visibleChildItemCount = 0
-    private var _visibleChildren = listOf<View>()
+    private var _visibleChildren = ArrayList<View>(16)
     private var _isOddVisibleItemCount = false
 
     private var _height: Int = 0
@@ -75,6 +74,8 @@ class MediaLayout : ViewGroup {
     private var _leftElHeight: Double = 0.0
     private var _colCount: Int = 0
     private var _childWidth: Int = 0
+
+    private var _suspendLayout = false
 
     constructor(context: Context) : super(context)
     constructor(context: Context, attrs: AttributeSet?)
@@ -93,8 +94,8 @@ class MediaLayout : ViewGroup {
             attrs, R.styleable.MediaLayout, defStyleAttr, defStyleRes
         )
         a.apply {
-            val spaceSize = getResourceId(R.styleable.MediaLayout_spaceSize, 8)
-            spaceMargin = if (spaceSize != 0) spaceSize / 2 else 0
+            val spaceSize = getDimensionPixelSize(R.styleable.MediaLayout_spaceSize, 8)
+            spaceMargin = spaceSize / 2
         }
 
         a.recycle()
@@ -102,9 +103,17 @@ class MediaLayout : ViewGroup {
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec)
-        _visibleChildren = children.filter { it.isVisible }.toList()
+        _visibleChildren.clear()
+        for (v in children) {
+            if (v.visibility == View.VISIBLE) {
+                _visibleChildren.add(v)
+            }
+        }
         _visibleChildItemCount = _visibleChildren.size
         _isOddVisibleItemCount = _visibleChildItemCount % 2 == 1
+        if (_suspendLayout) {
+            return
+        }
         if (_visibleChildItemCount == 0) {
             _height = 0
             setMeasuredDimension(0, 0)
@@ -130,29 +139,7 @@ class MediaLayout : ViewGroup {
 
         for (i in 0 until _visibleChildItemCount) {
             val child = _visibleChildren[i]
-            val isRight = i % 2 == 1
-            val childHeight = if (isRight) {
-                _rightElHeight
-            } else {
-                _leftElHeight
-            }
-            child.measure(
-                MeasureSpec.makeMeasureSpec(_childWidth, MeasureSpec.EXACTLY),
-                MeasureSpec.makeMeasureSpec(childHeight.toInt(), MeasureSpec.EXACTLY)
-            )
-        }
-
-
-        _height = height.toInt()
-        setMeasuredDimension(width, height.toInt())
-    }
-
-
-    override fun onLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int) {
-        val width = right - left
-
-        for (i in 0 until _visibleChildItemCount) {
-            val child = _visibleChildren[i]
+            val params = child.layoutParams as LayoutParams
 
             val isOddView = i % 2 == 1
             val isLast = i == _visibleChildItemCount - 1
@@ -161,23 +148,13 @@ class MediaLayout : ViewGroup {
             } else {
                 i % 2 == 1
             }
+
             val childHeight = if (isRight) {
                 _rightElHeight
             } else {
                 _leftElHeight
-            }
-            val childTop = (i / 2) * childHeight
-            val childLeft = if (isRight) {
-                width - _childWidth
-            } else {
-                0
-            }
+            }.toInt()
 
-            val childBottom = childTop + childHeight
-            val childRight = childLeft + _childWidth
-
-            val hasRightItem = !isOddView && !isLast && _visibleChildItemCount > 1
-            val hasTopItem = i >= 2
             val hasBottomItem = if (_visibleChildItemCount > 3) {
                 if (_isOddVisibleItemCount) {
                     // 最後ではないこと, 最後から二つ目ではないこと
@@ -190,6 +167,56 @@ class MediaLayout : ViewGroup {
                 // 3つ以下の場合は、要素数が3かつ2番目の要素であること
                 _visibleChildItemCount == 3 && i == 1
             }
+
+            child.measure(
+                MeasureSpec.makeMeasureSpec(_childWidth, MeasureSpec.EXACTLY),
+                MeasureSpec.makeMeasureSpec(childHeight, MeasureSpec.EXACTLY)
+            )
+
+            params.updateMemoParams(
+                measuredWidth = _childWidth,
+                measuredHeight = childHeight,
+                isRight = isRight,
+                isLast = isLast,
+                isOddView = isOddView,
+                hasBottomView = hasBottomItem,
+            )
+
+        }
+
+
+        _height = height.toInt()
+        setMeasuredDimension(width, height.toInt())
+    }
+
+
+    override fun onLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int) {
+        if (_suspendLayout) {
+            return
+        }
+        val width = right - left
+
+        for (i in 0 until _visibleChildItemCount) {
+            val child = _visibleChildren[i]
+            val params = child.layoutParams as LayoutParams
+
+            val isOddView = params.isOddView
+            val isLast = params.isLast
+            val isRight = params.isRight
+            val childHeight = params.measuredHeight
+            val childTop = (i / 2) * childHeight
+            val childLeft = if (isRight) {
+                width - params.measuredWidth
+            } else {
+                0
+            }
+
+            val childBottom = childTop + childHeight
+            val childRight = childLeft + params.measuredWidth
+
+            val hasRightItem = !isOddView && !isLast && _visibleChildItemCount > 1
+            val hasTopItem = i >= 2
+            val hasBottomItem = params.hasBottomView
             val childTopMargin = if (hasTopItem) +spaceMargin else 0
             val childBottomMargin = if (hasBottomItem) -spaceMargin else 0
             val childLeftMargin = if (isRight) +spaceMargin else 0
@@ -197,13 +224,85 @@ class MediaLayout : ViewGroup {
 
             child.layout(
                 childLeft + childLeftMargin,
-                childTop.toInt() + childTopMargin,
+                childTop + childTopMargin,
                 childRight + childRightMargin,
-                childBottom.toInt() + childBottomMargin
+                childBottom + childBottomMargin
             )
         }
 
     }
 
+    override fun generateLayoutParams(attrs: AttributeSet?): LayoutParams {
+        return LayoutParams(context, attrs)
+    }
+
+    /**
+     * レイアウトの更新を一時的に停止する
+     * 目的としては、子要素の追加や削除を行う際に、レイアウトの表示要素が確定するまで、
+     * onMeasureとonLayoutを呼び出さないようにするためです。
+     * それによって、無駄なレイアウトの計算を行わないようにすることができます。
+     * @param block このブロックの中で、複数のレイアウトの更新操作をすることを想定しています。
+     */
+    fun withSuspendLayout(block: () -> Unit) {
+        suspendLayout()
+        block()
+        resumeLayout()
+    }
+
+
+    private fun suspendLayout() {
+        _suspendLayout = true
+    }
+
+    private fun resumeLayout() {
+        _suspendLayout = false
+        requestLayout()
+    }
+
+
+    class LayoutParams : ViewGroup.LayoutParams {
+
+        constructor(c: Context, attrs: AttributeSet?) : super(c, attrs)
+
+        @Suppress("unused")
+        constructor(width: Int, height: Int) : super(width, height)
+
+        @Suppress("unused")
+        constructor(source: ViewGroup.LayoutParams?) : super(source)
+
+        internal var isRight = false
+            private set
+        internal var measuredWidth = 0
+            private set
+
+        internal var measuredHeight = 0
+            private set
+
+        internal var isLast = false
+            private set
+
+        internal var isOddView = false
+            private set
+
+        internal var hasBottomView: Boolean = false
+            private set
+
+
+        internal fun updateMemoParams(
+            measuredWidth: Int,
+            measuredHeight: Int,
+            isRight: Boolean,
+            isLast: Boolean,
+            isOddView: Boolean,
+            hasBottomView: Boolean,
+        ) {
+            this.measuredHeight = measuredHeight
+            this.measuredWidth = measuredWidth
+            this.isRight = isRight
+            this.isLast = isLast
+            this.isOddView = isOddView
+            this.hasBottomView  = hasBottomView
+        }
+    }
 
 }
