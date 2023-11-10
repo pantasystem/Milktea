@@ -7,7 +7,6 @@ import android.view.ViewGroup
 import androidx.annotation.AttrRes
 import androidx.annotation.StyleRes
 import androidx.core.view.children
-import androidx.core.view.isVisible
 import net.pantasystem.milktea.common_android.R
 import kotlin.math.max
 import kotlin.math.min
@@ -67,7 +66,7 @@ class MediaLayout : ViewGroup {
 
     private var spaceMargin = 8
     private var _visibleChildItemCount = 0
-    private var _visibleChildren = listOf<View>()
+    private var _visibleChildren = mutableListOf<View>()
     private var _isOddVisibleItemCount = false
 
     private var _height: Int = 0
@@ -104,10 +103,18 @@ class MediaLayout : ViewGroup {
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec)
-        _visibleChildren = children.filter { it.isVisible }.toList()
+        _visibleChildren.clear()
+        for (v in children) {
+            if (v.visibility == View.VISIBLE) {
+                _visibleChildren.add(v)
+            }
+        }
         _visibleChildItemCount = _visibleChildren.size
         _isOddVisibleItemCount = _visibleChildItemCount % 2 == 1
-        if (_visibleChildItemCount == 0 || _suspendLayout) {
+        if (_suspendLayout) {
+            return
+        }
+        if (_visibleChildItemCount == 0) {
             _height = 0
             setMeasuredDimension(0, 0)
             return
