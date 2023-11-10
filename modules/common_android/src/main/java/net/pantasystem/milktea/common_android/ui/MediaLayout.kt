@@ -66,7 +66,7 @@ class MediaLayout : ViewGroup {
 
     private var spaceMargin = 8
     private var _visibleChildItemCount = 0
-    private var _visibleChildren = mutableListOf<View>()
+    private var _visibleChildren = ArrayList<View>(16)
     private var _isOddVisibleItemCount = false
 
     private var _height: Int = 0
