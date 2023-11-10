@@ -199,13 +199,13 @@ class MediaLayout : ViewGroup {
             val childHeight = params.measuredHeight
             val childTop = (i / 2) * childHeight
             val childLeft = if (isRight) {
-                width - _childWidth
+                width - params.measuredWidth
             } else {
                 0
             }
 
             val childBottom = childTop + childHeight
-            val childRight = childLeft + _childWidth
+            val childRight = childLeft + params.measuredWidth
 
             val hasRightItem = !isOddView && !isLast && _visibleChildItemCount > 1
             val hasTopItem = i >= 2
