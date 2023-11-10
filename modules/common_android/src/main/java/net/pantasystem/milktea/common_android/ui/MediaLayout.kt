@@ -229,7 +229,11 @@ class MediaLayout : ViewGroup {
     class LayoutParams : ViewGroup.LayoutParams {
 
         constructor(c: Context, attrs: AttributeSet?) : super(c, attrs)
+
+        @Suppress("unused")
         constructor(width: Int, height: Int) : super(width, height)
+
+        @Suppress("unused")
         constructor(source: ViewGroup.LayoutParams?) : super(source)
 
         internal var isRight = false
