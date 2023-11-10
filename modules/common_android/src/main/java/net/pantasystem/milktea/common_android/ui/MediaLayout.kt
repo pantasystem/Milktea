@@ -130,16 +130,51 @@ class MediaLayout : ViewGroup {
 
         for (i in 0 until _visibleChildItemCount) {
             val child = _visibleChildren[i]
-            val isRight = i % 2 == 1
+            val params = child.layoutParams as LayoutParams
+
+            val isOddView = i % 2 == 1
+            val isLast = i == _visibleChildItemCount - 1
+            val isRight = if (_isOddVisibleItemCount) {
+                _visibleChildItemCount > 1 && (isLast || isOddView)
+            } else {
+                i % 2 == 1
+            }
+
             val childHeight = if (isRight) {
                 _rightElHeight
             } else {
                 _leftElHeight
+            }.toInt()
+
+            val hasBottomItem = if (_visibleChildItemCount > 3) {
+                if (_isOddVisibleItemCount) {
+                    // 最後ではないこと, 最後から二つ目ではないこと
+                    !isLast && i != _visibleChildItemCount - 3
+                } else {
+                    // 最後から二つ目より前であること
+                    i < _visibleChildItemCount - 2
+                }
+            } else {
+                // 3つ以下の場合は、要素数が3かつ2番目の要素であること
+                _visibleChildItemCount == 3 && i == 1
             }
-            child.measure(
-                MeasureSpec.makeMeasureSpec(_childWidth, MeasureSpec.EXACTLY),
-                MeasureSpec.makeMeasureSpec(childHeight.toInt(), MeasureSpec.EXACTLY)
+
+            if (params.measuredWidth != _childWidth || params.measuredHeight != childHeight) {
+                child.measure(
+                    MeasureSpec.makeMeasureSpec(_childWidth, MeasureSpec.EXACTLY),
+                    MeasureSpec.makeMeasureSpec(childHeight, MeasureSpec.EXACTLY)
+                )
+            }
+
+            params.updateMemoParams(
+                measuredWidth = _childWidth,
+                measuredHeight = childHeight,
+                isRight = isRight,
+                isLast = isLast,
+                isOddView = isOddView,
+                hasBottomView = hasBottomItem,
             )
+
         }
 
 
@@ -153,19 +188,12 @@ class MediaLayout : ViewGroup {
 
         for (i in 0 until _visibleChildItemCount) {
             val child = _visibleChildren[i]
+            val params = child.layoutParams as LayoutParams
 
-            val isOddView = i % 2 == 1
-            val isLast = i == _visibleChildItemCount - 1
-            val isRight = if (_isOddVisibleItemCount) {
-                _visibleChildItemCount > 1 && (isLast || isOddView)
-            } else {
-                i % 2 == 1
-            }
-            val childHeight = if (isRight) {
-                _rightElHeight
-            } else {
-                _leftElHeight
-            }
+            val isOddView = params.isOddView
+            val isLast = params.isLast
+            val isRight = params.isRight
+            val childHeight = params.measuredHeight
             val childTop = (i / 2) * childHeight
             val childLeft = if (isRight) {
                 width - _childWidth
@@ -178,18 +206,7 @@ class MediaLayout : ViewGroup {
 
             val hasRightItem = !isOddView && !isLast && _visibleChildItemCount > 1
             val hasTopItem = i >= 2
-            val hasBottomItem = if (_visibleChildItemCount > 3) {
-                if (_isOddVisibleItemCount) {
-                    // 最後ではないこと, 最後から二つ目ではないこと
-                    !isLast && i != _visibleChildItemCount - 3
-                } else {
-                    // 最後から二つ目より前であること
-                    i < _visibleChildItemCount - 2
-                }
-            } else {
-                // 3つ以下の場合は、要素数が3かつ2番目の要素であること
-                _visibleChildItemCount == 3 && i == 1
-            }
+            val hasBottomItem = params.hasBottomView
             val childTopMargin = if (hasTopItem) +spaceMargin else 0
             val childBottomMargin = if (hasBottomItem) -spaceMargin else 0
             val childLeftMargin = if (isRight) +spaceMargin else 0
@@ -197,13 +214,57 @@ class MediaLayout : ViewGroup {
 
             child.layout(
                 childLeft + childLeftMargin,
-                childTop.toInt() + childTopMargin,
+                childTop + childTopMargin,
                 childRight + childRightMargin,
-                childBottom.toInt() + childBottomMargin
+                childBottom + childBottomMargin
             )
         }
 
     }
 
+    override fun generateLayoutParams(attrs: AttributeSet?): LayoutParams {
+        return LayoutParams(context, attrs)
+    }
+
+    class LayoutParams : ViewGroup.LayoutParams {
+
+        constructor(c: Context, attrs: AttributeSet?) : super(c, attrs)
+        constructor(width: Int, height: Int) : super(width, height)
+        constructor(source: ViewGroup.LayoutParams?) : super(source)
+
+        internal var isRight = false
+            private set
+        internal var measuredWidth = 0
+            private set
+
+        internal var measuredHeight = 0
+            private set
+
+        internal var isLast = false
+            private set
+
+        internal var isOddView = false
+            private set
+
+        internal var hasBottomView: Boolean = false
+            private set
+
+
+        internal fun updateMemoParams(
+            measuredWidth: Int,
+            measuredHeight: Int,
+            isRight: Boolean,
+            isLast: Boolean,
+            isOddView: Boolean,
+            hasBottomView: Boolean,
+        ) {
+            this.measuredHeight = measuredHeight
+            this.measuredWidth = measuredWidth
+            this.isRight = isRight
+            this.isLast = isLast
+            this.isOddView = isOddView
+            this.hasBottomView  = hasBottomView
+        }
+    }
 
 }
