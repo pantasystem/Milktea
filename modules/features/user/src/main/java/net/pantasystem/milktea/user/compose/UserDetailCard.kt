@@ -88,9 +88,9 @@ fun UserDetailCard(
                     text = stringResource(id = R.string.follower),
                     color = Color.White,
                     modifier = Modifier
+                        .clip(RoundedCornerShape(12.dp))
                         .background(Color.Black.copy(alpha = 0.75f))
                         .padding(4.dp)
-                        .clip(RoundedCornerShape(2.dp))
                         .constrainAs(followingULabel) {
                             start.linkTo(parent.start, margin = 8.dp)
                             top.linkTo(parent.top, margin = 8.dp)
