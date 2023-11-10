@@ -93,8 +93,8 @@ class MediaLayout : ViewGroup {
             attrs, R.styleable.MediaLayout, defStyleAttr, defStyleRes
         )
         a.apply {
-            val spaceSize = getResourceId(R.styleable.MediaLayout_spaceSize, 8)
-            spaceMargin = if (spaceSize != 0) spaceSize / 2 else 0
+            val spaceSize = getDimensionPixelSize(R.styleable.MediaLayout_spaceSize, 8)
+            spaceMargin = spaceSize / 2
         }
 
         a.recycle()
