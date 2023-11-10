@@ -159,12 +159,10 @@ class MediaLayout : ViewGroup {
                 _visibleChildItemCount == 3 && i == 1
             }
 
-            if (params.measuredWidth != _childWidth || params.measuredHeight != childHeight) {
-                child.measure(
-                    MeasureSpec.makeMeasureSpec(_childWidth, MeasureSpec.EXACTLY),
-                    MeasureSpec.makeMeasureSpec(childHeight, MeasureSpec.EXACTLY)
-                )
-            }
+            child.measure(
+                MeasureSpec.makeMeasureSpec(_childWidth, MeasureSpec.EXACTLY),
+                MeasureSpec.makeMeasureSpec(childHeight, MeasureSpec.EXACTLY)
+            )
 
             params.updateMemoParams(
                 measuredWidth = _childWidth,
