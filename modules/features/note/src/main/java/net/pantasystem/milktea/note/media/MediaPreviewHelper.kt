@@ -191,51 +191,52 @@ object MediaPreviewHelper {
             return
         }
 
-        var count = this.childCount
-        while (count > previewAbleList.size) {
-            if (this.childCount > 4) {
-                this.removeViewAt(this.childCount - 1)
-            } else {
-                this.getChildAt(count - 1).setMemoVisibility(View.GONE)
+        withSuspendLayout {
+            var count = this.childCount
+            while (count > previewAbleList.size) {
+                if (this.childCount > 4) {
+                    this.removeViewAt(this.childCount - 1)
+                } else {
+                    this.getChildAt(count - 1).setMemoVisibility(View.GONE)
+                }
+                count --
             }
-            count --
+
+            val inflater = LayoutInflater.from(this.context)
+            previewAbleList.forEachIndexed { index, previewAbleFile ->
+                val existsView: View? = this.getChildAt(index)
+                val binding = if (existsView == null) {
+                    ItemMediaPreviewBinding.inflate(inflater, this, false)
+                } else {
+                    ItemMediaPreviewBinding.bind(existsView)
+                }
+                binding.root.setMemoVisibility(View.VISIBLE)
+
+                binding.baseFrame.setClickWhenShowMediaActivityListener(
+                    binding.thumbnail,
+                    binding.actionButton,
+                    previewAbleFile,
+                    previewAbleList
+                )
+                binding.baseFrame.setOnClickListener {
+                    mediaViewData.show(index)
+                }
+
+                binding.thumbnail.setPreview(previewAbleFile, mediaViewData.config)
+
+                binding.actionButton.isVisible = previewAbleFile.isVisiblePlayButton
+                binding.nsfwMessage.isVisible = previewAbleFile.isHiding
+                binding.nsfwMessage.setHideImageMessage(previewAbleFile, mediaViewData.config)
+                binding.toggleVisibilityButton.setImageResource(if (previewAbleFile.isHiding) R.drawable.ic_baseline_image_24 else R.drawable.ic_baseline_hide_image_24)
+                binding.toggleVisibilityButton.setOnClickListener {
+                    mediaViewData.toggleVisibility(index)
+                }
+
+                if (existsView == null) {
+                    this.addView(binding.root)
+                }
+            }
         }
-
-        val inflater = LayoutInflater.from(this.context)
-        previewAbleList.forEachIndexed { index, previewAbleFile ->
-            val existsView: View? = this.getChildAt(index)
-            val binding = if (existsView == null) {
-                ItemMediaPreviewBinding.inflate(inflater, this, false)
-            } else {
-                ItemMediaPreviewBinding.bind(existsView)
-            }
-            binding.root.setMemoVisibility(View.VISIBLE)
-
-            binding.baseFrame.setClickWhenShowMediaActivityListener(
-                binding.thumbnail,
-                binding.actionButton,
-                previewAbleFile,
-                previewAbleList
-            )
-            binding.baseFrame.setOnClickListener {
-                mediaViewData.show(index)
-            }
-
-            binding.thumbnail.setPreview(previewAbleFile, mediaViewData.config)
-
-            binding.actionButton.isVisible = previewAbleFile.isVisiblePlayButton
-            binding.nsfwMessage.isVisible = previewAbleFile.isHiding
-            binding.nsfwMessage.setHideImageMessage(previewAbleFile, mediaViewData.config)
-            binding.toggleVisibilityButton.setImageResource(if (previewAbleFile.isHiding) R.drawable.ic_baseline_image_24 else R.drawable.ic_baseline_hide_image_24)
-            binding.toggleVisibilityButton.setOnClickListener {
-                mediaViewData.toggleVisibility(index)
-            }
-
-            if (existsView == null) {
-                this.addView(binding.root)
-            }
-        }
-
 
         this.visibility = View.VISIBLE
 

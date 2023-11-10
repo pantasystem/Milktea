@@ -76,6 +76,8 @@ class MediaLayout : ViewGroup {
     private var _colCount: Int = 0
     private var _childWidth: Int = 0
 
+    private var _suspendLayout = false
+
     constructor(context: Context) : super(context)
     constructor(context: Context, attrs: AttributeSet?)
             : this(context, attrs, 0)
@@ -105,7 +107,7 @@ class MediaLayout : ViewGroup {
         _visibleChildren = children.filter { it.isVisible }.toList()
         _visibleChildItemCount = _visibleChildren.size
         _isOddVisibleItemCount = _visibleChildItemCount % 2 == 1
-        if (_visibleChildItemCount == 0) {
+        if (_visibleChildItemCount == 0 || _suspendLayout) {
             _height = 0
             setMeasuredDimension(0, 0)
             return
@@ -182,6 +184,9 @@ class MediaLayout : ViewGroup {
 
 
     override fun onLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int) {
+        if (_suspendLayout) {
+            return
+        }
         val width = right - left
 
         for (i in 0 until _visibleChildItemCount) {
@@ -223,6 +228,30 @@ class MediaLayout : ViewGroup {
     override fun generateLayoutParams(attrs: AttributeSet?): LayoutParams {
         return LayoutParams(context, attrs)
     }
+
+    /**
+     * レイアウトの更新を一時的に停止する
+     * 目的としては、子要素の追加や削除を行う際に、レイアウトの表示要素が確定するまで、
+     * onMeasureとonLayoutを呼び出さないようにするためです。
+     * それによって、無駄なレイアウトの計算を行わないようにすることができます。
+     * @param block このブロックの中で、複数のレイアウトの更新操作をすることを想定しています。
+     */
+    fun withSuspendLayout(block: () -> Unit) {
+        suspendLayout()
+        block()
+        resumeLayout()
+    }
+
+
+    private fun suspendLayout() {
+        _suspendLayout = true
+    }
+
+    private fun resumeLayout() {
+        _suspendLayout = false
+        requestLayout()
+    }
+
 
     class LayoutParams : ViewGroup.LayoutParams {
 
