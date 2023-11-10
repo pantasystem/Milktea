@@ -514,8 +514,8 @@
             app:emojiCompatEnabled="false"
             app:layout_constraintEnd_toStartOf="@id/toggleMastodonFavouriteButton"
             app:layout_constraintStart_toEndOf="@id/renoteButton"
-            app:layout_constraintTop_toTopOf="@id/renoteButton"
-            app:layout_constraintBottom_toBottomOf="@id/renoteButton"
+            app:layout_constraintTop_toTopOf="@id/replyButton"
+            app:layout_constraintBottom_toBottomOf="@id/replyButton"
             tools:text="10" />
 
         <ImageButton
