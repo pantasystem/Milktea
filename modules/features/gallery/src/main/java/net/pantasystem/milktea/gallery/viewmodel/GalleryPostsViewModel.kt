@@ -106,9 +106,8 @@ class GalleryPostsViewModel @AssistedInject constructor(
 
 
         val relations = combine(galleryPostsStore.state, galleryDataSource.state) { it, _ ->
-
-            it.convert {
-                runBlocking {
+            it.suspendConvert {
+                coroutineScope {
                     it.map { id ->
                         async {
                             galleryDataSource.find(id).getOrNull()

@@ -93,12 +93,12 @@ class ChannelAPI(
     }
 
 
-    private fun connect(type: Type, listener: (ChannelBody) -> Unit): Unit = runBlocking {
+    private suspend fun connect(type: Type, listener: (ChannelBody) -> Unit) {
         // NOTE すでにlistenerを追加済みであれば何もせずに終了する。
         mutex.withLock {
             if (listenersMap[type]?.contains(listener) == true) {
                 logger.debug { "リッスン済み" }
-                return@runBlocking
+                return
             }
 
             fun getOrNew(type: Type): Set<(ChannelBody) -> Unit> {

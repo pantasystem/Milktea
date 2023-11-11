@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.channelFlow
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
@@ -41,7 +42,7 @@ class NoteCaptureAPIAdapterImpl(
     private val imageCacheRepository: ImageCacheRepository,
     loggerFactory: Logger.Factory,
     cs: CoroutineScope,
-    dispatcher: CoroutineDispatcher = Dispatchers.Default,
+    private val dispatcher: CoroutineDispatcher = Dispatchers.Default,
 ) : NoteDataSource.Listener, NoteCaptureAPIAdapter {
 
     private val logger = loggerFactory.create("NoteCaptureAPIAdapter")
@@ -132,6 +133,19 @@ class NoteCaptureAPIAdapterImpl(
             trySend(ev)
         }
 
+        captureAndDispatchEvent(account, id, repositoryEventListener)
+
+        awaitClose {
+            removeEventHandlerAndCancelJobIfNeed(id, repositoryEventListener)
+        }
+    }.flowOn(dispatcher)
+
+
+    private fun captureAndDispatchEvent(
+        account: Account,
+        id: Note.Id,
+        repositoryEventListener: (NoteDataSource.Event) -> Unit,
+    ) {
         synchronized(noteIdWithJob) {
             if (addRepositoryEventListener(id, repositoryEventListener)) {
                 logger.debug("未登録だったのでRemoteに対して購読を開始する")
@@ -160,30 +174,23 @@ class NoteCaptureAPIAdapterImpl(
 
             }
         }
-
-        awaitClose {
-            // NoteCaptureの購読を解除する
-            synchronized(noteIdWithJob) {
-                // リスナーを解除する
-                removeRepositoryEventListener(id, repositoryEventListener).also { result ->
-                    if (result) {
-
-                        // すべてのリスナーが解除されていればRemoteへの購読も解除する
-                        noteIdWithJob.remove(id)?.cancel() ?: run {
-                            logger.warning("購読解除しようとしたところすでに解除されていた")
-                        }
-                    }
-                }
-
-            }
-
-//            // NOTE: Noteのキャプチャーが一切行われなくなった場合キャッシュ上からも削除している。
-//            if (result) {
-//                noteResourceReleaseEvent.tryEmit(id)
-//            }
-        }
     }
 
+    private fun removeEventHandlerAndCancelJobIfNeed(id: Note.Id, repositoryEventListener: (NoteDataSource.Event) -> Unit) {
+        synchronized(noteIdWithJob) {
+            // リスナーを解除する
+            removeRepositoryEventListener(id, repositoryEventListener).also { result ->
+                if (result) {
+
+                    // すべてのリスナーが解除されていればRemoteへの購読も解除する
+                    noteIdWithJob.remove(id)?.cancel() ?: run {
+                        logger.warning("購読解除しようとしたところすでに解除されていた")
+                    }
+                }
+            }
+
+        }
+    }
 
     /**
      * @return Note.Idが初めてListenerに登録されるとtrueが返されます。
