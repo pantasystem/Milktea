@@ -1,6 +1,7 @@
 package net.pantasystem.milktea.note.view
 
 import androidx.appcompat.app.AppCompatActivity
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import net.pantasystem.milktea.app_store.setting.SettingStore
 import net.pantasystem.milktea.common_navigation.ChannelDetailNavigation
 import net.pantasystem.milktea.common_navigation.UserDetailNavigation
@@ -130,6 +131,19 @@ class NoteCardActionHandler(
                 activity.startActivity(
                     channelDetailNavigation.newIntent(action.channelId)
                 )
+            }
+            is NoteCardAction.OnMediaPreviewLongClicked -> {
+                val context = activity
+                val previewAbleFile = action.previewAbleFile
+                val title = previewAbleFile?.source?.name
+                val altText = previewAbleFile?.source?.comment
+                val alertDialog = MaterialAlertDialogBuilder(context)
+                alertDialog.setTitle(title)
+                alertDialog.setMessage(altText)
+                alertDialog.setNeutralButton("Exit") { intf, _ ->
+                    intf.cancel()
+                }
+                alertDialog.show()
             }
         }
     }
