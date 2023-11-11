@@ -2,94 +2,60 @@
 package net.pantasystem.milktea.note.media
 
 import android.annotation.SuppressLint
-import android.app.Activity
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.FrameLayout
 import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
-import androidx.core.app.ActivityOptionsCompat
 import androidx.core.view.isVisible
 import androidx.databinding.BindingAdapter
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.CenterCrop
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import dagger.hilt.android.EntryPointAccessors
-import dagger.hilt.android.internal.managers.FragmentComponentManager
 import jp.wasabeef.glide.transformations.BlurTransformation
 import net.pantasystem.milktea.common.glide.GlideApp
 import net.pantasystem.milktea.common.glide.blurhash.BlurHashSource
 import net.pantasystem.milktea.common_android.platform.isWifiConnected
 import net.pantasystem.milktea.common_android.ui.MediaLayout
 import net.pantasystem.milktea.common_android.ui.VisibilityHelper.setMemoVisibility
-import net.pantasystem.milktea.common_android_ui.NavigationEntryPointForBinding
-import net.pantasystem.milktea.common_navigation.MediaNavigationArgs
 import net.pantasystem.milktea.model.setting.Config
 import net.pantasystem.milktea.model.setting.MediaDisplayMode
 import net.pantasystem.milktea.note.R
 import net.pantasystem.milktea.note.databinding.ItemMediaPreviewBinding
 import net.pantasystem.milktea.note.media.viewmodel.MediaViewData
 import net.pantasystem.milktea.note.media.viewmodel.PreviewAbleFile
+import net.pantasystem.milktea.note.view.NoteCardActionListenerAdapter
 
 object MediaPreviewHelper {
 
 
-    @BindingAdapter("thumbnailView", "playButton", "previewAbleFile", "previewAbleFileList")
     @JvmStatic
     fun FrameLayout.setClickWhenShowMediaActivityListener(
         thumbnailView: ImageView,
         playButton: ImageButton,
         previewAbleFile: PreviewAbleFile?,
-        previewAbleFileList: List<PreviewAbleFile>?
+        previewAbleFileList: List<PreviewAbleFile>?,
+        noteCardActionListenerAdapter: NoteCardActionListenerAdapter?,
     ) {
 
         if (previewAbleFileList.isNullOrEmpty()) {
             return
         }
         val listener = View.OnClickListener {
-            val activity = FragmentComponentManager.findActivity(it.context) as Activity
-            val intent = EntryPointAccessors.fromActivity(
-                activity,
-                NavigationEntryPointForBinding::class.java
+            noteCardActionListenerAdapter?.onMediaPreviewClicked(
+                previewAbleFile = previewAbleFile,
+                files = previewAbleFileList,
+                index = previewAbleFileList.indexOfFirst { f ->
+                    f === previewAbleFile
+                },
+                thumbnailView = thumbnailView,
             )
-                .mediaNavigation().newIntent(
-                    MediaNavigationArgs.Files(
-                        files = previewAbleFileList.map { fvd ->
-                            fvd.source
-                        },
-                        index = previewAbleFileList.indexOfFirst { f ->
-                            f === previewAbleFile
-                        })
-                )
-            val context = it.context
-
-            if (context is Activity) {
-                val compat = ActivityOptionsCompat.makeSceneTransitionAnimation(
-                    context,
-                    thumbnailView,
-                    "image"
-                )
-                context.startActivity(intent, compat.toBundle())
-
-            } else {
-                context.startActivity(intent)
-            }
         }
         thumbnailView.setOnClickListener(listener)
         playButton.setOnClickListener(listener)
 
         val holdListener = View.OnLongClickListener {
-            val context = it.context
-            val title = previewAbleFile?.source?.name
-            val altText = previewAbleFile?.source?.comment
-            val alertDialog = MaterialAlertDialogBuilder(context)
-            alertDialog.setTitle(title)
-            alertDialog.setMessage(altText)
-            alertDialog.setNeutralButton("Exit") { intf, _ ->
-                intf.cancel()
-            }
-            alertDialog.show()
+            noteCardActionListenerAdapter?.onMediaPreviewLongClicked(previewAbleFile)
             true
         }
         thumbnailView.setOnLongClickListener(holdListener)
@@ -176,10 +142,11 @@ object MediaPreviewHelper {
 
 
     @JvmStatic
-    @BindingAdapter("previewAbleList", "mediaViewData")
+    @BindingAdapter("previewAbleList", "mediaViewData", "noteCardActionListenerAdapter")
     fun MediaLayout.setPreviewAbleList(
         previewAbleList: List<PreviewAbleFile>?,
-        mediaViewData: MediaViewData?
+        mediaViewData: MediaViewData?,
+        noteCardActionListenerAdapter: NoteCardActionListenerAdapter?,
     ) {
         if (previewAbleList == null || mediaViewData == null) {
             this.visibility = View.GONE
@@ -216,7 +183,8 @@ object MediaPreviewHelper {
                     binding.thumbnail,
                     binding.actionButton,
                     previewAbleFile,
-                    previewAbleList
+                    previewAbleList,
+                    noteCardActionListenerAdapter,
                 )
                 binding.baseFrame.setOnClickListener {
                     mediaViewData.show(index)

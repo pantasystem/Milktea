@@ -186,6 +186,7 @@
                     android:visibility="@{note.media.visibleMediaPreviewArea ? View.VISIBLE : View.GONE}"
                     mediaViewData="@{note.media}"
                     previewAbleList="@{note.media.files}"
+                    noteCardActionListenerAdapter="@{noteCardActionListener}"
                     tools:visibility="gone"
                     rect="@{30f}"
                     android:layout_marginTop="@dimen/note_media_preview_top_margin_size"
@@ -311,6 +312,7 @@
                             android:visibility="@{note.subNoteFiles.empty ? View.GONE : View.VISIBLE}"
                             mediaViewData="@{note.subNoteMedia}"
                             previewAbleList="@{note.subNoteMedia.files}"
+                            noteCardActionListenerAdapter="@{noteCardActionListener}"
                             rect="@{20f}"
                             tools:layout_height="50dp" />
 

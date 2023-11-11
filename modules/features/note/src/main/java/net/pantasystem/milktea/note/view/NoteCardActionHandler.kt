@@ -1,8 +1,13 @@
 package net.pantasystem.milktea.note.view
 
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityOptionsCompat
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import dagger.hilt.android.EntryPointAccessors
 import net.pantasystem.milktea.app_store.setting.SettingStore
+import net.pantasystem.milktea.common_android_ui.NavigationEntryPointForBinding
 import net.pantasystem.milktea.common_navigation.ChannelDetailNavigation
+import net.pantasystem.milktea.common_navigation.MediaNavigationArgs
 import net.pantasystem.milktea.common_navigation.UserDetailNavigation
 import net.pantasystem.milktea.common_navigation.UserDetailNavigationArgs
 import net.pantasystem.milktea.model.account.page.Pageable
@@ -130,6 +135,49 @@ class NoteCardActionHandler(
                 activity.startActivity(
                     channelDetailNavigation.newIntent(action.channelId)
                 )
+            }
+            is NoteCardAction.OnMediaPreviewLongClicked -> {
+                val context = activity
+                val previewAbleFile = action.previewAbleFile
+                val title = previewAbleFile?.source?.name
+                val altText = previewAbleFile?.source?.comment
+                val alertDialog = MaterialAlertDialogBuilder(context)
+                alertDialog.setTitle(title)
+                alertDialog.setMessage(altText)
+                alertDialog.setNeutralButton("Exit") { intf, _ ->
+                    intf.cancel()
+                }
+                alertDialog.show()
+            }
+            is NoteCardAction.OnMediaPreviewClicked -> {
+                val previewAbleFileList = action.files
+                val previewAbleFile = action.previewAbleFile
+                val intent = EntryPointAccessors.fromActivity(
+                    activity,
+                    NavigationEntryPointForBinding::class.java
+                )
+                    .mediaNavigation().newIntent(
+                        MediaNavigationArgs.Files(
+                            files = previewAbleFileList.map { fvd ->
+                                fvd.source
+                            },
+                            index = previewAbleFileList.indexOfFirst { f ->
+                                f === previewAbleFile
+                            })
+                    )
+
+                when(val thumbnailView = action.thumbnailView.get()) {
+                    null -> activity.startActivity(intent)
+                    else -> {
+                        val compat = ActivityOptionsCompat.makeSceneTransitionAnimation(
+                            activity,
+                            thumbnailView,
+                            "image"
+                        )
+                        activity.startActivity(intent, compat.toBundle())
+                    }
+                }
+
             }
         }
     }

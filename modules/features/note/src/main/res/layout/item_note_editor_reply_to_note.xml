@@ -210,6 +210,7 @@
                         android:id="@+id/manyFilePreviewListView"
                         mediaViewData="@{note.media}"
                         previewAbleList="@{note.media.files}"
+                        noteCardActionListenerAdapter="@{null}"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:visibility="gone"
@@ -355,6 +356,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="200dp"
                             android:visibility="@{note.isVisibleSubNoteMediaPreview ? View.VISIBLE : View.GONE}"
+                            noteCardActionListenerAdapter="@{null}"
 
                             android:layout_below="@id/subNoteText"
                             mediaViewData="@{note.subNoteMedia}"
