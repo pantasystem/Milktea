@@ -1,5 +1,6 @@
 package net.pantasystem.milktea.note.view
 
+import android.widget.ImageView
 import net.pantasystem.milktea.model.channel.Channel
 import net.pantasystem.milktea.model.note.Note
 import net.pantasystem.milktea.model.note.poll.Poll
@@ -7,6 +8,7 @@ import net.pantasystem.milktea.model.user.User
 import net.pantasystem.milktea.note.media.viewmodel.PreviewAbleFile
 import net.pantasystem.milktea.note.reaction.ReactionCountAction
 import net.pantasystem.milktea.note.viewmodel.PlaneNoteViewData
+import java.lang.ref.WeakReference
 
 class NoteCardActionListenerAdapter(
     val onAction: (NoteCardAction) -> Unit,
@@ -68,6 +70,10 @@ class NoteCardActionListenerAdapter(
     fun onMediaPreviewLongClicked(previewAbleFile: PreviewAbleFile?) {
         onAction(NoteCardAction.OnMediaPreviewLongClicked(previewAbleFile))
     }
+
+    fun onMediaPreviewClicked(previewAbleFile: PreviewAbleFile?, files: List<PreviewAbleFile>, index: Int, thumbnailView: ImageView) {
+        onAction(NoteCardAction.OnMediaPreviewClicked(previewAbleFile, files, index, WeakReference(thumbnailView)))
+    }
 }
 
 
@@ -88,4 +94,11 @@ sealed interface NoteCardAction {
     data class OnChannelButtonClicked(val channelId: Channel.Id) : NoteCardAction
 
     data class OnMediaPreviewLongClicked(val previewAbleFile: PreviewAbleFile?) : NoteCardAction
+
+    data class OnMediaPreviewClicked(
+        val previewAbleFile: PreviewAbleFile?,
+        val files: List<PreviewAbleFile>,
+        val index: Int,
+        val thumbnailView: WeakReference<ImageView>,
+    ) : NoteCardAction
 }
