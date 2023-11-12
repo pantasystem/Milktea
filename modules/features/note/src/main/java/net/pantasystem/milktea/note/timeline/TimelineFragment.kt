@@ -241,6 +241,8 @@ class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view)
                 super.onItemRangeInserted(positionStart, itemCount)
                 if (mViewModel.timelineStore.latestReceiveNoteId() != null && positionStart == 0 && mFirstVisibleItemPosition == 0 && isShowing && itemCount == 1) {
                     lm.scrollToPosition(0)
+                } else {
+                    mViewModel.onScrollPositionChanged(lm.findFirstVisibleItemPosition())
                 }
             }
         })
