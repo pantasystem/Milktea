@@ -291,10 +291,6 @@ class TimelineViewModel @AssistedInject constructor(
         if (config?.isEnableStreamingAPIAndNoteCapture == false) {
             // NOTE: 自動更新が無効なのでStreaming APIを停止している
             timelineStore.suspendStreaming()
-            noteStreamingCollector.suspendStreaming()
-        } else {
-            // NOTE: 自動更新が有効なのでStreaming APIを再開している
-            noteStreamingCollector.resumeStreaming()
         }
     }
 
@@ -319,7 +315,6 @@ class TimelineViewModel @AssistedInject constructor(
 
         if (config?.isStopStreamingApiWhenBackground == true) {
             timelineStore.suspendStreaming()
-            noteStreamingCollector.suspendStreaming()
         }
     }
 
