@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -110,13 +111,20 @@ class NotificationViewModel @Inject constructor(
         accountStore.getOrCurrent(accountId)
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
 
+    private var listenStreamingJob: Job? = null
+
     init {
         currentAccount.filterNotNull().flowOn(Dispatchers.IO)
             .onEach {
                 loadInit()
             }.launchIn(viewModelScope)
 
-        currentAccount.filterNotNull().flatMapLatest { ac ->
+        //loadInit()
+    }
+
+    fun onResume() {
+        listenStreamingJob?.cancel()
+        listenStreamingJob = currentAccount.filterNotNull().flatMapLatest { ac ->
             notificationStreaming.connect {
                 ac
             }.map {
@@ -128,7 +136,10 @@ class NotificationViewModel @Inject constructor(
             notificationPagingStore.onReceiveNewNotification(it.second)
         }.launchIn(viewModelScope + Dispatchers.IO)
 
-        //loadInit()
+    }
+
+    fun onPause() {
+        listenStreamingJob?.cancel()
     }
 
     fun loadInit() {

@@ -30,23 +30,23 @@ import net.pantasystem.milktea.common_viewmodel.CurrentPageType
 import net.pantasystem.milktea.common_viewmodel.CurrentPageableTimelineViewModel
 import net.pantasystem.milktea.model.instance.FeatureEnables
 import net.pantasystem.milktea.model.note.draft.DraftNoteService
+import net.pantasystem.milktea.model.notification.Notification
 import net.pantasystem.milktea.model.user.report.ReportState
 import net.pantasystem.milktea.notification.notificationMessageScope
 import net.pantasystem.milktea.user.ReportStateHandler
 import net.pantasystem.milktea.worker.note.CreateNoteWorkerExecutor
 import javax.inject.Inject
 
-@Suppress("DEPRECATION")
 internal class MainActivityEventHandler(
     val activity: MainActivity,
     val binding: ActivityMainBinding,
-    val lifecycleScope: CoroutineScope,
-    val lifecycleOwner: LifecycleOwner,
-    val mainViewModel: MainViewModel,
+    private val lifecycleScope: CoroutineScope,
+    private val lifecycleOwner: LifecycleOwner,
+    private val mainViewModel: MainViewModel,
     val reportViewModel: ReportViewModel,
     private val createNoteWorkerExecutor: CreateNoteWorkerExecutor,
     val accountStore: AccountStore,
-    val requestPostNotificationsPermissionLauncher: ActivityResultLauncher<String>,
+    private val requestPostNotificationsPermissionLauncher: ActivityResultLauncher<String>,
     val changeNavMenuVisibilityFromAPIVersion: ChangeNavMenuVisibilityFromAPIVersion,
     private val configStore: SettingStore,
     private val draftNoteService: DraftNoteService,
@@ -176,7 +176,7 @@ internal class MainActivityEventHandler(
 
         // NOTE: 最新の通知をSnackBar等に表示する
         lifecycleScope.launch {
-            lifecycleOwner.whenCreated {
+            lifecycleOwner.repeatOnLifecycle(Lifecycle.State.RESUMED) {
                 mainViewModel.newNotifications.collect { notificationRelation ->
                     activity.apply {
                         notificationMessageScope {
@@ -188,16 +188,20 @@ internal class MainActivityEventHandler(
         }
         val audioManager = activity.getSystemService(Context.AUDIO_SERVICE) as AudioManager
 
+        var replayedNotifyId: Notification.Id?
         lifecycleScope.launch {
-            lifecycleOwner.whenResumed {
-                // NOTE: 通知音を再生する
+            lifecycleOwner.repeatOnLifecycle(Lifecycle.State.RESUMED) {
                 mainViewModel.newNotifications.collect {
+                    replayedNotifyId = it.notification.id
+                    if (replayedNotifyId == it.notification.id) {
+                        return@collect
+                    }
                     if (ringtone?.isPlaying == true) {
                         ringtone.stop()
                     }
                     if (
                         configStore.configState.value.isEnableNotificationSound
-                            && audioManager.ringerMode == AudioManager.RINGER_MODE_NORMAL
+                        && audioManager.ringerMode == AudioManager.RINGER_MODE_NORMAL
                     ) {
                         ringtone?.play()
                     }

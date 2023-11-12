@@ -11,7 +11,9 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
 import com.bumptech.glide.Glide
@@ -33,6 +35,7 @@ import jp.panta.misskeyandroidclient.ui.main.SetupOnBackPressedDispatcherHandler
 import jp.panta.misskeyandroidclient.ui.main.ToggleNavigationDrawerDelegate
 import jp.panta.misskeyandroidclient.ui.main.viewmodel.MainViewModel
 import jp.panta.misskeyandroidclient.ui.setLongPressListenerOnNavigationItem
+import kotlinx.coroutines.launch
 import net.pantasystem.milktea.app_store.setting.SettingStore
 import net.pantasystem.milktea.common.ui.ApplyTheme
 import net.pantasystem.milktea.common.ui.ToolbarSetter
@@ -42,6 +45,8 @@ import net.pantasystem.milktea.common_android_ui.report.ReportViewModel
 import net.pantasystem.milktea.common_navigation.MainNavigation
 import net.pantasystem.milktea.common_viewmodel.CurrentPageableTimelineViewModel
 import net.pantasystem.milktea.common_viewmodel.ScrollToTopViewModel
+import net.pantasystem.milktea.data.infrastructure.streaming.ChannelAPIMainEventDispatcherAdapter
+import net.pantasystem.milktea.data.infrastructure.streaming.MediatorMainEventDispatcher
 import net.pantasystem.milktea.note.renote.RenoteResultHandler
 import net.pantasystem.milktea.note.renote.RenoteViewModel
 import net.pantasystem.milktea.note.view.NoteActionHandler
@@ -66,6 +71,12 @@ class MainActivity : AppCompatActivity(), ToolbarSetter {
 
     @Inject
     internal lateinit var fabClickHandleFactory: FabClickHandler.Factory
+
+    @Inject
+    internal lateinit var mainEventDispatcherFactory: MediatorMainEventDispatcher.Factory
+
+    @Inject
+    internal lateinit var channelAPIMainEventDispatcherAdapter: ChannelAPIMainEventDispatcherAdapter
 
     private val notesViewModel: NotesViewModel by viewModels()
 
@@ -147,6 +158,14 @@ class MainActivity : AppCompatActivity(), ToolbarSetter {
 
         if (savedInstanceState == null) {
             handleIntent()
+        }
+
+
+        val mainEventDispatcher = mainEventDispatcherFactory.create()
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.RESUMED) {
+                channelAPIMainEventDispatcherAdapter(mainEventDispatcher)
+            }
         }
 
         GoogleApiAvailability.getInstance().makeGooglePlayServicesAvailable(this)

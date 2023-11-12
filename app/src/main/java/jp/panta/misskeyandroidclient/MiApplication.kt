@@ -15,8 +15,6 @@ import net.pantasystem.milktea.app_store.account.AccountStore
 import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.common_android.platform.activeNetworkFlow
 import net.pantasystem.milktea.data.infrastructure.MemoryCacheCleaner
-import net.pantasystem.milktea.data.infrastructure.streaming.ChannelAPIMainEventDispatcherAdapter
-import net.pantasystem.milktea.data.infrastructure.streaming.MediatorMainEventDispatcher
 import net.pantasystem.milktea.data.streaming.SocketWithAccountProvider
 import javax.inject.Inject
 
@@ -31,11 +29,8 @@ class MiApplication : Application(), Configuration.Provider {
     internal lateinit var mSocketWithAccountProvider: SocketWithAccountProvider
 
 
-    @Inject
-    internal lateinit var mainEventDispatcherFactory: MediatorMainEventDispatcher.Factory
 
-    @Inject
-    internal lateinit var channelAPIMainEventDispatcherAdapter: ChannelAPIMainEventDispatcherAdapter
+
 
     @Inject
     internal lateinit var applicationScope: CoroutineScope
@@ -73,9 +68,6 @@ class MiApplication : Application(), Configuration.Provider {
                 defaultUncaughtExceptionHandler?.uncaughtException(t, e)
             }
         }
-
-        val mainEventDispatcher = mainEventDispatcherFactory.create()
-        channelAPIMainEventDispatcherAdapter(mainEventDispatcher)
 
         applicationScope.launch {
             appStateController.initializeSettings()

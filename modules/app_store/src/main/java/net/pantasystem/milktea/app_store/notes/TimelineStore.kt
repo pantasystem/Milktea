@@ -19,8 +19,8 @@ interface TimelineStore {
     val isActiveStreaming: Boolean
 
 
-    suspend fun loadPrevious(): Result<Unit>
-    suspend fun loadFuture(): Result<Unit>
+    suspend fun loadPrevious(): Result<Int>
+    suspend fun loadFuture(): Result<Int>
 
     /**
      * @param initialLoadQuery コンテンツが空の状態の時にloadPreviousを呼び出した時に
@@ -38,6 +38,8 @@ interface TimelineStore {
     fun suspendStreaming()
 
     suspend fun releaseUnusedPages(position: Int, offset: Int = 50)
+
+    fun setActiveStreamingChangedListener(listener: (Boolean) -> Unit)
 
 }
 

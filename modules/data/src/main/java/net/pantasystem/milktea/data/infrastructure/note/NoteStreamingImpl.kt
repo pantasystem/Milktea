@@ -130,7 +130,7 @@ class NoteStreamingImpl @Inject constructor(
                 true
             }
         }.map {
-            noteDataSourceAdder.addNoteDtoToDataSource(account, it.body)
+            noteDataSourceAdder.addNoteDtoToDataSource(account, it.body, skipExists = true)
         }
     }
 
@@ -146,7 +146,7 @@ class NoteStreamingImpl @Inject constructor(
                 true
             }
         }.map {
-            noteDataSourceAdder.addTootStatusDtoIntoDataSource(account, it)
+            noteDataSourceAdder.addTootStatusDtoIntoDataSource(account, it, skipExists = true)
         }
     }
 
