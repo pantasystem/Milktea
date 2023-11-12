@@ -176,7 +176,7 @@ internal class MainActivityEventHandler(
 
         // NOTE: 最新の通知をSnackBar等に表示する
         lifecycleScope.launch {
-            lifecycleOwner.whenCreated {
+            lifecycleOwner.repeatOnLifecycle(Lifecycle.State.RESUMED) {
                 mainViewModel.newNotifications.collect { notificationRelation ->
                     activity.apply {
                         notificationMessageScope {

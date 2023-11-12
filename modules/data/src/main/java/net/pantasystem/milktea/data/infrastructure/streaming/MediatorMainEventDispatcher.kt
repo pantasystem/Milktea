@@ -1,10 +1,7 @@
 package net.pantasystem.milktea.data.infrastructure.streaming
 
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
-import kotlinx.coroutines.plus
 import net.pantasystem.milktea.api_streaming.ChannelBody
 import net.pantasystem.milktea.api_streaming.channel.ChannelAPI
 import net.pantasystem.milktea.app_store.account.AccountStore
@@ -77,17 +74,15 @@ class MediatorMainEventDispatcher(val logger: Logger) {
 
 }
 
-@Singleton
 class ChannelAPIMainEventDispatcherAdapter @Inject constructor(
     private val channelAPIProvider: ChannelAPIWithAccountProvider,
     private val accountStore: AccountStore,
-    private val applicationScope: CoroutineScope,
     loggerFactory: Logger.Factory
 ) {
     val logger = loggerFactory.create("MainEventDispatcher")
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    operator fun invoke(mainDispatcher: MediatorMainEventDispatcher) {
+    suspend operator fun invoke(mainDispatcher: MediatorMainEventDispatcher) {
         accountStore.state.map { it.currentAccount }.filterNotNull().filter {
             it.instanceType == Account.InstanceType.MISSKEY || it.instanceType == Account.InstanceType.FIREFISH
         }.flatMapLatest { ac ->
@@ -98,10 +93,10 @@ class ChannelAPIMainEventDispatcherAdapter @Inject constructor(
             (it.second as? ChannelBody.Main)?.let { main ->
                 it.first to main
             }
-        }.onEach {
-            mainDispatcher.dispatch(it.first, it.second)
         }.catch { e ->
             logger.error("Dispatch時にエラー発生", e = e)
-        }.launchIn(applicationScope + Dispatchers.IO)
+        }.collect {
+            mainDispatcher.dispatch(it.first, it.second)
+        }
     }
 }
