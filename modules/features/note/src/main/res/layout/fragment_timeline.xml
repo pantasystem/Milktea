@@ -1,13 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:android="http://schemas.android.com/apk/res/android">
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
 
-    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
             android:id="@+id/refresh"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             >
 
-        <androidx.recyclerview.widget.RecyclerView
+            <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/list_view"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
@@ -15,5 +20,26 @@
                 android:paddingBottom="?attr/actionBarSize"
                 android:nestedScrollingEnabled="true"
                 />
-    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+        </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+
+        <TextView
+            android:id="@+id/jumpToNewPostsButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="@string/jump_to_new_post"
+            android:background="?attr/colorPrimary"
+            android:textColor="?attr/colorOnPrimary"
+            android:paddingVertical="8dp"
+            android:paddingHorizontal="16dp"
+            rectByDp="@{8}"
+            android:elevation="4dp"
+            android:clickable="true"
+            android:focusable="true"
+            android:visibility="gone"
+            tools:visibility="visible"
+            android:layout_gravity="center_horizontal"
+            />
+    </FrameLayout>
+
 </layout>

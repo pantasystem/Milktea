@@ -144,7 +144,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal|bottom"
                 android:text="@string/expand"
-                app:cornerRadius="24dp"
+                app:cornerRadius="8dp"
                 app:emojiCompatEnabled="false"
 
                 />

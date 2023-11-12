@@ -22,6 +22,14 @@ object CircleOutlineHelper {
     }
 
     @JvmStatic
+    @BindingAdapter("rectByDp")
+    fun View.setCircleOutlineToView(rect: Int?) {
+        rect?: return
+        val r = context.resources.displayMetrics.density * rect
+        outlineProvider = RoundedOutlineProvider.getInstance(r)
+    }
+
+    @JvmStatic
     @BindingAdapter("rectViewById")
     fun View.setCircleOutline(rect: Int?) {
         rect?: return

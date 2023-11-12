@@ -636,6 +636,7 @@
     <!-- User -->
 
     <string name="settings_user_cache">ユーザキャッシュ</string>
+    <string name="jump_to_new_post">新着投稿を表示</string>
 
 
 </resources>
