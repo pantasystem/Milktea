@@ -8,6 +8,7 @@ import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.MenuHost
 import androidx.core.view.MenuProvider
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
@@ -242,7 +243,7 @@ class TimelineFragment : Fragment(R.layout.fragment_timeline), PageableView {
                 if (mViewModel.timelineStore.latestReceiveNoteId() != null && positionStart == 0 && mFirstVisibleItemPosition == 0 && isShowing && itemCount == 1) {
                     lm.scrollToPosition(0)
                 } else {
-                    mViewModel.onScrollPositionChanged(lm.findFirstVisibleItemPosition())
+                    mViewModel.onScrollStateChanged(lm.findFirstVisibleItemPosition())
                 }
             }
         })
@@ -286,12 +287,13 @@ class TimelineFragment : Fragment(R.layout.fragment_timeline), PageableView {
                     super.onScrolled(recyclerView, dx, dy)
                     val firstVisibleItemPosition = lm.findFirstVisibleItemPosition()
                     mFirstVisibleItemPosition = firstVisibleItemPosition
-                    mViewModel.position = firstVisibleItemPosition
                     val topView = layoutManager.findViewByPosition(firstVisibleItemPosition)
+                    var offset: Int? = null
                     if (topView != null) {
                         val top = topView.top - topView.paddingTop
-                        mViewModel.offset = top
+                        offset = top
                     }
+                    mViewModel.onScrolled(dy, firstVisibleItemPosition, offset)
                 }
 
                 override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
@@ -304,11 +306,22 @@ class TimelineFragment : Fragment(R.layout.fragment_timeline), PageableView {
                         mViewModel.loadOld()
                     }
 
-                    mViewModel.onScrollPositionChanged(lm.findFirstVisibleItemPosition())
+                    mViewModel.onScrollStateChanged(lm.findFirstVisibleItemPosition())
 
                 }
             }
         )
+
+        mViewModel.isVisibleNewPostsButton.onEach {
+            mBinding.jumpToNewPostsButton.isVisible = it
+        }.flowWithLifecycle(
+            viewLifecycleOwner.lifecycle,
+            Lifecycle.State.RESUMED
+        ).launchIn(viewLifecycleOwner.lifecycleScope)
+
+        mBinding.jumpToNewPostsButton.setOnClickListener {
+            mViewModel.loadInit(ignoreSavedScrollPosition = true)
+        }
     }
 
 

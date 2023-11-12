@@ -58,7 +58,10 @@ class TimelineViewModel @AssistedInject constructor(
 
 
     var position: Int = 0
+        private set
     var offset: Int = 0
+        private set
+
     private val currentAccountWatcher = CurrentAccountWatcher(
         if (accountId?.value != null && accountId.value <= 0) null else accountId?.value,
         accountRepository
@@ -103,6 +106,9 @@ class TimelineViewModel @AssistedInject constructor(
         SharingStarted.WhileSubscribed(5_000),
         false
     )
+
+    private val _isVisibleNewPostsButton = MutableStateFlow(false)
+    val isVisibleNewPostsButton: SharedFlow<Boolean> = _isVisibleNewPostsButton.asStateFlow()
 
 
     private val logger = loggerFactory.create(TAG)
@@ -164,6 +170,7 @@ class TimelineViewModel @AssistedInject constructor(
                 if (config?.isEnableStreamingAPIAndNoteCapture == true) {
                     noteStreamingCollector.resumeStreaming()
                 }
+                _isVisibleNewPostsButton.value = false
             } else {
                 noteStreamingCollector.suspendStreaming()
             }
@@ -173,7 +180,9 @@ class TimelineViewModel @AssistedInject constructor(
 
     fun loadNew() {
         pagingCoroutineScope.launch {
-            timelineStore.loadFuture().onFailure {
+            timelineStore.loadFuture().onSuccess { count ->
+                _isVisibleNewPostsButton.value = count >= 10
+            }.onFailure {
                 logger.error("load future timeline failed", it)
             }
         }
@@ -181,7 +190,9 @@ class TimelineViewModel @AssistedInject constructor(
 
     fun loadOld() {
         pagingCoroutineScope.launch {
-            timelineStore.loadPrevious().onFailure {
+            timelineStore.loadPrevious().onSuccess {
+                _isVisibleNewPostsButton.value = false
+            }.onFailure {
                 logger.error("load previous timeline failed", it)
             }
         }
@@ -239,7 +250,7 @@ class TimelineViewModel @AssistedInject constructor(
         }
     }
 
-    fun onScrollPositionChanged(firstVisiblePosition: Int) {
+    fun onScrollStateChanged(firstVisiblePosition: Int) {
         if (firstVisiblePosition <= 3) {
             onVisibleFirst()
         } else {
@@ -257,13 +268,24 @@ class TimelineViewModel @AssistedInject constructor(
         saveScrollPositionScrolledEvent.tryEmit(firstVisiblePosition)
     }
 
+    fun onScrolled(dy: Int, firstVisibleItemPosition: Int, offset: Int? = null) {
+        position = firstVisibleItemPosition
+        this.offset = offset ?: this.offset
+        // 下方向へのスクロールであれば、新着ボタンを非表示にする
+        if (dy > 16) {
+            _isVisibleNewPostsButton.value = false
+        }
+    }
+
     private fun onVisibleFirst() {
         viewModelScope.launch {
             if (this@TimelineViewModel.isActive
                 && !timelineStore.isActiveStreaming
                 && timelineState.value !is PageableState.Loading
             ) {
-                timelineStore.loadFuture()
+                timelineStore.loadFuture().onSuccess { count ->
+                    _isVisibleNewPostsButton.value = count >= 10
+                }
             }
         }
     }
