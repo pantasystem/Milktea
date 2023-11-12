@@ -33,14 +33,14 @@ import net.pantasystem.milktea.model.account.page.Page
 import net.pantasystem.milktea.model.account.page.Pageable
 import net.pantasystem.milktea.model.setting.LocalConfigRepository
 import net.pantasystem.milktea.note.R
-import net.pantasystem.milktea.note.databinding.FragmentSwipeRefreshRecyclerViewBinding
+import net.pantasystem.milktea.note.databinding.FragmentTimelineBinding
 import net.pantasystem.milktea.note.timeline.viewmodel.*
 import net.pantasystem.milktea.note.view.NoteCardActionHandler
 import net.pantasystem.milktea.note.viewmodel.NotesViewModel
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view), PageableView {
+class TimelineFragment : Fragment(R.layout.fragment_timeline), PageableView {
 
     companion object {
 
@@ -121,7 +121,7 @@ class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view)
     internal lateinit var configRepository: LocalConfigRepository
 
 
-    private val mBinding: FragmentSwipeRefreshRecyclerViewBinding by dataBinding()
+    private val mBinding: FragmentTimelineBinding by dataBinding()
 
     @Suppress("DEPRECATION")
     private val mPage: Page? by lazy {
