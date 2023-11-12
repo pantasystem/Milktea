@@ -15,8 +15,12 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Button
 import androidx.compose.material.OutlinedButton
 import androidx.compose.material.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.core.app.TaskStackBuilder
 import androidx.databinding.DataBindingUtil
@@ -193,33 +197,47 @@ class UserDetailActivity : AppCompatActivity() {
             }
         }
 
+        @Composable
+        fun FollowButton(
+            userDetail: User.Detail?,
+            isMine: State<Boolean>,
+            buttonText: String,
+            modifier: Modifier = Modifier,
+        ) {
+            if (!isMine.value) {
+                when (userDetail?.followState) {
+                    FollowState.UNFOLLOWING, FollowState.UNFOLLOWING_LOCKED -> {
+                        OutlinedButton(
+                            shape = RoundedCornerShape(32.dp),
+                            onClick = { mViewModel.changeFollow() },
+                        ) {
+                            Text(buttonText)
+                        }
+                    }
+                    FollowState.FOLLOWING, FollowState.PENDING_FOLLOW_REQUEST -> {
+                        Button(
+                            shape = RoundedCornerShape(32.dp),
+                            onClick = { mViewModel.changeFollow() },
+                        ) {
+                            Text(buttonText)
+                        }
+                    }
+                    else -> {  }
+                }
+            }
+        }
+
         binding.followButton.apply {
             setContent {
                 val userDetail by mViewModel.userState.collectAsState()
                 val isMine = mViewModel.isMine.collectAsState()
                 val buttonText = setFollowState(userDetail?.followState)
                 MdcTheme {
-                    if (!isMine.value) {
-                        when (userDetail?.followState) {
-                            FollowState.UNFOLLOWING, FollowState.UNFOLLOWING_LOCKED -> {
-                                OutlinedButton(
-                                    shape = RoundedCornerShape(32.dp),
-                                    onClick = { mViewModel.changeFollow() },
-                                ) {
-                                    Text(buttonText)
-                                }
-                            }
-                            FollowState.FOLLOWING, FollowState.PENDING_FOLLOW_REQUEST -> {
-                                Button(
-                                    shape = RoundedCornerShape(32.dp),
-                                    onClick = { mViewModel.changeFollow() },
-                                ) {
-                                    Text(buttonText)
-                                }
-                            }
-                            else -> {  }
-                        }
-                    }
+                    FollowButton(
+                        userDetail = userDetail,
+                        isMine = isMine,
+                        buttonText = buttonText,
+                    )
                 }
             }
         }
@@ -509,11 +527,12 @@ class UserDetailActivity : AppCompatActivity() {
         binding.remoteUserState.setBackgroundColor(typed.data)
     }
 
+    @Composable
     private fun setFollowState(state: FollowState?): String = when (state) {
-        FollowState.FOLLOWING -> getString(R.string.unfollow)
-        FollowState.UNFOLLOWING -> getString(R.string.follow)
-        FollowState.UNFOLLOWING_LOCKED -> getString(R.string.request_follow_from_u)
-        FollowState.PENDING_FOLLOW_REQUEST -> getString(R.string.follow_approval_pending)
+        FollowState.FOLLOWING -> stringResource(R.string.unfollow)
+        FollowState.UNFOLLOWING -> stringResource(R.string.follow)
+        FollowState.UNFOLLOWING_LOCKED -> stringResource(R.string.request_follow_from_u)
+        FollowState.PENDING_FOLLOW_REQUEST -> stringResource(R.string.follow_approval_pending)
         else -> ""
     }
 
