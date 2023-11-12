@@ -75,6 +75,8 @@ class TimelineStoreImpl(
     override val receiveNoteQueue: SharedFlow<Note.Id>
         get() = willAddNoteQueue
 
+    private var activeStreamingChangedListener: ((Boolean) -> Unit)? = null
+
 
     internal val pageableStore: TimelinePagingBase by lazy {
         when (pageableTimeline) {
@@ -114,7 +116,13 @@ class TimelineStoreImpl(
     private var initialLoadQuery: InitialLoadQuery? = null
 
     override var isActiveStreaming: Boolean = true
-        private set
+        private set(value) {
+            val oldValue = field
+            field = value
+            if (oldValue != value) {
+                activeStreamingChangedListener?.invoke(value)
+            }
+        }
 
     init {
         coroutineScope.launch(Dispatchers.IO) {
@@ -194,6 +202,10 @@ class TimelineStoreImpl(
 
     override fun suspendStreaming() {
         isActiveStreaming = false
+    }
+
+    override fun setActiveStreamingChangedListener(listener: (Boolean) -> Unit) {
+        activeStreamingChangedListener = listener
     }
 
     private suspend fun appendStreamEventNote(noteId: Note.Id) {

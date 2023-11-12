@@ -39,6 +39,8 @@ interface TimelineStore {
 
     suspend fun releaseUnusedPages(position: Int, offset: Int = 50)
 
+    fun setActiveStreamingChangedListener(listener: (Boolean) -> Unit)
+
 }
 
 sealed interface InitialLoadQuery {

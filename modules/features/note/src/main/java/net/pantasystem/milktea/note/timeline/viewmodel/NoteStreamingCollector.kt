@@ -30,15 +30,19 @@ internal class NoteStreamingCollector(
 
     private var job: Job? = null
 
-    fun onSuspend() {
+    fun suspendStreaming() {
         synchronized(this) {
             job?.cancel()
             job = null
         }
     }
 
+    fun resumeStreaming() {
+        startObserveStreaming()
+    }
+
     @OptIn(ExperimentalCoroutinesApi::class)
-    fun onResume() {
+    private fun startObserveStreaming() {
         synchronized(this) {
             if (job != null) {
                 return
@@ -52,6 +56,5 @@ internal class NoteStreamingCollector(
                     logger.error("receive not error", it)
                 }.launchIn(coroutineScope + Dispatchers.IO)
         }
-
     }
 }

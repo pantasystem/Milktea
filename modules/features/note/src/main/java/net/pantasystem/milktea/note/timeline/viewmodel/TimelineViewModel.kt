@@ -156,6 +156,17 @@ class TimelineViewModel @AssistedInject constructor(
             }
         })
         cache.addFilter(ExcludeRepostOrReplyFilter(pageable))
+
+        timelineStore.setActiveStreamingChangedListener { isActive ->
+            if (isActive) {
+                val config = configRepository.get().getOrNull()
+                if (config?.isEnableStreamingAPIAndNoteCapture == true) {
+                    noteStreamingCollector.resumeStreaming()
+                }
+            } else {
+                noteStreamingCollector.suspendStreaming()
+            }
+        }
     }
 
 
@@ -210,23 +221,8 @@ class TimelineViewModel @AssistedInject constructor(
         isActive = true
         viewModelScope.launch {
             val config = configRepository.get().getOrNull()
-            if (config?.isEnableStreamingAPIAndNoteCapture == false) {
-                // NOTE: 自動更新が無効であればNoteのCaptureとStreaming APIを停止している
-                timelineStore.suspendStreaming()
-                noteStreamingCollector.onSuspend()
-                cache.suspendNoteCapture()
-            } else {
-                // NOTE: 自動更新が有効なのでNote CaptureとStreaming APIを再開している
-                noteStreamingCollector.onResume()
-
-                cache.captureNotesBy(
-                    (timelineState.value.content as? StateContent.Exist)?.rawContent?.map {
-                        it.id
-                    } ?: emptyList()
-                )
-                cache.captureNotes()
-            }
-
+            resumeReceiveStreamingIfNeed()
+            resumeNoteCaptureIfNeed()
             if (config?.isStopStreamingApiWhenBackground == true) {
                 loadNew()
             }
@@ -236,17 +232,9 @@ class TimelineViewModel @AssistedInject constructor(
     fun onPause() {
         isActive = false
         viewModelScope.launch {
-            val config = configRepository.get().getOrNull()
-            if (config?.isStopStreamingApiWhenBackground == true) {
-                timelineStore.suspendStreaming()
-                noteStreamingCollector.onSuspend()
-            }
-
-            if (config?.isStopNoteCaptureWhenBackground == true) {
-                cache.suspendNoteCapture()
-            }
-
             saveNowScrollPosition()
+            suspendReceiveStreamingIfNeed()
+            suspendNoteCaptureIfNeed()
         }
     }
 
@@ -295,6 +283,50 @@ class TimelineViewModel @AssistedInject constructor(
                     it
                 )
             }
+        }
+    }
+
+    private fun resumeReceiveStreamingIfNeed() {
+        val config = configRepository.get().getOrNull()
+        if (config?.isEnableStreamingAPIAndNoteCapture == false) {
+            // NOTE: 自動更新が無効なのでStreaming APIを停止している
+            timelineStore.suspendStreaming()
+            noteStreamingCollector.suspendStreaming()
+        } else {
+            // NOTE: 自動更新が有効なのでStreaming APIを再開している
+            noteStreamingCollector.resumeStreaming()
+        }
+    }
+
+    private suspend fun resumeNoteCaptureIfNeed() {
+        val config = configRepository.get().getOrNull()
+        if (config?.isEnableStreamingAPIAndNoteCapture == false) {
+            // NOTE: 自動更新が無効であればNoteのCaptureを停止している
+            cache.suspendNoteCapture()
+        } else {
+            // NOTE: 自動更新が有効なのでNote Captureを再開している
+            cache.captureNotesBy(
+                (timelineState.value.content as? StateContent.Exist)?.rawContent?.map {
+                    it.id
+                } ?: emptyList()
+            )
+            cache.captureNotes()
+        }
+    }
+
+    private fun suspendReceiveStreamingIfNeed() {
+        val config = configRepository.get().getOrNull()
+
+        if (config?.isStopStreamingApiWhenBackground == true) {
+            timelineStore.suspendStreaming()
+            noteStreamingCollector.suspendStreaming()
+        }
+    }
+
+    private suspend fun suspendNoteCaptureIfNeed() {
+        val config = configRepository.get().getOrNull()
+        if (config?.isStopNoteCaptureWhenBackground == true) {
+            cache.suspendNoteCapture()
         }
     }
 }
