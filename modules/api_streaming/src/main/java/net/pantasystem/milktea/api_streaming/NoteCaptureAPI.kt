@@ -130,6 +130,9 @@ class NoteCaptureAPIImpl(
             listeners?.forEach {
                 it.invoke(e)
             }
+            if (listeners.isNullOrEmpty()) {
+                sendUnSub(e.body.id)
+            }
             return true
         }
         return false
