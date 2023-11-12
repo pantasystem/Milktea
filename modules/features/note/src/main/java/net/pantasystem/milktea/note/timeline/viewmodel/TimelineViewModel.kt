@@ -51,9 +51,10 @@ class TimelineViewModel @AssistedInject constructor(
         ): TimelineViewModel
     }
 
-    companion object
+    companion object {
+        const val TAG = "TimelineViewModel"
+    }
 
-    val tag = "TimelineViewModel"
 
 
     var position: Int = 0
@@ -104,7 +105,7 @@ class TimelineViewModel @AssistedInject constructor(
     )
 
 
-    private val logger = loggerFactory.create("TimelineViewModel")
+    private val logger = loggerFactory.create(TAG)
     private val cache = planeNoteViewDataCacheFactory.create(
         currentAccountWatcher::getAccount,
         viewModelScope
