@@ -122,7 +122,7 @@ class TimelineViewModel @AssistedInject constructor(
 
     private val pagingCoroutineScope = PagingLoaderScopeController(viewModelScope)
 
-    private var isActive = true
+    private var isActive = false
 
     private val saveScrollPositionScrolledEvent = MutableSharedFlow<Int>(extraBufferCapacity = 4)
 
@@ -157,8 +157,8 @@ class TimelineViewModel @AssistedInject constructor(
         })
         cache.addFilter(ExcludeRepostOrReplyFilter(pageable))
 
-        timelineStore.setActiveStreamingChangedListener { isActive ->
-            if (isActive) {
+        timelineStore.setActiveStreamingChangedListener { isActiveStreaming ->
+            if (isActiveStreaming && isActive) {
                 val config = configRepository.get().getOrNull()
                 if (config?.isEnableStreamingAPIAndNoteCapture == true) {
                     noteStreamingCollector.resumeStreaming()
