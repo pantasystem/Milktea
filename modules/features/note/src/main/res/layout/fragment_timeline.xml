@@ -32,7 +32,7 @@
             android:textColor="?attr/colorOnPrimary"
             android:paddingVertical="8dp"
             android:paddingHorizontal="16dp"
-            rectByDp="@{4}"
+            rectByDp="@{8}"
             android:elevation="4dp"
             android:clickable="true"
             android:focusable="true"
