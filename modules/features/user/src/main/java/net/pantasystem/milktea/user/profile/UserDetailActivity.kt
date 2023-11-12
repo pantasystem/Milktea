@@ -197,36 +197,6 @@ class UserDetailActivity : AppCompatActivity() {
             }
         }
 
-        @Composable
-        fun FollowButton(
-            userDetail: User.Detail?,
-            isMine: State<Boolean>,
-            buttonText: String,
-            modifier: Modifier = Modifier,
-        ) {
-            if (!isMine.value) {
-                when (userDetail?.followState) {
-                    FollowState.UNFOLLOWING, FollowState.UNFOLLOWING_LOCKED -> {
-                        OutlinedButton(
-                            shape = RoundedCornerShape(32.dp),
-                            onClick = { mViewModel.changeFollow() },
-                        ) {
-                            Text(buttonText)
-                        }
-                    }
-                    FollowState.FOLLOWING, FollowState.PENDING_FOLLOW_REQUEST -> {
-                        Button(
-                            shape = RoundedCornerShape(32.dp),
-                            onClick = { mViewModel.changeFollow() },
-                        ) {
-                            Text(buttonText)
-                        }
-                    }
-                    else -> {  }
-                }
-            }
-        }
-
         binding.followButton.apply {
             setContent {
                 val userDetail by mViewModel.userState.collectAsState()
@@ -525,6 +495,36 @@ class UserDetailActivity : AppCompatActivity() {
             theme.resolveAttribute(R.attr.background, typed, true)
         }
         binding.remoteUserState.setBackgroundColor(typed.data)
+    }
+
+    @Composable
+    fun FollowButton(
+        userDetail: User.Detail?,
+        isMine: State<Boolean>,
+        buttonText: String,
+        modifier: Modifier = Modifier,
+    ) {
+        if (!isMine.value) {
+            when (userDetail?.followState) {
+                FollowState.UNFOLLOWING, FollowState.UNFOLLOWING_LOCKED -> {
+                    OutlinedButton(
+                        shape = RoundedCornerShape(32.dp),
+                        onClick = { mViewModel.changeFollow() },
+                    ) {
+                        Text(buttonText)
+                    }
+                }
+                FollowState.FOLLOWING, FollowState.PENDING_FOLLOW_REQUEST -> {
+                    Button(
+                        shape = RoundedCornerShape(32.dp),
+                        onClick = { mViewModel.changeFollow() },
+                    ) {
+                        Text(buttonText)
+                    }
+                }
+                else -> {  }
+            }
+        }
     }
 
     @Composable
