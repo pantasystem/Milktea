@@ -186,7 +186,7 @@ class TimelineStoreImpl(
     override suspend fun clear(initialLoadQuery: InitialLoadQuery?) {
         pageableStore.mutex.withLock {
             this.initialLoadQuery = initialLoadQuery
-            isActiveStreaming = true
+            isActiveStreaming = initialLoadQuery == null
             pageableStore.setState(PageableState.Loading.Init())
         }
     }
