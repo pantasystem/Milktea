@@ -117,11 +117,8 @@ class TimelineStoreImpl(
 
     override var isActiveStreaming: Boolean = true
         private set(value) {
-            val oldValue = field
             field = value
-            if (oldValue != value) {
-                activeStreamingChangedListener?.invoke(value)
-            }
+            activeStreamingChangedListener?.invoke(value)
         }
 
     init {
@@ -206,7 +203,6 @@ class TimelineStoreImpl(
 
     override fun setActiveStreamingChangedListener(listener: (Boolean) -> Unit) {
         activeStreamingChangedListener = listener
-        listener(isActiveStreaming)
     }
 
     private suspend fun appendStreamEventNote(noteId: Note.Id) {
