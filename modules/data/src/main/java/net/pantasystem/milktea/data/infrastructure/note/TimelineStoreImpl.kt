@@ -206,6 +206,7 @@ class TimelineStoreImpl(
 
     override fun setActiveStreamingChangedListener(listener: (Boolean) -> Unit) {
         activeStreamingChangedListener = listener
+        listener(isActiveStreaming)
     }
 
     private suspend fun appendStreamEventNote(noteId: Note.Id) {
