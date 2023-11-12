@@ -11,8 +11,13 @@ import android.view.Menu
 import android.view.MenuItem
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.Button
+import androidx.compose.material.OutlinedButton
+import androidx.compose.material.Text
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.unit.dp
 import androidx.core.app.TaskStackBuilder
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.*
@@ -39,6 +44,7 @@ import net.pantasystem.milktea.common_navigation.*
 import net.pantasystem.milktea.model.setting.Config
 import net.pantasystem.milktea.model.setting.LocalConfigRepository
 import net.pantasystem.milktea.model.setting.Theme
+import net.pantasystem.milktea.model.user.FollowState
 import net.pantasystem.milktea.model.user.User
 import net.pantasystem.milktea.note.NoteEditorActivity
 import net.pantasystem.milktea.note.view.NoteActionHandler
@@ -183,6 +189,37 @@ class UserDetailActivity : AppCompatActivity() {
                             )
                         }
                     )
+                }
+            }
+        }
+
+        binding.followButton.apply {
+            setContent {
+                val userDetail by mViewModel.userState.collectAsState()
+                val isMine = mViewModel.isMine.collectAsState()
+                val buttonText = setFollowState(userDetail?.followState)
+                MdcTheme {
+                    if (!isMine.value) {
+                        when (userDetail?.followState) {
+                            FollowState.UNFOLLOWING, FollowState.UNFOLLOWING_LOCKED -> {
+                                OutlinedButton(
+                                    shape = RoundedCornerShape(32.dp),
+                                    onClick = { mViewModel.changeFollow() },
+                                ) {
+                                    Text(buttonText)
+                                }
+                            }
+                            FollowState.FOLLOWING, FollowState.PENDING_FOLLOW_REQUEST -> {
+                                Button(
+                                    shape = RoundedCornerShape(32.dp),
+                                    onClick = { mViewModel.changeFollow() },
+                                ) {
+                                    Text(buttonText)
+                                }
+                            }
+                            else -> {  }
+                        }
+                    }
                 }
             }
         }
@@ -472,6 +509,13 @@ class UserDetailActivity : AppCompatActivity() {
         binding.remoteUserState.setBackgroundColor(typed.data)
     }
 
+    private fun setFollowState(state: FollowState?): String = when (state) {
+        FollowState.FOLLOWING -> getString(R.string.unfollow)
+        FollowState.UNFOLLOWING -> getString(R.string.follow)
+        FollowState.UNFOLLOWING_LOCKED -> getString(R.string.request_follow_from_u)
+        FollowState.PENDING_FOLLOW_REQUEST -> getString(R.string.follow_approval_pending)
+        else -> ""
+    }
 
     @ExperimentalCoroutinesApi
     private fun addPageToTab() {

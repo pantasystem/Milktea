@@ -120,19 +120,12 @@
                             app:layout_constraintTop_toTopOf="@id/avatarIcon"
                             app:layout_constraintBottom_toBottomOf="@id/avatarIcon"
                             >
-
-
-                        <com.google.android.material.button.MaterialButton
-                                android:id="@+id/followButton"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_gravity="bottom"
-                                tools:text="フォロー"
-                                followState="@{userViewModel.userState.followState}"
-                                android:visibility="@{userViewModel.mine ? View.GONE : View.VISIBLE}"
-                                android:onClick="@{()-> userViewModel.changeFollow()}"
-                                app:cornerRadius="32dp"
-                                />
+                        <androidx.compose.ui.platform.ComposeView
+                            android:id="@+id/followButton"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="bottom"
+                            />
                     </LinearLayout>
 
                     <TextView
