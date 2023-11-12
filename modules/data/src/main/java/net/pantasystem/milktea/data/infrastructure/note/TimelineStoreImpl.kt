@@ -129,8 +129,8 @@ class TimelineStoreImpl(
         }
     }
 
-    override suspend fun loadFuture(): Result<Unit> {
-        return runCancellableCatching<Unit> {
+    override suspend fun loadFuture(): Result<Int> {
+        return runCancellableCatching<Int> {
             val addedCount = when (val store = pageableStore) {
                 is TimelinePagingStoreImpl -> {
                     FuturePagingController.create(
@@ -153,12 +153,13 @@ class TimelineStoreImpl(
                 isActiveStreaming = true
             }
             latestReceiveId = null
+            addedCount.getOrThrow()
         }
     }
 
-    override suspend fun loadPrevious(): Result<Unit> {
-        return runCancellableCatching<Unit> {
-            when (val store = pageableStore) {
+    override suspend fun loadPrevious(): Result<Int> {
+        return runCancellableCatching<Int> {
+            val result = when (val store = pageableStore) {
                 is TimelinePagingStoreImpl -> {
                     PreviousPagingController.create(
                         store,
@@ -176,6 +177,7 @@ class TimelineStoreImpl(
                 }
             }
             latestReceiveId = null
+            result.getOrThrow()
         }
 
     }
