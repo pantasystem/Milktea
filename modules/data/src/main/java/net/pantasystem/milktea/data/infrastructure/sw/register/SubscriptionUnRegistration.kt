@@ -69,8 +69,20 @@ class SubscriptionUnRegistrationImpl @Inject constructor(
                             }
                         }
                         Account.InstanceType.MASTODON,Account.InstanceType.PLEROMA -> {
-                            mastodonAPIProvider.get(account).unSubscribePushNotification()
-                                .throwIfHasError()
+                            try {
+                                mastodonAPIProvider.get(account).unSubscribePushNotification()
+                                    .throwIfHasError()
+                            } catch (e: APIError.ForbiddenException) {
+                                return@withContext
+                            }
+                            catch (e: APIError.AuthenticationException) {
+                                return@withContext
+                            } catch (e: APIError.SomethingException) {
+                                if (e.statusCode == 410) {
+                                    return@withContext
+                                }
+                                throw e
+                            }
                         }
                     }
 

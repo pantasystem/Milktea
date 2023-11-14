@@ -21,13 +21,8 @@ class SignOutUseCaseImpl @Inject constructor(
 
     override suspend fun invoke(account: Account): Result<Unit> {
         return runCancellableCatching {
-            when(account.instanceType) {
-                Account.InstanceType.MISSKEY, Account.InstanceType.FIREFISH -> {
-                    subscriptionUnRegistration
-                        .unregister(account.accountId)
-                }
-                Account.InstanceType.MASTODON, Account.InstanceType.PLEROMA -> {}
-            }
+            subscriptionUnRegistration
+                .unregister(account.accountId)
         }.mapCancellableCatching {
             accountRepository.delete(account)
         }.mapCancellableCatching {
