@@ -16,7 +16,6 @@ import androidx.compose.material.Button
 import androidx.compose.material.OutlinedButton
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
@@ -200,13 +199,12 @@ class UserDetailActivity : AppCompatActivity() {
         binding.followButton.apply {
             setContent {
                 val userDetail by mViewModel.userState.collectAsState()
-                val isMine = mViewModel.isMine.collectAsState()
-                val buttonText = setFollowState(userDetail?.followState)
+                val isMine by mViewModel.isMine.collectAsState()
                 MdcTheme {
                     FollowButton(
-                        userDetail = userDetail,
+                        userState = userDetail?.followState,
                         isMine = isMine,
-                        buttonText = buttonText,
+                        onClick = { mViewModel.changeFollow() }
                     )
                 }
             }
@@ -499,17 +497,18 @@ class UserDetailActivity : AppCompatActivity() {
 
     @Composable
     fun FollowButton(
-        userDetail: User.Detail?,
-        isMine: State<Boolean>,
-        buttonText: String,
+        userState: FollowState?,
+        isMine: Boolean,
         modifier: Modifier = Modifier,
+        onClick: () -> Unit,
     ) {
-        if (!isMine.value) {
-            when (userDetail?.followState) {
+        val buttonText = setFollowState(userState)
+        if (!isMine) {
+            when (userState) {
                 FollowState.UNFOLLOWING, FollowState.UNFOLLOWING_LOCKED -> {
                     OutlinedButton(
                         shape = RoundedCornerShape(32.dp),
-                        onClick = { mViewModel.changeFollow() },
+                        onClick = onClick,
                     ) {
                         Text(buttonText)
                     }
@@ -517,12 +516,12 @@ class UserDetailActivity : AppCompatActivity() {
                 FollowState.FOLLOWING, FollowState.PENDING_FOLLOW_REQUEST -> {
                     Button(
                         shape = RoundedCornerShape(32.dp),
-                        onClick = { mViewModel.changeFollow() },
+                        onClick = onClick,
                     ) {
                         Text(buttonText)
                     }
                 }
-                else -> {  }
+                null -> {  }
             }
         }
     }
