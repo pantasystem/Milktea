@@ -9,6 +9,7 @@ import dagger.hilt.components.SingletonComponent
 import jp.panta.misskeyandroidclient.BuildConfig
 import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.common.getPreferences
+import net.pantasystem.milktea.data.api.mastodon.MastodonAPIProvider
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
 import net.pantasystem.milktea.data.infrastructure.sw.register.DeviceTokenRepositoryImpl
 import net.pantasystem.milktea.data.infrastructure.sw.register.SubscriptionRegistrationImpl
@@ -32,6 +33,7 @@ object PushSubscriptionModule {
         misskeyAPIProvider: MisskeyAPIProvider,
         loggerFactory: Logger.Factory,
         deviceTokenRepository: DeviceTokenRepository,
+        mastodonAPIProvider: MastodonAPIProvider,
     ): SubscriptionRegistration {
         return SubscriptionRegistrationImpl(
             accountRepository,
@@ -42,7 +44,8 @@ object PushSubscriptionModule {
             publicKey = BuildConfig.PUSH_TO_FCM_PUBLIC_KEY,
             endpointBase = BuildConfig.PUSH_TO_FCM_SERVER_BASE_URL,
             context = context,
-            deviceTokenRepository = deviceTokenRepository
+            deviceTokenRepository = deviceTokenRepository,
+            mastodonAPIProvider = mastodonAPIProvider,
         )
     }
 
@@ -52,6 +55,7 @@ object PushSubscriptionModule {
         @ApplicationContext context: Context,
         accountRepository: AccountRepository,
         misskeyAPIProvider: MisskeyAPIProvider,
+        mastodonAPIProvider: MastodonAPIProvider,
     ): SubscriptionUnRegistration {
         return SubscriptionUnRegistrationImpl(
             accountRepository,
@@ -61,6 +65,7 @@ object PushSubscriptionModule {
             auth = BuildConfig.PUSH_TO_FCM_AUTH,
             publicKey = BuildConfig.PUSH_TO_FCM_PUBLIC_KEY,
             context = context,
+            mastodonAPIProvider = mastodonAPIProvider,
         )
     }
 
