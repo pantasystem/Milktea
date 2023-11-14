@@ -55,6 +55,7 @@ object PushSubscriptionModule {
         @ApplicationContext context: Context,
         accountRepository: AccountRepository,
         misskeyAPIProvider: MisskeyAPIProvider,
+        mastodonAPIProvider: MastodonAPIProvider,
     ): SubscriptionUnRegistration {
         return SubscriptionUnRegistrationImpl(
             accountRepository,
@@ -64,6 +65,7 @@ object PushSubscriptionModule {
             auth = BuildConfig.PUSH_TO_FCM_AUTH,
             publicKey = BuildConfig.PUSH_TO_FCM_PUBLIC_KEY,
             context = context,
+            mastodonAPIProvider = mastodonAPIProvider,
         )
     }
 

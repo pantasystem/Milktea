@@ -199,6 +199,9 @@ interface MastodonAPI {
     @POST("api/v1/push/subscription")
     suspend fun subscribePushNotification(@Body body: SubscribePushNotification): Response<WebPushSubscription>
 
+    @DELETE("api/v1/push/subscription")
+    suspend fun unSubscribePushNotification(): Response<Unit>
+
     @POST("api/v1/statuses")
     suspend fun createStatus(
         @Body body: CreateStatus,
