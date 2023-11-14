@@ -112,7 +112,7 @@ app.post('/webpushcallback', rawBodyMiddlware, decodeBodyMiddleware, parseJsonMi
         msgData.userId = req.decodeJson.body.userId;
     }
     message.data = msgData;
-    console.log(message);
+    // console.log(message);
     try {
         await messaging.send(message);
         res.status(204).end();
