@@ -65,21 +65,21 @@ class AuthStateHelper @Inject constructor(
     ): Authorization.Waiting4UserAuthorization {
         return when (app) {
             is AppType.Mastodon -> {
-                val authState = app.createAuth(instanceBase, "read write")
+                val authState = app.createAuth(instanceBase, "read write follow push")
                 customAuthStore.setCustomAuthBridge(authState)
                 Authorization.Waiting4UserAuthorization.Mastodon(
                     instanceBase,
                     client = app,
-                    scope = "read write"
+                    scope = "read write follow push"
                 )
             }
             is AppType.Pleroma -> {
-                val authState = app.createAuth(instanceBase, "read write")
+                val authState = app.createAuth(instanceBase, "read write follow push")
                 customAuthStore.setCustomAuthBridge(authState)
                 Authorization.Waiting4UserAuthorization.Pleroma(
                     instanceBase,
                     client = app,
-                    scope = "read write"
+                    scope = "read write follow push"
                 )
             }
             is AppType.Misskey -> {
@@ -125,7 +125,7 @@ class AuthStateHelper @Inject constructor(
                         CreateApp(
                             clientName = appName,
                             redirectUris = CALL_BACK_URL,
-                            scopes = "read write"
+                            scopes = "read write follow push"
                         )
                     ).throwIfHasError().body()
                     ?: throw IllegalStateException("Appの作成に失敗しました。")
@@ -137,7 +137,7 @@ class AuthStateHelper @Inject constructor(
                         CreateApp(
                             clientName = appName,
                             redirectUris = CALL_BACK_URL,
-                            scopes = "read write"
+                            scopes = "read write follow push"
                         )
                     ).throwIfHasError().body()
                     ?: throw IllegalStateException("Appの作成に失敗しました。")
