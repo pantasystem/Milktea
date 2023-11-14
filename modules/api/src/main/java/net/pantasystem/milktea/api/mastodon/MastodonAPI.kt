@@ -30,6 +30,7 @@ import net.pantasystem.milktea.api.mastodon.status.CreateStatus
 import net.pantasystem.milktea.api.mastodon.status.ScheduledStatus
 import net.pantasystem.milktea.api.mastodon.status.TootStatusDTO
 import net.pantasystem.milktea.api.mastodon.subscription.SubscribePushNotification
+import net.pantasystem.milktea.api.mastodon.subscription.WebPushSubscription
 import net.pantasystem.milktea.api.mastodon.suggestion.SuggestionDTO
 import net.pantasystem.milktea.api.mastodon.tag.MastodonTagDTO
 import retrofit2.Response
@@ -196,7 +197,7 @@ interface MastodonAPI {
 
 
     @POST("api/v1/push/subscription")
-    suspend fun subscribePushNotification(@Body body: SubscribePushNotification): Response<Unit>
+    suspend fun subscribePushNotification(@Body body: SubscribePushNotification): Response<WebPushSubscription>
 
     @POST("api/v1/statuses")
     suspend fun createStatus(

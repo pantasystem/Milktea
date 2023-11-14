@@ -23,20 +23,8 @@ data class SubscribePushNotification(
 
     @Serializable
     data class Data(
-        @SerialName("alerts") val alerts: Alerts,
+        @SerialName("alerts") val alerts: WebPushSubscriptionAlerts,
         @SerialName("policy") val policy: String? = null,
-    ) {
-        @Serializable
-        data class Alerts(
-            @SerialName("mention") val mention: Boolean? = null,
-            @SerialName("status") val status: Boolean? = null,
-            @SerialName("reblog") val reblog: Boolean? = null,
-            @SerialName("follow") val follow: Boolean? = null,
-            @SerialName("follow_request") val followRequest: Boolean? = null,
-            @SerialName("favourite") val favourite: Boolean? = null,
-            @SerialName("poll") val poll: Boolean? = null,
-            @SerialName("update") val update: Boolean? = null,
-        )
-    }
+    )
 
 }
