@@ -136,6 +136,52 @@ app.post('/webpushcallback', rawBodyMiddlware, decodeBodyMiddleware, parseJsonMi
 
 });
 
+app.post("/webpushcallback-4-mastodon", rawBodyMiddlware, decodeBodyMiddleware, parseJsonMiddleware, switchLangMiddleware ,async (req, res)=>{
+    let deviceToken = req.query.deviceToken;
+    let accountId = req.query.accountId;
+    if(!(deviceToken && accountId)) {
+        console.warn('無効な値');
+        return res.status(410).end();
+    }
+    const title = req.decodeJson.title;
+    const body = req.decodeJson.body;
+    const message = {
+        token: deviceToken,
+        notification: {
+            title: title,
+            body: body
+        }
+    };
+    message.data = {
+        title: title,
+        body: body,
+        type: req.decodeJson.notification_type,
+        notificationId: req.decodeJson.notification_id,
+        accountId: accountId
+    }
+    console.log(message);
+    try {
+        await messaging.send(message);
+        res.status(204).end();
+        return;
+    } catch (e) {
+        if (
+            [
+              'The registration token is not a valid FCM registration token',
+              'Requested entity was not found.',
+              'NotRegistered.'
+            ].includes(e.message)
+        ) {
+            console.log('トークン切れ');
+            res.status(410).end();
+        } else {
+            console.error("未知のエラー", e);
+            res.status(500).end();
+        }
+        return;
+    }
+});
+
 app.get('/health', switchLangMiddleware,(req, res)=>{
     let msg= res.__('test.message');
     res.json({'msg': msg});
