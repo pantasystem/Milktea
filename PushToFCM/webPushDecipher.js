@@ -64,10 +64,10 @@ exports.decrypt = function (body64, receiverKey, verbose) {
   log(verbose, "idlen", idlen);
   log(verbose, "keyid", keyid.toString("base64"));
 
-  return decryptContent(content, receiverKey, keyid, verbose);
+  return decryptContent(content, receiverKey, salt, keyid, verbose);
 };
 
-function decryptContent(content, receiverKey, keyid ,verbose) {
+function decryptContent(content, receiverKey, salt, keyid ,verbose) {
   let auth_secret = receiverKey.authSecret;
   let receiver_public = receiverKey.public;
   let receiver_private = receiverKey.private;
