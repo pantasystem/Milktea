@@ -141,3 +141,4 @@ function decryptContent(content, receiverKey, salt, keyid ,verbose) {
 }
 
 exports.decryptContent = decryptContent;
+exports.decodeBase64 = decodeBase64;
