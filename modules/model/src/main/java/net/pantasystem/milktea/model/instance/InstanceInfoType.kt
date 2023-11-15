@@ -4,12 +4,25 @@ import net.pantasystem.milktea.model.nodeinfo.NodeInfo
 
 sealed interface InstanceInfoType {
     val nodeInfo: NodeInfo
-    data class Misskey(override val nodeInfo: NodeInfo, val meta: Meta) : InstanceInfoType
-    data class Mastodon(override val nodeInfo: NodeInfo, val info: MastodonInstanceInfo) : InstanceInfoType
+    val softwareType: NodeInfo.SoftwareType
+    data class Misskey(override val nodeInfo: NodeInfo, val meta: Meta) : InstanceInfoType {
+        override val softwareType: NodeInfo.SoftwareType.Misskey
+            get() = nodeInfo.type as NodeInfo.SoftwareType.Misskey
+    }
+    data class Mastodon(override val nodeInfo: NodeInfo, val info: MastodonInstanceInfo) : InstanceInfoType {
+        override val softwareType: NodeInfo.SoftwareType.Mastodon
+            get() =  nodeInfo.type as NodeInfo.SoftwareType.Mastodon
+    }
 
-    data class Pleroma(override val nodeInfo: NodeInfo, val info: MastodonInstanceInfo) : InstanceInfoType
+    data class Pleroma(override val nodeInfo: NodeInfo, val info: MastodonInstanceInfo) : InstanceInfoType {
+        override val softwareType: NodeInfo.SoftwareType.Pleroma
+            get() = nodeInfo.type as NodeInfo.SoftwareType.Pleroma
+    }
 
-    data class Firefish(override val nodeInfo: NodeInfo, val meta: Meta) : InstanceInfoType
+    data class Firefish(override val nodeInfo: NodeInfo, val meta: Meta) : InstanceInfoType {
+        override val softwareType: NodeInfo.SoftwareType.Firefish
+            get() = nodeInfo.type as NodeInfo.SoftwareType.Firefish
+    }
 
     val iconUrl: String? get() {
         return when(this) {

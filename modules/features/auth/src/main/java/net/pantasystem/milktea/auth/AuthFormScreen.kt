@@ -145,8 +145,8 @@ fun AuthFormScreen(
                 .padding(vertical = 8.dp, horizontal = 14.dp),
             horizontalAlignment = Alignment.End,
         ) {
-            if (uiState.metaState is ResultState.Fixed
-                && uiState.metaState.content is StateContent.Exist
+            if (uiState.instanceInfoResultState is ResultState.Fixed
+                && uiState.instanceInfoResultState.content is StateContent.Exist
             ) {
                 AgreementLayout(
                     uiState = uiState,
@@ -175,8 +175,8 @@ fun AuthFormScreen(
 
                 Button(
                     onClick = onStartAuthButtonClicked,
-                    enabled = uiState.metaState is ResultState.Fixed
-                            && uiState.metaState.content is StateContent.Exist
+                    enabled = uiState.instanceInfoResultState is ResultState.Fixed
+                            && uiState.instanceInfoResultState.content is StateContent.Exist
                             && uiState.formState.isPrivacyPolicyAgreement
                             && uiState.formState.isTermsOfServiceAgreement
                             && (!uiState.isMastodon || uiState.formState.isAcceptMastodonAlphaTest),
@@ -319,7 +319,7 @@ fun Preview_AuthFormScreen() {
                         isTermsOfServiceAgreement = false,
                         isAcceptMastodonAlphaTest = false,
                     ),
-                    metaState = ResultState.initialState(),
+                    instanceInfoResultState = ResultState.initialState(),
                     stateType = Authorization.BeforeAuthentication,
                     misskeyInstanceInfosResponse = emptyList(),
                 ),

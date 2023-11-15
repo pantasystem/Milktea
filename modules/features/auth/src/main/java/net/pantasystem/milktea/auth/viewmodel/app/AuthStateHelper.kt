@@ -1,6 +1,5 @@
 package net.pantasystem.milktea.auth.viewmodel.app
 
-import android.util.Log
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
@@ -28,16 +27,11 @@ import net.pantasystem.milktea.data.infrastructure.auth.custom.CustomAuthStore
 import net.pantasystem.milktea.data.infrastructure.auth.custom.createAuth
 import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.app.AppType
-import net.pantasystem.milktea.model.instance.MastodonInstanceInfo
-import net.pantasystem.milktea.model.instance.MastodonInstanceInfoRepository
-import net.pantasystem.milktea.model.instance.Meta
-import net.pantasystem.milktea.model.instance.MetaRepository
-import net.pantasystem.milktea.model.nodeinfo.NodeInfo
-import net.pantasystem.milktea.model.nodeinfo.NodeInfoRepository
+import net.pantasystem.milktea.model.instance.InstanceInfoService
+import net.pantasystem.milktea.model.instance.InstanceInfoType
 import net.pantasystem.milktea.model.sw.register.SubscriptionRegistration
 import net.pantasystem.milktea.model.user.User
 import net.pantasystem.milktea.model.user.UserDataSource
-import java.net.URL
 import java.util.regex.Pattern
 import javax.inject.Inject
 
@@ -46,16 +40,14 @@ val urlPattern: Pattern = Pattern.compile("""(https?)(://)([-_.!~*'()\[\]a-zA-Z0
 class AuthStateHelper @Inject constructor(
     private val mastodonAPIProvider: MastodonAPIProvider,
     private val misskeyAPIProvider: MisskeyAPIProvider,
-    private val metaRepository: MetaRepository,
     private val customAuthStore: CustomAuthStore,
     private val misskeyAPIServiceBuilder: MisskeyAPIServiceBuilder,
     private val accountRepository: AccountRepository,
     private val accountStore: AccountStore,
     private val subscriptionRegistration: SubscriptionRegistration,
     private val userDataSource: UserDataSource,
-    private val nodeInfoRepository: NodeInfoRepository,
-    private val mastodonInstanceInfoRepository: MastodonInstanceInfoRepository,
-    private val userDTOEntityConverter: UserDTOEntityConverter
+    private val userDTOEntityConverter: UserDTOEntityConverter,
+    private val instanceInfoService: InstanceInfoService,
 ) {
 
 
@@ -115,11 +107,11 @@ class AuthStateHelper @Inject constructor(
 
     suspend fun createApp(
         url: String,
-        instanceType: InstanceType,
+        instanceType: InstanceInfoType,
         appName: String
     ): AppType {
         when (instanceType) {
-            is InstanceType.Mastodon -> {
+            is InstanceInfoType.Mastodon -> {
                 val app = mastodonAPIProvider.get(url)
                     .createApp(
                         CreateApp(
@@ -131,7 +123,7 @@ class AuthStateHelper @Inject constructor(
                     ?: throw IllegalStateException("Appの作成に失敗しました。")
                 return AppType.fromDTO(app)
             }
-            is InstanceType.Pleroma -> {
+            is InstanceInfoType.Pleroma -> {
                 val app = mastodonAPIProvider.get(url)
                     .createApp(
                         CreateApp(
@@ -144,8 +136,8 @@ class AuthStateHelper @Inject constructor(
 
                 return AppType.fromPleromaDTO(app)
             }
-            is InstanceType.Misskey -> {
-                val version = instanceType.instance.getVersion()
+            is InstanceInfoType.Misskey -> {
+                val version = instanceType.version
                 val misskeyAPI = misskeyAPIProvider.get(url)
                 val app = misskeyAPI.createApp(
                     net.pantasystem.milktea.api.misskey.app.CreateApp(
@@ -160,7 +152,7 @@ class AuthStateHelper @Inject constructor(
                     ?: throw IllegalStateException("Appの作成に失敗しました。")
                 return AppType.fromDTO(app)
             }
-            is InstanceType.Firefish -> {
+            is InstanceInfoType.Firefish -> {
                 val misskeyAPI = misskeyAPIProvider.get(url)
                 val app = misskeyAPI.createApp(
                     net.pantasystem.milktea.api.misskey.app.CreateApp(
@@ -178,79 +170,10 @@ class AuthStateHelper @Inject constructor(
 
     }
 
-    suspend fun getMeta(url: String): InstanceType {
+    suspend fun getMeta(url: String): InstanceInfoType {
         if (urlPattern.matcher(url).find()) {
-            val nodeInfo = nodeInfoRepository.find(URL(url).host).getOrNull()
 
-            val misskey: Meta?
-            val mastodon: MastodonInstanceInfo?
-            val pleroma: MastodonInstanceInfo?
-            val firefish: Meta?
-
-            suspend fun fetchMeta(): Meta? {
-                return withContext(Dispatchers.IO) {
-                    metaRepository.find(url).onFailure {
-                        Log.e("AppAuthViewModel", "fetch meta error", it)
-                    }.getOrNull()
-                }
-            }
-
-            suspend fun fetchInstance(): MastodonInstanceInfo? {
-                return withContext(Dispatchers.IO) {
-                    mastodonInstanceInfoRepository.find(url).getOrNull()
-                }
-            }
-            when (nodeInfo?.type) {
-                is NodeInfo.SoftwareType.Mastodon -> {
-                    mastodon = fetchInstance()
-                    misskey = null
-                    pleroma = null
-                    firefish = null
-                }
-                is NodeInfo.SoftwareType.Misskey -> {
-                    misskey = fetchMeta()
-                    mastodon = null
-                    pleroma = null
-                    firefish = null
-                }
-                is NodeInfo.SoftwareType.Pleroma -> {
-                    pleroma = fetchInstance()
-                    misskey = null
-                    mastodon = null
-                    firefish = null
-                }
-                is NodeInfo.SoftwareType.Firefish -> {
-                    misskey = null
-                    mastodon = null
-                    pleroma = null
-                    firefish = fetchMeta()
-                }
-                else -> {
-                    misskey = fetchMeta()
-                    mastodon = if (misskey == null) {
-                        fetchInstance()
-                    } else {
-                        null
-                    }
-                    pleroma = null
-                    firefish = null
-                }
-            }
-
-            if (misskey != null) {
-                return InstanceType.Misskey(misskey, nodeInfo?.type as? NodeInfo.SoftwareType.Misskey)
-            }
-            if (mastodon != null) {
-                return InstanceType.Mastodon(mastodon, nodeInfo?.type as? NodeInfo.SoftwareType.Mastodon)
-            }
-
-            if (pleroma != null) {
-                return InstanceType.Pleroma(pleroma, nodeInfo?.type as? NodeInfo.SoftwareType.Pleroma)
-            }
-            if (firefish != null) {
-                return InstanceType.Firefish(firefish, nodeInfo?.type as? NodeInfo.SoftwareType.Firefish)
-            }
-            throw IllegalArgumentException()
+            return instanceInfoService.find(url).getOrThrow()
         } else {
             throw IllegalArgumentException("not support pattern url: $url")
         }

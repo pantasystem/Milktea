@@ -5,9 +5,7 @@ import net.pantasystem.milktea.common.ResultState
 import net.pantasystem.milktea.common.StateContent
 import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.data.infrastructure.auth.Authorization
-import net.pantasystem.milktea.model.instance.MastodonInstanceInfo
-import net.pantasystem.milktea.model.instance.Meta
-import net.pantasystem.milktea.model.nodeinfo.NodeInfo
+import net.pantasystem.milktea.model.instance.InstanceInfoType
 
 
 data class AuthUserInputState(
@@ -39,33 +37,9 @@ data class AuthUserInputState(
 
 data class BeforeAuthState(
     val inputState: AuthUserInputState,
-    val meta: ResultState<InstanceType>,
+    val meta: ResultState<InstanceInfoType>,
 )
 
-
-sealed interface InstanceType {
-    val softwareType: NodeInfo.SoftwareType?
-
-    data class Mastodon(
-        val instance: MastodonInstanceInfo,
-        override val softwareType: NodeInfo.SoftwareType.Mastodon?,
-    ) : InstanceType
-
-    data class Misskey(
-        val instance: Meta,
-        override val softwareType: NodeInfo.SoftwareType.Misskey?,
-    ) : InstanceType
-
-    data class Pleroma(
-        val instance: MastodonInstanceInfo,
-        override val softwareType: NodeInfo.SoftwareType?
-    ) : InstanceType
-
-    data class Firefish(
-        val instance: Meta,
-        override val softwareType: NodeInfo.SoftwareType.Firefish?
-    ) : InstanceType
-}
 
 sealed interface GenerateTokenResult {
     object Success : GenerateTokenResult
@@ -78,7 +52,7 @@ val userNameRegex = Regex("""\A@([\w._\-]+)@([\w._\-]+)""")
 
 data class AuthUiState(
     val formState: AuthUserInputState,
-    val metaState: ResultState<InstanceType>,
+    val instanceInfoResultState: ResultState<InstanceInfoType>,
     val stateType: Authorization,
     val waiting4ApproveState: ResultState<Authorization.Waiting4UserAuthorization> = ResultState.Fixed(
         StateContent.NotExist()
@@ -87,10 +61,10 @@ data class AuthUiState(
     val misskeyInstanceInfosResponse: List<SimpleInstanceInfo>,
 ) {
     val isProgress by lazy {
-        metaState is ResultState.Loading || waiting4ApproveState is ResultState.Loading
+        instanceInfoResultState is ResultState.Loading || waiting4ApproveState is ResultState.Loading
     }
 
     val isMastodon by lazy {
-        (metaState.content as? StateContent.Exist)?.rawContent is InstanceType.Mastodon
+        (instanceInfoResultState.content as? StateContent.Exist)?.rawContent is InstanceInfoType.Mastodon
     }
 }

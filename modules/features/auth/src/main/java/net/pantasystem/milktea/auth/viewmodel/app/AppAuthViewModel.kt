@@ -28,7 +28,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.plus
 import net.pantasystem.milktea.api.misskey.MisskeyAPIServiceBuilder
 import net.pantasystem.milktea.api.misskey.auth.UserKey
-import net.pantasystem.milktea.app_store.account.AccountStore
 import net.pantasystem.milktea.auth.suggestions.InstanceSuggestionsPagingModel
 import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.common.ResultState
@@ -36,11 +35,9 @@ import net.pantasystem.milktea.common.StateContent
 import net.pantasystem.milktea.common.asLoadingStateFlow
 import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.common.throwIfHasError
-import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
 import net.pantasystem.milktea.data.infrastructure.auth.Authorization
 import net.pantasystem.milktea.data.infrastructure.auth.custom.toFirefishModel
 import net.pantasystem.milktea.data.infrastructure.auth.custom.toModel
-import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.account.ClientIdRepository
 import net.pantasystem.milktea.model.instance.SyncMetaExecutor
 import java.util.Date
@@ -54,10 +51,7 @@ const val CALL_BACK_URL = "misskey://app_auth_callback"
 class AppAuthViewModel @Inject constructor(
     private val authService: AuthStateHelper,
     loggerFactory: Logger.Factory,
-    val accountRepository: AccountRepository,
-    val accountStore: AccountStore,
-    val misskeyAPIServiceBuilder: MisskeyAPIServiceBuilder,
-    val misskeyAPIProvider: MisskeyAPIProvider,
+    private val misskeyAPIServiceBuilder: MisskeyAPIServiceBuilder,
     private val getAccessToken: GetAccessToken,
     private val clientIdRepository: ClientIdRepository,
     private val syncMetaExecutor: SyncMetaExecutor,
@@ -176,12 +170,7 @@ class AppAuthViewModel @Inject constructor(
         suspend {
             when (val meta = it.meta.content) {
                 is StateContent.Exist -> {
-                    val instanceBase = when (val info = meta.rawContent) {
-                        is InstanceType.Mastodon -> "https://${info.instance.uri}"
-                        is InstanceType.Pleroma -> info.instance.uri
-                        is InstanceType.Misskey -> info.instance.uri
-                        is InstanceType.Firefish -> info.instance.uri
-                    }
+                    val instanceBase = meta.rawContent.uri
                     logger.debug { "instanceBaseUrl: $instanceBase" }
                     authService.createWaiting4Approval(
                         instanceBase,
@@ -243,7 +232,7 @@ class AppAuthViewModel @Inject constructor(
     ) { formState, (waiting4Approve, approved, finished, result), misskeyInstances ->
         AuthUiState(
             formState = formState.inputState,
-            metaState = formState.meta,
+            instanceInfoResultState = formState.meta,
             stateType = when {
                 result is GenerateTokenResult.Failure -> Authorization.BeforeAuthentication
                 finished != null -> finished
@@ -260,7 +249,7 @@ class AppAuthViewModel @Inject constructor(
         SharingStarted.WhileSubscribed(5_000),
         AuthUiState(
             formState = authUserInputState.value,
-            metaState = metaState.value,
+            instanceInfoResultState = metaState.value,
             stateType = Authorization.BeforeAuthentication,
             misskeyInstanceInfosResponse = emptyList(),
         )
