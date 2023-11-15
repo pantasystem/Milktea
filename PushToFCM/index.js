@@ -66,6 +66,30 @@ const decodeBodyMiddleware = (req, res, next) => {
     next();
 }
 
+const decodeMastodonWebPushMiddleware = (req, res, next) => {
+    let rawBody = req.rawBody;
+    if (!rawBody) { 
+        console.log('Invalid Body');
+        return res.status(200).send('Invalid Body.').end(); 
+    }
+    const converted = rawBody.toString('base64');
+    const key = webPushDecipher.buildReciverKey(PUBLIC_KEY, PRIVATE_KEY, AUTH_SECRET);
+    //console.log(`public_key:${PUBLIC_KEY}, private_key:${PRIVATE_KEY}, auth_secret:${AUTH_SECRET}`);
+    try {
+        const saltInHeader = req.headers['Encryption'];
+        const keyidInHeader = req.headers['Crypto-Key'];
+        const salt = saltInHeader.substring("salt=".length, saltInHeader.length);
+        const keyid = keyidInHeader.substring("keyid=".length, keyidInHeader.length);
+        webPushDecipher.decryptContent()
+        let decrypted = webPushDecipher.decryptContent(converted, key, salt, keyid, false);
+        req.rawJson = decrypted;
+    } catch (e) {
+        console.log(`Decrypt Error: ${e}, request original url: ${req.originalUrl}, headers:${JSON.stringify(req.headers)}`);
+        throw e;
+    }
+    
+    next();
+}
 const parseJsonMiddleware = (req, res, next) => {
     try {
         req.decodeJson = JSON.parse(req.rawJson);
@@ -142,7 +166,7 @@ app.post('/webpushcallback', rawBodyMiddlware, decodeBodyMiddleware, parseJsonMi
 
 });
 
-app.post("/webpushcallback-4-mastodon", rawBodyMiddlware, decodeBodyMiddleware, parseJsonMiddleware, switchLangMiddleware ,async (req, res)=>{
+app.post("/webpushcallback-4-mastodon", rawBodyMiddlware, decodeMastodonWebPushMiddleware, parseJsonMiddleware, switchLangMiddleware ,async (req, res)=>{
     let deviceToken = req.query.deviceToken;
     let accountId = req.query.accountId;
     if(!(deviceToken && accountId)) {
