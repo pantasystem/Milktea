@@ -38,6 +38,12 @@ class DeviceTokenRepositoryImpl @Inject constructor(
         }
     }
 
+    override suspend fun get(): Result<String?> = runCancellableCatching{
+        lock.withLock {
+            sharedPreferences.getString(TOKEN, null)
+        }
+    }
+
     override suspend fun getOrCreate(): Result<String> = runCancellableCatching {
         lock.withLock {
             var token = sharedPreferences.getString(TOKEN, null)

@@ -35,10 +35,10 @@ class SubscriptionRegistrationImpl(
     /**
      * 特定のアカウントをsw/registerに登録します。
      */
-    override suspend fun register(accountId: Long) : Result<Unit> = runCancellableCatching {
-        val token = deviceTokenRepository.getOrCreate().getOrThrow()
-        logger.debug("call register(accountId:$accountId)")
-        logger.debug("auth:$auth, publicKey:$publicKey")
+    override suspend fun register(accountId: Long): Result<Unit> = runCancellableCatching {
+        val token = deviceTokenRepository.get().getOrThrow() ?: return@runCancellableCatching
+        logger.debug { "call register(accountId:$accountId)" }
+        logger.debug { "auth:$auth, publicKey:$publicKey" }
         val account = accountRepository.get(accountId).getOrThrow()
         val endpoint = EndpointBuilder(
             deviceToken = token,
@@ -49,9 +49,9 @@ class SubscriptionRegistrationImpl(
             publicKey = publicKey,
             instanceType = account.instanceType
         ).build()
-        logger.debug("endpoint:${endpoint}")
+        logger.debug { "endpoint:${endpoint}" }
 
-        when(account.instanceType) {
+        when (account.instanceType) {
             Account.InstanceType.MISSKEY, Account.InstanceType.FIREFISH -> {
                 val api = misskeyAPIProvider.get(account.normalizedInstanceUri)
                 val res = api.swRegister(
@@ -71,7 +71,8 @@ class SubscriptionRegistrationImpl(
                     )
                 }
             }
-            Account.InstanceType.MASTODON,Account.InstanceType.PLEROMA -> {
+
+            Account.InstanceType.MASTODON, Account.InstanceType.PLEROMA -> {
                 mastodonAPIProvider.get(account).subscribePushNotification(
                     SubscribePushNotification(
                         SubscribePushNotification.Subscription(
@@ -81,7 +82,7 @@ class SubscriptionRegistrationImpl(
                                 p256dh = publicKey
                             ),
 
-                        ),
+                            ),
                         data = SubscribePushNotification.Data(
                             alerts = WebPushSubscriptionAlerts(
                                 mention = true,
@@ -100,23 +101,21 @@ class SubscriptionRegistrationImpl(
         }
 
 
-
-
     }
 
     /**
      * 全てのアカウントをsw/registerに登録します。
      * @return 成功件数
      */
-    override suspend fun registerAll() : Int {
+    override suspend fun registerAll(): Int {
         val accounts = accountRepository.findAll().getOrThrow()
         return coroutineScope {
             accounts.map {
                 async {
                     register(it.accountId).onFailure {
                         logger.error("sw/registerに失敗しました", it)
-                    }.onSuccess { result ->
-                        logger.debug("subscription result:${result}")
+                    }.onSuccess {
+                        logger.debug { "subscription success}" }
                     }.fold(
                         onSuccess = {
                             1
