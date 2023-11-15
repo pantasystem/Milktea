@@ -28,21 +28,25 @@ open class InstanceInfoService @Inject constructor(
             when(it.type) {
                 is NodeInfo.SoftwareType.Mastodon -> {
                     InstanceInfoType.Mastodon(
+                        it,
                         mastodonInstanceInfoRepository.find(instanceDomain).getOrThrow()
                     )
                 }
                 is NodeInfo.SoftwareType.Misskey -> {
                     InstanceInfoType.Misskey(
+                        it,
                         metaRepository.find(instanceDomain).getOrThrow()
                     )
                 }
                 is NodeInfo.SoftwareType.Firefish -> {
                     InstanceInfoType.Firefish(
+                        it,
                         metaRepository.find(instanceDomain).getOrThrow()
                     )
                 }
                 is NodeInfo.SoftwareType.Pleroma -> {
                     InstanceInfoType.Pleroma(
+                        it,
                         mastodonInstanceInfoRepository.find(instanceDomain).getOrThrow()
                     )
                 }
@@ -84,28 +88,28 @@ open class InstanceInfoService @Inject constructor(
                 is NodeInfo.SoftwareType.Mastodon -> {
                     mastodonInstanceInfoRepository.observe(instanceDomain).map {
                         it?.let {
-                            InstanceInfoType.Mastodon(it)
+                            InstanceInfoType.Mastodon(nodeInfo, it)
                         }
                     }
                 }
                 is NodeInfo.SoftwareType.Misskey -> {
                     metaRepository.observe(instanceDomain).map {
                         it?.let {
-                            InstanceInfoType.Misskey(it)
+                            InstanceInfoType.Misskey(nodeInfo, it)
                         }
                     }
                 }
                 is NodeInfo.SoftwareType.Firefish -> {
                     metaRepository.observe(instanceDomain).map {
                         it?.let {
-                            InstanceInfoType.Firefish(it)
+                            InstanceInfoType.Firefish(nodeInfo, it)
                         }
                     }
                 }
                 is NodeInfo.SoftwareType.Pleroma -> {
                     mastodonInstanceInfoRepository.observe(instanceDomain).map {
                         it?.let {
-                            InstanceInfoType.Pleroma(it)
+                            InstanceInfoType.Pleroma(nodeInfo, it)
                         }
                     }
                 }
