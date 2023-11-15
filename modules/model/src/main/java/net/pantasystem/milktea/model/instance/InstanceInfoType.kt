@@ -83,4 +83,13 @@ sealed interface InstanceInfoType {
     val isRequirePerformNyaizeFrontend: Boolean get() {
         return this is Misskey && this.meta.getVersion() >= Version("2023.10.2")
     }
+
+    val version: Version get() {
+        return when(this) {
+            is Firefish -> meta.getVersion()
+            is Mastodon -> Version(info.version)
+            is Misskey -> meta.getVersion()
+            is Pleroma -> Version(info.version)
+        }
+    }
 }
