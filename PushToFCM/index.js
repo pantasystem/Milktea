@@ -76,8 +76,8 @@ const decodeMastodonWebPushMiddleware = (req, res, next) => {
     const key = webPushDecipher.buildReciverKey(PUBLIC_KEY, PRIVATE_KEY, AUTH_SECRET);
     //console.log(`public_key:${PUBLIC_KEY}, private_key:${PRIVATE_KEY}, auth_secret:${AUTH_SECRET}`);
     try {
-        const saltInHeader = req.headers['Encryption'];
-        const keyidInHeader = req.headers['Crypto-Key'];
+        const saltInHeader = req.headers['encryption'];
+        const keyidInHeader = req.headers['crypto-key'];
         const salt = saltInHeader.substring("salt=".length, saltInHeader.length);
         const keyid = keyidInHeader.substring("keyid=".length, keyidInHeader.length);
         webPushDecipher.decryptContent()
