@@ -59,7 +59,7 @@ const decodeBodyMiddleware = (req, res, next) => {
         let decrypted = webPushDecipher.decrypt(converted, key, false);
         req.rawJson = decrypted;
     } catch (e) {
-        console.log(`Decrypt Error: ${e}, request original url: ${req.originalUrl}`);
+        console.log(`Decrypt Error: ${e}, request original url: ${req.originalUrl}, headers:${JSON.stringify(req.headers)}`);
         throw e;
     }
     

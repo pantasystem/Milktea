@@ -38,9 +38,6 @@ exports.buildReciverKey = function (public, private, authSecret) {
 // WebPushで流れてきた通知をdecrypt
 exports.decrypt = function (body64, receiverKey, verbose) {
   let body = decodeBase64(body64);
-  let auth_secret = receiverKey.authSecret;
-  let receiver_public = receiverKey.public;
-  let receiver_private = receiverKey.private;
 
   // bodyを分解してsalt, keyid, 暗号化されたcontentsを取り出す
   // bodyの構造は以下の通り↓
@@ -60,22 +57,27 @@ exports.decrypt = function (body64, receiverKey, verbose) {
 
   const content = body.slice(16 + 4 + 1 + idlen, body.length);
 
-  const sender_public = decodeBase64(keyid.toString("base64"));
-
-  // 共有秘密鍵を生成(ECDH)
-  let receiver_curve = crypto.createECDH("prime256v1");
-  receiver_curve.setPrivateKey(receiver_private);
-  const sharedSecret = receiver_curve.computeSecret(keyid);
-
   // For Verbose Mode
   log(verbose, "salt", salt.toString("base64"));
   log(verbose, "rs", rs.toString("hex"));
   log(verbose, "idlen_hex", idlen_hex);
   log(verbose, "idlen", idlen);
   log(verbose, "keyid", keyid.toString("base64"));
-  log(verbose, "content", content.toString("base64"));
-  log(verbose, "sender_public", sender_public.toString("base64"));
-  log(verbose, "sharedSecret:", sharedSecret.toString("base64"));
+
+  return decryptContent(content, receiverKey, keyid, verbose);
+};
+
+function decryptContent(content, receiverKey, keyid ,verbose) {
+  let auth_secret = receiverKey.authSecret;
+  let receiver_public = receiverKey.public;
+  let receiver_private = receiverKey.private;
+
+  const sender_public = decodeBase64(keyid.toString("base64"));
+
+  // 共有秘密鍵を生成(ECDH)
+  let receiver_curve = crypto.createECDH("prime256v1");
+  receiver_curve.setPrivateKey(receiver_private);
+  const sharedSecret = receiver_curve.computeSecret(keyid);
 
   /*
 	  # HKDF-Extract(salt=auth_secret, IKM=ecdh_secret)
@@ -136,5 +138,6 @@ exports.decrypt = function (body64, receiverKey, verbose) {
 
   log(verbose, "shaped:", result.toString("utf8"));
   return result.toString("utf8");
+}
 
-};
+exports.decryptContent = decryptContent;
