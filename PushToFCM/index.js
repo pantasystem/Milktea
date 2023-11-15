@@ -80,7 +80,6 @@ const decodeMastodonWebPushMiddleware = (req, res, next) => {
         const keyidInHeader = req.headers['crypto-key'];
         const salt = saltInHeader.substring("salt=".length, saltInHeader.length);
         const keyid = keyidInHeader.substring("keyid=".length, keyidInHeader.length);
-        webPushDecipher.decryptContent()
         let decrypted = webPushDecipher.decryptContent(converted, key, salt, keyid, false);
         req.rawJson = decrypted;
     } catch (e) {
