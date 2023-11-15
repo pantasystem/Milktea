@@ -8,6 +8,7 @@ import net.pantasystem.milktea.api.misskey.users.UserDTO
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.instance.InstanceInfoType
 import net.pantasystem.milktea.model.instance.Meta
+import net.pantasystem.milktea.model.nodeinfo.NodeInfo
 import net.pantasystem.milktea.model.note.Note
 import net.pantasystem.milktea.model.user.User
 import org.junit.jupiter.api.Assertions
@@ -37,6 +38,7 @@ class NoteDTOEntityConverterTest {
                     find(any())
                 } doReturn Result.success(
                     InstanceInfoType.Misskey(
+                        NodeInfo("", "", NodeInfo.Software("", "")),
                         Meta(
                             uri = "https://misskey.pantasystem.com",
                         )
@@ -126,6 +128,7 @@ class NoteDTOEntityConverterTest {
                     find(any())
                 } doReturn Result.success(
                     InstanceInfoType.Misskey(
+                        NodeInfo("", "", NodeInfo.Software("", "")),
                         Meta(
                             uri = "https://misskey.pantasystem.com",
                             version = "2023.10.2"
@@ -218,6 +221,7 @@ class NoteDTOEntityConverterTest {
                     find(any())
                 } doReturn Result.success(
                     InstanceInfoType.Misskey(
+                        NodeInfo("", "", NodeInfo.Software("", "")),
                         Meta(
                             uri = "https://misskey.pantasystem.com",
                             version = "2023.10.2"

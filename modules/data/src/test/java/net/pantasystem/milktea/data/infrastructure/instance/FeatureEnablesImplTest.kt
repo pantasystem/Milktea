@@ -5,6 +5,8 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import net.pantasystem.milktea.model.instance.FeatureType
+import net.pantasystem.milktea.model.instance.InstanceInfoType
+import net.pantasystem.milktea.model.instance.MastodonInstanceInfo
 import net.pantasystem.milktea.model.instance.Meta
 import net.pantasystem.milktea.model.nodeinfo.NodeInfo
 import org.junit.jupiter.api.Assertions
@@ -53,11 +55,14 @@ class FeatureEnablesImplTest {
     @Test
     fun enableFeatures_GiveMisskeyAndV11(): Unit = runBlocking {
         val impl = FeatureEnablesImpl(
-            metaRepository = mock() {
+            instanceInfoService = mock() {
                 onBlocking {
                     find(any())
                 } doReturn Result.success(
-                    v11Meta
+                    InstanceInfoType.Misskey(
+                        NodeInfo("", "", NodeInfo.Software("misskey", "")),
+                        v11Meta
+                    )
                 )
             },
             nodeInfoRepository = mock() {
@@ -94,11 +99,14 @@ class FeatureEnablesImplTest {
     @Test
     fun enableFeatures_GiveMisskeyV12() = runTest {
         val impl = FeatureEnablesImpl(
-            metaRepository = mock() {
+            instanceInfoService = mock() {
                 onBlocking {
                     find(any())
                 } doReturn Result.success(
-                    v12Meta
+                    InstanceInfoType.Misskey(
+                        NodeInfo("", "", NodeInfo.Software("misskey", "")),
+                        v12Meta
+                    )
                 )
             },
             nodeInfoRepository = mock() {
@@ -137,11 +145,14 @@ class FeatureEnablesImplTest {
     @Test
     fun enableFeatures_GiveMisskeyV12_74_0() = runTest {
         val impl = FeatureEnablesImpl(
-            metaRepository = mock() {
+            instanceInfoService = mock() {
                 onBlocking {
                     find(any())
                 } doReturn Result.success(
-                    v1274Meta
+                    InstanceInfoType.Misskey(
+                        NodeInfo("", "", NodeInfo.Software("misskey", "")),
+                        v1274Meta
+                    )
                 )
             },
             nodeInfoRepository = mock() {
@@ -180,11 +191,14 @@ class FeatureEnablesImplTest {
     @Test
     fun enableFeatures_GiveMisskeyV12_75_0() = runTest {
         val impl = FeatureEnablesImpl(
-            metaRepository = mock() {
+            instanceInfoService = mock() {
                 onBlocking {
                     find(any())
                 } doReturn Result.success(
-                    v1275Meta
+                    InstanceInfoType.Misskey(
+                        NodeInfo("", "", NodeInfo.Software("misskey", "")),
+                        v1275Meta
+                    )
                 )
             },
             nodeInfoRepository = mock() {
@@ -225,11 +239,14 @@ class FeatureEnablesImplTest {
     @Test
     fun enableFeatures_GiveMisskeyV13_6_1() = runTest {
         val impl = FeatureEnablesImpl(
-            metaRepository = mock() {
+            instanceInfoService = mock() {
                 onBlocking {
                     find(any())
                 } doReturn Result.success(
-                    v1361Meta
+                    InstanceInfoType.Misskey(
+                        NodeInfo("", "", NodeInfo.Software("misskey", "")),
+                        v1361Meta
+                    )
                 )
             },
             nodeInfoRepository = mock() {
@@ -271,11 +288,14 @@ class FeatureEnablesImplTest {
     @Test
     fun enableFeatures_GiveMisskeyV13_6_2() = runTest {
         val impl = FeatureEnablesImpl(
-            metaRepository = mock() {
+            instanceInfoService = mock() {
                 onBlocking {
                     find(any())
                 } doReturn Result.success(
-                    v1362Meta
+                    InstanceInfoType.Misskey(
+                        NodeInfo("", "", NodeInfo.Software("misskey", "")),
+                        v1362Meta
+                    )
                 )
             },
             nodeInfoRepository = mock() {
@@ -315,11 +335,14 @@ class FeatureEnablesImplTest {
     @Test
     fun enableFeatures_GiveCalckeyV13() = runTest {
         val impl = FeatureEnablesImpl(
-            metaRepository = mock() {
+            instanceInfoService = mock() {
                 onBlocking {
                     find(any())
                 } doReturn Result.success(
-                    calckeyV13Meta
+                    InstanceInfoType.Misskey(
+                        NodeInfo("", "", NodeInfo.Software("misskey", "")),
+                        calckeyV13Meta
+                    )
                 )
             },
             nodeInfoRepository = mock() {
@@ -360,10 +383,32 @@ class FeatureEnablesImplTest {
     @Test
     fun enableFeatures_GiveMastodon() = runTest {
         val impl = FeatureEnablesImpl(
-            metaRepository = mock() {
+            instanceInfoService = mock() {
                 onBlocking {
                     find(any())
-                } doReturn Result.failure(IllegalArgumentException())
+                } doReturn Result.success(
+                    InstanceInfoType.Mastodon(
+                        NodeInfo(
+                            host = "example.com",
+                            version = "2.0",
+                            software = NodeInfo.Software(
+                                name = "mastodon",
+                                version = "3.0.0"
+                            )
+                        ),
+                        MastodonInstanceInfo(
+                            "",
+                            "",
+                            "",
+                            "",
+                            "",
+                            MastodonInstanceInfo.Urls(""),
+                            null,
+                            null,
+                            null
+                        )
+                    )
+                )
             },
             nodeInfoRepository = mock() {
                 onBlocking {
@@ -394,10 +439,21 @@ class FeatureEnablesImplTest {
     @Test
     fun enableFeatures_GiveFirefish() = runTest {
         val impl = FeatureEnablesImpl(
-            metaRepository = mock() {
+            instanceInfoService = mock() {
                 onBlocking {
                     find(any())
-                } doReturn Result.failure(IllegalArgumentException())
+                } doReturn Result.success(
+                    InstanceInfoType.Firefish(
+                        NodeInfo(
+                            host = "example.com",
+                            version = "2.0",
+                            software = NodeInfo.Software(
+                                name = "firefish",
+                                version = "1.0.0"
+                            )
+                        ), Meta("https://example.com", "1.0.0")
+                    )
+                )
             },
             nodeInfoRepository = mock() {
                 onBlocking {

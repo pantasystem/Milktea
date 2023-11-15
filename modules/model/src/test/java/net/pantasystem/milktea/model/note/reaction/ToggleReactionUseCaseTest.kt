@@ -7,6 +7,7 @@ import net.pantasystem.milktea.model.emoji.CustomEmoji
 import net.pantasystem.milktea.model.instance.InstanceInfoType
 import net.pantasystem.milktea.model.instance.MastodonInstanceInfo
 import net.pantasystem.milktea.model.instance.Meta
+import net.pantasystem.milktea.model.nodeinfo.NodeInfo
 import net.pantasystem.milktea.model.note.Note
 import net.pantasystem.milktea.model.note.NoteRepository
 import net.pantasystem.milktea.model.note.generateEmptyNote
@@ -94,7 +95,7 @@ class ToggleReactionUseCaseTest {
             instanceInfoService = mock() {
                 onBlocking {
                     find(any())
-                } doReturn Result.success(InstanceInfoType.Misskey(meta))
+                } doReturn Result.success(InstanceInfoType.Misskey(nodeInfo = NodeInfo("", "", NodeInfo.Software("", "")),meta))
             },
             userRepository = mock() {
                 onBlocking {
@@ -178,7 +179,7 @@ class ToggleReactionUseCaseTest {
             instanceInfoService = mock() {
                 onBlocking {
                     find(any())
-                } doReturn Result.success(InstanceInfoType.Misskey(meta))
+                } doReturn Result.success(InstanceInfoType.Misskey(NodeInfo("", "", NodeInfo.Software("", "")), meta))
             },
             userRepository = mock() {
                 onBlocking {
@@ -269,7 +270,7 @@ class ToggleReactionUseCaseTest {
             instanceInfoService = mock() {
                 onBlocking {
                     find(any())
-                } doReturn Result.success(InstanceInfoType.Misskey(meta))
+                } doReturn Result.success(InstanceInfoType.Misskey(NodeInfo("", "", NodeInfo.Software("", "")), meta))
             },
             userRepository = mock() {
                 onBlocking {
@@ -348,7 +349,7 @@ class ToggleReactionUseCaseTest {
             instanceInfoService = mock() {
                 onBlocking {
                     find(any())
-                } doReturn Result.success(InstanceInfoType.Misskey(meta))
+                } doReturn Result.success(InstanceInfoType.Misskey(NodeInfo("", "", NodeInfo.Software("", "")), meta))
             },
             customEmojiRepository = mock() {
                 onBlocking {
@@ -434,7 +435,7 @@ class ToggleReactionUseCaseTest {
             instanceInfoService = mock() {
                 onBlocking {
                     find(any())
-                } doReturn Result.success(InstanceInfoType.Misskey(meta))
+                } doReturn Result.success(InstanceInfoType.Misskey(NodeInfo("", "", NodeInfo.Software("", "")), meta))
             },
             customEmojiRepository = mock() {
                 onBlocking {
@@ -523,7 +524,7 @@ class ToggleReactionUseCaseTest {
             instanceInfoService = mock() {
                 onBlocking {
                     find(any())
-                } doReturn Result.success(InstanceInfoType.Misskey(meta))
+                } doReturn Result.success(InstanceInfoType.Misskey(NodeInfo("", "", NodeInfo.Software("", "")), meta))
             },
             userRepository = mock() {
                 onBlocking {
@@ -612,6 +613,7 @@ class ToggleReactionUseCaseTest {
                     find(any())
                 } doReturn Result.success(
                     InstanceInfoType.Mastodon(
+                        NodeInfo("", "", NodeInfo.Software("", "")),
                         MastodonInstanceInfo(
                             uri = "",
                             title = "",
@@ -732,6 +734,7 @@ class ToggleReactionUseCaseTest {
                     find(any())
                 } doReturn Result.success(
                     InstanceInfoType.Mastodon(
+                        NodeInfo("", "", NodeInfo.Software("", "")),
                         MastodonInstanceInfo(
                             uri = "",
                             title = "",
