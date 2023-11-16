@@ -41,7 +41,7 @@ fun ProfileBadgeRoles(
     ) {
         FlowRow(
             horizontalArrangement = Arrangement.spacedBy(4.dp),
-            verticalAlignment = Alignment.CenterVertically,
+            verticalArrangement = Arrangement.Center,
 
         ) {
             for (it in badgeRoles) {

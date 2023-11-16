@@ -23,7 +23,7 @@ sealed interface EmojisType {
     data class TypeObject(val emojis: Map<String, String>) : EmojisType
 
     @kotlinx.serialization.Serializable
-    object None : EmojisType
+    data object None : EmojisType
 }
 
 @kotlinx.serialization.Serializable
