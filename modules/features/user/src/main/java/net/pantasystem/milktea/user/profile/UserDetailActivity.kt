@@ -11,16 +11,8 @@ import android.view.Menu
 import android.view.MenuItem
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Button
-import androidx.compose.material.OutlinedButton
-import androidx.compose.material.Text
-import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
 import androidx.core.app.TaskStackBuilder
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.*
@@ -47,11 +39,11 @@ import net.pantasystem.milktea.common_navigation.*
 import net.pantasystem.milktea.model.setting.Config
 import net.pantasystem.milktea.model.setting.LocalConfigRepository
 import net.pantasystem.milktea.model.setting.Theme
-import net.pantasystem.milktea.model.user.FollowState
 import net.pantasystem.milktea.model.user.User
 import net.pantasystem.milktea.note.NoteEditorActivity
 import net.pantasystem.milktea.note.view.NoteActionHandler
 import net.pantasystem.milktea.note.viewmodel.NotesViewModel
+import net.pantasystem.milktea.user.FollowButton
 import net.pantasystem.milktea.user.R
 import net.pantasystem.milktea.user.databinding.ActivityUserDetailBinding
 import net.pantasystem.milktea.user.followlist.FollowFollowerActivity
@@ -493,46 +485,6 @@ class UserDetailActivity : AppCompatActivity() {
             theme.resolveAttribute(R.attr.background, typed, true)
         }
         binding.remoteUserState.setBackgroundColor(typed.data)
-    }
-
-    @Composable
-    fun FollowButton(
-        userState: FollowState?,
-        isMine: Boolean,
-        modifier: Modifier = Modifier,
-        onClick: () -> Unit,
-    ) {
-        val buttonText = setFollowState(userState)
-        if (!isMine) {
-            when (userState) {
-                FollowState.UNFOLLOWING, FollowState.UNFOLLOWING_LOCKED -> {
-                    OutlinedButton(
-                        shape = RoundedCornerShape(32.dp),
-                        onClick = onClick,
-                    ) {
-                        Text(buttonText)
-                    }
-                }
-                FollowState.FOLLOWING, FollowState.PENDING_FOLLOW_REQUEST -> {
-                    Button(
-                        shape = RoundedCornerShape(32.dp),
-                        onClick = onClick,
-                    ) {
-                        Text(buttonText)
-                    }
-                }
-                null -> {  }
-            }
-        }
-    }
-
-    @Composable
-    private fun setFollowState(state: FollowState?): String = when (state) {
-        FollowState.FOLLOWING -> stringResource(R.string.unfollow)
-        FollowState.UNFOLLOWING -> stringResource(R.string.follow)
-        FollowState.UNFOLLOWING_LOCKED -> stringResource(R.string.request_follow_from_u)
-        FollowState.PENDING_FOLLOW_REQUEST -> stringResource(R.string.follow_approval_pending)
-        else -> ""
     }
 
     @ExperimentalCoroutinesApi
