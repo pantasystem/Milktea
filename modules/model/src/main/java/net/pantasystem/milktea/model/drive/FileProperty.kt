@@ -2,7 +2,6 @@ package net.pantasystem.milktea.model.drive
 
 import kotlinx.datetime.Instant
 import net.pantasystem.milktea.model.user.User
-
 import java.io.Serializable as JSerializable
 
 data class FileProperty(
@@ -21,6 +20,8 @@ data class FileProperty(
     val url: String,
     val thumbnailUrl: String? = null,
 ) : JSerializable {
+    companion object;
+
     data class Id(
         val accountId: Long,
         val fileId: String,
@@ -75,4 +76,38 @@ data class FileProperty(
             },
         )
     }
+}
+
+fun FileProperty.Companion.make(
+    id: FileProperty.Id = FileProperty.Id(0L, ""),
+    name: String = "",
+    createdAt: Instant? = null,
+    type: String = "",
+    md5: String? = null,
+    size: Int? = null,
+    userId: User.Id? = null,
+    folderId: String? = null,
+    comment: String? = null,
+    properties: FileProperty.Properties? = null,
+    isSensitive: Boolean = false,
+    blurhash: String? = null,
+    url: String = "",
+    thumbnailUrl: String? = null,
+): FileProperty {
+    return FileProperty(
+        id = id,
+        name = name,
+        createdAt = createdAt,
+        type = type,
+        md5 = md5,
+        size = size,
+        userId = userId,
+        folderId = folderId,
+        comment = comment,
+        properties = properties,
+        isSensitive = isSensitive,
+        blurhash = blurhash,
+        url = url,
+        thumbnailUrl = thumbnailUrl,
+    )
 }
