@@ -43,6 +43,7 @@ import net.pantasystem.milktea.model.user.User
 import net.pantasystem.milktea.note.NoteEditorActivity
 import net.pantasystem.milktea.note.view.NoteActionHandler
 import net.pantasystem.milktea.note.viewmodel.NotesViewModel
+import net.pantasystem.milktea.user.FollowButton
 import net.pantasystem.milktea.user.R
 import net.pantasystem.milktea.user.databinding.ActivityUserDetailBinding
 import net.pantasystem.milktea.user.followlist.FollowFollowerActivity
@@ -182,6 +183,20 @@ class UserDetailActivity : AppCompatActivity() {
                                 displayOrder = it.displayOrder
                             )
                         }
+                    )
+                }
+            }
+        }
+
+        binding.followButton.apply {
+            setContent {
+                val userDetail by mViewModel.userState.collectAsState()
+                val isMine by mViewModel.isMine.collectAsState()
+                MdcTheme {
+                    FollowButton(
+                        userState = userDetail?.followState,
+                        isMine = isMine,
+                        onClick = { mViewModel.changeFollow() }
                     )
                 }
             }
@@ -471,7 +486,6 @@ class UserDetailActivity : AppCompatActivity() {
         }
         binding.remoteUserState.setBackgroundColor(typed.data)
     }
-
 
     @ExperimentalCoroutinesApi
     private fun addPageToTab() {
