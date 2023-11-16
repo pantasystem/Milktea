@@ -209,7 +209,9 @@ class SettingMovementActivity : AppCompatActivity() {
                             }
                         }
                         SettingSection(title = stringResource(id = R.string.media)) {
-                            Box(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp)) {
+                            Box(modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 16.dp)) {
                                 var isVisibleDropdown by remember {
                                     mutableStateOf(false)
                                 }
@@ -273,5 +275,6 @@ private fun stringFromDisplayMode(displayMode: MediaDisplayMode): String {
         MediaDisplayMode.AUTO -> stringResource(R.string.media_display_mode_default)
         MediaDisplayMode.ALWAYS_HIDE -> stringResource(id = R.string.media_display_mode_always)
         MediaDisplayMode.ALWAYS_HIDE_WHEN_MOBILE_NETWORK -> stringResource(id = R.string.settings_hide_media_when_mobile_network)
+        MediaDisplayMode.ALWAYS_SHOW -> stringResource(id = R.string.settings_always_show_media)
     }
 }

@@ -106,7 +106,7 @@ open class PlaneNoteViewData(
     }?.filter {
         it.aboutMediaType == AboutMediaType.IMAGE || it.aboutMediaType == AboutMediaType.VIDEO
     } ?: emptyList()
-    val media = MediaViewData(previewableFiles, configRepository.get().getOrNull(), coroutineScope)
+    val media = MediaViewData(previewableFiles, configRepository.get().getOrNull())
 
     val isOnlyVisibleRenoteStatusMessage = MutableStateFlow<Boolean>(false)
 
@@ -195,7 +195,7 @@ open class PlaneNoteViewData(
     val subNoteFiles = subNote?.files ?: emptyList()
     val subNoteMedia = MediaViewData(subNote?.files?.map {
         FilePreviewSource.Remote(AppFile.Remote(it.id), it)
-    } ?: emptyList(), configRepository.get().getOrNull(), coroutineScope)
+    } ?: emptyList(), configRepository.get().getOrNull())
 
     val channelInfo = (toShowNote.note.type as? Note.Type.Misskey)?.channel
 

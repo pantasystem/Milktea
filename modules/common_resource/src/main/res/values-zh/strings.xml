@@ -449,6 +449,7 @@
     <string name="note_editor_poll_choice_n">选择%d</string>
     <string name="settings_visible_instance_domain_in_toolbar">在工具栏中显示实例的域</string>
     <string name="settings_hide_media_when_mobile_network">移动网络时隐藏媒体</string>
+    <string name="settings_always_show_media">始终显示媒体</string>
     <string name="notes_media_click_to_load_image">点击加载图片</string>
     <string name="notifications_follow_requests">按照要求</string>
     <string name="content_not_exists_message">无内容</string>
