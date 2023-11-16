@@ -174,4 +174,5 @@ enum class MediaDisplayMode(val value: Int) {
     AUTO(0),
     ALWAYS_HIDE(1),
     ALWAYS_HIDE_WHEN_MOBILE_NETWORK(2),
+    ALWAYS_SHOW(3),
 }
