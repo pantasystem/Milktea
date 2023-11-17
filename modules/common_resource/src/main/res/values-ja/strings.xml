@@ -630,15 +630,15 @@
     <string name="notification_sync_download_custom_emoji_title">カスタム絵文字ダウンロード中</string>
     <string name="alarm_permission_description_title">アラームの権限を付与してください</string>
     <string name="alarm_permission_description_message">予約投稿はアラーム機能の仕組みを利用するため、設定からMilkteaにアラームの権限を付与する必要性があります。</string>
-    <string name="exclude_replies">Exclude replies</string>
-    <string name="exclude_reposts">Exclude reposts</string>
+    <string name="exclude_replies">リプライを除外</string>
+    <string name="exclude_reposts">リポストを除外</string>
     <string name="notify_about_new_posts">投稿の通知を受信する</string>
     <string name="stop_notify_about_new_posts">投稿の通知をやめる</string>
     <!-- User -->
 
     <string name="settings_user_cache">ユーザキャッシュ</string>
     <string name="jump_to_new_post">新着投稿を表示</string>
-    <string name="exclude_if_exists_sensitive_media">Exclude if exists sensitive media</string>
+    <string name="exclude_if_exists_sensitive_media">センシティブなメディアを含む投稿を除外</string>
 
 
 </resources>
