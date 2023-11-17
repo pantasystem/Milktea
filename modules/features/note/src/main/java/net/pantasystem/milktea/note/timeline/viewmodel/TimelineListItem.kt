@@ -13,7 +13,7 @@ import java.net.SocketTimeoutException
 
 
 sealed interface TimelineListItem {
-    object Loading : TimelineListItem
+    data object Loading : TimelineListItem
     data class Note(val note: PlaneNoteViewData) : TimelineListItem
     data class Error(val throwable: Throwable) : TimelineListItem {
         fun getErrorMessage(): StringSource {
@@ -43,7 +43,7 @@ sealed interface TimelineListItem {
         }
     }
 
-    object Empty : TimelineListItem
+    data object Empty : TimelineListItem
 }
 
 internal fun PageableState<List<PlaneNoteViewData>>.toList(): List<TimelineListItem> {

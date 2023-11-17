@@ -14,7 +14,7 @@ import net.pantasystem.milktea.model.user.User
  * 認証の状態
  */
 sealed interface Authorization {
-    object BeforeAuthentication : Authorization
+    data object BeforeAuthentication : Authorization
 
     sealed interface Waiting4UserAuthorization : Authorization{
         val instanceBaseURL: String

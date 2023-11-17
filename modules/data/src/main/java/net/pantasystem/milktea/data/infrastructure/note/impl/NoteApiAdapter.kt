@@ -320,7 +320,7 @@ sealed interface NoteResultType {
 
 sealed interface DeleteNoteResultType {
     data class Mastodon(val status: TootStatusDTO) : DeleteNoteResultType
-    object Misskey : DeleteNoteResultType
+    data object Misskey : DeleteNoteResultType
 }
 
 
@@ -330,13 +330,13 @@ typealias NoteCreatedResultType = NoteResultType
 
 
 sealed interface ToggleThreadMuteResultType {
-    object Misskey : ToggleThreadMuteResultType
+    data object Misskey : ToggleThreadMuteResultType
     data class Mastodon(val status: TootStatusDTO) : ToggleThreadMuteResultType
 }
 
 typealias RenoteResultType = NoteResultType
 
 sealed interface UnrenoteResultType {
-    object Misskey : UnrenoteResultType
+    data object Misskey : UnrenoteResultType
     data class Mastodon(val status: TootStatusDTO) : UnrenoteResultType
 }
