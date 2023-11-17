@@ -8,6 +8,7 @@ import androidx.core.view.isVisible
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.activityViewModels
 import dagger.hilt.android.AndroidEntryPoint
+import net.pantasystem.milktea.model.account.page.CanExcludeIfExistsSensitiveMedia
 import net.pantasystem.milktea.model.account.page.CanExcludeReplies
 import net.pantasystem.milktea.model.account.page.CanExcludeReposts
 import net.pantasystem.milktea.model.account.page.CanOnlyMedia
@@ -80,6 +81,13 @@ class EditTabSettingDialog : AppCompatDialogFragment(){
             binding.toggleExcludeReplies.isVisible = false
         }
 
+        if (page.pageable() is CanExcludeIfExistsSensitiveMedia<*>) {
+            binding.toggleExcludeIfExistsSensitiveMedia.isVisible = true
+            binding.toggleExcludeIfExistsSensitiveMedia.isChecked = page.pageParams.excludeIfExistsSensitiveMedia ?: false
+        } else {
+            binding.toggleExcludeIfExistsSensitiveMedia.isVisible = false
+        }
+
         binding.okButton.setOnClickListener {
             val name = binding.editTabName.text?.toString()
             if(name?.isNotBlank() == true){
@@ -107,6 +115,14 @@ class EditTabSettingDialog : AppCompatDialogFragment(){
                     is CanExcludeReposts<*> -> {
                         target = target.copy(
                             pageParams = (pageable.setExcludeReposts(binding.toggleExcludeReposts.isChecked) as Pageable).toParams()
+                        )
+                    }
+                    else -> Unit
+                }
+                when(val pageable = target.pageable()) {
+                    is CanExcludeIfExistsSensitiveMedia<*> -> {
+                        target = target.copy(
+                            pageParams = (pageable.setExcludeIfExistsSensitiveMedia(binding.toggleExcludeIfExistsSensitiveMedia.isChecked) as Pageable).toParams()
                         )
                     }
                     else -> Unit
