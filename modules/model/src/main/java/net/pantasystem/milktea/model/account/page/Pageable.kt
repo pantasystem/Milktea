@@ -719,3 +719,8 @@ interface CanExcludeReposts<T> {
     fun setExcludeReposts(isExcludeReposts: Boolean): T
     fun getExcludeReposts(): Boolean
 }
+
+interface CanExcludeIfExistsSensitiveMedia<T> {
+    fun setExcludeIfExistsSensitiveMedia(isExcludeIfExistsSensitiveMedia: Boolean): T
+    fun getExcludeIfExistsSensitiveMedia(): Boolean
+}
