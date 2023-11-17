@@ -120,7 +120,8 @@ data class PageParams(
                         withFiles = withFiles,
                         includeMyRenotes = includeMyRenotes,
                         includeLocalRenotes = includeLocalRenotes,
-                        includeRenotedMyRenotes = includeRenotedMyRenotes
+                        includeRenotedMyRenotes = includeRenotedMyRenotes,
+                        excludeIfExistsSensitiveMedia = excludeIfExistsSensitiveMedia
                     )
                 }
                 MENTION -> {

@@ -215,7 +215,7 @@ sealed class Pageable : Serializable {
         var excludeIfExistsSensitiveMedia: Boolean? = null
 
     ) : Pageable(), UntilPaginate, SincePaginate, CanOnlyMedia<HomeTimeline>,
-        CanExcludeReplies<HomeTimeline>, CanExcludeReposts<HomeTimeline> {
+        CanExcludeReplies<HomeTimeline>, CanExcludeReposts<HomeTimeline>, CanExcludeIfExistsSensitiveMedia<HomeTimeline> {
 
         override fun toParams(): PageParams {
             return PageParams(
@@ -260,6 +260,16 @@ sealed class Pageable : Serializable {
 
         override fun getExcludeReposts(): Boolean {
             return excludeReposts ?: false
+        }
+
+        override fun getExcludeIfExistsSensitiveMedia(): Boolean {
+            return excludeIfExistsSensitiveMedia ?: false
+        }
+
+        override fun setExcludeIfExistsSensitiveMedia(isExcludeIfExistsSensitiveMedia: Boolean): HomeTimeline {
+            return copy(
+                excludeIfExistsSensitiveMedia = isExcludeIfExistsSensitiveMedia
+            )
         }
     }
 
