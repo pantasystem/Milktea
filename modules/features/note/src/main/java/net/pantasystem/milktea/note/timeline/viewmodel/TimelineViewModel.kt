@@ -21,7 +21,6 @@ import net.pantasystem.milktea.model.note.Note
 import net.pantasystem.milktea.model.note.NoteStreaming
 import net.pantasystem.milktea.model.note.TimelineScrollPositionRepository
 import net.pantasystem.milktea.model.setting.LocalConfigRepository
-import net.pantasystem.milktea.note.timeline.viewmodel.filter.ExcludeIfExistsSensitiveMediaFilter
 import net.pantasystem.milktea.note.timeline.viewmodel.filter.ExcludeRepostOrReplyFilter
 import net.pantasystem.milktea.note.viewmodel.PlaneNoteViewData
 import net.pantasystem.milktea.note.viewmodel.PlaneNoteViewDataCache
@@ -164,7 +163,6 @@ class TimelineViewModel @AssistedInject constructor(
             }
         })
         cache.addFilter(ExcludeRepostOrReplyFilter(pageable))
-        cache.addFilter(ExcludeIfExistsSensitiveMediaFilter(pageable))
 
         timelineStore.setActiveStreamingChangedListener { isActiveStreaming ->
             if (isActiveStreaming && isActive) {

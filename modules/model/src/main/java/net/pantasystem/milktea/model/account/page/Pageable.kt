@@ -11,20 +11,17 @@ sealed class Pageable : Serializable {
 
         var withFiles: Boolean? = null,
         var excludeReposts: Boolean? = null,
-        var excludeReplies: Boolean? = null,
-        val excludeIfExistsSensitiveMedia: Boolean? = null
+        var excludeReplies: Boolean? = null
     ) : Pageable(), UntilPaginate, SincePaginate,
         CanOnlyMedia<GlobalTimeline>,
         CanExcludeReplies<GlobalTimeline>,
-        CanExcludeReposts<GlobalTimeline>,
-        CanExcludeIfExistsSensitiveMedia<GlobalTimeline> {
+        CanExcludeReposts<GlobalTimeline> {
         override fun toParams(): PageParams {
             return PageParams(
                 withFiles = withFiles,
                 type = PageType.GLOBAL,
                 excludeReplies = excludeReplies,
-                excludeReposts = excludeReposts,
-                excludeIfExistsSensitiveMedia = excludeIfExistsSensitiveMedia,
+                excludeReposts = excludeReposts
             )
         }
 
@@ -61,16 +58,6 @@ sealed class Pageable : Serializable {
                 excludeReposts = isExcludeReposts
             )
         }
-
-        override fun getExcludeIfExistsSensitiveMedia(): Boolean {
-            return excludeIfExistsSensitiveMedia ?: false
-        }
-
-        override fun setExcludeIfExistsSensitiveMedia(isExcludeIfExistsSensitiveMedia: Boolean): GlobalTimeline {
-            return copy(
-                excludeIfExistsSensitiveMedia = isExcludeIfExistsSensitiveMedia
-            )
-        }
     }
 
     data class LocalTimeline(
@@ -78,11 +65,10 @@ sealed class Pageable : Serializable {
         var withFiles: Boolean? = null,
         var excludeNsfw: Boolean? = null,
         var excludeReplies: Boolean? = null,
-        var excludeReposts: Boolean? = null,
-        var excludeIfExistsSensitiveMedia: Boolean? = null
+        var excludeReposts: Boolean? = null
 
     ) : Pageable(), UntilPaginate, SincePaginate, CanOnlyMedia<LocalTimeline>,
-        CanExcludeReplies<LocalTimeline>, CanExcludeReposts<LocalTimeline>, CanExcludeIfExistsSensitiveMedia<LocalTimeline> {
+        CanExcludeReplies<LocalTimeline>, CanExcludeReposts<LocalTimeline> {
         override fun toParams(): PageParams {
             return PageParams(
                 PageType.LOCAL,
@@ -124,16 +110,6 @@ sealed class Pageable : Serializable {
         override fun getExcludeReposts(): Boolean {
             return excludeReposts ?: false
         }
-
-        override fun setExcludeIfExistsSensitiveMedia(isExcludeIfExistsSensitiveMedia: Boolean): LocalTimeline {
-            return copy(
-                excludeIfExistsSensitiveMedia = isExcludeIfExistsSensitiveMedia
-            )
-        }
-
-        override fun getExcludeIfExistsSensitiveMedia(): Boolean {
-            return excludeIfExistsSensitiveMedia ?: false
-        }
     }
 
     data class HybridTimeline(
@@ -143,11 +119,10 @@ sealed class Pageable : Serializable {
         var includeMyRenotes: Boolean? = null,
         var includeRenotedMyRenotes: Boolean? = null,
         var excludeReplies: Boolean? = null,
-        var excludeReposts: Boolean? = null,
-        var excludeIfExistsSensitiveMedia: Boolean? = null
+        var excludeReposts: Boolean? = null
 
     ) : Pageable(), UntilPaginate, SincePaginate, CanOnlyMedia<HybridTimeline>,
-        CanExcludeReplies<HybridTimeline>, CanExcludeReposts<HybridTimeline>, CanExcludeIfExistsSensitiveMedia<HybridTimeline> {
+        CanExcludeReplies<HybridTimeline>, CanExcludeReposts<HybridTimeline> {
         override fun toParams(): PageParams {
             return PageParams(
                 type = PageType.SOCIAL,
@@ -156,8 +131,7 @@ sealed class Pageable : Serializable {
                 includeMyRenotes = includeMyRenotes,
                 includeRenotedMyRenotes = includeRenotedMyRenotes,
                 excludeReplies = excludeReplies,
-                excludeReposts = excludeReposts,
-                excludeIfExistsSensitiveMedia = excludeIfExistsSensitiveMedia,
+                excludeReposts = excludeReposts
             )
         }
 
@@ -192,16 +166,6 @@ sealed class Pageable : Serializable {
         override fun getExcludeReposts(): Boolean {
             return excludeReposts ?: false
         }
-
-        override fun getExcludeIfExistsSensitiveMedia(): Boolean {
-            return excludeIfExistsSensitiveMedia ?: false
-        }
-
-        override fun setExcludeIfExistsSensitiveMedia(isExcludeIfExistsSensitiveMedia: Boolean): HybridTimeline {
-            return copy(
-                excludeIfExistsSensitiveMedia = isExcludeIfExistsSensitiveMedia
-            )
-        }
     }
 
     data class HomeTimeline(
@@ -211,8 +175,7 @@ sealed class Pageable : Serializable {
         var includeMyRenotes: Boolean? = null,
         var includeRenotedMyRenotes: Boolean? = null,
         var excludeReplies: Boolean? = null,
-        var excludeReposts: Boolean? = null,
-        var excludeIfExistsSensitiveMedia: Boolean? = null
+        var excludeReposts: Boolean? = null
 
     ) : Pageable(), UntilPaginate, SincePaginate, CanOnlyMedia<HomeTimeline>,
         CanExcludeReplies<HomeTimeline>, CanExcludeReposts<HomeTimeline> {
@@ -226,7 +189,6 @@ sealed class Pageable : Serializable {
                 includeMyRenotes = includeMyRenotes,
                 excludeReplies = excludeReplies,
                 excludeReposts = excludeReposts,
-                excludeIfExistsSensitiveMedia = excludeIfExistsSensitiveMedia,
             )
         }
 
@@ -269,9 +231,9 @@ sealed class Pageable : Serializable {
         var withFiles: Boolean? = null,
         var includeLocalRenotes: Boolean? = null,
         var includeMyRenotes: Boolean? = null,
-        var includeRenotedMyRenotes: Boolean? = null,
-        var excludeIfExistsSensitiveMedia: Boolean? = null,
-    ) : Pageable(), UntilPaginate, SincePaginate, CanOnlyMedia<UserListTimeline>, CanExcludeIfExistsSensitiveMedia<UserListTimeline> {
+        var includeRenotedMyRenotes: Boolean? = null
+
+    ) : Pageable(), UntilPaginate, SincePaginate, CanOnlyMedia<UserListTimeline> {
 
         override fun toParams(): PageParams {
             return PageParams(
@@ -280,8 +242,7 @@ sealed class Pageable : Serializable {
                 withFiles = withFiles,
                 includeLocalRenotes = includeLocalRenotes,
                 includeMyRenotes = includeMyRenotes,
-                includeRenotedMyRenotes = includeRenotedMyRenotes,
-                excludeIfExistsSensitiveMedia = excludeIfExistsSensitiveMedia,
+                includeRenotedMyRenotes = includeRenotedMyRenotes
             )
         }
 
@@ -295,16 +256,6 @@ sealed class Pageable : Serializable {
 
         override fun getOnlyMedia(): Boolean {
             return withFiles ?: false
-        }
-
-        override fun getExcludeIfExistsSensitiveMedia(): Boolean {
-            return excludeIfExistsSensitiveMedia ?: false
-        }
-
-        override fun setExcludeIfExistsSensitiveMedia(isExcludeIfExistsSensitiveMedia: Boolean): UserListTimeline {
-            return copy(
-                excludeIfExistsSensitiveMedia = isExcludeIfExistsSensitiveMedia
-            )
         }
     }
 
@@ -528,15 +479,13 @@ sealed class Pageable : Serializable {
             val isOnlyMedia: Boolean? = null,
             val excludeReplies: Boolean? = null,
             val excludeReposts: Boolean? = null,
-            val excludeIfExistsSensitiveMedia: Boolean? = null,
-        ) : Mastodon(), CanOnlyMedia<PublicTimeline>, UntilPaginate, SincePaginate, CanExcludeReplies<PublicTimeline>, CanExcludeReposts<PublicTimeline>, CanExcludeIfExistsSensitiveMedia<PublicTimeline> {
+        ) : Mastodon(), CanOnlyMedia<PublicTimeline>, UntilPaginate, SincePaginate, CanExcludeReplies<PublicTimeline>, CanExcludeReposts<PublicTimeline> {
             override fun toParams(): PageParams {
                 return PageParams(
                     type = PageType.MASTODON_PUBLIC_TIMELINE,
                     withFiles = isOnlyMedia,
                     excludeReplies = excludeReplies,
-                    excludeReposts = excludeReposts,
-                    excludeIfExistsSensitiveMedia = excludeIfExistsSensitiveMedia,
+                    excludeReposts = excludeReposts
                 )
             }
 
@@ -569,24 +518,13 @@ sealed class Pageable : Serializable {
             override fun getExcludeReposts(): Boolean {
                 return excludeReposts ?: false
             }
-
-            override fun getExcludeIfExistsSensitiveMedia(): Boolean {
-                return excludeIfExistsSensitiveMedia ?: false
-            }
-
-            override fun setExcludeIfExistsSensitiveMedia(isExcludeIfExistsSensitiveMedia: Boolean): PublicTimeline {
-                return copy(
-                    excludeIfExistsSensitiveMedia = isExcludeIfExistsSensitiveMedia
-                )
-            }
         }
 
         data class LocalTimeline(
             val isOnlyMedia: Boolean? = null,
             val excludeReplies: Boolean? = null,
             val excludeReposts: Boolean? = null,
-            val excludeIfExistsSensitiveMedia: Boolean? = null,
-        ) : Mastodon(), CanOnlyMedia<LocalTimeline>, UntilPaginate, SincePaginate, CanExcludeReplies<LocalTimeline>, CanExcludeReposts<LocalTimeline>, CanExcludeIfExistsSensitiveMedia<LocalTimeline> {
+        ) : Mastodon(), CanOnlyMedia<LocalTimeline>, UntilPaginate, SincePaginate, CanExcludeReplies<LocalTimeline>, CanExcludeReposts<LocalTimeline> {
             override fun toParams(): PageParams {
                 return PageParams(
                     type = PageType.MASTODON_LOCAL_TIMELINE,
@@ -625,16 +563,6 @@ sealed class Pageable : Serializable {
             override fun getExcludeReposts(): Boolean {
                 return excludeReposts ?: false
             }
-
-            override fun getExcludeIfExistsSensitiveMedia(): Boolean {
-                return excludeIfExistsSensitiveMedia ?: false
-            }
-
-            override fun setExcludeIfExistsSensitiveMedia(isExcludeIfExistsSensitiveMedia: Boolean): LocalTimeline {
-                return copy(
-                    excludeIfExistsSensitiveMedia = isExcludeIfExistsSensitiveMedia
-                )
-            }
         }
 
         data class HashTagTimeline(val hashtag: String, val isOnlyMedia: Boolean? = null) :
@@ -670,8 +598,7 @@ sealed class Pageable : Serializable {
         data class HomeTimeline(
             val excludeReplies: Boolean? = null,
             val excludeReposts: Boolean? = null,
-            val excludeIfExistsSensitiveMedia: Boolean? = null,
-        ) : Mastodon(), SincePaginate, UntilPaginate, CanExcludeReposts<HomeTimeline>, CanExcludeReplies<HomeTimeline>, CanExcludeIfExistsSensitiveMedia<HomeTimeline> {
+        ) : Mastodon(), SincePaginate, UntilPaginate, CanExcludeReposts<HomeTimeline>, CanExcludeReplies<HomeTimeline> {
             override fun toParams(): PageParams {
                 return PageParams(
                     type = PageType.MASTODON_HOME_TIMELINE,
@@ -697,16 +624,6 @@ sealed class Pageable : Serializable {
             override fun setExcludeReposts(isExcludeReposts: Boolean): HomeTimeline {
                 return copy(
                     excludeReposts = isExcludeReposts
-                )
-            }
-
-            override fun getExcludeIfExistsSensitiveMedia(): Boolean {
-                return excludeIfExistsSensitiveMedia ?: false
-            }
-
-            override fun setExcludeIfExistsSensitiveMedia(isExcludeIfExistsSensitiveMedia: Boolean): HomeTimeline {
-                return copy(
-                    excludeIfExistsSensitiveMedia = isExcludeIfExistsSensitiveMedia
                 )
             }
         }
@@ -801,9 +718,4 @@ interface CanExcludeReplies<T> {
 interface CanExcludeReposts<T> {
     fun setExcludeReposts(isExcludeReposts: Boolean): T
     fun getExcludeReposts(): Boolean
-}
-
-interface CanExcludeIfExistsSensitiveMedia<T> {
-    fun setExcludeIfExistsSensitiveMedia(isExcludeIfExistsSensitiveMedia: Boolean): T
-    fun getExcludeIfExistsSensitiveMedia(): Boolean
 }
