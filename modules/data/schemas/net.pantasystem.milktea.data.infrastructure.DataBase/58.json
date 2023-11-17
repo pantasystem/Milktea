@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 58,
-    "identityHash": "9257b02f1c5fb08f3a6b602d66676be8",
+    "identityHash": "abeea00a832ef048d99e46fb3c1751c6",
     "entities": [
       {
         "tableName": "reaction_history",
@@ -475,7 +475,7 @@
       },
       {
         "tableName": "page_table",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`accountId` INTEGER NOT NULL, `title` TEXT NOT NULL, `weight` INTEGER NOT NULL, `isSavePagePosition` INTEGER, `attachedAccountId` INTEGER, `pageId` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `type` TEXT NOT NULL, `withFiles` INTEGER, `excludeNsfw` INTEGER, `includeLocalRenotes` INTEGER, `includeMyRenotes` INTEGER, `includeRenotedMyRenotes` INTEGER, `listId` TEXT, `following` INTEGER, `visibility` TEXT, `noteId` TEXT, `tag` TEXT, `reply` INTEGER, `renote` INTEGER, `poll` INTEGER, `offset` INTEGER, `markAsRead` INTEGER, `userId` TEXT, `includeReplies` INTEGER, `query` TEXT, `host` TEXT, `antennaId` TEXT, `channelId` TEXT, `clipId` TEXT, `excludeReplies` INTEGER, `excludeReposts` INTEGER, `excludeIfExistsSensitiveMedia` INTEGER)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`accountId` INTEGER NOT NULL, `title` TEXT NOT NULL, `weight` INTEGER NOT NULL, `isSavePagePosition` INTEGER, `attachedAccountId` INTEGER, `pageId` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `type` TEXT NOT NULL, `withFiles` INTEGER, `excludeNsfw` INTEGER, `includeLocalRenotes` INTEGER, `includeMyRenotes` INTEGER, `includeRenotedMyRenotes` INTEGER, `listId` TEXT, `following` INTEGER, `visibility` TEXT, `noteId` TEXT, `tag` TEXT, `reply` INTEGER, `renote` INTEGER, `poll` INTEGER, `offset` INTEGER, `markAsRead` INTEGER, `userId` TEXT, `includeReplies` INTEGER, `query` TEXT, `host` TEXT, `antennaId` TEXT, `channelId` TEXT, `clipId` TEXT, `excludeReplies` INTEGER, `excludeReposts` INTEGER)",
         "fields": [
           {
             "fieldPath": "accountId",
@@ -660,12 +660,6 @@
           {
             "fieldPath": "pageParams.excludeReposts",
             "columnName": "excludeReposts",
-            "affinity": "INTEGER",
-            "notNull": false
-          },
-          {
-            "fieldPath": "pageParams.excludeIfExistsSensitiveMedia",
-            "columnName": "excludeIfExistsSensitiveMedia",
             "affinity": "INTEGER",
             "notNull": false
           }
@@ -3271,7 +3265,7 @@
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '9257b02f1c5fb08f3a6b602d66676be8')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'abeea00a832ef048d99e46fb3c1751c6')"
     ]
   }
 }

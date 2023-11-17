@@ -635,7 +635,6 @@
     <string name="stop_notify_about_new_posts">Stop notify about new posts</string>
     <string name="settings_user_cache">User cache</string>
     <string name="jump_to_new_post">Jump to new post</string>
-    <string name="exclude_if_exists_sensitive_media">Exclude if exists sensitive media</string>
     <!-- reaction-acceptance -->
 
 </resources>

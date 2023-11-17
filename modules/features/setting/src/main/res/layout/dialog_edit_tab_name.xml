@@ -44,19 +44,12 @@
             android:layout_below="@id/toggleExcludeReplies"
             android:text="@string/exclude_reposts"/>
 
-        <com.google.android.material.switchmaterial.SwitchMaterial
-            android:id="@+id/toggleExcludeIfExistsSensitiveMedia"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/toggleExcludeReposts"
-            android:text="@string/exclude_if_exists_sensitive_media"/>
-
         <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/tabNameInput"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="8dp"
-                android:layout_below="@id/toggleExcludeIfExistsSensitiveMedia"
+                android:layout_below="@id/toggleExcludeReposts"
                 >
             <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/editTabName"
