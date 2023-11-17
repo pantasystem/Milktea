@@ -79,6 +79,9 @@ data class PageRecordParams(
 
     @ColumnInfo(name = "excludeReposts")
     val excludeReposts: Boolean? = null,
+
+    @ColumnInfo(name = "excludeIfExistsSensitiveMedia")
+    val excludeIfExistsSensitiveMedia: Boolean? = null,
 ) {
     fun toParams(): PageParams {
         return PageParams(
@@ -107,6 +110,7 @@ data class PageRecordParams(
             clipId = clipId,
             excludeReplies = excludeReplies,
             excludeReposts = excludeReposts,
+            excludeIfExistsSensitiveMedia = excludeIfExistsSensitiveMedia,
         )
     }
 
@@ -139,6 +143,7 @@ data class PageRecordParams(
                     clipId = clipId,
                     excludeReplies = excludeReplies,
                     excludeReposts = excludeReposts,
+                    excludeIfExistsSensitiveMedia = excludeIfExistsSensitiveMedia,
                 )
             }
         }

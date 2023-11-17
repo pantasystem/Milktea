@@ -33,6 +33,7 @@ data class PageParams(
     val clipId: String? = null,
     val excludeReplies: Boolean? = null,
     val excludeReposts: Boolean? = null,
+    val excludeIfExistsSensitiveMedia: Boolean? = null,
 ) : Serializable, Parcelable {
 
 
@@ -49,6 +50,7 @@ data class PageParams(
                         includeRenotedMyRenotes = includeRenotedMyRenotes,
                         excludeReposts = excludeReposts,
                         excludeReplies = excludeReplies,
+                        excludeIfExistsSensitiveMedia = excludeIfExistsSensitiveMedia,
                     )
                 }
                 LOCAL -> {
@@ -57,6 +59,7 @@ data class PageParams(
                         excludeNsfw = excludeNsfw,
                         excludeReplies = excludeReplies,
                         excludeReposts = excludeReposts,
+                        excludeIfExistsSensitiveMedia = excludeIfExistsSensitiveMedia,
                     )
                 }
                 SOCIAL -> {
@@ -64,7 +67,8 @@ data class PageParams(
                         withFiles = withFiles,
                         includeRenotedMyRenotes = includeRenotedMyRenotes,
                         includeMyRenotes = includeMyRenotes,
-                        includeLocalRenotes = includeLocalRenotes
+                        includeLocalRenotes = includeLocalRenotes,
+                        excludeIfExistsSensitiveMedia = excludeIfExistsSensitiveMedia,
                     )
                 }
                 GLOBAL -> {
@@ -72,6 +76,7 @@ data class PageParams(
                         withFiles = withFiles,
                         excludeReposts = excludeReposts,
                         excludeReplies = excludeReplies,
+                        excludeIfExistsSensitiveMedia = excludeIfExistsSensitiveMedia,
                     )
                 }
                 SEARCH -> {
@@ -162,6 +167,7 @@ data class PageParams(
                         isOnlyMedia = withFiles,
                         excludeReposts = excludeReposts,
                         excludeReplies = excludeReplies,
+                        excludeIfExistsSensitiveMedia = excludeIfExistsSensitiveMedia,
                     )
                 }
                 MASTODON_PUBLIC_TIMELINE -> {
@@ -169,12 +175,14 @@ data class PageParams(
                         isOnlyMedia = withFiles,
                         excludeReposts = excludeReposts,
                         excludeReplies = excludeReplies,
+                        excludeIfExistsSensitiveMedia = excludeIfExistsSensitiveMedia,
                     )
                 }
                 MASTODON_HOME_TIMELINE -> {
                     Pageable.Mastodon.HomeTimeline(
                         excludeReposts = excludeReposts,
                         excludeReplies = excludeReplies,
+                        excludeIfExistsSensitiveMedia = excludeIfExistsSensitiveMedia,
                     )
                 }
                 MASTODON_LIST_TIMELINE -> {
