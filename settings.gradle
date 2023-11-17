@@ -16,8 +16,8 @@ dependencyResolutionManagement {
             bundle("compose-foundation", ["compose-foundation-foundation"])
 
             library("compose-material-material", "androidx.compose.material:material:1.3.3")
-            library("compose-material-material-icons-core", "androidx.compose.material:material-icons-core:1.5.4")
-            library("compose-material-material-icons-extended", "androidx.compose.material:material-icons-extended:1.5.4")
+            library("compose-material-material-icons-core", "androidx.compose.material:material-icons-core:1.5.3")
+            library("compose-material-material-icons-extended", "androidx.compose.material:material-icons-extended:1.5.3")
             bundle("compose-material", ["compose-material-material", "compose-material-material-icons-core", "compose-material-material-icons-extended"])
 
             library("compose-ui-ui-test-junit4", "androidx.compose.ui:ui-test-junit4:1.3.3")
