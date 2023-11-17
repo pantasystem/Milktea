@@ -638,6 +638,7 @@
 
     <string name="settings_user_cache">ユーザキャッシュ</string>
     <string name="jump_to_new_post">新着投稿を表示</string>
+    <string name="exclude_if_exists_sensitive_media">Exclude if exists sensitive media</string>
 
 
 </resources>
