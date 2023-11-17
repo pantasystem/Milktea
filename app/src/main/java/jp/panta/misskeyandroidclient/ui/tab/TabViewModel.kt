@@ -54,6 +54,6 @@ class TabViewModel @Inject constructor(
 }
 
 sealed interface CurrentAccountInstanceInfoUrl {
-    object Invisible : CurrentAccountInstanceInfoUrl
+    data object Invisible : CurrentAccountInstanceInfoUrl
     data class Visible(val host: String) : CurrentAccountInstanceInfoUrl
 }

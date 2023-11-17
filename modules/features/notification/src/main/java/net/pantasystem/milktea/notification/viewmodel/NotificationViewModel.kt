@@ -249,7 +249,7 @@ sealed interface NotificationListItem {
         val notificationViewData: NotificationViewData
     ) : NotificationListItem
 
-    object Loading : NotificationListItem
+    data object Loading : NotificationListItem
 
     data class Error(val throwable: Throwable) : NotificationListItem {
 
@@ -269,7 +269,7 @@ sealed interface NotificationListItem {
         }
     }
 
-    object Empty : NotificationListItem
+    data object Empty : NotificationListItem
 }
 
 fun PageableState<List<NotificationViewData>>.toList(): List<NotificationListItem> {

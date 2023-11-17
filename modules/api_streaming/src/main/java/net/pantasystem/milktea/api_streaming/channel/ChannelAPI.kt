@@ -25,12 +25,12 @@ class ChannelAPI(
 
 
     sealed interface Type {
-        object Main : Type
-        object Home : Type
-        object Local : Type
-        object Hybrid : Type
-        object Global : Type
-        object RecommendedTimeline : Type
+        data object Main : Type
+        data object Home : Type
+        data object Local : Type
+        data object Hybrid : Type
+        data object Global : Type
+        data object RecommendedTimeline : Type
         data class UserList(
             val userListId: String
         ) : Type

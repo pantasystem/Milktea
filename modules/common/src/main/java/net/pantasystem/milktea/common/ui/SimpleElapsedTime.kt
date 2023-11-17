@@ -10,8 +10,8 @@ sealed interface TimeUnit {
     data class Hour(val value: Long) : TimeUnit
     data class Minute(val value: Long) : TimeUnit
     data class Second(val value: Long) : TimeUnit
-    object Now : TimeUnit
-    object Future : TimeUnit
+    data object Now : TimeUnit
+    data object Future : TimeUnit
 }
 
 object SimpleElapsedTime {

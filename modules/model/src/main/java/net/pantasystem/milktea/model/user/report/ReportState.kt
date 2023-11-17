@@ -12,7 +12,7 @@ sealed interface ReportState {
         val canSend: Boolean
             get() = this.comment.isNotBlank()
     }
-    object None : ReportState
+    data object None : ReportState
 
 
     sealed interface Sending : ReportState {

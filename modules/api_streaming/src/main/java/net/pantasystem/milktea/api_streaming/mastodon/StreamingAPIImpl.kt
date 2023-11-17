@@ -5,11 +5,14 @@ import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.buffer
 import kotlinx.coroutines.flow.channelFlow
-import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 import net.pantasystem.milktea.api.mastodon.status.TootStatusDTO
 import net.pantasystem.milktea.common.Logger
-import okhttp3.*
+import okhttp3.Call
+import okhttp3.Callback
+import okhttp3.OkHttpClient
+import okhttp3.Request
+import okhttp3.Response
 import okhttp3.sse.EventSource
 import okhttp3.sse.EventSourceListener
 import okhttp3.sse.EventSources
@@ -24,11 +27,11 @@ class StreamingAPIImpl(
 
 
     private sealed interface ConnectType {
-        object LocalPublic : ConnectType
-        object Public : ConnectType
+        data object LocalPublic : ConnectType
+        data object Public : ConnectType
         data class Hashtag(val tag: String) : ConnectType
         data class UserList(val listId: String) : ConnectType
-        object User : ConnectType
+        data object User : ConnectType
     }
 
     private fun interface StreamingEventHandler {

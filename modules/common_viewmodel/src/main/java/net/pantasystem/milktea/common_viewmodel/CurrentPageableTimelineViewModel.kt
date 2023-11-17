@@ -9,9 +9,9 @@ import net.pantasystem.milktea.model.account.page.Pageable
 import javax.inject.Inject
 
 sealed interface SuitableType {
-    object Gallery : SuitableType
+    data object Gallery : SuitableType
     data class Channel(val channelId: String) : SuitableType
-    object Other : SuitableType
+    data object Other : SuitableType
 
     companion object
 }
@@ -55,5 +55,5 @@ class CurrentPageableTimelineViewModel @Inject constructor(
 
 sealed interface CurrentPageType {
     data class Page(val accountId: Long?, val pageable: Pageable, val pageId: Long?) : CurrentPageType
-    object Account : CurrentPageType
+    data object Account : CurrentPageType
 }
