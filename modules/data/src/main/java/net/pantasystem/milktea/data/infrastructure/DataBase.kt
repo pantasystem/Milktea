@@ -133,7 +133,7 @@ import net.pantasystem.milktea.data.infrastructure.user.renote.mute.db.RenoteMut
         CustomEmojiRecord::class,
         CustomEmojiAliasRecord::class,
     ],
-    version = 58,
+    version = 59,
     exportSchema = true,
     autoMigrations = [
         AutoMigration(from = 11, to = 12),
@@ -181,6 +181,7 @@ import net.pantasystem.milktea.data.infrastructure.user.renote.mute.db.RenoteMut
         AutoMigration(from = 54, to = 55),
         AutoMigration(from = 55, to = 56),
         AutoMigration(from = 56, to = 57),
+        AutoMigration(from = 58, to = 59),
     ],
     views = [UserView::class, GroupMemberView::class, UserListMemberView::class]
 )
