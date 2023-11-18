@@ -83,7 +83,8 @@ data class PageParams(
                     Pageable.Search(
                         query = query!!,
                         host = host,
-                        userId = userId
+                        userId = userId,
+                        excludeIfExistsSensitiveMedia = excludeIfExistsSensitiveMedia,
                     )
                 }
                 SEARCH_HASH -> {
@@ -92,7 +93,8 @@ data class PageParams(
                         reply = reply,
                         renote = renote,
                         withFiles = withFiles,
-                        poll = poll
+                        poll = poll,
+                        excludeIfExistsSensitiveMedia = excludeIfExistsSensitiveMedia,
                     )
                 }
                 USER -> {
@@ -100,7 +102,8 @@ data class PageParams(
                         userId = userId!!,
                         includeMyRenotes = includeMyRenotes,
                         includeReplies = includeReplies,
-                        withFiles = withFiles
+                        withFiles = withFiles,
+                        excludeIfExistsSensitiveMedia = excludeIfExistsSensitiveMedia,
                     )
                 }
                 FAVORITE -> {
@@ -127,12 +130,14 @@ data class PageParams(
                 MENTION -> {
                     Pageable.Mention(
                         following = following,
-                        visibility = visibility
+                        visibility = visibility,
+                        excludeIfExistsSensitiveMedia = excludeIfExistsSensitiveMedia
                     )
                 }
                 ANTENNA -> {
                     Pageable.Antenna(
-                        antennaId = antennaId!!
+                        antennaId = antennaId!!,
+                        excludeIfExistsSensitiveMedia = excludeIfExistsSensitiveMedia,
                     )
                 }
                 NOTIFICATION -> {

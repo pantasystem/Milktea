@@ -320,11 +320,23 @@ sealed class Pageable : Serializable {
 
     data class ChannelTimeline(
         val channelId: String,
-    ) : Pageable(), UntilPaginate, SincePaginate {
+        val excludeIfExistsSensitiveMedia: Boolean? = null,
+    ) : Pageable(), UntilPaginate, SincePaginate, CanExcludeIfExistsSensitiveMedia<ChannelTimeline> {
         override fun toParams(): PageParams {
             return PageParams(
                 PageType.CHANNEL_TIMELINE,
-                channelId = channelId
+                channelId = channelId,
+                excludeIfExistsSensitiveMedia = excludeIfExistsSensitiveMedia,
+            )
+        }
+
+        override fun getExcludeIfExistsSensitiveMedia(): Boolean {
+            return excludeIfExistsSensitiveMedia ?: false
+        }
+
+        override fun setExcludeIfExistsSensitiveMedia(isExcludeIfExistsSensitiveMedia: Boolean): ChannelTimeline {
+            return copy(
+                excludeIfExistsSensitiveMedia = isExcludeIfExistsSensitiveMedia
             )
         }
     }
@@ -332,14 +344,26 @@ sealed class Pageable : Serializable {
     data class Mention(
 
         val following: Boolean?,
-        val visibility: String? = null
+        val visibility: String? = null,
+        val excludeIfExistsSensitiveMedia: Boolean? = null
 
-    ) : Pageable(), UntilPaginate, SincePaginate {
+    ) : Pageable(), UntilPaginate, SincePaginate, CanExcludeIfExistsSensitiveMedia<Mention> {
         override fun toParams(): PageParams {
             return PageParams(
                 PageType.MENTION,
                 following = following,
-                visibility = visibility
+                visibility = visibility,
+                excludeIfExistsSensitiveMedia = excludeIfExistsSensitiveMedia,
+            )
+        }
+
+        override fun getExcludeIfExistsSensitiveMedia(): Boolean {
+            return excludeIfExistsSensitiveMedia ?: false
+        }
+
+        override fun setExcludeIfExistsSensitiveMedia(isExcludeIfExistsSensitiveMedia: Boolean): Mention {
+            return copy(
+                excludeIfExistsSensitiveMedia = isExcludeIfExistsSensitiveMedia
             )
         }
     }
@@ -362,9 +386,9 @@ sealed class Pageable : Serializable {
         val tag: String, var reply: Boolean? = null,
         var renote: Boolean? = null,
         var withFiles: Boolean? = null,
-        var poll: Boolean? = null
-
-    ) : Pageable(), UntilPaginate, SincePaginate, CanOnlyMedia<SearchByTag> {
+        var poll: Boolean? = null,
+        val excludeIfExistsSensitiveMedia: Boolean? = null
+    ) : Pageable(), UntilPaginate, SincePaginate, CanOnlyMedia<SearchByTag>, CanExcludeIfExistsSensitiveMedia<SearchByTag> {
         override fun toParams(): PageParams {
             return PageParams(
                 PageType.SEARCH_HASH,
@@ -372,7 +396,8 @@ sealed class Pageable : Serializable {
                 reply = reply,
                 renote = renote,
                 withFiles = withFiles,
-                poll = poll
+                poll = poll,
+                excludeIfExistsSensitiveMedia = excludeIfExistsSensitiveMedia,
             )
         }
 
@@ -386,6 +411,16 @@ sealed class Pageable : Serializable {
 
         override fun getOnlyMedia(): Boolean {
             return withFiles ?: false
+        }
+
+        override fun getExcludeIfExistsSensitiveMedia(): Boolean {
+            return excludeIfExistsSensitiveMedia ?: false
+        }
+
+        override fun setExcludeIfExistsSensitiveMedia(isExcludeIfExistsSensitiveMedia: Boolean): SearchByTag {
+            return copy(
+                excludeIfExistsSensitiveMedia = isExcludeIfExistsSensitiveMedia
+            )
         }
     }
 
@@ -422,16 +457,18 @@ sealed class Pageable : Serializable {
         val userId: String,
         var includeReplies: Boolean? = true,
         var includeMyRenotes: Boolean? = true,
-        var withFiles: Boolean? = null
+        var withFiles: Boolean? = null,
+        val excludeIfExistsSensitiveMedia: Boolean? = null
 
-    ) : Pageable(), SincePaginate, UntilPaginate, CanOnlyMedia<UserTimeline> {
+    ) : Pageable(), SincePaginate, UntilPaginate, CanOnlyMedia<UserTimeline>, CanExcludeIfExistsSensitiveMedia<UserTimeline> {
         override fun toParams(): PageParams {
             return PageParams(
                 PageType.USER,
                 includeReplies = includeReplies,
                 includeMyRenotes = includeMyRenotes,
                 withFiles = withFiles,
-                userId = userId
+                userId = userId,
+                excludeIfExistsSensitiveMedia = excludeIfExistsSensitiveMedia,
             )
         }
 
@@ -446,15 +483,26 @@ sealed class Pageable : Serializable {
         override fun getOnlyMedia(): Boolean {
             return withFiles ?: false
         }
+
+        override fun getExcludeIfExistsSensitiveMedia(): Boolean {
+            return excludeIfExistsSensitiveMedia ?: false
+        }
+
+        override fun setExcludeIfExistsSensitiveMedia(isExcludeIfExistsSensitiveMedia: Boolean): UserTimeline {
+            return copy(
+                excludeIfExistsSensitiveMedia = isExcludeIfExistsSensitiveMedia
+            )
+        }
     }
 
     data class Search(
 
         var query: String,
         var host: String? = null,
-        var userId: String? = null
+        var userId: String? = null,
+        val excludeIfExistsSensitiveMedia: Boolean? = null
 
-    ) : Pageable(), SincePaginate, UntilPaginate {
+    ) : Pageable(), SincePaginate, UntilPaginate, CanExcludeIfExistsSensitiveMedia<Search> {
         override fun toParams(): PageParams {
             return PageParams(
                 PageType.SEARCH,
@@ -463,17 +511,38 @@ sealed class Pageable : Serializable {
                 userId = userId
             )
         }
+
+        override fun getExcludeIfExistsSensitiveMedia(): Boolean {
+            return excludeIfExistsSensitiveMedia ?: false
+        }
+
+        override fun setExcludeIfExistsSensitiveMedia(isExcludeIfExistsSensitiveMedia: Boolean): Search {
+            return copy(
+                excludeIfExistsSensitiveMedia = isExcludeIfExistsSensitiveMedia
+            )
+        }
     }
 
     data class Antenna(
 
-        val antennaId: String
-
-    ) : Pageable(), UntilPaginate, SincePaginate {
+        val antennaId: String,
+        val excludeIfExistsSensitiveMedia: Boolean? = null,
+    ) : Pageable(), UntilPaginate, SincePaginate, CanExcludeIfExistsSensitiveMedia<Antenna> {
         override fun toParams(): PageParams {
             return PageParams(
                 PageType.ANTENNA,
-                antennaId = antennaId
+                antennaId = antennaId,
+                excludeIfExistsSensitiveMedia = excludeIfExistsSensitiveMedia,
+            )
+        }
+
+        override fun getExcludeIfExistsSensitiveMedia(): Boolean {
+            return excludeIfExistsSensitiveMedia ?: false
+        }
+
+        override fun setExcludeIfExistsSensitiveMedia(isExcludeIfExistsSensitiveMedia: Boolean): Antenna {
+            return copy(
+                excludeIfExistsSensitiveMedia = isExcludeIfExistsSensitiveMedia
             )
         }
     }
