@@ -166,7 +166,7 @@ data class PageParams(
                     Pageable.Gallery.MyPosts
                 }
                 CHANNEL_TIMELINE -> {
-                    Pageable.ChannelTimeline(channelId!!)
+                    Pageable.ChannelTimeline(channelId!!, excludeIfExistsSensitiveMedia = excludeIfExistsSensitiveMedia)
                 }
                 MASTODON_LOCAL_TIMELINE -> {
                     Pageable.Mastodon.LocalTimeline(
@@ -194,6 +194,7 @@ data class PageParams(
                 MASTODON_LIST_TIMELINE -> {
                     Pageable.Mastodon.ListTimeline(
                         listId = requireNotNull(listId),
+                        excludeIfExistsSensitiveMedia = excludeIfExistsSensitiveMedia,
                     )
                 }
                 MASTODON_USER_TIMELINE -> {
@@ -201,7 +202,8 @@ data class PageParams(
                         userId = requireNotNull(userId),
                         isOnlyMedia = withFiles,
                         excludeReblogs = includeMyRenotes?.not(),
-                        excludeReplies = includeReplies?.not()
+                        excludeReplies = includeReplies?.not(),
+                        excludeIfExistsSensitiveMedia = excludeIfExistsSensitiveMedia,
                     )
                 }
                 CALCKEY_RECOMMENDED_TIMELINE -> {
@@ -219,11 +221,13 @@ data class PageParams(
                     Pageable.Mastodon.SearchTimeline(
                         query = requireNotNull(query),
                         userId = userId,
+                        excludeIfExistsSensitiveMedia = excludeIfExistsSensitiveMedia,
                     )
                 }
                 MASTODON_TAG_TIMELINE -> {
                     Pageable.Mastodon.HashTagTimeline(
-                        requireNotNull(tag)
+                        requireNotNull(tag),
+                        excludeIfExistsSensitiveMedia = excludeIfExistsSensitiveMedia,
                     )
                 }
                 MASTODON_TREND_TIMELINE -> {

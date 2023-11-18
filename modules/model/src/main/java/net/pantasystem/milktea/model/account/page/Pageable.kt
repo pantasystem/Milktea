@@ -716,8 +716,8 @@ sealed class Pageable : Serializable {
             }
         }
 
-        data class HashTagTimeline(val hashtag: String, val isOnlyMedia: Boolean? = null) :
-            Mastodon(), CanOnlyMedia<HashTagTimeline>, SincePaginate, UntilPaginate {
+        data class HashTagTimeline(val hashtag: String, val isOnlyMedia: Boolean? = null, val excludeIfExistsSensitiveMedia: Boolean? = null) :
+            Mastodon(), CanOnlyMedia<HashTagTimeline>, SincePaginate, UntilPaginate, CanExcludeIfExistsSensitiveMedia<HashTagTimeline> {
             override fun toParams(): PageParams {
                 return PageParams(
                     type = PageType.MASTODON_TAG_TIMELINE,
@@ -735,13 +735,33 @@ sealed class Pageable : Serializable {
             override fun getOnlyMedia(): Boolean {
                 return isOnlyMedia ?: false
             }
+
+            override fun getExcludeIfExistsSensitiveMedia(): Boolean {
+                return excludeIfExistsSensitiveMedia ?: false
+            }
+
+            override fun setExcludeIfExistsSensitiveMedia(isExcludeIfExistsSensitiveMedia: Boolean): HashTagTimeline {
+                return copy(
+                    excludeIfExistsSensitiveMedia = isExcludeIfExistsSensitiveMedia
+                )
+            }
         }
 
-        data class ListTimeline(val listId: String) : Mastodon(), SincePaginate, UntilPaginate {
+        data class ListTimeline(val listId: String, val excludeIfExistsSensitiveMedia: Boolean? = null) : Mastodon(), SincePaginate, UntilPaginate, CanExcludeIfExistsSensitiveMedia<ListTimeline> {
             override fun toParams(): PageParams {
                 return PageParams(
                     type = PageType.MASTODON_LIST_TIMELINE,
                     listId = listId,
+                )
+            }
+
+            override fun getExcludeIfExistsSensitiveMedia(): Boolean {
+                return excludeIfExistsSensitiveMedia ?: false
+            }
+
+            override fun setExcludeIfExistsSensitiveMedia(isExcludeIfExistsSensitiveMedia: Boolean): ListTimeline {
+                return copy(
+                    excludeIfExistsSensitiveMedia = isExcludeIfExistsSensitiveMedia
                 )
             }
         }
@@ -795,7 +815,8 @@ sealed class Pageable : Serializable {
             val isOnlyMedia: Boolean? = null,
             val excludeReplies: Boolean? = null,
             val excludeReblogs: Boolean? = null,
-        ) : Mastodon(), CanOnlyMedia<UserTimeline>, SincePaginate, UntilPaginate {
+            val excludeIfExistsSensitiveMedia: Boolean? = null,
+        ) : Mastodon(), CanOnlyMedia<UserTimeline>, SincePaginate, UntilPaginate, CanExcludeIfExistsSensitiveMedia<UserTimeline> {
             override fun toParams(): PageParams {
                 return PageParams(
                     type = PageType.MASTODON_USER_TIMELINE,
@@ -813,6 +834,16 @@ sealed class Pageable : Serializable {
             override fun getOnlyMedia(): Boolean {
                 return isOnlyMedia ?: false
             }
+
+            override fun getExcludeIfExistsSensitiveMedia(): Boolean {
+                return excludeIfExistsSensitiveMedia ?: false
+            }
+
+            override fun setExcludeIfExistsSensitiveMedia(isExcludeIfExistsSensitiveMedia: Boolean): UserTimeline {
+                return copy(
+                    excludeIfExistsSensitiveMedia = isExcludeIfExistsSensitiveMedia
+                )
+            }
         }
 
         object BookmarkTimeline : Mastodon(), SincePaginate, UntilPaginate {
@@ -826,12 +857,23 @@ sealed class Pageable : Serializable {
         data class SearchTimeline(
             val query: String,
             val userId: String? = null,
-        ) : Mastodon() {
+            val excludeIfExistsSensitiveMedia: Boolean? = null,
+        ) : Mastodon(), CanExcludeIfExistsSensitiveMedia<SearchTimeline> {
             override fun toParams(): PageParams {
                 return PageParams(
                     type = PageType.MASTODON_SEARCH_TIMELINE,
                     query = query,
                     userId = userId,
+                )
+            }
+
+            override fun getExcludeIfExistsSensitiveMedia(): Boolean {
+                return excludeIfExistsSensitiveMedia ?: false
+            }
+
+            override fun setExcludeIfExistsSensitiveMedia(isExcludeIfExistsSensitiveMedia: Boolean): SearchTimeline {
+                return copy(
+                    excludeIfExistsSensitiveMedia = isExcludeIfExistsSensitiveMedia
                 )
             }
         }
