@@ -637,6 +637,7 @@
 
     <string name="confirm_display_sensitive_media_dialog_title">确认媒体显示</string>
     <string name="confirm_display_sensitive_media_dialog_message">可能会显示暴力或性内容的媒体。您确定要查看吗？</string>
-
+    <string name="confirm_display_sensitive_media_dialog_positive_button">显示</string>
+    <string name="confirm_display_sensitive_media_dialog_neutral_button">不要警告</string>
 
 </resources>

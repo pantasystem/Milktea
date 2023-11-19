@@ -644,7 +644,8 @@
 
     <string name="confirm_display_sensitive_media_dialog_title">Confirm Media Display</string>
     <string name="confirm_display_sensitive_media_dialog_message">There is a risk that violent or sexual media will be displayed. Are you sure you want to view it?</string>
-
+    <string name="confirm_display_sensitive_media_dialog_positive_button">Display</string>
+    <string name="confirm_display_sensitive_media_dialog_neutral_button">Do not warn</string>
     <!-- reaction-acceptance -->
 
 </resources>

@@ -648,5 +648,7 @@
 
     <string name="confirm_display_sensitive_media_dialog_title">メディア表示の確認</string>
     <string name="confirm_display_sensitive_media_dialog_message">暴力的、性的なメディアが表示される恐れがあります。本当に表示しますか？</string>
+    <string name="confirm_display_sensitive_media_dialog_positive_button">表示</string>
+    <string name="confirm_display_sensitive_media_dialog_neutral_button">警告を非表示</string>
 
 </resources>
