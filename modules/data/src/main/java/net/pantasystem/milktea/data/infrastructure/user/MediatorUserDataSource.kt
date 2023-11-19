@@ -16,6 +16,7 @@ import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.common.collection.LRUCache
 import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.common_android.hilt.IODispatcher
+import net.pantasystem.milktea.data.infrastructure.MemoryCacheCleaner
 import net.pantasystem.milktea.data.infrastructure.user.db.BadgeRoleRecord
 import net.pantasystem.milktea.data.infrastructure.user.db.PinnedNoteIdRecord
 import net.pantasystem.milktea.data.infrastructure.user.db.UserDao
@@ -40,12 +41,17 @@ class MediatorUserDataSource @Inject constructor(
     private val userDao: UserDao,
 //    private val inMem: InMemoryUserDataSource,
     @IODispatcher private val ioDispatcher: CoroutineDispatcher,
+    memoryCacheCleaner: MemoryCacheCleaner,
     loggerFactory: Logger.Factory
-) : UserDataSource {
+) : UserDataSource, MemoryCacheCleaner.Cleanable {
 
-    val memCache = LRUCache<User.Id, User>(50)
+    private val memCache = LRUCache<User.Id, User>(50)
 
     val logger = loggerFactory.create("MediatorUserDataSource")
+
+    init {
+        memoryCacheCleaner.register(this)
+    }
 
     override suspend fun get(userId: User.Id, isSimple: Boolean): Result<User> =
         runCancellableCatching {
@@ -583,5 +589,9 @@ class MediatorUserDataSource @Inject constructor(
             }
         )
 
+    }
+
+    override suspend fun clean() {
+        memCache.clear()
     }
 }

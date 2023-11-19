@@ -10,6 +10,7 @@ import kotlinx.coroutines.withContext
 import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.common_android.hilt.DefaultDispatcher
 import net.pantasystem.milktea.common_android.hilt.IODispatcher
+import net.pantasystem.milktea.data.infrastructure.MemoryCacheCleaner
 import net.pantasystem.milktea.model.emoji.CustomEmoji
 import net.pantasystem.milktea.model.emoji.CustomEmojiAspectRatioDataSource
 import net.pantasystem.milktea.model.emoji.CustomEmojiRepository
@@ -28,8 +29,13 @@ internal class CustomEmojiRepositoryImpl @Inject constructor(
     private val customEmojiDAO: CustomEmojiDAO,
     private val customEmojiInserter: CustomEmojiInserter,
     @IODispatcher private val ioDispatcher: CoroutineDispatcher,
-    @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher
+    @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher,
+    memoryCacheCleaner: MemoryCacheCleaner,
 ) : CustomEmojiRepository {
+
+    init {
+        memoryCacheCleaner.register(customEmojiCache)
+    }
 
     override suspend fun findBy(host: String): Result<List<CustomEmoji>> = runCancellableCatching {
         withContext(ioDispatcher) {

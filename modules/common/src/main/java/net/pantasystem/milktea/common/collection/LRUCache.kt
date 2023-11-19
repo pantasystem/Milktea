@@ -1,7 +1,7 @@
 package net.pantasystem.milktea.common.collection
 
 class LRUCache<K, V>(private val capacity: Int) {
-    val cache = linkedMapOf<K, V>()
+    private val cache = linkedMapOf<K, V>()
 
     operator fun get(key: K): V? {
         synchronized(cache) {
@@ -35,6 +35,12 @@ class LRUCache<K, V>(private val capacity: Int) {
     fun remove(key: K) {
         synchronized(cache) {
             cache.remove(key)
+        }
+    }
+
+    fun clear() {
+        synchronized(cache) {
+            cache.clear()
         }
     }
 }
