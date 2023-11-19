@@ -32,6 +32,10 @@ class LRUCache<K, V>(private val capacity: Int) {
         }
     }
 
+    operator fun set(key: K, value: V) {
+        put(key, value)
+    }
+
     fun remove(key: K) {
         synchronized(cache) {
             cache.remove(key)
