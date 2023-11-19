@@ -5,6 +5,7 @@ import android.util.Log
 import android.view.MenuItem
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -46,6 +47,11 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class SettingMovementActivity : AppCompatActivity() {
 
+    companion object {
+        const val EXTRA_HIGHLIGHT_SAFE_SEARCH = "EXTRA_HIGHLIGHT_SAFE_SEARCH"
+
+    }
+
 
     @Inject
     lateinit var accountStore: AccountStore
@@ -62,6 +68,8 @@ class SettingMovementActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         applyTheme()
+
+        val isHighlightSafeSearch = intent.getBooleanExtra(EXTRA_HIGHLIGHT_SAFE_SEARCH, false)
         setContent {
             val configState by settingStore.configState.collectAsState()
             val currentAccount by accountStore.observeCurrentAccount.collectAsState(initial = null)
@@ -144,6 +152,11 @@ class SettingMovementActivity : AppCompatActivity() {
 
                             SettingSwitchTile(
                                 checked = currentConfigState.isEnableSafeSearch.isEnabled,
+                                modifier = Modifier.then(
+                                    if (isHighlightSafeSearch)
+                                        Modifier.background(MaterialTheme.colors.primary.copy(alpha = 0.2f))
+                                    else Modifier
+                                ),
                                 onChanged = {
                                     currentConfigState =
                                         currentConfigState.copy(
