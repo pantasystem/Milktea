@@ -117,7 +117,8 @@ class SettingMovementActivity : AppCompatActivity() {
                                 onChanged = {
                                     currentConfigState =
                                         currentConfigState.copy(isIncludeLocalRenotes = it)
-                                }) {
+                                },
+                            ) {
                                 Text(text = stringResource(id = R.string.include_local_renotes))
                             }
 
@@ -126,7 +127,8 @@ class SettingMovementActivity : AppCompatActivity() {
                                 onChanged = {
                                     currentConfigState =
                                         currentConfigState.copy(isIncludeRenotedMyNotes = it)
-                                }) {
+                                },
+                            ) {
                                 Text(text = stringResource(id = R.string.include_renoted_my_notes))
                             }
 
@@ -135,8 +137,19 @@ class SettingMovementActivity : AppCompatActivity() {
                                 onChanged = {
                                     currentConfigState =
                                         currentConfigState.copy(isIncludeMyRenotes = it)
-                                }) {
+                                },
+                            ) {
                                 Text(text = stringResource(id = R.string.include_my_renotes))
+                            }
+
+                            SettingSwitchTile(
+                                checked = currentConfigState.excludeIfExistsSensitiveMedia,
+                                onChanged = {
+                                    currentConfigState =
+                                        currentConfigState.copy(excludeIfExistsSensitiveMedia = it)
+                                },
+                            ) {
+                                Text(text = stringResource(id = R.string.exclude_if_exists_sensitive_media))
                             }
                         }
 
@@ -209,9 +222,11 @@ class SettingMovementActivity : AppCompatActivity() {
                             }
                         }
                         SettingSection(title = stringResource(id = R.string.media)) {
-                            Box(modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(horizontal = 16.dp)) {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(horizontal = 16.dp)
+                            ) {
                                 var isVisibleDropdown by remember {
                                     mutableStateOf(false)
                                 }
@@ -225,7 +240,10 @@ class SettingMovementActivity : AppCompatActivity() {
                                         horizontalArrangement = Arrangement.SpaceBetween,
                                     ) {
                                         Text(stringFromDisplayMode(displayMode = currentConfigState.mediaDisplayMode))
-                                        Icon(Icons.Default.KeyboardArrowDown, contentDescription = null)
+                                        Icon(
+                                            Icons.Default.KeyboardArrowDown,
+                                            contentDescription = null
+                                        )
                                     }
                                 }
                                 DropdownMenu(
@@ -235,7 +253,8 @@ class SettingMovementActivity : AppCompatActivity() {
                                 ) {
                                     MediaDisplayMode.values().forEach {
                                         DropdownMenuItem(onClick = {
-                                            currentConfigState = currentConfigState.copy(mediaDisplayMode = it)
+                                            currentConfigState =
+                                                currentConfigState.copy(mediaDisplayMode = it)
                                             isVisibleDropdown = false
                                         }) {
                                             Text(stringFromDisplayMode(displayMode = it))
@@ -271,7 +290,7 @@ class SettingMovementActivity : AppCompatActivity() {
 
 @Composable
 private fun stringFromDisplayMode(displayMode: MediaDisplayMode): String {
-    return when(displayMode) {
+    return when (displayMode) {
         MediaDisplayMode.AUTO -> stringResource(R.string.media_display_mode_default)
         MediaDisplayMode.ALWAYS_HIDE -> stringResource(id = R.string.media_display_mode_always)
         MediaDisplayMode.ALWAYS_HIDE_WHEN_MOBILE_NETWORK -> stringResource(id = R.string.settings_hide_media_when_mobile_network)

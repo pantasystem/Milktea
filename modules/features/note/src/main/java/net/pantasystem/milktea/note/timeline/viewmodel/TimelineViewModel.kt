@@ -164,7 +164,7 @@ class TimelineViewModel @AssistedInject constructor(
             }
         })
         cache.addFilter(ExcludeRepostOrReplyFilter(pageable))
-        cache.addFilter(ExcludeIfExistsSensitiveMediaFilter(pageable))
+        cache.addFilter(ExcludeIfExistsSensitiveMediaFilter(pageable, configRepository))
 
         timelineStore.setActiveStreamingChangedListener { isActiveStreaming ->
             if (isActiveStreaming && isActive) {
