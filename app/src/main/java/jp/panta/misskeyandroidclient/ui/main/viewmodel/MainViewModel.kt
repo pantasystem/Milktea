@@ -64,6 +64,12 @@ class MainViewModel @Inject constructor(
         !(it.isEnable || it.isConfirmed)
     }.distinctUntilChanged().shareIn(viewModelScope, SharingStarted.Lazily)
 
+    val isShowEnableSafeSearchDescription = settingStore.configState.map {
+        it.isEnableSafeSearch
+    }.map {
+        !(!it.isEnabled || it.isConfirmed)
+    }.distinctUntilChanged().shareIn(viewModelScope, SharingStarted.Lazily)
+
     val isShowGoogleAnalyticsDialog = settingStore.configState.map { config ->
         !(config.isAnalyticsCollectionEnabled.isEnabled
                 || config.isAnalyticsCollectionEnabled.isConfirmed)
@@ -118,6 +124,16 @@ class MainViewModel @Inject constructor(
                 logger.error("設定状態の保存に失敗", it)
             }
 
+        }
+    }
+
+    fun onDoNotShowSafeSearchDescription() {
+        viewModelScope.launch {
+            configRepository.get().mapCancellableCatching {
+                configRepository.save(it.copy(isEnableSafeSearch = it.isEnableSafeSearch.copy(isConfirmed = true)))
+            }.onFailure {
+                logger.error("設定状態の保存に失敗", it)
+            }
         }
     }
 
