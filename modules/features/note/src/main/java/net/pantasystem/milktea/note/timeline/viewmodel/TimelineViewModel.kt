@@ -152,14 +152,6 @@ class TimelineViewModel @AssistedInject constructor(
 
         cache.addFilter(object : PlaneNoteViewDataCache.ViewDataFilter {
             override suspend fun check(viewData: PlaneNoteViewData): PlaneNoteViewData.FilterResult {
-
-                // NOTE: 将来的にセンシティブな投稿をフィルタリングするための機能を追加するための実験的なテストコード
-                if (viewData.account.remoteId == "7slno9u6re" && viewData.account.getHost() == "misskey.io") {
-                    if (viewData.note.files?.any { it.isSensitive } == true
-                        || viewData.subNote?.files?.any { it.isSensitive } == true) {
-                        return PlaneNoteViewData.FilterResult.ShouldFilterNote
-                    }
-                }
                 return timelineFilterService.filterNote(viewData).filterResult
             }
         })
