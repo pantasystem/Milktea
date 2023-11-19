@@ -197,10 +197,15 @@ object MediaPreviewHelper {
                     mediaViewData.toggleVisibility(index)
                 }
                 binding.baseFrame.setOnClickListener {
-                    noteCardActionListenerAdapter?.onSensitiveMediaPreviewClicked(
-                        mediaViewData,
-                        index
-                    )
+                    if (previewAbleFile.visibleType == PreviewAbleFile.VisibleType.SensitiveHide) {
+                        noteCardActionListenerAdapter?.onSensitiveMediaPreviewClicked(
+                            mediaViewData,
+                            index
+                        )
+                    } else {
+                        mediaViewData.show(index)
+                    }
+
                 }
 
                 if (existsView == null) {
