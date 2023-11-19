@@ -641,6 +641,11 @@
     <string name="safe_search_description_dialog_message">Safe Search has been enabled to comply with Google Play\'s User Content Policy. When Safe Search is enabled, posts containing sensitive media will not be displayed on your timeline. To disable Safe Search, go to Settings > Motion > Enable Safe Search and turn it off.</string>
     <string name="safe_search_description_dialog_positive_button">Go to Settings</string>
     <string name="safe_search_description_dialog_negative_button">Keep Safe Search enabled</string>
+
+    <string name="confirm_display_sensitive_media_dialog_title">Confirm Media Display</string>
+    <string name="confirm_display_sensitive_media_dialog_message">There is a risk that violent or sexual media will be displayed. Are you sure you want to view it?</string>
+    <string name="confirm_display_sensitive_media_dialog_positive_button">Display</string>
+    <string name="confirm_display_sensitive_media_dialog_neutral_button">Do not warn</string>
     <!-- reaction-acceptance -->
 
 </resources>

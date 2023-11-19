@@ -16,6 +16,7 @@ import net.pantasystem.milktea.model.note.reaction.Reaction
 import net.pantasystem.milktea.model.setting.ReactionPickerType
 import net.pantasystem.milktea.note.NoteDetailActivity
 import net.pantasystem.milktea.note.NoteEditorActivity
+import net.pantasystem.milktea.note.R
 import net.pantasystem.milktea.note.option.NoteOptionDialog
 import net.pantasystem.milktea.note.reaction.ReactionSelectionDialog
 import net.pantasystem.milktea.note.reaction.RemoteReactionEmojiSuggestionDialog
@@ -176,6 +177,27 @@ class NoteCardActionHandler(
                         )
                         activity.startActivity(intent, compat.toBundle())
                     }
+                }
+
+            }
+            is NoteCardAction.OnSensitiveMediaPreviewClicked -> {
+                if (settingStore.configState.value.isShowWarningDisplayingSensitiveMedia) {
+                    val dialog = MaterialAlertDialogBuilder(activity)
+                        .setTitle(R.string.confirm_display_sensitive_media_dialog_title)
+                        .setMessage(R.string.confirm_display_sensitive_media_dialog_message)
+                        .setNeutralButton(R.string.confirm_display_sensitive_media_dialog_neutral_button) { _, _ ->
+                            notesViewModel.neverShowSensitiveMediaDialog()
+                        }
+                        .setPositiveButton(R.string.confirm_display_sensitive_media_dialog_positive_button) { _, _ ->
+                            action.mediaViewData.show(action.targetIndex)
+                        }
+                        .setNegativeButton(android.R.string.cancel) { _, _ ->
+                            // do nothing
+                        }
+                        .create()
+                    dialog.show()
+                } else {
+                    action.mediaViewData.show(action.targetIndex)
                 }
 
             }

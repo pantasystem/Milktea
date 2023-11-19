@@ -94,6 +94,7 @@ data class Config(
     val avatarIconShapeType: AvatarIconShapeType,
     val mediaDisplayMode: MediaDisplayMode,
     val isEnableSafeSearch: IsSafeSearchEnabled,
+    val isShowWarningDisplayingSensitiveMedia: Boolean,
 ) {
     companion object
 
@@ -115,14 +116,7 @@ data class Config(
         )
     }
 
-    fun setSafeSearchEnabled(enabled: Boolean): Config {
-        return copy(
-            isEnableSafeSearch = IsSafeSearchEnabled(
-                isEnabled = enabled,
-                isConfirmed = true
-            )
-        )
-    }
+
 }
 
 object DefaultConfig {
@@ -169,6 +163,7 @@ object DefaultConfig {
             isEnabled = true,
             isConfirmed = false,
         ),
+        isShowWarningDisplayingSensitiveMedia = true,
     )
 
     fun getRememberVisibilityConfig(accountId: Long): RememberVisibility.Remember {

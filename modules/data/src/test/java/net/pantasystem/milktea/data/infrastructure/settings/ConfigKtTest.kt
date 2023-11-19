@@ -181,6 +181,10 @@ class ConfigKtTest {
                     config.isEnableSafeSearch.isConfirmed,
                     (u as PrefType.BoolPref).value
                 )
+                Keys.IsShowWarningDisplayingSensitiveMedia -> Assertions.assertEquals(
+                    config.isShowWarningDisplayingSensitiveMedia,
+                    (u as PrefType.BoolPref).value
+                )
             }
         }
     }
