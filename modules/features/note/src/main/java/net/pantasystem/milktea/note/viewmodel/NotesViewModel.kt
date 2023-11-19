@@ -9,6 +9,7 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
 import net.pantasystem.milktea.app_store.notes.NoteTranslationStore
 import net.pantasystem.milktea.common.Logger
+import net.pantasystem.milktea.common.mapCancellableCatching
 import net.pantasystem.milktea.common_android.resource.StringSource
 import net.pantasystem.milktea.model.note.DeleteAndEditUseCase
 import net.pantasystem.milktea.model.note.DeleteNoteUseCase
@@ -26,6 +27,7 @@ import net.pantasystem.milktea.model.note.poll.VoteUseCase
 import net.pantasystem.milktea.model.note.reaction.DeleteReactionsUseCase
 import net.pantasystem.milktea.model.note.reaction.ToggleReactionUseCase
 import net.pantasystem.milktea.model.note.repost.QuoteRenoteData
+import net.pantasystem.milktea.model.setting.LocalConfigRepository
 import net.pantasystem.milktea.model.user.report.Report
 import net.pantasystem.milktea.note.R
 import javax.inject.Inject
@@ -45,6 +47,7 @@ class NotesViewModel @Inject constructor(
     private val deleteAndEditUseCase: DeleteAndEditUseCase,
     private val deleteReactionUseCase: DeleteReactionsUseCase,
     private val voteUseCase: VoteUseCase,
+    private val configRepository: LocalConfigRepository,
     loggerFactory: Logger.Factory
 ) : ViewModel() {
     private val logger by lazy {
@@ -204,4 +207,15 @@ class NotesViewModel @Inject constructor(
         }
     }
 
+    fun neverShowSensitiveMediaDialog() {
+        viewModelScope.launch {
+            configRepository.get().mapCancellableCatching {
+                it.copy(isShowWarningDisplayingSensitiveMedia = false)
+            }.mapCancellableCatching {
+                configRepository.save(it)
+            }.onFailure {
+                logger.error("警告表示の抑制に失敗", it)
+            }
+        }
+    }
 }
