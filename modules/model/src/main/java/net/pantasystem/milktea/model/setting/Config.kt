@@ -88,7 +88,7 @@ data class Config(
     val emojiPickerEmojiDisplaySize: Int,
     val avatarIconShapeType: AvatarIconShapeType,
     val mediaDisplayMode: MediaDisplayMode,
-    val excludeIfExistsSensitiveMedia: Boolean,
+    val isEnableSafeSearch: Boolean,
 ) {
     companion object
 
@@ -151,7 +151,7 @@ object DefaultConfig {
         emojiPickerEmojiDisplaySize = 28,
         avatarIconShapeType = AvatarIconShapeType.Circle,
         mediaDisplayMode = MediaDisplayMode.AUTO,
-        excludeIfExistsSensitiveMedia = false,
+        isEnableSafeSearch = true,
     )
 
     fun getRememberVisibilityConfig(accountId: Long): RememberVisibility.Remember {

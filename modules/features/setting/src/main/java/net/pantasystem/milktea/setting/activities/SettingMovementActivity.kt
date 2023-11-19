@@ -143,10 +143,10 @@ class SettingMovementActivity : AppCompatActivity() {
                             }
 
                             SettingSwitchTile(
-                                checked = currentConfigState.excludeIfExistsSensitiveMedia,
+                                checked = currentConfigState.isEnableSafeSearch,
                                 onChanged = {
                                     currentConfigState =
-                                        currentConfigState.copy(excludeIfExistsSensitiveMedia = it)
+                                        currentConfigState.copy(isEnableSafeSearch = it)
                                 },
                             ) {
                                 Text(text = stringResource(id = R.string.exclude_if_exists_sensitive_media))

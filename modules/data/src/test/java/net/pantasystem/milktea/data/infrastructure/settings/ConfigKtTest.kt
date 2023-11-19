@@ -173,7 +173,7 @@ class ConfigKtTest {
                     (u as PrefType.IntPref).value
                 )
                 Keys.ExcludeIfExistsSensitiveMedia -> Assertions.assertEquals(
-                    config.excludeIfExistsSensitiveMedia,
+                    config.isEnableSafeSearch,
                     (u as PrefType.BoolPref).value
                 )
             }
