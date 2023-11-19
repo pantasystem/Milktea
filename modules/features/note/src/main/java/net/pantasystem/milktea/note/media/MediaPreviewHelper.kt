@@ -19,7 +19,7 @@ import net.pantasystem.milktea.common_android.platform.isWifiConnected
 import net.pantasystem.milktea.common_android.ui.MediaLayout
 import net.pantasystem.milktea.common_android.ui.VisibilityHelper.setMemoVisibility
 import net.pantasystem.milktea.model.setting.Config
-import net.pantasystem.milktea.model.setting.MediaDisplayMode
+import net.pantasystem.milktea.model.setting.DefaultConfig
 import net.pantasystem.milktea.note.R
 import net.pantasystem.milktea.note.databinding.ItemMediaPreviewBinding
 import net.pantasystem.milktea.note.media.viewmodel.MediaViewData
@@ -36,6 +36,7 @@ object MediaPreviewHelper {
         previewAbleFile: PreviewAbleFile?,
         previewAbleFileList: List<PreviewAbleFile>?,
         noteCardActionListenerAdapter: NoteCardActionListenerAdapter?,
+        config: Config?,
     ) {
 
         if (previewAbleFileList.isNullOrEmpty()) {
@@ -61,9 +62,11 @@ object MediaPreviewHelper {
         thumbnailView.setOnLongClickListener(holdListener)
 
         // NOTE: 実装の仕様上、サムネイル非表示時には親レイアウトにクリックイベントを伝播する必要がある
-        if (previewAbleFile?.visibleType == PreviewAbleFile.VisibleType.SensitiveHide
-            || (previewAbleFile?.visibleType == PreviewAbleFile.VisibleType.HideWhenMobileNetwork && previewAbleFile.isHiding)
-        ) {
+
+        if (previewAbleFile?.isHidingWithNetworkStateAndConfig(
+            isMobileNetwork = !context.isWifiConnected(),
+            mediaDisplayMode = config?.mediaDisplayMode ?: DefaultConfig.config.mediaDisplayMode
+        ) == true) {
             thumbnailView.setOnClickListener {
                 this.performClick()
             }
@@ -76,15 +79,10 @@ object MediaPreviewHelper {
     fun ImageView.setPreview(file: PreviewAbleFile?, config: Config?) {
         file ?: return
         config ?: return
-        val isHiding = when(file.visibleType) {
-            PreviewAbleFile.VisibleType.Visible -> false
-            PreviewAbleFile.VisibleType.HideWhenMobileNetwork -> {
-                if (config.mediaDisplayMode == MediaDisplayMode.ALWAYS_HIDE_WHEN_MOBILE_NETWORK) {
-                    !context.isWifiConnected()
-                } else config.mediaDisplayMode == MediaDisplayMode.ALWAYS_HIDE
-            }
-            PreviewAbleFile.VisibleType.SensitiveHide -> true
-        }
+        val isHiding = file.isHidingWithNetworkStateAndConfig(
+            isMobileNetwork = !context.isWifiConnected(),
+            mediaDisplayMode = config.mediaDisplayMode
+        )
         if (isHiding) {
             Glide.with(this)
                 .let {
@@ -116,26 +114,23 @@ object MediaPreviewHelper {
     fun TextView.setHideImageMessage(src: PreviewAbleFile?, config: Config?) {
         src ?: return
         config ?: return
-        when(src.visibleType) {
-            PreviewAbleFile.VisibleType.Visible -> {
-                this.setMemoVisibility(View.GONE)
-                return
+
+        val isHiding = src.isHidingWithNetworkStateAndConfig(
+            isMobileNetwork = !context.isWifiConnected(),
+            mediaDisplayMode = config.mediaDisplayMode
+        )
+        setMemoVisibility(
+            if (isHiding) {
+                View.VISIBLE
+            } else {
+                View.GONE
             }
-            PreviewAbleFile.VisibleType.HideWhenMobileNetwork -> {
-                this.text = context.getString(R.string.notes_media_click_to_load_image)
-                if (context.isWifiConnected()) {
-                    if (config.mediaDisplayMode == MediaDisplayMode.ALWAYS_HIDE) {
-                        this.setMemoVisibility(View.VISIBLE)
-                    } else {
-                        this.setMemoVisibility(View.GONE)
-                    }
-                } else {
-                    this.setMemoVisibility(View.VISIBLE)
-                }
-            }
-            PreviewAbleFile.VisibleType.SensitiveHide -> {
-                this.setMemoVisibility(View.VISIBLE)
+        )
+        if (isHiding) {
+            if (src.visibleType == PreviewAbleFile.VisibleType.SensitiveHide) {
                 this.text = context.getString(R.string.sensitive_content)
+            } else {
+                this.text = context.getString(R.string.notes_media_click_to_load_image)
             }
         }
     }
@@ -157,6 +152,8 @@ object MediaPreviewHelper {
             this.visibility = View.GONE
             return
         }
+
+        val isWifiConnected = context.isWifiConnected()
 
         withSuspendLayout {
             var count = this.childCount
@@ -185,6 +182,7 @@ object MediaPreviewHelper {
                     previewAbleFile,
                     previewAbleList,
                     noteCardActionListenerAdapter,
+                    mediaViewData.config,
                 )
                 binding.baseFrame.setOnClickListener {
                     if (previewAbleFile.visibleType == PreviewAbleFile.VisibleType.SensitiveHide) {
@@ -204,7 +202,9 @@ object MediaPreviewHelper {
                 binding.nsfwMessage.setHideImageMessage(previewAbleFile, mediaViewData.config)
                 binding.toggleVisibilityButton.setImageResource(if (previewAbleFile.isHiding) R.drawable.ic_baseline_image_24 else R.drawable.ic_baseline_hide_image_24)
                 binding.toggleVisibilityButton.setOnClickListener {
-                    mediaViewData.toggleVisibility(index)
+                    // NOTE: ここでのネットワークの状態はbind時のものを使う
+                    // なぜなら表示状態はbindされた時のネットワークの状態を使っているから
+                    mediaViewData.toggleVisibility(index, isMobileNetwork = !isWifiConnected, mediaDisplayMode = mediaViewData.config?.mediaDisplayMode ?: DefaultConfig.config.mediaDisplayMode)
                 }
 
                 if (existsView == null) {

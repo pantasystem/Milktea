@@ -57,15 +57,19 @@ class MediaViewData(
         }
     }
 
-    fun toggleVisibility(index: Int) {
+    fun toggleVisibility(index: Int, isMobileNetwork: Boolean, mediaDisplayMode: MediaDisplayMode) {
         _files.update {
             it.toMutableList().mapIndexed { i, previewAbleFile ->
                 if (i == index) {
                     previewAbleFile.copy(
-                        visibleType = when (previewAbleFile.visibleType) {
-                            PreviewAbleFile.VisibleType.Visible -> PreviewAbleFile.VisibleType.SensitiveHide
-                            PreviewAbleFile.VisibleType.HideWhenMobileNetwork -> PreviewAbleFile.VisibleType.Visible
-                            PreviewAbleFile.VisibleType.SensitiveHide -> PreviewAbleFile.VisibleType.Visible
+                        visibleType = if (previewAbleFile.isHidingWithNetworkStateAndConfig(
+                                isMobileNetwork = isMobileNetwork,
+                                mediaDisplayMode = mediaDisplayMode,
+                            )
+                        ) {
+                            PreviewAbleFile.VisibleType.Visible
+                        } else {
+                            PreviewAbleFile.VisibleType.SensitiveHide
                         }
                     )
                 } else {

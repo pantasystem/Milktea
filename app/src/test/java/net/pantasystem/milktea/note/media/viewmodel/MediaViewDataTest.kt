@@ -198,7 +198,7 @@ class MediaViewDataTest {
             )
         )
         val mediaViewData = MediaViewData(files, config)
-        mediaViewData.toggleVisibility(0)
+        mediaViewData.toggleVisibility(0, false, MediaDisplayMode.AUTO)
         Assertions.assertEquals(
             listOf(
                 PreviewAbleFile.VisibleType.SensitiveHide,
@@ -209,7 +209,7 @@ class MediaViewDataTest {
             mediaViewData.files.value.map { it.visibleType }
         )
 
-        mediaViewData.toggleVisibility(2)
+        mediaViewData.toggleVisibility(2, false, MediaDisplayMode.AUTO)
         Assertions.assertEquals(
             listOf(
                 PreviewAbleFile.VisibleType.SensitiveHide,
@@ -220,7 +220,7 @@ class MediaViewDataTest {
             mediaViewData.files.value.map { it.visibleType }
         )
 
-        mediaViewData.toggleVisibility(2)
+        mediaViewData.toggleVisibility(2, false, MediaDisplayMode.AUTO)
         Assertions.assertEquals(
             listOf(
                 PreviewAbleFile.VisibleType.SensitiveHide,
@@ -272,7 +272,7 @@ class MediaViewDataTest {
             )
         )
         val mediaViewData = MediaViewData(files, config)
-        mediaViewData.toggleVisibility(0)
+        mediaViewData.toggleVisibility(0, true, MediaDisplayMode.ALWAYS_HIDE_WHEN_MOBILE_NETWORK)
         Assertions.assertEquals(
             listOf(
                 PreviewAbleFile.VisibleType.Visible,
@@ -283,7 +283,7 @@ class MediaViewDataTest {
             mediaViewData.files.value.map { it.visibleType }
         )
 
-        mediaViewData.toggleVisibility(1)
+        mediaViewData.toggleVisibility(1, true, MediaDisplayMode.ALWAYS_HIDE_WHEN_MOBILE_NETWORK)
         Assertions.assertEquals(
             listOf(
                 PreviewAbleFile.VisibleType.Visible,
@@ -293,7 +293,7 @@ class MediaViewDataTest {
             ),
             mediaViewData.files.value.map { it.visibleType }
         )
-        mediaViewData.toggleVisibility(1)
+        mediaViewData.toggleVisibility(1, true, MediaDisplayMode.ALWAYS_HIDE_WHEN_MOBILE_NETWORK)
         Assertions.assertEquals(
             listOf(
                 PreviewAbleFile.VisibleType.Visible,
