@@ -306,4 +306,84 @@ class MediaViewDataTest {
 
     }
 
+    @Test
+    fun toggleVisibility_GiveConfigAsAlwaysHideWhenMobileNetworkAndNetworkIsWifi() = runTest {
+        val config = DefaultConfig.config.copy(
+            mediaDisplayMode = MediaDisplayMode.ALWAYS_HIDE_WHEN_MOBILE_NETWORK
+        )
+        val files = listOf(
+            FilePreviewSource.Remote(
+                AppFile.Remote(id = FileProperty.Id(0L, "1")),
+                FileProperty.make(
+                    id = FileProperty.Id(0L, "1"),
+                    isSensitive = true
+                ),
+            ),
+            FilePreviewSource.Remote(
+                AppFile.Remote(id = FileProperty.Id(0L, "1")),
+                FileProperty.make(
+                    id = FileProperty.Id(0L, "1"),
+                    isSensitive = false
+                ),
+            ),
+            FilePreviewSource.Remote(
+                AppFile.Remote(id = FileProperty.Id(0L, "1")),
+                FileProperty.make(
+                    id = FileProperty.Id(0L, "1"),
+                    isSensitive = false
+                ),
+            ),
+            FilePreviewSource.Remote(
+                AppFile.Remote(id = FileProperty.Id(0L, "1")),
+                FileProperty.make(
+                    id = FileProperty.Id(0L, "1"),
+                    isSensitive = false
+                ),
+            )
+        )
+        val mediaViewData = MediaViewData(files, config)
+        Assertions.assertEquals(
+            listOf(
+                PreviewAbleFile.VisibleType.SensitiveHide,
+                PreviewAbleFile.VisibleType.HideWhenMobileNetwork,
+                PreviewAbleFile.VisibleType.HideWhenMobileNetwork,
+                PreviewAbleFile.VisibleType.HideWhenMobileNetwork
+            ),
+            mediaViewData.files.value.map { it.visibleType }
+        )
+        mediaViewData.toggleVisibility(0, false, MediaDisplayMode.ALWAYS_HIDE_WHEN_MOBILE_NETWORK)
+        Assertions.assertEquals(
+            listOf(
+                PreviewAbleFile.VisibleType.Visible,
+                PreviewAbleFile.VisibleType.HideWhenMobileNetwork,
+                PreviewAbleFile.VisibleType.HideWhenMobileNetwork,
+                PreviewAbleFile.VisibleType.HideWhenMobileNetwork
+            ),
+            mediaViewData.files.value.map { it.visibleType }
+        )
+
+        mediaViewData.toggleVisibility(1, false, MediaDisplayMode.ALWAYS_HIDE_WHEN_MOBILE_NETWORK)
+        Assertions.assertEquals(
+            listOf(
+                PreviewAbleFile.VisibleType.Visible,
+                PreviewAbleFile.VisibleType.SensitiveHide,
+                PreviewAbleFile.VisibleType.HideWhenMobileNetwork,
+                PreviewAbleFile.VisibleType.HideWhenMobileNetwork
+            ),
+            mediaViewData.files.value.map { it.visibleType }
+        )
+        mediaViewData.toggleVisibility(1, false, MediaDisplayMode.ALWAYS_HIDE_WHEN_MOBILE_NETWORK)
+        Assertions.assertEquals(
+            listOf(
+                PreviewAbleFile.VisibleType.Visible,
+                PreviewAbleFile.VisibleType.Visible,
+                PreviewAbleFile.VisibleType.HideWhenMobileNetwork,
+                PreviewAbleFile.VisibleType.HideWhenMobileNetwork
+            ),
+            mediaViewData.files.value.map { it.visibleType }
+        )
+
+    }
+
+
 }
