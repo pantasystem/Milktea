@@ -36,72 +36,75 @@ val Keys.Companion.allKeys by lazy {
         Keys.EmojiPickerEmojiDisplaySize,
         Keys.AvatarIconShapeType,
         Keys.MediaDisplayMode,
+        Keys.ExcludeIfExistsSensitiveMedia,
     )
 }
 
 sealed interface Keys {
 
 
-    object IsSimpleEditorEnabled : Keys
+    data object IsSimpleEditorEnabled : Keys
 
-    object ReactionPickerType : Keys
+    data object ReactionPickerType : Keys
 
-    object BackgroundImage : Keys
-    object ClassicUI : Keys
+    data object BackgroundImage : Keys
+    data object ClassicUI : Keys
 
-    object IsUserNameDefault : Keys
+    data object IsUserNameDefault : Keys
 
-    object IsPostButtonToBottom : Keys
+    data object IsPostButtonToBottom : Keys
 
-    object NoteLimitHeight : Keys
+    data object NoteLimitHeight : Keys
 
 
-    object ThemeType : Keys
+    data object ThemeType : Keys
 
-    object IsIncludeMyRenotes : Keys
-    object IsIncludeRenotedMyNotes : Keys
-    object IsIncludeLocalRenotes : Keys
-    object SurfaceColorOpacity : Keys
-    object IsEnableTimelineScrollAnimation : Keys
-    object IsCrashlyticsCollectionEnabled : Keys
-    object IsConfirmedCrashlyticsCollection : Keys
+    data object IsIncludeMyRenotes : Keys
+    data object IsIncludeRenotedMyNotes : Keys
+    data object IsIncludeLocalRenotes : Keys
+    data object SurfaceColorOpacity : Keys
+    data object IsEnableTimelineScrollAnimation : Keys
+    data object IsCrashlyticsCollectionEnabled : Keys
+    data object IsConfirmedCrashlyticsCollection : Keys
 
-    object IsAnalyticsCollectionEnabled : Keys
-    object IsConfirmedAnalyticsCollection : Keys
+    data object IsAnalyticsCollectionEnabled : Keys
+    data object IsConfirmedAnalyticsCollection : Keys
 
-    object IsConfirmedPostNotification : Keys
+    data object IsConfirmedPostNotification : Keys
 
-    object IsEnableInstanceTicker : Keys
+    data object IsEnableInstanceTicker : Keys
 
-    object IsDriveUsingGridView : Keys
+    data object IsDriveUsingGridView : Keys
 
-    object IsEnableNotificationSound : Keys
+    data object IsEnableNotificationSound : Keys
 
-    object IsStopStreamingApiWhenBackground : Keys
+    data object IsStopStreamingApiWhenBackground : Keys
 
-    object IsStopNoteCaptureWhenBackground : Keys
+    data object IsStopNoteCaptureWhenBackground : Keys
 
-    object IsEnableStreamingAPIAndNoteCapture : Keys
+    data object IsEnableStreamingAPIAndNoteCapture : Keys
 
-    object IsEnableNoteDivider: Keys
+    data object IsEnableNoteDivider: Keys
 
-    object IsVisibleInstanceUrlInToolbar : Keys
+    data object IsVisibleInstanceUrlInToolbar : Keys
 
-    object NoteHeaderFontSize: Keys
+    data object NoteHeaderFontSize: Keys
 
-    object NoteContentFontSize: Keys
+    data object NoteContentFontSize: Keys
 
-    object IsDisplayTimestampsAsAbsoluteDates: Keys
+    data object IsDisplayTimestampsAsAbsoluteDates: Keys
 
-    object NoteReactionCounterFontSize : Keys
+    data object NoteReactionCounterFontSize : Keys
 
-    object NoteCustomEmojiScaleSizeInText : Keys
+    data object NoteCustomEmojiScaleSizeInText : Keys
 
-    object EmojiPickerEmojiDisplaySize : Keys
+    data object EmojiPickerEmojiDisplaySize : Keys
 
-    object AvatarIconShapeType : Keys
+    data object AvatarIconShapeType : Keys
 
-    object MediaDisplayMode : Keys
+    data object MediaDisplayMode : Keys
+
+    data object ExcludeIfExistsSensitiveMedia : Keys
 
     companion object
 }
@@ -142,5 +145,6 @@ fun Keys.str(): String {
         is Keys.EmojiPickerEmojiDisplaySize -> "EmojiPickerEmojiDisplaySize"
         is Keys.AvatarIconShapeType -> "AvatarIconShapeType"
         is Keys.MediaDisplayMode -> "MediaDisplayMode"
+        is Keys.ExcludeIfExistsSensitiveMedia -> "ExcludeIfExistsSensitiveMedia"
     }
 }

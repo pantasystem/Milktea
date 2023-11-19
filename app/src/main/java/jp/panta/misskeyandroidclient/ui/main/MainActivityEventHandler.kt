@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.media.AudioManager
+import android.media.Ringtone
 import android.media.RingtoneManager
 import android.os.Build
 import android.util.Log
@@ -19,9 +20,11 @@ import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.ActivityMainBinding
 import jp.panta.misskeyandroidclient.ui.main.viewmodel.MainViewModel
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import net.pantasystem.milktea.app_store.account.AccountStore
 import net.pantasystem.milktea.app_store.setting.SettingStore
 import net.pantasystem.milktea.auth.JoinMilkteaActivity
@@ -171,9 +174,6 @@ internal class MainActivityEventHandler(
     }
 
     private fun collectLatestNotifications() {
-        val uri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
-        val ringtone = RingtoneManager.getRingtone(activity, uri)
-
         // NOTE: 最新の通知をSnackBar等に表示する
         lifecycleScope.launch {
             lifecycleOwner.repeatOnLifecycle(Lifecycle.State.RESUMED) {
@@ -189,15 +189,22 @@ internal class MainActivityEventHandler(
         val audioManager = activity.getSystemService(Context.AUDIO_SERVICE) as AudioManager
 
         var replayedNotifyId: Notification.Id?
+        var ringtone: Ringtone? = null
         lifecycleScope.launch {
             lifecycleOwner.repeatOnLifecycle(Lifecycle.State.RESUMED) {
+                withContext(Dispatchers.Default) {
+                    if (ringtone == null) {
+                        val uri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
+                        ringtone = RingtoneManager.getRingtone(activity, uri)
+                    }
+                }
                 mainViewModel.newNotifications.collect {
                     replayedNotifyId = it.notification.id
                     if (replayedNotifyId == it.notification.id) {
                         return@collect
                     }
                     if (ringtone?.isPlaying == true) {
-                        ringtone.stop()
+                        ringtone?.stop()
                     }
                     if (
                         configStore.configState.value.isEnableNotificationSound

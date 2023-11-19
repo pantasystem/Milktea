@@ -9,6 +9,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import net.pantasystem.milktea.common.Logger
+import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.model.image.ImageCacheRepository
 import net.pantasystem.milktea.model.note.NoteDataSource
 import net.pantasystem.milktea.model.user.UserDataSource
@@ -28,7 +29,7 @@ class CacheSettingViewModel @Inject constructor(
 
     val uiState = _refreshEvent.map {
         CacheSettingUiState(
-            imageCacheSize = imageCacheRepository.findCachedFileCount(),
+            imageCacheSize = runCancellableCatching { imageCacheRepository.findCachedFileCount()}.getOrElse { 0L },
             noteCacheSize = noteDataSource.findLocalCount().getOrElse { 0L },
             userCacheSize = userDataSource.count().getOrElse { 0L },
         )
