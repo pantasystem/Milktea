@@ -38,6 +38,7 @@ val Keys.Companion.allKeys by lazy {
         Keys.MediaDisplayMode,
         Keys.IsSafeSearchEnabled,
         Keys.IsConfirmedSafeSearchEnabled,
+        Keys.IsShowWarningDisplayingSensitiveMedia,
     )
 }
 

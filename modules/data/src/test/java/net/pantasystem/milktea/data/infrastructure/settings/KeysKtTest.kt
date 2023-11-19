@@ -141,6 +141,10 @@ class KeysKtTest {
                     "IsConfirmedSafeSearchEnabled",
                     key.str()
                 )
+                Keys.IsShowWarningDisplayingSensitiveMedia -> Assertions.assertEquals(
+                    "IsShowWarningDisplayingSensitiveMedia",
+                    key.str()
+                )
             }
         }
     }
@@ -148,8 +152,8 @@ class KeysKtTest {
 
     @Test
     fun checkAllKeysCount() {
-        Assertions.assertEquals(36, Keys.allKeys.size)
-        Assertions.assertEquals(36, Keys.allKeys.map { it.str() }.toSet().size)
+        Assertions.assertEquals(37, Keys.allKeys.size)
+        Assertions.assertEquals(37, Keys.allKeys.map { it.str() }.toSet().size)
     }
 
 
