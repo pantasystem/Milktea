@@ -161,6 +161,9 @@ fun Config.Companion.from(map: Map<Keys, PrefType?>): Config {
                 Keys.IsConfirmedSafeSearchEnabled
             )?.value ?: DefaultConfig.config.isEnableSafeSearch.isConfirmed
         ),
+        isShowWarningDisplayingSensitiveMedia = map.getValue<PrefType.BoolPref>(
+            Keys.IsShowWarningDisplayingSensitiveMedia
+        )?.value ?: DefaultConfig.config.isShowWarningDisplayingSensitiveMedia,
     )
 }
 
@@ -315,6 +318,9 @@ fun Config.pref(key: Keys): PrefType {
         }
         Keys.IsConfirmedSafeSearchEnabled -> {
             PrefType.BoolPref(isEnableSafeSearch.isConfirmed)
+        }
+        Keys.IsShowWarningDisplayingSensitiveMedia -> {
+            PrefType.BoolPref(isShowWarningDisplayingSensitiveMedia)
         }
     }
 }

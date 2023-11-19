@@ -186,9 +186,6 @@ object MediaPreviewHelper {
                     previewAbleList,
                     noteCardActionListenerAdapter,
                 )
-                binding.baseFrame.setOnClickListener {
-                    mediaViewData.show(index)
-                }
 
                 binding.thumbnail.setPreview(previewAbleFile, mediaViewData.config)
 
@@ -198,6 +195,12 @@ object MediaPreviewHelper {
                 binding.toggleVisibilityButton.setImageResource(if (previewAbleFile.isHiding) R.drawable.ic_baseline_image_24 else R.drawable.ic_baseline_hide_image_24)
                 binding.toggleVisibilityButton.setOnClickListener {
                     mediaViewData.toggleVisibility(index)
+                }
+                binding.baseFrame.setOnClickListener {
+                    noteCardActionListenerAdapter?.onSensitiveMediaPreviewClicked(
+                        mediaViewData,
+                        index
+                    )
                 }
 
                 if (existsView == null) {

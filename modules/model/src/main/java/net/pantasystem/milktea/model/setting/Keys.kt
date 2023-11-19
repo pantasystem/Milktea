@@ -109,6 +109,8 @@ sealed interface Keys {
 
     data object IsConfirmedSafeSearchEnabled : Keys
 
+    data object IsShowWarningDisplayingSensitiveMedia : Keys
+
     companion object
 }
 
@@ -150,5 +152,6 @@ fun Keys.str(): String {
         is Keys.MediaDisplayMode -> "MediaDisplayMode"
         is Keys.IsSafeSearchEnabled -> "ExcludeIfExistsSensitiveMedia"
         is Keys.IsConfirmedSafeSearchEnabled -> "IsConfirmedSafeSearchEnabled"
+        is Keys.IsShowWarningDisplayingSensitiveMedia -> "IsShowWarningDisplayingSensitiveMedia"
     }
 }
