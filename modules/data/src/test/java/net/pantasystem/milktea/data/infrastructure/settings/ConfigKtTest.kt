@@ -172,6 +172,10 @@ class ConfigKtTest {
                     config.mediaDisplayMode.value,
                     (u as PrefType.IntPref).value
                 )
+                Keys.ExcludeIfExistsSensitiveMedia -> Assertions.assertEquals(
+                    config.excludeIfExistsSensitiveMedia,
+                    (u as PrefType.BoolPref).value
+                )
             }
         }
     }
