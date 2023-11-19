@@ -143,13 +143,17 @@ class SettingMovementActivity : AppCompatActivity() {
                             }
 
                             SettingSwitchTile(
-                                checked = currentConfigState.isEnableSafeSearch,
+                                checked = currentConfigState.isEnableSafeSearch.isEnabled,
                                 onChanged = {
                                     currentConfigState =
-                                        currentConfigState.copy(isEnableSafeSearch = it)
+                                        currentConfigState.copy(
+                                            isEnableSafeSearch = currentConfigState.isEnableSafeSearch.copy(
+                                                isEnabled = it
+                                            ),
+                                        )
                                 },
                             ) {
-                                Text(text = stringResource(id = R.string.exclude_if_exists_sensitive_media))
+                                Text(text = stringResource(id = R.string.enable_safe_search))
                             }
                         }
 

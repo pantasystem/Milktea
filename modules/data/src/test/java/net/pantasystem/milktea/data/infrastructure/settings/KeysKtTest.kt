@@ -129,8 +129,16 @@ class KeysKtTest {
                     "MediaDisplayMode",
                     key.str()
                 )
-                Keys.ExcludeIfExistsSensitiveMedia -> Assertions.assertEquals(
+                Keys.IsSafeSearchEnabled -> Assertions.assertEquals(
                     "ExcludeIfExistsSensitiveMedia",
+                    key.str()
+                )
+                Keys.IsSafeSearchEnabled -> Assertions.assertEquals(
+                    "ExcludeIfExistsSensitiveMedia",
+                    key.str()
+                )
+                Keys.IsConfirmedSafeSearchEnabled -> Assertions.assertEquals(
+                    "IsConfirmedSafeSearchEnabled",
                     key.str()
                 )
             }
@@ -140,8 +148,8 @@ class KeysKtTest {
 
     @Test
     fun checkAllKeysCount() {
-        Assertions.assertEquals(35, Keys.allKeys.size)
-        Assertions.assertEquals(35, Keys.allKeys.map { it.str() }.toSet().size)
+        Assertions.assertEquals(36, Keys.allKeys.size)
+        Assertions.assertEquals(36, Keys.allKeys.map { it.str() }.toSet().size)
     }
 
 

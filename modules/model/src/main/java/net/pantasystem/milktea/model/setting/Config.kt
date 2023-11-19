@@ -29,6 +29,11 @@ data class IsAnalyticsCollectionEnabled(
     val isConfirmed: Boolean,
 )
 
+data class IsSafeSearchEnabled(
+    val isEnabled: Boolean,
+    val isConfirmed: Boolean,
+)
+
 /**
  * @param isSimpleEditorEnabled シンプルエディターを使用するのか
  * @param reactionPickerType リアクションピッカーの種別　
@@ -88,7 +93,7 @@ data class Config(
     val emojiPickerEmojiDisplaySize: Int,
     val avatarIconShapeType: AvatarIconShapeType,
     val mediaDisplayMode: MediaDisplayMode,
-    val isEnableSafeSearch: Boolean,
+    val isEnableSafeSearch: IsSafeSearchEnabled,
 ) {
     companion object
 
@@ -104,6 +109,15 @@ data class Config(
     fun setAnalyticsCollectionEnabled(enabled: Boolean): Config {
         return copy(
             isAnalyticsCollectionEnabled = isAnalyticsCollectionEnabled.copy(
+                isEnabled = enabled,
+                isConfirmed = true
+            )
+        )
+    }
+
+    fun setSafeSearchEnabled(enabled: Boolean): Config {
+        return copy(
+            isEnableSafeSearch = IsSafeSearchEnabled(
                 isEnabled = enabled,
                 isConfirmed = true
             )
@@ -151,7 +165,10 @@ object DefaultConfig {
         emojiPickerEmojiDisplaySize = 28,
         avatarIconShapeType = AvatarIconShapeType.Circle,
         mediaDisplayMode = MediaDisplayMode.AUTO,
-        isEnableSafeSearch = true,
+        isEnableSafeSearch =IsSafeSearchEnabled(
+            isEnabled = true,
+            isConfirmed = false,
+        ),
     )
 
     fun getRememberVisibilityConfig(accountId: Long): RememberVisibility.Remember {

@@ -19,7 +19,7 @@ class ExcludeIfExistsSensitiveMediaFilter(private val pageable: Pageable, privat
         val config = configRepository.get().getOrElse { DefaultConfig.config }
 
         // 除外設定がされていない場合は何もしない
-        if (!config.isEnableSafeSearch && (pageable as? CanExcludeIfExistsSensitiveMedia<*>)?.getExcludeIfExistsSensitiveMedia() != true) {
+        if (!config.isEnableSafeSearch.isEnabled && (pageable as? CanExcludeIfExistsSensitiveMedia<*>)?.getExcludeIfExistsSensitiveMedia() != true) {
             return viewData.filterResult
         }
 

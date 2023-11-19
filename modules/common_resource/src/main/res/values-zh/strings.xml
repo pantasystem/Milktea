@@ -629,6 +629,6 @@
     <string name="settings_user_cache">User caches</string>
     <string name="jump_to_new_post">Jump to new post</string>
     <string name="exclude_if_exists_sensitive_media">Exclude if exists senstive media</string>
-
+    <string name="enable_safe_search">启用安全搜索</string>
 
 </resources>

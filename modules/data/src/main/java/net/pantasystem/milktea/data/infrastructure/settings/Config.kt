@@ -153,9 +153,14 @@ fun Config.Companion.from(map: Map<Keys, PrefType?>): Config {
         )?.value?.let { value ->
             MediaDisplayMode.values().find { it.value == value }
         } ?: DefaultConfig.config.mediaDisplayMode,
-        isEnableSafeSearch = map.getValue<PrefType.BoolPref>(
-            Keys.ExcludeIfExistsSensitiveMedia
-        )?.value ?: DefaultConfig.config.isEnableSafeSearch,
+        isEnableSafeSearch = IsSafeSearchEnabled(
+            isEnabled = map.getValue<PrefType.BoolPref>(
+                Keys.IsSafeSearchEnabled
+            )?.value ?: DefaultConfig.config.isEnableSafeSearch.isEnabled,
+            isConfirmed = map.getValue<PrefType.BoolPref>(
+                Keys.IsConfirmedSafeSearchEnabled
+            )?.value ?: DefaultConfig.config.isEnableSafeSearch.isConfirmed
+        ),
     )
 }
 
@@ -305,8 +310,11 @@ fun Config.pref(key: Keys): PrefType {
         Keys.MediaDisplayMode -> {
             PrefType.IntPref(mediaDisplayMode.value)
         }
-        Keys.ExcludeIfExistsSensitiveMedia -> {
-            PrefType.BoolPref(isEnableSafeSearch)
+        Keys.IsSafeSearchEnabled -> {
+            PrefType.BoolPref(isEnableSafeSearch.isEnabled)
+        }
+        Keys.IsConfirmedSafeSearchEnabled -> {
+            PrefType.BoolPref(isEnableSafeSearch.isConfirmed)
         }
     }
 }
