@@ -646,4 +646,7 @@
     <string name="safe_search_description_dialog_positive_button">設定へ移動する</string>
     <string name="safe_search_description_dialog_negative_button">セーフサーチを有効にしてお</string>
 
+    <string name="confirm_display_sensitive_media_dialog_title">メディア表示の確認</string>
+    <string name="confirm_display_sensitive_media_dialog_message">暴力的、性的なメディアが表示される恐れがあります。本当に表示しますか？</string>
+
 </resources>

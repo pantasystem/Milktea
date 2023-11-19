@@ -635,4 +635,8 @@
     <string name="safe_search_description_dialog_positive_button">移动到设置</string>
     <string name="safe_search_description_dialog_negative_button">保持启用安全搜索</string>
 
+    <string name="confirm_display_sensitive_media_dialog_title">确认媒体显示</string>
+    <string name="confirm_display_sensitive_media_dialog_message">可能会显示暴力或性内容的媒体。您确定要查看吗？</string>
+
+
 </resources>
