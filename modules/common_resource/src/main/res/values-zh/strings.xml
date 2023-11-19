@@ -629,6 +629,10 @@
     <string name="settings_user_cache">User caches</string>
     <string name="jump_to_new_post">Jump to new post</string>
     <string name="exclude_if_exists_sensitive_media">Exclude if exists senstive media</string>
-
+    <string name="enable_safe_search">启用安全搜索</string>
+    <string name="safe_search_description_dialog_title">安全搜索已启用</string>
+    <string name="safe_search_description_dialog_message">为遵守Google Play用户内容政策，已启用安全搜索。启用安全搜索时，包含敏感媒体的帖子将不会显示在时间线上。要禁用安全搜索，请转到设置>动作>启用安全搜索并关闭。</string>
+    <string name="safe_search_description_dialog_positive_button">移动到设置</string>
+    <string name="safe_search_description_dialog_negative_button">保持启用安全搜索</string>
 
 </resources>

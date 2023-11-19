@@ -112,16 +112,38 @@ internal class MainActivityEventHandler(
         collectRequestPostNotificationState()
         collectDraftNoteSavedEvent()
         collectCurrentPageableState()
+        collectEnableSafeSearchDescriptionState()
     }
 
     private fun collectCrashlyticsCollectionState() {
         lifecycleScope.launch {
             lifecycleOwner.repeatOnLifecycle(Lifecycle.State.RESUMED) {
                 mainViewModel.isShowFirebaseCrashlytics.collect {
-                    if (it && activity.supportFragmentManager.findFragmentByTag(ConfirmCrashlyticsDialog.FRAGMENT_TAG) == null) {
+                    if (it && activity.supportFragmentManager.findFragmentByTag(
+                            ConfirmCrashlyticsDialog.FRAGMENT_TAG
+                        ) == null
+                    ) {
                         ConfirmCrashlyticsDialog().show(
                             activity.supportFragmentManager,
                             ConfirmCrashlyticsDialog.FRAGMENT_TAG
+                        )
+                    }
+                }
+            }
+        }
+    }
+
+    private fun collectEnableSafeSearchDescriptionState() {
+        lifecycleScope.launch {
+            lifecycleOwner.repeatOnLifecycle(Lifecycle.State.RESUMED) {
+                mainViewModel.isShowEnableSafeSearchDescription.collect {
+                    if (it && activity.supportFragmentManager.findFragmentByTag(
+                            SafeSearchDescriptionDialog.TAG
+                        ) == null
+                    ) {
+                        SafeSearchDescriptionDialog().show(
+                            activity.supportFragmentManager,
+                            SafeSearchDescriptionDialog.TAG
                         )
                     }
                 }
@@ -133,7 +155,10 @@ internal class MainActivityEventHandler(
         lifecycleScope.launch {
             lifecycleOwner.repeatOnLifecycle(Lifecycle.State.RESUMED) {
                 mainViewModel.isShowGoogleAnalyticsDialog.collect {
-                    if (it && activity.supportFragmentManager.findFragmentByTag(ConfirmGoogleAnalyticsDialog.FRAGMENT_TAG) == null) {
+                    if (it && activity.supportFragmentManager.findFragmentByTag(
+                            ConfirmGoogleAnalyticsDialog.FRAGMENT_TAG
+                        ) == null
+                    ) {
                         ConfirmGoogleAnalyticsDialog().show(
                             activity.supportFragmentManager,
                             ConfirmGoogleAnalyticsDialog.FRAGMENT_TAG
@@ -318,6 +343,7 @@ internal class MainActivityEventHandler(
                     CurrentPageType.Account -> {
                         R.drawable.ic_person_add_black_24dp
                     }
+
                     is CurrentPageType.Page -> {
                         R.drawable.ic_edit_black_24dp
                     }

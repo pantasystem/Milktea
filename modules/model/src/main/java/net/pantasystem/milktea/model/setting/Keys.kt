@@ -36,7 +36,8 @@ val Keys.Companion.allKeys by lazy {
         Keys.EmojiPickerEmojiDisplaySize,
         Keys.AvatarIconShapeType,
         Keys.MediaDisplayMode,
-        Keys.ExcludeIfExistsSensitiveMedia,
+        Keys.IsSafeSearchEnabled,
+        Keys.IsConfirmedSafeSearchEnabled,
     )
 }
 
@@ -104,7 +105,9 @@ sealed interface Keys {
 
     data object MediaDisplayMode : Keys
 
-    data object ExcludeIfExistsSensitiveMedia : Keys
+    data object IsSafeSearchEnabled : Keys
+
+    data object IsConfirmedSafeSearchEnabled : Keys
 
     companion object
 }
@@ -145,6 +148,7 @@ fun Keys.str(): String {
         is Keys.EmojiPickerEmojiDisplaySize -> "EmojiPickerEmojiDisplaySize"
         is Keys.AvatarIconShapeType -> "AvatarIconShapeType"
         is Keys.MediaDisplayMode -> "MediaDisplayMode"
-        is Keys.ExcludeIfExistsSensitiveMedia -> "ExcludeIfExistsSensitiveMedia"
+        is Keys.IsSafeSearchEnabled -> "ExcludeIfExistsSensitiveMedia"
+        is Keys.IsConfirmedSafeSearchEnabled -> "IsConfirmedSafeSearchEnabled"
     }
 }

@@ -639,6 +639,11 @@
     <string name="settings_user_cache">ユーザキャッシュ</string>
     <string name="jump_to_new_post">新着投稿を表示</string>
     <string name="exclude_if_exists_sensitive_media">センシティブなメディアを含む投稿を除外</string>
+    <string name="enable_safe_search">セーフサーチを有効にする</string>
 
+    <string name="safe_search_description_dialog_title">セーフサーチが有効になっています</string>
+    <string name="safe_search_description_dialog_message">Gogole Playのユーザコンテンツポリシーに準拠するためにセーフサーチが有効になっています。セーフサーチが有効になっていると、センシティブなメディアが含まれる投稿がタイムラインに表示されなくなります。セーフサーチを無効化するには、設定>動き>セーフサーチを有効にするをOFFにしてください。</string>
+    <string name="safe_search_description_dialog_positive_button">設定へ移動する</string>
+    <string name="safe_search_description_dialog_negative_button">セーフサーチを有効にしてお</string>
 
 </resources>

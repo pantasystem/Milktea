@@ -172,8 +172,13 @@ class ConfigKtTest {
                     config.mediaDisplayMode.value,
                     (u as PrefType.IntPref).value
                 )
-                Keys.ExcludeIfExistsSensitiveMedia -> Assertions.assertEquals(
-                    config.excludeIfExistsSensitiveMedia,
+                Keys.IsSafeSearchEnabled -> Assertions.assertEquals(
+                    config.isEnableSafeSearch.isEnabled,
+                    (u as PrefType.BoolPref).value
+                )
+
+                Keys.IsConfirmedSafeSearchEnabled -> Assertions.assertEquals(
+                    config.isEnableSafeSearch.isConfirmed,
                     (u as PrefType.BoolPref).value
                 )
             }
