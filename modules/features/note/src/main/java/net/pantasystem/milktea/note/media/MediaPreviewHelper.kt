@@ -62,7 +62,7 @@ object MediaPreviewHelper {
 
         // NOTE: 実装の仕様上、サムネイル非表示時には親レイアウトにクリックイベントを伝播する必要がある
         if (previewAbleFile?.visibleType == PreviewAbleFile.VisibleType.SensitiveHide
-            || previewAbleFile?.visibleType == PreviewAbleFile.VisibleType.HideWhenMobileNetwork
+            || (previewAbleFile?.visibleType == PreviewAbleFile.VisibleType.HideWhenMobileNetwork && previewAbleFile.isHiding)
         ) {
             thumbnailView.setOnClickListener {
                 this.performClick()
@@ -186,16 +186,6 @@ object MediaPreviewHelper {
                     previewAbleList,
                     noteCardActionListenerAdapter,
                 )
-
-                binding.thumbnail.setPreview(previewAbleFile, mediaViewData.config)
-
-                binding.actionButton.isVisible = previewAbleFile.isVisiblePlayButton
-                binding.nsfwMessage.isVisible = previewAbleFile.isHiding
-                binding.nsfwMessage.setHideImageMessage(previewAbleFile, mediaViewData.config)
-                binding.toggleVisibilityButton.setImageResource(if (previewAbleFile.isHiding) R.drawable.ic_baseline_image_24 else R.drawable.ic_baseline_hide_image_24)
-                binding.toggleVisibilityButton.setOnClickListener {
-                    mediaViewData.toggleVisibility(index)
-                }
                 binding.baseFrame.setOnClickListener {
                     if (previewAbleFile.visibleType == PreviewAbleFile.VisibleType.SensitiveHide) {
                         noteCardActionListenerAdapter?.onSensitiveMediaPreviewClicked(
@@ -205,7 +195,16 @@ object MediaPreviewHelper {
                     } else {
                         mediaViewData.show(index)
                     }
+                }
 
+                binding.thumbnail.setPreview(previewAbleFile, mediaViewData.config)
+
+                binding.actionButton.isVisible = previewAbleFile.isVisiblePlayButton
+                binding.nsfwMessage.isVisible = previewAbleFile.isHiding
+                binding.nsfwMessage.setHideImageMessage(previewAbleFile, mediaViewData.config)
+                binding.toggleVisibilityButton.setImageResource(if (previewAbleFile.isHiding) R.drawable.ic_baseline_image_24 else R.drawable.ic_baseline_hide_image_24)
+                binding.toggleVisibilityButton.setOnClickListener {
+                    mediaViewData.toggleVisibility(index)
                 }
 
                 if (existsView == null) {
