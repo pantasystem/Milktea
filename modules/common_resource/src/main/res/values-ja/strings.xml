@@ -644,7 +644,7 @@
     <string name="safe_search_description_dialog_title">セーフサーチが有効になっています</string>
     <string name="safe_search_description_dialog_message">Gogole Playのユーザコンテンツポリシーに準拠するためにセーフサーチが有効になっています。セーフサーチが有効になっていると、センシティブなメディアが含まれる投稿がタイムラインに表示されなくなります。セーフサーチを無効化するには、設定>動き>セーフサーチを有効にするをOFFにしてください。</string>
     <string name="safe_search_description_dialog_positive_button">設定へ移動する</string>
-    <string name="safe_search_description_dialog_negative_button">セーフサーチを有効にしてお</string>
+    <string name="safe_search_description_dialog_negative_button">セーフサーチを有効にしておく</string>
 
     <string name="confirm_display_sensitive_media_dialog_title">メディア表示の確認</string>
     <string name="confirm_display_sensitive_media_dialog_message">暴力的、性的なメディアが表示される恐れがあります。本当に表示しますか？</string>
