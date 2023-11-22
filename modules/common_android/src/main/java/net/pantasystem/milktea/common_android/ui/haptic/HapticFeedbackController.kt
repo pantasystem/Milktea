@@ -16,6 +16,24 @@ object HapticFeedbackController {
         }
     }
 
+    fun performLongClickHapticFeedback(view: View) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            view.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS)
+        }
+    }
+
+    fun performToggledHapticFeedback(view: View, isChecked: Boolean) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+            if (isChecked) {
+                view.performHapticFeedback(HapticFeedbackConstants.TOGGLE_ON)
+            } else {
+                view.performHapticFeedback(HapticFeedbackConstants.TOGGLE_OFF)
+            }
+        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            view.performHapticFeedback(HapticFeedbackConstants.CONTEXT_CLICK)
+        }
+    }
+
     @Suppress("DEPRECATION")
     fun performTickVibrateHapticFeedback(context: Context) {
         val vibratorManager =

@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import net.pantasystem.milktea.common.glide.GlideApp
 import net.pantasystem.milktea.common_android.ui.VisibilityHelper.setMemoVisibility
+import net.pantasystem.milktea.common_android.ui.haptic.HapticFeedbackController
 import net.pantasystem.milktea.model.note.reaction.LegacyReaction
 import net.pantasystem.milktea.note.EmojiListItemType
 import net.pantasystem.milktea.note.EmojiType
@@ -126,9 +127,11 @@ class EmojiListItemsAdapter(
                 }
             }
             binding.root.setOnClickListener {
+                HapticFeedbackController.performClickHapticFeedback(it)
                 onEmojiSelected(item)
             }
             binding.root.setOnLongClickListener {
+                HapticFeedbackController.performLongClickHapticFeedback(it)
                 onEmojiLongClicked(item)
             }
             binding.executePendingBindings()

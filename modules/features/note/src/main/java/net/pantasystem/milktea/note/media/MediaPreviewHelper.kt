@@ -205,10 +205,15 @@ object MediaPreviewHelper {
                 binding.nsfwMessage.setHideImageMessage(previewAbleFile, mediaViewData.config)
                 binding.toggleVisibilityButton.setImageResource(if (previewAbleFile.isHiding) R.drawable.ic_baseline_image_24 else R.drawable.ic_baseline_hide_image_24)
                 binding.toggleVisibilityButton.setOnClickListener {
-                    HapticFeedbackController.performClickHapticFeedback(it)
+                    val visibleState = previewAbleFile.isHidingWithNetworkStateAndConfig(
+                        isMobileNetwork = !isWifiConnected,
+                        mediaDisplayMode = mediaViewData.config?.mediaDisplayMode ?: DefaultConfig.config.mediaDisplayMode
+                    )
+
                     // NOTE: ここでのネットワークの状態はbind時のものを使う
                     // なぜなら表示状態はbindされた時のネットワークの状態を使っているから
                     mediaViewData.toggleVisibility(index, isMobileNetwork = !isWifiConnected, mediaDisplayMode = mediaViewData.config?.mediaDisplayMode ?: DefaultConfig.config.mediaDisplayMode)
+                    HapticFeedbackController.performToggledHapticFeedback(it, !visibleState)
                 }
 
                 if (existsView == null) {
