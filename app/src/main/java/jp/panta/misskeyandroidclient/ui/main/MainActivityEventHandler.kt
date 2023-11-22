@@ -213,7 +213,7 @@ internal class MainActivityEventHandler(
         }
         val audioManager = activity.getSystemService(Context.AUDIO_SERVICE) as AudioManager
 
-        var replayedNotifyId: Notification.Id?
+        var replayedNotifyId: Notification.Id? = null
         var ringtone: Ringtone? = null
         lifecycleScope.launch {
             lifecycleOwner.repeatOnLifecycle(Lifecycle.State.RESUMED) {
@@ -224,10 +224,10 @@ internal class MainActivityEventHandler(
                     }
                 }
                 mainViewModel.newNotifications.collect {
-                    replayedNotifyId = it.notification.id
                     if (replayedNotifyId == it.notification.id) {
                         return@collect
                     }
+                    replayedNotifyId = it.notification.id
                     if (ringtone?.isPlaying == true) {
                         ringtone?.stop()
                     }
