@@ -6,6 +6,7 @@ import net.pantasystem.milktea.model.note.draft.DraftNoteRepository
 import net.pantasystem.milktea.model.note.draft.DraftNoteService
 import net.pantasystem.milktea.model.setting.LocalConfigRepository
 import net.pantasystem.milktea.model.setting.RememberVisibility
+import net.pantasystem.milktea.model.statistics.InAppPostCounterRepository
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -15,6 +16,7 @@ class CreateNoteUseCase @Inject constructor(
     private val draftNoteRepository: DraftNoteRepository,
     private val settingRepository: LocalConfigRepository,
     private val draftNoteService: DraftNoteService,
+    private val inAppPostCounterRepository: InAppPostCounterRepository,
 ) : UseCase {
 
     suspend operator fun invoke(createNote: CreateNote): Result<Note> {
@@ -28,7 +30,7 @@ class CreateNoteUseCase @Inject constructor(
                 draftNoteRepository.delete(createNote.draftNoteId)
             }
             setNoteVisibility(createNote)
-
+            inAppPostCounterRepository.increment()
             return@runCancellableCatching result
         }
     }
