@@ -20,12 +20,12 @@ class InAppReviewWrapper(
 
     suspend fun showReview(activity: Activity) {
         try {
+            lastlyInAppReviewShownRepository.set(Clock.System.now())
             val request = inAppReviewManager.requestReviewFlow()
             val reviewInfo: ReviewInfo? = request.await()
             if (reviewInfo != null) {
                 inAppReviewManager.launchReviewFlow(activity, reviewInfo).await()
             }
-            lastlyInAppReviewShownRepository.set(Clock.System.now())
         } catch (e: Exception) {
             logger.error("Failed to show in-app review", e)
         }
