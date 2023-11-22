@@ -8,6 +8,7 @@ import androidx.core.animation.doOnEnd
 import androidx.core.animation.doOnStart
 import androidx.core.view.isVisible
 import androidx.databinding.BindingAdapter
+import net.pantasystem.milktea.common_android.ui.haptic.HapticFeedbackController
 import net.pantasystem.milktea.model.note.Note
 
 object CwAnimationHelper {
@@ -29,10 +30,10 @@ object CwAnimationHelper {
         this.tag = noteId.noteId
         this.setOnClickListener {
 
-            Log.d("CwAnimationHelper", "isVisible:$isVisible")
             if (animatingNoteIds.contains(noteId) || this.tag != noteId.noteId) {
                 return@setOnClickListener
             }
+            HapticFeedbackController.performToggledHapticFeedback(it, isVisible ?: false)
             val animator = if (isVisible == false) {
                 targetView!!.measure(
                     View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED),
