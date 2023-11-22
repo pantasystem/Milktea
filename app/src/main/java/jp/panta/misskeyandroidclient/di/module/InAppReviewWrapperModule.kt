@@ -11,6 +11,7 @@ import dagger.hilt.components.SingletonComponent
 import jp.panta.misskeyandroidclient.BuildConfig
 import jp.panta.misskeyandroidclient.review.InAppReviewWrapper
 import net.pantasystem.milktea.common.Logger
+import net.pantasystem.milktea.model.statistics.LastlyInAppReviewShownRepository
 import javax.inject.Singleton
 
 @Module
@@ -19,17 +20,24 @@ object InAppReviewWrapperModule {
 
     @Provides
     @Singleton
-    fun provideInAppReviewWrapper(@ApplicationContext context: Context, loggerFactory: Logger.Factory): InAppReviewWrapper {
+    fun provideInAppReviewWrapper(
+        @ApplicationContext context: Context,
+        loggerFactory: Logger.Factory,
+        lastlyInAppReviewShownRepository: LastlyInAppReviewShownRepository
+    ): InAppReviewWrapper {
         return if (BuildConfig.DEBUG) {
             InAppReviewWrapper(
                 FakeReviewManager(context),
                 loggerFactory,
+                lastlyInAppReviewShownRepository,
             )
         } else {
             InAppReviewWrapper(
                 ReviewManagerFactory.create(context),
                 loggerFactory,
-            )
+                lastlyInAppReviewShownRepository,
+
+                )
         }
     }
 }

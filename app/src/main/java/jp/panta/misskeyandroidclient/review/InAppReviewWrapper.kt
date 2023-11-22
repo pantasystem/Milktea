@@ -4,11 +4,14 @@ import android.app.Activity
 import com.google.android.play.core.review.ReviewInfo
 import com.google.android.play.core.review.ReviewManager
 import kotlinx.coroutines.tasks.await
+import kotlinx.datetime.Clock
 import net.pantasystem.milktea.common.Logger
+import net.pantasystem.milktea.model.statistics.LastlyInAppReviewShownRepository
 
 class InAppReviewWrapper(
     private val inAppReviewManager: ReviewManager,
     private val loggerFactory: Logger.Factory,
+    private val lastlyInAppReviewShownRepository: LastlyInAppReviewShownRepository
 ) {
 
     private val logger by lazy {
@@ -22,6 +25,7 @@ class InAppReviewWrapper(
             if (reviewInfo != null) {
                 inAppReviewManager.launchReviewFlow(activity, reviewInfo).await()
             }
+            lastlyInAppReviewShownRepository.set(Clock.System.now())
         } catch (e: Exception) {
             logger.error("Failed to show in-app review", e)
         }
