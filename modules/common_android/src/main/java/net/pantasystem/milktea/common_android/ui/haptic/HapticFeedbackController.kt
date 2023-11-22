@@ -7,6 +7,7 @@ import android.os.Vibrator
 import android.view.HapticFeedbackConstants
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
+import androidx.databinding.BindingAdapter
 
 object HapticFeedbackController {
 
@@ -25,9 +26,9 @@ object HapticFeedbackController {
     fun performToggledHapticFeedback(view: View, isChecked: Boolean) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
             if (isChecked) {
-                view.performHapticFeedback(HapticFeedbackConstants.TOGGLE_ON)
-            } else {
                 view.performHapticFeedback(HapticFeedbackConstants.TOGGLE_OFF)
+            } else {
+                view.performHapticFeedback(HapticFeedbackConstants.TOGGLE_ON)
             }
         } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             view.performHapticFeedback(HapticFeedbackConstants.CONTEXT_CLICK)
@@ -42,6 +43,16 @@ object HapticFeedbackController {
             VibrationEffect.createPredefined(VibrationEffect.EFFECT_TICK).let {
                 vibratorManager.vibrate(it)
             }
+        }
+    }
+
+
+    @BindingAdapter("onClickAndPerformHapticFeedback")
+    @JvmStatic
+    fun View.onClickAndPerformHapticFeedback(onClick: View.OnClickListener) {
+        setOnClickListener {
+            performClickHapticFeedback(it)
+            onClick.onClick(it)
         }
     }
 }
