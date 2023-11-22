@@ -98,6 +98,7 @@ data class MastodonAccountDTO(
                 updatedAt = null,
                 isPublicReactions = false,
                 description = note,
+                ffVisibility = null,
             ),
             related = related,
             badgeRoles = emptyList(),

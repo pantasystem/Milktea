@@ -103,6 +103,12 @@ class UserDTOEntityConverter @Inject constructor(
                         User.Field(it.name, it.value)
                     } ?: emptyList(),
                     isPublicReactions = userDTO.publicReactions ?: false,
+                    ffVisibility = when (userDTO.followFollowerVisibility) {
+                        UserDTO.FollowFollowerVisibility.Public -> User.FollowerFollowerVisibility.Public
+                        UserDTO.FollowFollowerVisibility.Followers -> User.FollowerFollowerVisibility.Followers
+                        UserDTO.FollowFollowerVisibility.Private -> User.FollowerFollowerVisibility.Private
+                        null -> null
+                    },
                 ),
                 related = User.Related(
                     isFollowing = userDTO.isFollowing ?: false,

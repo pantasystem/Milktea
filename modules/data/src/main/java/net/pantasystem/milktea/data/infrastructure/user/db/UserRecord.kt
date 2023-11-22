@@ -144,7 +144,10 @@ data class UserInfoStateRecord(
 
     @ColumnInfo(name = "userId")
     @PrimaryKey(autoGenerate = false)
-    val userId: Long
+    val userId: Long,
+
+    @ColumnInfo(name = "ffVisibility")
+    val ffVisibility: String? = null,
 ) {
     companion object {
         fun from(dbId: Long, info: User.Info): UserInfoStateRecord {
@@ -161,7 +164,13 @@ data class UserInfoStateRecord(
                 birthday = info.birthday,
                 createdAt = info.createdAt,
                 updatedAt = info.updatedAt,
-                publicReactions = info.isPublicReactions
+                publicReactions = info.isPublicReactions,
+                ffVisibility = when (info.ffVisibility) {
+                    User.FollowerFollowerVisibility.Public -> "public"
+                    User.FollowerFollowerVisibility.Followers -> "followers"
+                    User.FollowerFollowerVisibility.Private -> "private"
+                    null -> null
+                }
             )
         }
     }
@@ -364,10 +373,10 @@ data class UserEmojiRecord(
 
     fun isEqualToModel(model: CustomEmoji): Boolean {
         return name == model.name &&
-            url == model.url &&
-            uri == model.uri &&
-            aspectRatio == model.aspectRatio &&
-            cachePath == model.cachePath
+                url == model.url &&
+                uri == model.uri &&
+                aspectRatio == model.aspectRatio &&
+                cachePath == model.cachePath
     }
 }
 
@@ -376,7 +385,7 @@ fun List<UserEmojiRecord>?.isEqualToModels(models: List<CustomEmoji>): Boolean {
     if (this == null) return false
     if (size != models.size) return false
     val records = this.toSet()
-    return models.all {  model ->
+    return models.all { model ->
         records.any { record ->
             record.isEqualToModel(model)
         }
@@ -388,7 +397,7 @@ fun List<BadgeRoleRecord>?.isEqualToBadgeRoleModels(models: List<User.BadgeRole>
     if (this == null) return false
     if (size != models.size) return false
     val records = this.toSet()
-    return models.all {  model ->
+    return models.all { model ->
         records.any { record ->
             record.isEqualToModel(model)
         }
@@ -793,6 +802,12 @@ data class UserRelated(
                             User.Field(it.name, it.value)
                         } ?: emptyList(),
                         isPublicReactions = info.publicReactions ?: false,
+                        ffVisibility = when (info.ffVisibility) {
+                            "public" -> User.FollowerFollowerVisibility.Public
+                            "followers" -> User.FollowerFollowerVisibility.Followers
+                            "private" -> User.FollowerFollowerVisibility.Private
+                            else -> null
+                        },
                     )
                 },
                 related = related?.let { related ->
