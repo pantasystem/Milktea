@@ -54,7 +54,7 @@
             app:layout_constraintTop_toTopOf="parent"
             app:transitionDestinationUser="@{note.toShowNote.user}"
             tools:srcCompat="@android:drawable/sym_def_app_icon"
-
+            android:hapticFeedbackEnabled="true"
             />
 
         <TextView
@@ -123,7 +123,9 @@
             app:emojiCompatEnabled="false"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            tools:text="16分前" />
+            tools:text="16分前"
+            android:hapticFeedbackEnabled="true"
+            />
 
         <net.pantasystem.milktea.common_android.ui.AutoCollapsingLayout
             android:id="@+id/autoExpanded"
@@ -146,7 +148,7 @@
                 android:text="@string/expand"
                 app:cornerRadius="8dp"
                 app:emojiCompatEnabled="false"
-
+                android:hapticFeedbackEnabled="true"
                 />
 
             <LinearLayout
@@ -194,7 +196,9 @@
                     android:text="@string/auto_note_folding"
                     android:textColor="?attr/colorAccent"
                     app:emojiCompatEnabled="false"
-                    tools:text="展開する" />
+                    tools:text="展開する"
+                    android:hapticFeedbackEnabled="true"
+                    />
 
                 <LinearLayout
                     android:id="@+id/contentMain"
@@ -343,7 +347,9 @@
                             android:textColor="?attr/colorAccent"
 
                             android:layout_below="@id/subCw"
-                            tools:text="展開する" />
+                            tools:text="展開する"
+                            android:hapticFeedbackEnabled="true"
+                            />
 
                         <TextView
                             android:id="@+id/subNoteText"
@@ -394,7 +400,9 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toEndOf="@id/avatarIcon"
-            app:layout_constraintTop_toBottomOf="@id/autoExpanded" />
+            app:layout_constraintTop_toBottomOf="@id/autoExpanded"
+            android:hapticFeedbackEnabled="true"
+            />
 
         <com.google.android.flexbox.FlexboxLayout
             android:id="@+id/reaction_view"
@@ -421,7 +429,9 @@
             android:text="@string/show_more_reactions"
             android:visibility="@{ note.reactionCountsExpanded ? View.GONE : View.VISIBLE }"
             app:layout_constraintEnd_toEndOf="@id/reaction_view"
-            app:layout_constraintTop_toBottomOf="@id/reaction_view" />
+            app:layout_constraintTop_toBottomOf="@id/reaction_view"
+            android:hapticFeedbackEnabled="true"
+            />
 
         <TextView
             android:id="@+id/absoluteTimestamp"
@@ -439,7 +449,7 @@
             app:layout_constraintStart_toEndOf="@id/avatarIcon"
             app:layout_constraintTop_toBottomOf="@id/expandAllReactionCounts"
             tools:text="10秒前"
-
+            android:hapticFeedbackEnabled="true"
             />
 
         <!-- BEGIN 下部コントロールパネル BEGIN -->
@@ -452,6 +462,7 @@
             android:layout_marginStart="8dp"
             android:contentDescription="@string/reply_title"
             android:onClick="@{ ()-> noteCardActionListener.onReplyButtonClicked(note)}"
+            android:hapticFeedbackEnabled="true"
 
             android:padding="@dimen/note_bottom_action_icon_padding_size"
             android:scaleType="centerCrop"
@@ -499,7 +510,9 @@
             app:layout_constraintTop_toBottomOf="@id/absoluteTimestamp"
             app:notesViewModelForClickRenote="@{noteCardActionListener}"
             app:srcCompat="@drawable/ic_re_note"
-            tools:ignore="TouchTargetSizeCheck" />
+            tools:ignore="TouchTargetSizeCheck"
+            android:hapticFeedbackEnabled="true"
+            />
 
         <TextView
             android:id="@+id/renoteCountView"
@@ -538,6 +551,7 @@
             app:layout_constraintStart_toEndOf="@id/renoteCountView"
             app:layout_constraintEnd_toStartOf="@id/mastodonFavoriteCountView"
             app:layout_constraintTop_toBottomOf="@id/absoluteTimestamp"
+            android:hapticFeedbackEnabled="true"
 
             />
 
@@ -580,7 +594,9 @@
 
             app:tint="?attr/normalIconTint"
             tools:ignore="TouchTargetSizeCheck"
-            tools:srcCompat="@drawable/ic_add_black_24dp" />
+            tools:srcCompat="@drawable/ic_add_black_24dp"
+            android:hapticFeedbackEnabled="true"
+            />
 
 
         <TextView
@@ -617,6 +633,7 @@
             app:srcCompat="@drawable/ic_more_horiz_black_24dp"
             app:tint="?attr/normalIconTint"
             tools:ignore="TouchTargetSizeCheck"
+            android:hapticFeedbackEnabled="true"
             />
 
         <!-- END 下部コントロールパネル END -->

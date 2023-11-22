@@ -18,6 +18,7 @@ import net.pantasystem.milktea.common.glide.blurhash.BlurHashSource
 import net.pantasystem.milktea.common_android.platform.isWifiConnected
 import net.pantasystem.milktea.common_android.ui.MediaLayout
 import net.pantasystem.milktea.common_android.ui.VisibilityHelper.setMemoVisibility
+import net.pantasystem.milktea.common_android.ui.haptic.HapticFeedbackController
 import net.pantasystem.milktea.model.setting.Config
 import net.pantasystem.milktea.model.setting.DefaultConfig
 import net.pantasystem.milktea.note.R
@@ -43,6 +44,7 @@ object MediaPreviewHelper {
             return
         }
         val listener = View.OnClickListener {
+            HapticFeedbackController.performClickHapticFeedback(it)
             noteCardActionListenerAdapter?.onMediaPreviewClicked(
                 previewAbleFile = previewAbleFile,
                 files = previewAbleFileList,
@@ -185,6 +187,7 @@ object MediaPreviewHelper {
                     mediaViewData.config,
                 )
                 binding.baseFrame.setOnClickListener {
+                    HapticFeedbackController.performClickHapticFeedback(it)
                     if (previewAbleFile.visibleType == PreviewAbleFile.VisibleType.SensitiveHide) {
                         noteCardActionListenerAdapter?.onSensitiveMediaPreviewClicked(
                             mediaViewData,
@@ -202,6 +205,7 @@ object MediaPreviewHelper {
                 binding.nsfwMessage.setHideImageMessage(previewAbleFile, mediaViewData.config)
                 binding.toggleVisibilityButton.setImageResource(if (previewAbleFile.isHiding) R.drawable.ic_baseline_image_24 else R.drawable.ic_baseline_hide_image_24)
                 binding.toggleVisibilityButton.setOnClickListener {
+                    HapticFeedbackController.performClickHapticFeedback(it)
                     // NOTE: ここでのネットワークの状態はbind時のものを使う
                     // なぜなら表示状態はbindされた時のネットワークの状態を使っているから
                     mediaViewData.toggleVisibility(index, isMobileNetwork = !isWifiConnected, mediaDisplayMode = mediaViewData.config?.mediaDisplayMode ?: DefaultConfig.config.mediaDisplayMode)
