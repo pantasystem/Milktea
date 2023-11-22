@@ -123,7 +123,11 @@ data class UserDTO(
     val notifyState: String? = null,
 
     @SerialName("badgeRoles")
-    val badgeRoles: List<BadgeRoleDTO>? = null
+    val badgeRoles: List<BadgeRoleDTO>? = null,
+
+    @SerialName("ffVisibility")
+    @Transient
+    val followFollowerVisibility: FollowFollowerVisibility? = null,
 ) : Serializable {
 
     @kotlinx.serialization.Serializable
@@ -175,4 +179,9 @@ data class UserDTO(
         @SerialName("displayOrder")
         val displayOrder: Int? = null,
     )
+
+    @kotlinx.serialization.Serializable
+    enum class FollowFollowerVisibility {
+        @SerialName("public") Public, @SerialName("followers") Followers, @SerialName("private") Private,
+    }
 }
