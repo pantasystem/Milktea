@@ -167,6 +167,20 @@ class UserDetailViewModel @Inject constructor(
         renoteMuteRepository.observeOne(it.id)
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
 
+    val canVisibleFollowFollower = combine(
+        userState.filterNotNull(),
+        currentAccount.filterNotNull(),
+    ) { user, account ->
+        val isFollowing = user.related?.isFollowing ?: false
+        val isMe = user.id.id == account.remoteId
+        when(user.info.ffVisibility) {
+            User.FollowerFollowerVisibility.Public -> true
+            User.FollowerFollowerVisibility.Followers -> isMe || isFollowing
+            User.FollowerFollowerVisibility.Private -> isMe
+            null -> true
+        }
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), false)
+
 
     init {
         sync()
