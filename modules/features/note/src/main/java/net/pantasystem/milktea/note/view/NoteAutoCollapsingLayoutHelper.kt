@@ -7,6 +7,7 @@ import androidx.core.animation.doOnCancel
 import androidx.core.animation.doOnEnd
 import androidx.databinding.BindingAdapter
 import net.pantasystem.milktea.common_android.ui.AutoCollapsingLayout
+import net.pantasystem.milktea.common_android.ui.haptic.HapticFeedbackController
 
 object NoteAutoCollapsingLayoutHelper {
     @JvmStatic
@@ -20,6 +21,7 @@ object NoteAutoCollapsingLayoutHelper {
         button?.alpha = 1.0f
 
         targetButton.setOnClickListener {
+            HapticFeedbackController.performClickHapticFeedback(it)
 
             val beforeHeight = measuredHeight
 

@@ -5,6 +5,7 @@ import android.view.View
 import androidx.core.app.ActivityOptionsCompat
 import androidx.databinding.BindingAdapter
 import net.pantasystem.milktea.common_android.ui.Activities
+import net.pantasystem.milktea.common_android.ui.haptic.HapticFeedbackController
 import net.pantasystem.milktea.common_android.ui.putActivity
 import net.pantasystem.milktea.model.note.Note
 import net.pantasystem.milktea.note.NoteDetailActivity
@@ -17,6 +18,7 @@ object NoteTransitionHelper {
         transitionDestinationNote?: return
         val clicked = clickedView?: this
         clicked.setOnClickListener {
+            HapticFeedbackController.performClickHapticFeedback(it)
             val context = this.context
             val intent = NoteDetailActivity.newIntent(context, transitionDestinationNote.id)
             intent.putActivity(Activities.ACTIVITY_IN_APP)
