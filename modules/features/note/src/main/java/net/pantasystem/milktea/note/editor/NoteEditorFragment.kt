@@ -41,6 +41,7 @@ import net.pantasystem.milktea.common_android.ui.putActivity
 import net.pantasystem.milktea.common_android.ui.text.CustomEmojiTokenizer
 import net.pantasystem.milktea.common_android_ui.account.viewmodel.AccountViewModel
 import net.pantasystem.milktea.common_compose.MilkteaStyleConfigApplyAndTheme
+import net.pantasystem.milktea.common_compose.haptic.rememberHapticFeedback
 import net.pantasystem.milktea.common_navigation.*
 import net.pantasystem.milktea.model.channel.Channel
 import net.pantasystem.milktea.model.drive.FileProperty
@@ -224,7 +225,8 @@ class NoteEditorFragment : Fragment(R.layout.fragment_note_editor), EmojiSelecti
         bindViewModels()
 
         val toolbarBase = getToolbarBase()
-        val alarmManager: AlarmManager = requireContext().getSystemService(Context.ALARM_SERVICE) as AlarmManager
+        val alarmManager: AlarmManager =
+            requireContext().getSystemService(Context.ALARM_SERVICE) as AlarmManager
 
         toolbarBase.apply {
             setContent {
@@ -232,6 +234,7 @@ class NoteEditorFragment : Fragment(R.layout.fragment_note_editor), EmojiSelecti
                     val currentUser by noteEditorViewModel.user.collectAsState()
                     val uiState by noteEditorViewModel.uiState.collectAsState()
                     val isPostAvailable by noteEditorViewModel.isPostAvailable.collectAsState()
+                    val feedback = rememberHapticFeedback()
                     NoteEditorToolbar(
                         currentUser = currentUser,
                         visibility = uiState.sendToState.visibility,
@@ -240,12 +243,15 @@ class NoteEditorFragment : Fragment(R.layout.fragment_note_editor), EmojiSelecti
                             it.codePointCount(0, it.length)
                         } ?: 0,
                         onNavigateUpButtonClicked = {
+                            feedback.performClickHapticFeedback()
                             finishOrConfirmSaveAsDraftOrDelete()
                         },
                         onAvatarIconClicked = {
+                            feedback.performClickHapticFeedback()
                             accountViewModel.showSwitchDialog()
                         },
                         onVisibilityButtonClicked = {
+                            feedback.performClickHapticFeedback()
                             val dialog = VisibilitySelectionDialogV2()
                             dialog.show(
                                 childFragmentManager,
@@ -253,6 +259,7 @@ class NoteEditorFragment : Fragment(R.layout.fragment_note_editor), EmojiSelecti
                             )
                         },
                         onScheduleButtonClicked = {
+                            feedback.performClickHapticFeedback()
                             if (uiState.sendToState.schedulePostAt == null) {
                                 // check alarm permission
                                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
@@ -261,7 +268,11 @@ class NoteEditorFragment : Fragment(R.layout.fragment_note_editor), EmojiSelecti
                                             .setTitle(R.string.alarm_permission_description_title)
                                             .setMessage(R.string.alarm_permission_description_message)
                                             .setPositiveButton(android.R.string.ok) { _, _ ->
-                                                startActivity(Intent(ACTION_REQUEST_SCHEDULE_EXACT_ALARM))
+                                                startActivity(
+                                                    Intent(
+                                                        ACTION_REQUEST_SCHEDULE_EXACT_ALARM
+                                                    )
+                                                )
                                             }
                                             .setNegativeButton(android.R.string.cancel) { _, _ ->
                                                 // do nothing
@@ -274,6 +285,7 @@ class NoteEditorFragment : Fragment(R.layout.fragment_note_editor), EmojiSelecti
                             noteEditorViewModel.toggleReservationAt()
                         },
                         onPostButtonClicked = {
+                            feedback.performClickHapticFeedback()
                             noteEditorViewModel.post()
                         },
                     )
@@ -340,21 +352,29 @@ class NoteEditorFragment : Fragment(R.layout.fragment_note_editor), EmojiSelecti
         binding.filePreview.apply {
             setContent {
                 MilkteaStyleConfigApplyAndTheme(configRepository = configRepository) {
-                    NoteFilePreview(noteEditorViewModel = noteEditorViewModel, onShow = {
-                        val intent = mediaNavigation.newIntent(
-                            MediaNavigationArgs.AFile(
-                                it
+                    val feedback = rememberHapticFeedback()
+                    NoteFilePreview(
+                        noteEditorViewModel = noteEditorViewModel,
+                        onShow = {
+                            feedback.performClickHapticFeedback()
+                            val intent = mediaNavigation.newIntent(
+                                MediaNavigationArgs.AFile(
+                                    it
+                                )
                             )
-                        )
-
-                        requireActivity().startActivity(intent)
-                    }, onEditFileCaptionSelectionClicked = {
-                        EditFileCaptionDialog.newInstance(it.file, it.comment ?: "")
-                            .show(childFragmentManager, EditFileCaptionDialog.FRAGMENT_TAG)
-                    }, onEditFileNameSelectionClicked = {
-                        EditFileNameDialog.newInstance(it.file, it.name)
-                            .show(childFragmentManager, EditFileNameDialog.FRAGMENT_TAG)
-                    })
+                            requireActivity().startActivity(intent)
+                        },
+                        onEditFileCaptionSelectionClicked = {
+                            feedback.performClickHapticFeedback()
+                            EditFileCaptionDialog.newInstance(it.file, it.comment ?: "")
+                                .show(childFragmentManager, EditFileCaptionDialog.FRAGMENT_TAG)
+                        },
+                        onEditFileNameSelectionClicked = {
+                            feedback.performClickHapticFeedback()
+                            EditFileNameDialog.newInstance(it.file, it.name)
+                                .show(childFragmentManager, EditFileNameDialog.FRAGMENT_TAG)
+                        },
+                    )
                 }
 
             }
@@ -363,34 +383,43 @@ class NoteEditorFragment : Fragment(R.layout.fragment_note_editor), EmojiSelecti
             MilkteaStyleConfigApplyAndTheme(configRepository = configRepository) {
                 val state by noteEditorViewModel.enableFeatures.collectAsState()
                 val uiState by noteEditorViewModel.uiState.collectAsState()
+                val feedback = rememberHapticFeedback()
                 NoteEditorUserActionMenuLayout(iconColor = getColor(color = R.attr.normalIconTint),
                     isEnableDrive = state.contains(FeatureType.Drive),
                     isCw = uiState.formState.hasCw,
                     isPoll = uiState.poll != null,
                     onPickFileFromDriveButtonClicked = {
+                        feedback.performClickHapticFeedback()
                         showDriveFileSelector()
                     },
                     onPickFileFromLocalButtonCLicked = {
+                        feedback.performClickHapticFeedback()
                         showFileManager()
                     },
                     onPickImageFromLocalButtonClicked = {
+                        feedback.performClickHapticFeedback()
                         showMultipleImagePicker()
                     },
                     onTogglePollButtonClicked = {
+                        feedback.performClickHapticFeedback()
                         noteEditorViewModel.enablePoll()
                     },
                     onSelectMentionUsersButtonClicked = {
+                        feedback.performClickHapticFeedback()
                         startMentionToSearchAndSelectUser()
                     },
                     onSelectEmojiButtonClicked = {
+                        feedback.performClickHapticFeedback()
                         CustomEmojiPickerDialog.newInstance(
                             uiState.currentAccount?.accountId
                         ).show(childFragmentManager, CustomEmojiPickerDialog.FRAGMENT_TAG)
                     },
                     onToggleCwButtonClicked = {
+                        feedback.performClickHapticFeedback()
                         noteEditorViewModel.changeCwEnabled()
                     },
                     onSelectDraftNoteButtonClicked = {
+                        feedback.performClickHapticFeedback()
                         pickDraftNoteActivityResult.launch(
                             Intent(
                                 requireActivity(),
@@ -744,7 +773,10 @@ class NoteEditorFragment : Fragment(R.layout.fragment_note_editor), EmojiSelecti
     private fun finishOrConfirmSaveAsDraftOrDelete() {
         if (noteEditorViewModel.canSaveDraft()) {
             if (childFragmentManager.findFragmentByTag(ConfirmSaveAsDraftDialog.FRAGMENT_TAG) == null) {
-                ConfirmSaveAsDraftDialog().show(childFragmentManager, ConfirmSaveAsDraftDialog.FRAGMENT_TAG)
+                ConfirmSaveAsDraftDialog().show(
+                    childFragmentManager,
+                    ConfirmSaveAsDraftDialog.FRAGMENT_TAG
+                )
             }
         } else {
             upTo()

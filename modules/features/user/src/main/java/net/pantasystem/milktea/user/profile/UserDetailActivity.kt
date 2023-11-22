@@ -32,9 +32,11 @@ import net.pantasystem.milktea.common.ui.ApplyMenuTint
 import net.pantasystem.milktea.common.ui.ApplyTheme
 import net.pantasystem.milktea.common_android.ui.Activities
 import net.pantasystem.milktea.common_android.ui.getParentActivity
+import net.pantasystem.milktea.common_android.ui.haptic.HapticFeedbackController
 import net.pantasystem.milktea.common_android_ui.PageableFragmentFactory
 import net.pantasystem.milktea.common_android_ui.UserPinnedNotesFragmentFactory
 import net.pantasystem.milktea.common_android_ui.report.ReportDialog
+import net.pantasystem.milktea.common_compose.haptic.rememberHapticFeedback
 import net.pantasystem.milktea.common_navigation.*
 import net.pantasystem.milktea.model.setting.Config
 import net.pantasystem.milktea.model.setting.LocalConfigRepository
@@ -192,11 +194,15 @@ class UserDetailActivity : AppCompatActivity() {
             setContent {
                 val userDetail by mViewModel.userState.collectAsState()
                 val isMine by mViewModel.isMine.collectAsState()
+                val feedback = rememberHapticFeedback()
                 MdcTheme {
                     FollowButton(
                         userState = userDetail?.followState,
                         isMine = isMine,
-                        onClick = { mViewModel.changeFollow() }
+                        onClick = {
+                            feedback.performClickHapticFeedback()
+                            mViewModel.changeFollow()
+                        }
                     )
                 }
             }
@@ -264,18 +270,22 @@ class UserDetailActivity : AppCompatActivity() {
         }
 
         binding.followsText.setOnClickListener {
+            HapticFeedbackController.performClickHapticFeedback(it)
             showFollowings()
         }
 
         binding.followingCounter.setOnClickListener {
+            HapticFeedbackController.performClickHapticFeedback(it)
             showFollowings()
         }
 
         binding.followersCounter.setOnClickListener {
+            HapticFeedbackController.performClickHapticFeedback(it)
             showFollowers()
         }
 
         binding.followersText.setOnClickListener {
+            HapticFeedbackController.performClickHapticFeedback(it)
             showFollowers()
         }
 
@@ -294,6 +304,7 @@ class UserDetailActivity : AppCompatActivity() {
 
 
         binding.showRemoteUser.setOnClickListener {
+            HapticFeedbackController.performClickHapticFeedback(it)
             val account = accountStore.currentAccount
             if (account != null) {
                 mViewModel.userState.value?.getProfileUrl(account)?.let {
@@ -306,6 +317,7 @@ class UserDetailActivity : AppCompatActivity() {
         }
 
         binding.showRemoteUserInRemotePage.setOnClickListener {
+            HapticFeedbackController.performClickHapticFeedback(it)
             val account = accountStore.currentAccount
             if (account != null) {
 
@@ -319,6 +331,7 @@ class UserDetailActivity : AppCompatActivity() {
         }
 
         binding.createMention.setOnClickListener {
+            HapticFeedbackController.performClickHapticFeedback(it)
             mViewModel.userState.value?.displayUserName?.let {
                 val intent = NoteEditorActivity.newBundle(this, mentions = listOf(it))
                 startActivity(intent)
@@ -328,6 +341,7 @@ class UserDetailActivity : AppCompatActivity() {
 
 
         binding.editNicknameButton.setOnClickListener {
+            HapticFeedbackController.performClickHapticFeedback(it)
             EditNicknameDialog().show(supportFragmentManager, EditNicknameDialog.FRAGMENT_TAG)
         }
 

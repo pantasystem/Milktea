@@ -15,6 +15,7 @@ import androidx.fragment.app.viewModels
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import dagger.hilt.android.AndroidEntryPoint
 import net.pantasystem.milktea.common_compose.MilkteaStyleConfigApplyAndTheme
+import net.pantasystem.milktea.common_compose.haptic.rememberHapticFeedback
 import net.pantasystem.milktea.model.account.page.Pageable
 import net.pantasystem.milktea.model.note.Note
 import net.pantasystem.milktea.model.setting.LocalConfigRepository
@@ -52,9 +53,11 @@ class NoteOptionDialog : BottomSheetDialogFragment() {
             setContent {
                 val uiState by viewModel.uiState.collectAsState()
                 MilkteaStyleConfigApplyAndTheme(configRepository = configRepository) {
+                    val feedback = rememberHapticFeedback()
                     NoteOptionDialogLayout(
                         uiState = uiState,
                         onShowDetailButtonClicked = {
+                            feedback.performClickHapticFeedback()
                             requireActivity().startActivity(
                                 NoteDetailActivity.newIntent(
                                     requireActivity(),
@@ -65,6 +68,7 @@ class NoteOptionDialog : BottomSheetDialogFragment() {
                             dismiss()
                         },
                         onCopyTextButtonClicked = {
+                            feedback.performClickHapticFeedback()
                             val clipboardManager =
                                 context?.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager?
                             if (clipboardManager == null || uiState.note == null) {
@@ -80,6 +84,7 @@ class NoteOptionDialog : BottomSheetDialogFragment() {
                             }
                         },
                         onShareButtonClicked = {
+                            feedback.performClickHapticFeedback()
                             val baseUrl = uiState.currentAccount?.normalizedInstanceUri
                             val url = "$baseUrl/notes/${it?.id?.noteId}"
                             val intent = Intent().apply {
@@ -96,27 +101,33 @@ class NoteOptionDialog : BottomSheetDialogFragment() {
                             dismiss()
                         },
                         onTranslateButtonClicked = {
+                            feedback.performClickHapticFeedback()
                             notesViewModel.translate(it)
                             dismiss()
                         },
                         onDeleteFavoriteButtonClicked = {
+                            feedback.performClickHapticFeedback()
                             notesViewModel.deleteFavorite(it)
                             dismiss()
                         },
                         onCreateFavoriteButtonClicked = {
+                            feedback.performClickHapticFeedback()
                             notesViewModel.addFavorite(uiState.noteId!!)
                             dismiss()
                         },
                         onDeleteAndEditButtonClicked = {
+                            feedback.performClickHapticFeedback()
                             notesViewModel.confirmDeleteAndEditEvent.tryEmit(it)
                             dismiss()
                         },
                         onDeleteButtonClicked = {
+                            feedback.performClickHapticFeedback()
                             notesViewModel.confirmDeletionEvent.tryEmit(it)
                             dismiss()
                         },
                         onReportButtonClicked ={
                             if (it != null) {
+                                feedback.performClickHapticFeedback()
                                 val baseUrl = uiState.currentAccount?.normalizedInstanceUri
                                 val report = it.toReport(baseUrl!!)
                                 notesViewModel.confirmReportEvent.tryEmit(report)
@@ -124,26 +135,32 @@ class NoteOptionDialog : BottomSheetDialogFragment() {
                             dismiss()
                         },
                         onCreateThreadMuteButtonClicked = {
+                            feedback.performClickHapticFeedback()
                             viewModel.createThreadMute(it)
                             dismiss()
                         },
                         onDeleteThreadMuteButtonClicked = {
+                            feedback.performClickHapticFeedback()
                             viewModel.deleteThreadMute(it)
                             dismiss()
                         },
                         onAddBookmarkButtonClicked = {
+                            feedback.performClickHapticFeedback()
                             notesViewModel.addBookmark(it)
                             dismiss()
                         },
                         onDeleteBookmarkButtonClicked = {
+                            feedback.performClickHapticFeedback()
                             notesViewModel.removeBookmark(it)
                             dismiss()
                         },
                         onShowReactionHistoryButtonClicked = {
+                            feedback.performClickHapticFeedback()
                             dismiss()
                             ReactionHistoryPagerDialog.newInstance(it).show(parentFragmentManager, ReactionHistoryPagerDialog.FRAGMENT_TAG)
                         },
                         onToggleAddNoteToClipButtonClicked = {
+                            feedback.performClickHapticFeedback()
                             dismiss()
                             ToggleAddNoteToClipDialog.newInstance(it).show(parentFragmentManager, ToggleAddNoteToClipDialog.FRAGMENT_TAG)
                         }
