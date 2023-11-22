@@ -6,6 +6,7 @@ import com.bumptech.glide.Glide
 import com.google.android.flexbox.FlexboxLayout
 import net.pantasystem.milktea.common_android.ui.FontSizeUnitConverter.setMemoFontSpSize
 import net.pantasystem.milktea.common_android.ui.VisibilityHelper.setMemoVisibility
+import net.pantasystem.milktea.common_android.ui.haptic.HapticFeedbackController
 import net.pantasystem.milktea.note.databinding.ItemReactionBinding
 import net.pantasystem.milktea.note.reaction.NoteReactionViewHelper.bindReactionCount
 import net.pantasystem.milktea.note.reaction.ReactionCountAction
@@ -65,9 +66,10 @@ class ReactionCountItemsFlexboxLayoutBinder(
                 )
             }
 
-            binding.root.setOnLongClickListener {
+            binding.root.setOnLongClickListener { view ->
                 val id = currentNote?.toShowNote?.note?.id
                 if (id != null) {
+                    HapticFeedbackController.performLongClickHapticFeedback(view)
                     reactionCountActionListener(
                         ReactionCountAction.OnLongClicked(
                             currentNote,
@@ -79,8 +81,9 @@ class ReactionCountItemsFlexboxLayoutBinder(
                     false
                 }
             }
-            binding.root.setOnClickListener {
+            binding.root.setOnClickListener { view ->
                 currentNote?.let {
+                    HapticFeedbackController.performClickHapticFeedback(view)
                     reactionCountActionListener(ReactionCountAction.OnClicked(currentNote, reactionData.reaction))
                 }
             }

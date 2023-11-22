@@ -7,6 +7,7 @@ import androidx.databinding.BindingAdapter
 import dagger.hilt.android.EntryPointAccessors
 import dagger.hilt.android.internal.managers.FragmentComponentManager
 import net.pantasystem.milktea.common_android.ui.Activities
+import net.pantasystem.milktea.common_android.ui.haptic.HapticFeedbackController
 import net.pantasystem.milktea.common_android.ui.putActivity
 import net.pantasystem.milktea.common_navigation.UserDetailNavigationArgs
 import net.pantasystem.milktea.model.user.User
@@ -18,6 +19,7 @@ object UserTransitionHelper {
     fun View.showUserDetail(user: User?){
         user?: return
         this.setOnClickListener { view ->
+            HapticFeedbackController.performClickHapticFeedback(view)
             val context = view.context
 
 

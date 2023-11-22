@@ -12,6 +12,7 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import dagger.hilt.android.AndroidEntryPoint
 import net.pantasystem.milktea.app_store.account.AccountStore
 import net.pantasystem.milktea.common_compose.MilkteaStyleConfigApplyAndTheme
+import net.pantasystem.milktea.common_compose.haptic.rememberHapticFeedback
 import net.pantasystem.milktea.model.note.Note
 import net.pantasystem.milktea.model.setting.LocalConfigRepository
 import net.pantasystem.milktea.note.viewmodel.NotesViewModel
@@ -69,30 +70,36 @@ class RenoteBottomSheetDialog : BottomSheetDialogFragment() {
             setContent {
                 MilkteaStyleConfigApplyAndTheme(configRepository = configRepository) {
                     val uiState by viewModel.uiState.collectAsState()
-
+                    val feedback = rememberHapticFeedback()
                     RenoteDialogContent(
                         uiState = uiState,
                         isRenotedByMe = isRenotedByMe,
                         onToggleAddAccount = {
+                            feedback.performClickHapticFeedback()
                             viewModel.toggleAddAccount(it)
                         },
                         onRenoteButtonClicked = {
+                            feedback.performClickHapticFeedback()
                             viewModel.renote()
                             dismiss()
                         },
                         onQuoteRenoteButtonClicked = {
+                            feedback.performClickHapticFeedback()
                             notesViewModel.showQuoteNoteEditor(noteId)
                             dismiss()
                         },
                         onRenoteInChannelButtonClicked = {
+                            feedback.performClickHapticFeedback()
                             viewModel.renoteToChannel()
                             dismiss()
                         },
                         onQuoteInChannelRenoteButtonClicked = {
+                            feedback.performClickHapticFeedback()
                             notesViewModel.showQuoteToChannelNoteEditor(noteId)
                             dismiss()
                         },
                         onDeleteRenoteButtonCLicked = {
+                            feedback.performClickHapticFeedback()
                             viewModel.unRenote()
                             dismiss()
                         },

@@ -142,7 +142,7 @@
 
                     android:layout_marginStart="5dp"
                     android:layout_marginBottom="5dp"
-                    android:onClick="@{()-> note.changeContentFolding() }"
+                    onClickAndPerformHapticFeedback="@{()-> note.changeContentFolding() }"
                     stringSource="@{note.contentFoldingStatusMessage}"
                     android:textColor="?attr/colorAccent"
                     android:visibility='@{note.cw == null ? View.GONE : View.VISIBLE }'
@@ -226,7 +226,7 @@
                         android:layout_below="@+id/url_preview_list"
                         android:layout_marginTop="3dp"
                         android:background="@drawable/shape_rounded_square_line"
-                        android:onClick="@{()-> noteCardActionListener.onNoteCardClicked(note.subNote.note)}"
+                        onClickAndPerformHapticFeedback="@{()-> noteCardActionListener.onNoteCardClicked(note.subNote.note)}"
                         android:padding="8dp"
                         android:visibility='@{note.subNote != null ? View.VISIBLE : View.GONE}'
                         app:mainNameView="@{subNoteMainName}"
@@ -285,7 +285,7 @@
                             android:layout_below="@+id/subCw"
                             android:layout_marginStart="5dp"
                             android:layout_marginBottom="5dp"
-                            android:onClick="@{()-> note.changeSubContentFolding() }"
+                            onClickAndPerformHapticFeedback="@{()-> note.changeSubContentFolding() }"
                             stringSource="@{note.subContentFoldingStatusMessage}"
                             android:textColor="?attr/colorAccent"
                             android:visibility='@{note.subCw == null ? View.GONE : View.VISIBLE }'
@@ -394,7 +394,7 @@
                         android:layout_width="@dimen/note_bottom_action_icon_size"
                         android:layout_height="@dimen/note_bottom_action_icon_size"
                         android:contentDescription="@string/reply_title"
-                        android:onClick="@{ ()-> noteCardActionListener.onReplyButtonClicked(note) }"
+                        onClickAndPerformHapticFeedback="@{ ()-> noteCardActionListener.onReplyButtonClicked(note) }"
                         android:padding="@dimen/note_bottom_action_icon_padding_size"
                         android:scaleType="centerCrop"
                         app:srcCompat="@drawable/ic_reply_black_24dp"
@@ -417,7 +417,7 @@
                         android:layout_width="@dimen/note_bottom_action_icon_size"
                         android:layout_height="@dimen/note_bottom_action_icon_size"
                         android:contentDescription="@string/renote"
-                        android:onClick="@{ ()-> noteCardActionListener.onRenoteButtonClicked(note)}"
+                        onClickAndPerformHapticFeedback="@{ ()-> noteCardActionListener.onRenoteButtonClicked(note)}"
                         android:padding="@dimen/note_bottom_action_icon_padding_size"
                         android:scaleType="centerCrop"
                         app:srcCompat="@drawable/ic_re_note"
@@ -451,7 +451,7 @@
                         favoriteButtonIcon="@{note.currentNote}"
 
                         tools:ignore="TouchTargetSizeCheck"
-                        android:onClick="@{ () -> noteCardActionListener.onFavoriteButtonClicked(note.currentNote) }"
+                        onClickAndPerformHapticFeedback="@{ () -> noteCardActionListener.onFavoriteButtonClicked(note.currentNote) }"
                         />
                 <TextView
                         android:id="@+id/mastodonFavoriteCountView"
@@ -476,7 +476,7 @@
                         android:layout_width="@dimen/note_bottom_action_icon_size"
                         android:layout_height="@dimen/note_bottom_action_icon_size"
                         android:contentDescription="@string/reaction"
-                        android:onClick="@{ ()-> noteCardActionListener.onReactionButtonClicked(note) }"
+                        onClickAndPerformHapticFeedback="@{ ()-> noteCardActionListener.onReactionButtonClicked(note) }"
                         android:padding="@dimen/note_bottom_action_icon_padding_size"
                         android:scaleType="centerCrop"
                         app:isReacted="@{!note.currentNote.canReaction}"
@@ -503,7 +503,7 @@
                         android:layout_width="@dimen/note_bottom_action_icon_size"
                         android:layout_height="@dimen/note_bottom_action_icon_size"
                         android:contentDescription="@string/more"
-                        android:onClick="@{() -> noteCardActionListener.onOptionButtonClicked(note)}"
+                        onClickAndPerformHapticFeedback="@{() -> noteCardActionListener.onOptionButtonClicked(note)}"
                         android:padding="@dimen/note_bottom_action_icon_padding_size"
                         android:scaleType="centerCrop"
                         app:srcCompat="@drawable/ic_more_horiz_black_24dp"

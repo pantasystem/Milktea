@@ -11,6 +11,7 @@ import androidx.appcompat.app.AppCompatActivity
 import dagger.hilt.android.AndroidEntryPoint
 import net.pantasystem.milktea.common.ui.ApplyTheme
 import net.pantasystem.milktea.common_compose.MilkteaStyleConfigApplyAndTheme
+import net.pantasystem.milktea.common_compose.haptic.rememberHapticFeedback
 import net.pantasystem.milktea.model.setting.LocalConfigRepository
 import net.pantasystem.milktea.model.user.User
 import net.pantasystem.milktea.user.UserCardActionHandler
@@ -62,10 +63,12 @@ class FollowFollowerActivity : AppCompatActivity() {
 
         setContent {
             MilkteaStyleConfigApplyAndTheme(configRepository = configRepository) {
+                val feedback = rememberHapticFeedback()
                 FollowFollowerRoute(
                     followFollowerViewModel = followFollowerViewModel,
                     toggleFollowViewModel = toggleFollowFollowerViewModel,
                     onCardAction = {
+                        feedback.performClickHapticFeedback()
                         UserCardActionHandler(this, toggleFollowFollowerViewModel).onAction(it)
                     },
                     onNavigateUp = {
