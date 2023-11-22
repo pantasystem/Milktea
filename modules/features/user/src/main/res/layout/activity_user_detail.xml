@@ -288,6 +288,7 @@
                                 android:layout_marginEnd="4dp"
                                 tools:text="20"
                                 android:text="@{Integer.toString(userViewModel.userState.info.followingCount)}"
+                                android:visibility="@{userViewModel.canVisibleFollowFollower ? View.VISIBLE : View.GONE}"
                                 />
                         <TextView
                                 android:id="@+id/followsText"
@@ -295,6 +296,7 @@
                                 android:layout_height="wrap_content"
                                 android:text="@string/follow"
                                 android:layout_marginEnd="8dp"
+                                android:visibility="@{userViewModel.canVisibleFollowFollower ? View.VISIBLE : View.GONE}"
                                 />
                         <TextView
                                 android:id="@+id/followersCounter"
@@ -303,12 +305,15 @@
                                 tools:text="40"
                                 android:text="@{Integer.toString(userViewModel.userState.info.followersCount)}"
                                 android:layout_marginEnd="4dp"
+                                android:visibility="@{userViewModel.canVisibleFollowFollower ? View.VISIBLE : View.GONE}"
                                 />
                         <TextView
                                 android:id="@+id/followersText"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="@string/follower"/>
+                                android:text="@string/follower"
+                                android:visibility="@{userViewModel.canVisibleFollowFollower ? View.VISIBLE : View.GONE}"
+                            />
                     </LinearLayout>
 
 

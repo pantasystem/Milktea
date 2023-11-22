@@ -164,6 +164,7 @@ sealed interface User : Entity {
         val createdAt: Instant?,
         val updatedAt: Instant?,
         val isPublicReactions: Boolean,
+        val ffVisibility: FollowerFollowerVisibility?,
     )
 
     data class Related(
@@ -205,6 +206,10 @@ sealed interface User : Entity {
         val iconUri: String?,
         val displayOrder: Int,
     )
+
+    enum class FollowerFollowerVisibility {
+        Public, Followers, Private,
+    }
 
     val displayUserName: String
         get() = "@" + this.userName + if (isSameHost) {
@@ -258,6 +263,7 @@ sealed interface User : Entity {
                     createdAt = null,
                     updatedAt = null,
                     isPublicReactions = false,
+                    ffVisibility = null,
                 ),
                 related = null,
                 badgeRoles = badgeRoles,
@@ -338,6 +344,7 @@ fun User.Detail.Companion.make(
     avatarBlurhash: String? = null,
     isNotify: Boolean = false,
     badgeRoles: List<User.BadgeRole> = emptyList(),
+    ffVisibility: User.FollowerFollowerVisibility? = null,
 ): User.Detail {
     return User.Detail(
         id,
@@ -366,7 +373,8 @@ fun User.Detail.Companion.make(
             fields = fields ?: emptyList(),
             createdAt = createdAt,
             updatedAt = updatedAt,
-            isPublicReactions = isPublicReactions
+            isPublicReactions = isPublicReactions,
+            ffVisibility = ffVisibility,
         ),
         related = User.Related(
             isFollowing = isFollowing,
