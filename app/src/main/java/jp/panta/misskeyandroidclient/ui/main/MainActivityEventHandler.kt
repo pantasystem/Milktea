@@ -18,6 +18,7 @@ import com.google.firebase.crashlytics.FirebaseCrashlytics
 import jp.panta.misskeyandroidclient.MainActivity
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.ActivityMainBinding
+import jp.panta.misskeyandroidclient.review.InAppReviewWrapper
 import jp.panta.misskeyandroidclient.ui.main.viewmodel.MainViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -54,6 +55,7 @@ internal class MainActivityEventHandler(
     private val configStore: SettingStore,
     private val draftNoteService: DraftNoteService,
     private val currentPageableTimelineViewModel: CurrentPageableTimelineViewModel,
+    private val inAppReviewWrapper: InAppReviewWrapper,
 ) {
 
     class Factory @Inject constructor(
@@ -62,6 +64,7 @@ internal class MainActivityEventHandler(
         private val configStore: SettingStore,
         private val draftNoteService: DraftNoteService,
         private val featureEnables: FeatureEnables,
+        private val inAppReviewWrapper: InAppReviewWrapper,
     ) {
         fun create(
             activity: MainActivity,
@@ -84,7 +87,8 @@ internal class MainActivityEventHandler(
                 ChangeNavMenuVisibilityFromAPIVersion(binding.navView, featureEnables),
                 configStore,
                 draftNoteService,
-                currentPageableTimelineViewModel
+                currentPageableTimelineViewModel,
+                inAppReviewWrapper
             )
         }
     }
@@ -113,6 +117,7 @@ internal class MainActivityEventHandler(
         collectDraftNoteSavedEvent()
         collectCurrentPageableState()
         collectEnableSafeSearchDescriptionState()
+        collectShowInAppReviewState()
     }
 
     private fun collectCrashlyticsCollectionState() {
@@ -351,5 +356,17 @@ internal class MainActivityEventHandler(
             )
 
         }.flowWithLifecycle(activity.lifecycle, Lifecycle.State.RESUMED).launchIn(lifecycleScope)
+    }
+
+    private fun collectShowInAppReviewState() {
+        lifecycleScope.launch {
+            lifecycleOwner.repeatOnLifecycle(Lifecycle.State.RESUMED) {
+                mainViewModel.isShowInAppReview.distinctUntilChanged().collect {
+                    if (it) {
+                        inAppReviewWrapper.showReview(activity)
+                    }
+                }
+            }
+        }
     }
 }

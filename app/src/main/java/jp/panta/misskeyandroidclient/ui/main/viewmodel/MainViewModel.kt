@@ -18,6 +18,7 @@ import net.pantasystem.milktea.model.messaging.UnReadMessages
 import net.pantasystem.milktea.model.notification.NotificationRepository
 import net.pantasystem.milktea.model.notification.NotificationStreaming
 import net.pantasystem.milktea.model.setting.LocalConfigRepository
+import net.pantasystem.milktea.model.statistics.InAppPostCounterRepository
 import javax.inject.Inject
 
 @HiltViewModel
@@ -29,6 +30,7 @@ class MainViewModel @Inject constructor(
     private val configRepository: LocalConfigRepository,
     private val emojiEventHandler: EmojiEventHandler,
     private val notificationStreaming: NotificationStreaming,
+    inAppPostCounterRepository: InAppPostCounterRepository,
     settingStore: SettingStore
 ) : ViewModel() {
     val logger by lazy {
@@ -80,6 +82,9 @@ class MainViewModel @Inject constructor(
         !config.isConfirmedPostNotification
     }.distinctUntilChanged().shareIn(viewModelScope, SharingStarted.WhileSubscribed())
 
+    val isShowInAppReview = combine(inAppPostCounterRepository.observe(), accountStore.observeAccounts) { count, accounts ->
+        accounts.size >= 2 && count >= 10
+    }.distinctUntilChanged().shareIn(viewModelScope, SharingStarted.WhileSubscribed(5_000))
 
 
     val state: StateFlow<MainUiState> = combine(
