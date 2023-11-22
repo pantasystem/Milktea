@@ -83,7 +83,7 @@ class MainViewModel @Inject constructor(
     }.distinctUntilChanged().shareIn(viewModelScope, SharingStarted.WhileSubscribed())
 
     val isShowInAppReview = combine(inAppPostCounterRepository.observe(), accountStore.observeAccounts) { count, accounts ->
-        accounts.size >= 2 && count >= 10
+        accounts.size >= 2 && count >= 10 || count > 50
     }.distinctUntilChanged().shareIn(viewModelScope, SharingStarted.WhileSubscribed(5_000))
 
 
