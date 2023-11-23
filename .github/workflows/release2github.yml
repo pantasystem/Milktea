@@ -1,4 +1,4 @@
-name: Release Android to Google Play Store
+name: Release Android to Github Releases
 on:
   push:
     branches-ignore:
