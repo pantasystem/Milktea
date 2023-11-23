@@ -1,0 +1,53 @@
+name: Release Android to Google Play Store
+on:
+  push:
+    branches-ignore:
+      - '**'
+    tags:
+      - 'v*'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: zulu
+          cache: gradle
+      - name: Decode Keystore
+        run: |
+          echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > app/keystore.jks
+          echo "KEYSTORE_PATH=$(pwd)/app/keystore.jks" >> $GITHUB_ENV
+      - name: Generate secret.properties
+        env:
+          PUSH_TO_FCM_AUTH: ${{ secrets.PUSH_TO_FCM_AUTH }}
+          PUSH_TO_FCM_PUBLIC_KEY: ${{ secrets.PUSH_TO_FCM_PUBLIC_KEY }}
+          PUSH_TO_FCM_SERVER_BASE_URL: ${{ secrets.PUSH_TO_FCM_SERVER_BASE_URL }}
+        run: |
+          echo "push_to_fcm.server_base_url=${PUSH_TO_FCM_SERVER_BASE_URL}" >> ./secret.properties
+          echo "push_to_fcm.public_key=${PUSH_TO_FCM_PUBLIC_KEY}" >> ./secret.properties
+          echo "push_to_fcm.auth=${PUSH_TO_FCM_AUTH}" >> ./secret.properties
+      - name: Get the version tag
+        run: echo "ORG_GRADLE_PROJECT_VERSION_NAME=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      - name: Calculate version code
+        run: echo "ORG_GRADLE_PROJECT_VERSION_CODE=$((${{ github.run_number }} + 3000))" >> $GITHUB_ENV
+      - name: build apk
+        run: ./gradlew assembleRelease
+      - name: release to github releases
+        uses: ncipollo/release-action@v1
+        with:
+          artifacts: "app/build/outputs/**/*.apk"
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+
+
+
+
+
