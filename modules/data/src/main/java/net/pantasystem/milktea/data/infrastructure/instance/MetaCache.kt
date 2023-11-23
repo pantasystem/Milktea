@@ -1,7 +1,6 @@
 package net.pantasystem.milktea.data.infrastructure.instance
 
-import kotlinx.coroutines.sync.Mutex
-import kotlinx.coroutines.sync.withLock
+import net.pantasystem.milktea.common.collection.LRUCache
 import net.pantasystem.milktea.model.instance.Meta
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -12,18 +11,13 @@ import javax.inject.Singleton
 @Singleton
 class MetaCache @Inject constructor(){
 
-    private val lock = Mutex()
-    private var map = mapOf<String, Meta>()
+    private val lruCache = LRUCache<String, Meta>(100)
 
-    suspend fun put(instanceBaseURL: String, meta: Meta) {
-        lock.withLock {
-            map = map.toMutableMap().also { m ->
-                m[instanceBaseURL] = meta
-            }
-        }
+    fun put(instanceBaseURL: String, meta: Meta) {
+        lruCache[instanceBaseURL] = meta
     }
 
     fun get(instanceBaseURL: String): Meta? {
-        return map[instanceBaseURL]
+        return lruCache[instanceBaseURL]
     }
 }

@@ -9,7 +9,12 @@ import kotlinx.coroutines.withContext
 import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.common_android.hilt.IODispatcher
 import net.pantasystem.milktea.data.api.mastodon.MastodonAPIProvider
-import net.pantasystem.milktea.data.infrastructure.instance.db.*
+import net.pantasystem.milktea.data.infrastructure.instance.db.FedibirdCapabilitiesRecord
+import net.pantasystem.milktea.data.infrastructure.instance.db.MastodonInstanceInfoDAO
+import net.pantasystem.milktea.data.infrastructure.instance.db.MastodonInstanceInfoRecord
+import net.pantasystem.milktea.data.infrastructure.instance.db.PleromaMetadataFeatures
+import net.pantasystem.milktea.data.infrastructure.instance.db.from
+import net.pantasystem.milktea.data.infrastructure.instance.db.toModel
 import net.pantasystem.milktea.data.infrastructure.toModel
 import net.pantasystem.milktea.model.instance.MastodonInstanceInfo
 import net.pantasystem.milktea.model.instance.MastodonInstanceInfoRepository
@@ -26,7 +31,7 @@ class MastodonInstanceInfoRepositoryImpl @Inject constructor(
     override suspend fun find(instanceDomain: String): Result<MastodonInstanceInfo> =
         runCancellableCatching {
             withContext(ioDispatcher) {
-                var info = get(instanceDomain)
+                var info = cache.get(instanceDomain)
                 if (info != null) {
                     return@withContext info
                 }
@@ -43,9 +48,6 @@ class MastodonInstanceInfoRepositoryImpl @Inject constructor(
             }
         }
 
-    override fun get(instanceDomain: String): MastodonInstanceInfo? {
-        return cache.get(instanceDomain)
-    }
 
     override fun observe(instanceDomain: String): Flow<MastodonInstanceInfo?> {
         return mastodonInstanceInfoDAO.observeBy(URL(instanceDomain).host).map {

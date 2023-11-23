@@ -8,7 +8,5 @@ interface MastodonInstanceInfoRepository {
 
     fun observe(instanceDomain: String): Flow<MastodonInstanceInfo?>
 
-    fun get(instanceDomain: String): MastodonInstanceInfo?
-
     suspend fun find(instanceDomain: String): Result<MastodonInstanceInfo>
 }

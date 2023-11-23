@@ -1,7 +1,6 @@
 package net.pantasystem.milktea.data.infrastructure.instance
 
-import kotlinx.coroutines.sync.Mutex
-import kotlinx.coroutines.sync.withLock
+import net.pantasystem.milktea.common.collection.LRUCache
 import net.pantasystem.milktea.model.instance.MastodonInstanceInfo
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -12,18 +11,13 @@ import javax.inject.Singleton
 @Singleton
 class MastodonInstanceInfoCache @Inject constructor(){
 
-    private val lock = Mutex()
-    private var map = mapOf<String, MastodonInstanceInfo>()
+    private val lruCache = LRUCache<String, MastodonInstanceInfo>(100)
 
-    suspend fun put(instanceBaseURL: String, instanceInfo: MastodonInstanceInfo) {
-        lock.withLock {
-            map = map.toMutableMap().also { m ->
-                m[instanceBaseURL] = instanceInfo
-            }
-        }
+    fun put(instanceBaseURL: String, instanceInfo: MastodonInstanceInfo) {
+        lruCache[instanceBaseURL] = instanceInfo
     }
 
     fun get(instanceBaseURL: String): MastodonInstanceInfo? {
-        return map[instanceBaseURL]
+        return lruCache[instanceBaseURL]
     }
 }
