@@ -4,10 +4,12 @@ package net.pantasystem.milktea.api.misskey.users
 import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDate
 import kotlinx.serialization.SerialName
+import kotlinx.serialization.builtins.nullable
 import net.pantasystem.milktea.api.misskey.emoji.CustomEmojiNetworkDTO
 import net.pantasystem.milktea.api.misskey.emoji.CustomEmojisTypeSerializer
 import net.pantasystem.milktea.api.misskey.emoji.EmojisType
 import net.pantasystem.milktea.api.misskey.notes.NoteDTO
+import net.pantasystem.milktea.common.serializations.FallbackDefaultValueSerializer
 import java.io.Serializable
 
 /**
@@ -104,7 +106,7 @@ data class UserDTO(
     val fields: List<FieldDTO>? = null,
 
     @SerialName("birthday")
-    @kotlinx.serialization.Transient
+    @kotlinx.serialization.Serializable(with = BirthdaySerializer::class)
     val birthday: LocalDate? = null,
 
     @SerialName("createdAt")
@@ -185,3 +187,5 @@ data class UserDTO(
         @SerialName("public") Public, @SerialName("followers") Followers, @SerialName("private") Private,
     }
 }
+
+private object BirthdaySerializer : FallbackDefaultValueSerializer<LocalDate?>(LocalDate.serializer().nullable, null)
