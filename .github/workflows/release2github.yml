@@ -39,7 +39,15 @@ jobs:
       - name: Calculate version code
         run: echo "ORG_GRADLE_PROJECT_VERSION_CODE=$((${{ github.run_number }} + 3000))" >> $GITHUB_ENV
       - name: build apk
-        run: ./gradlew assembleRelease
+        env:
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+          ALIAS: ${{ secrets.ALIAS }}
+        run: ./gradlew assembleRelease \
+          -Pandroid.injected.signing.store.file=$KEYSTORE_PATH \
+          -Pandroid.injected.signing.store.password=$KEYSTORE_PASSWORD \
+          -Pandroid.injected.signing.key.alias=$ALIAS \ 
+          -Pandroid.injected.signing.key.password=$KEY_PASSWORD
       - name: release to github releases
         uses: ncipollo/release-action@v1
         with:
