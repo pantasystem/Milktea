@@ -47,7 +47,7 @@ jobs:
           ./gradlew assembleRelease \
           -Pandroid.injected.signing.store.file=$KEYSTORE_PATH \
           -Pandroid.injected.signing.store.password=$KEYSTORE_PASSWORD \
-          -Pandroid.injected.signing.key.alias=$ALIAS \ 
+          -Pandroid.injected.signing.key.alias=$ALIAS \
           -Pandroid.injected.signing.key.password=$KEY_PASSWORD
       - name: release to github releases
         uses: ncipollo/release-action@v1
