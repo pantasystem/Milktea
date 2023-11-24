@@ -123,4 +123,5 @@ dependencies {
 
     implementation 'com.github.kenglxn.QRGen:android:3.0.1'
 
+    implementation libs.konfetti
 }

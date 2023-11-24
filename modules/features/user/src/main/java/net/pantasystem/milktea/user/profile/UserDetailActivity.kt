@@ -26,6 +26,9 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
+import kotlinx.datetime.Clock
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.todayIn
 import net.pantasystem.milktea.app_store.account.AccountStore
 import net.pantasystem.milktea.app_store.setting.SettingStore
 import net.pantasystem.milktea.common.ui.ApplyMenuTint
@@ -55,6 +58,12 @@ import net.pantasystem.milktea.user.profile.view.ProfileBadgeRoleData
 import net.pantasystem.milktea.user.profile.view.ProfileBadgeRoles
 import net.pantasystem.milktea.user.profile.viewmodel.UserDetailViewModel
 import net.pantasystem.milktea.user.qrshare.QRShareDialog
+import nl.dionsegijn.konfetti.core.Angle
+import nl.dionsegijn.konfetti.core.Party
+import nl.dionsegijn.konfetti.core.Position
+import nl.dionsegijn.konfetti.core.Spread
+import nl.dionsegijn.konfetti.core.emitter.Emitter
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 class UserDetailNavigationImpl @Inject constructor(
@@ -162,6 +171,8 @@ class UserDetailActivity : AppCompatActivity() {
 
     @Inject
     lateinit var userPinnedNotesFragmentFactory: UserPinnedNotesFragmentFactory
+
+    private val currentDate = Clock.System.todayIn(TimeZone.currentSystemDefault())
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -350,10 +361,22 @@ class UserDetailActivity : AppCompatActivity() {
         binding.userFields.adapter = userFieldsAdapter
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.CREATED) {
-                mViewModel.userState.mapNotNull {
-                    it?.info?.fields
-                }.collect {
-                    userFieldsAdapter.submitList(it)
+                launch {
+                    mViewModel.userState.mapNotNull {
+                        it?.info?.fields
+                    }.collect {
+                        userFieldsAdapter.submitList(it)
+                    }
+                }
+                launch {
+                    mViewModel.userState.mapNotNull {
+                        it?.info?.birthday
+                    }.collect {
+                        if (it == currentDate) {
+                            binding.konfettiView.bringToFront()
+                            binding.konfettiView.start(rain())
+                        }
+                    }
                 }
             }
         }
@@ -518,6 +541,22 @@ class UserDetailActivity : AppCompatActivity() {
             val intent = FollowFollowerActivity.newIntent(this, it.id, isFollowing = true)
             startActivity(intent)
         }
+    }
+
+//  紙吹雪のアニメーションを制御する
+    private fun rain(): List<Party> {
+        return listOf(
+            Party(
+                speed = 2f,
+                maxSpeed = 4f,
+                damping = 0.9f,
+                angle = Angle.BOTTOM,
+                spread = Spread.ROUND,
+                colors = listOf(0xfce18a, 0xff726d, 0xf4306d, 0xb48def),
+                emitter = Emitter(duration = 9, TimeUnit.SECONDS).perSecond(50),
+                position = Position.Relative(0.0, 0.0).between(Position.Relative(1.0, 0.0))
+            )
+        )
     }
 }
 

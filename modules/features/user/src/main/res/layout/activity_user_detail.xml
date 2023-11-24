@@ -34,6 +34,15 @@
                         app:mainNameView="@{mainName}"
                         app:subNameView="@{subName}"
                         >
+                    <nl.dionsegijn.konfetti.xml.KonfettiView
+                        android:id="@+id/konfettiView"
+                        android:layout_width="0px"
+                        android:layout_height="0px"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintLeft_toLeftOf="parent"
+                        app:layout_constraintRight_toRightOf="parent"
+                        />
                     <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
