@@ -7,9 +7,11 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
+import kotlinx.datetime.todayIn
 import net.pantasystem.milktea.app_store.account.AccountStore
 import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.common.mapCancellableCatching
@@ -110,6 +112,13 @@ class UserDetailViewModel @Inject constructor(
         logger.error("observe user error", it)
         _errors.tryEmit(it)
     }.stateIn(viewModelScope, SharingStarted.Lazily, null)
+
+    val isTodayBirthday = userState.map {
+        val today = Clock.System.todayIn(TimeZone.currentSystemDefault())
+        it?.info?.birthday?.let { birthday ->
+            birthday.monthNumber == today.monthNumber && birthday.dayOfMonth == today.dayOfMonth
+        } ?: false
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), false)
 
     val originProfileUrl = userState.filterNotNull().map {
         val account = accountRepository.get(it.id.accountId).getOrThrow()

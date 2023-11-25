@@ -26,9 +26,6 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
-import kotlinx.datetime.Clock
-import kotlinx.datetime.TimeZone
-import kotlinx.datetime.todayIn
 import net.pantasystem.milktea.app_store.account.AccountStore
 import net.pantasystem.milktea.app_store.setting.SettingStore
 import net.pantasystem.milktea.common.ui.ApplyMenuTint
@@ -171,8 +168,6 @@ class UserDetailActivity : AppCompatActivity() {
 
     @Inject
     lateinit var userPinnedNotesFragmentFactory: UserPinnedNotesFragmentFactory
-
-    private val currentDate = Clock.System.todayIn(TimeZone.currentSystemDefault())
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -369,10 +364,8 @@ class UserDetailActivity : AppCompatActivity() {
                     }
                 }
                 launch {
-                    mViewModel.userState.mapNotNull {
-                        it?.info?.birthday
-                    }.collect {
-                        if (it == currentDate) {
+                    mViewModel.isTodayBirthday.collect {
+                        if (it) {
                             binding.konfettiView.bringToFront()
                             binding.konfettiView.start(rain())
                         }
