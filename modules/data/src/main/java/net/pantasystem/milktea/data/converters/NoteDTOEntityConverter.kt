@@ -60,7 +60,9 @@ class NoteDTOEntityConverter @Inject constructor(
             it.sourceUrl
         }
 
-        val allEmojis = instanceEmojis ?: customEmojiRepository.findAndConvertToMap(account.getHost()).getOrElse { emptyMap() }
+        val allEmojis =
+            instanceEmojis ?: customEmojiRepository.findAndConvertToMap(account.getHost())
+                .getOrElse { emptyMap() }
 
         return noteDTOs.map {
             convert(
@@ -94,7 +96,8 @@ class NoteDTOEntityConverter @Inject constructor(
         }).associateBy {
             it.sourceUrl
         }
-        val info = instanceInfoType ?: instanceInfoService.find(account.normalizedInstanceUri).getOrNull()
+        val info =
+            instanceInfoType ?: instanceInfoService.find(account.normalizedInstanceUri).getOrNull()
 
         return convert(
             account = account,
@@ -114,7 +117,6 @@ class NoteDTOEntityConverter @Inject constructor(
         fileCaches: Map<String, ImageCache>,
         instanceEmojis: Map<String, CustomEmoji>? = null,
     ): Note {
-        val emojis = noteDTO.emojiList
         val isRequireNyaize = (instanceInfoType?.isRequirePerformNyaizeFrontend ?: false)
                 && (noteDTO.user.isCat ?: false)
         val visibility = Visibility(
@@ -125,31 +127,6 @@ class NoteDTOEntityConverter @Inject constructor(
             } ?: emptyList()
         )
 
-        val emojiModels = emojis.map {
-            it.toModel(aspects[it.url ?: it.uri], fileCaches[it.url ?: it.uri]?.cachePath)
-        }
-
-        val emojisResultInText = CustomEmojiParser.parse(
-            sourceHost = noteDTO.user.host ?: account.getHost(),
-            emojis = emojiModels,
-            text = noteDTO.text ?: "",
-            instanceEmojis = instanceEmojis,
-        )
-
-        val emojisResultInCw = CustomEmojiParser.parse(
-            sourceHost = noteDTO.user.host ?: account.getHost(),
-            emojis = emojiModels,
-            text = noteDTO.cw ?: "",
-            instanceEmojis = instanceEmojis,
-        )
-        val emojisInText = emojisResultInText.emojis.mapNotNull {
-            (it.result as? EmojiResolvedType.Resolved?)?.emoji
-        }
-
-        val emojisInCw = emojisResultInCw.emojis.mapNotNull {
-            (it.result as? EmojiResolvedType.Resolved?)?.emoji
-        }
-
         val reactionCounts = noteDTO.reactionCounts?.map {
             ReactionCount(
                 reaction = it.key,
@@ -158,28 +135,21 @@ class NoteDTOEntityConverter @Inject constructor(
             )
         } ?: emptyList()
 
-        val noteEmojis = if (instanceEmojis == null) {
-            val unresolvedEmojiTags = emojisResultInText.emojis.mapNotNull {
-                (it.result as? EmojiResolvedType.UnResolved)?.tag
-            } + emojisResultInCw.emojis.mapNotNull {
-                (it.result as? EmojiResolvedType.UnResolved)?.tag
-            }
-            val reactionTags = noteDTO.reactionEmojiList.mapNotNull {
-                Reaction(it.name).getName()
-            }
-            customEmojiRepository.findByNames(noteDTO.user.host ?: account.getHost(), unresolvedEmojiTags + reactionTags).getOrElse {
-                emptyList()
-            } + emojisInCw + emojisInText + emojiModels
-        } else {
-            emojiModels + emojisInCw + emojisInText
-        }
+        val noteEmojis = getEmojis(
+            account = account,
+            noteDTO = noteDTO,
+            aspects = aspects,
+            fileCaches = fileCaches,
+            instanceEmojis = instanceEmojis
+        )
 
         val emojiNameMap = noteEmojis.associateBy {
             it.name
         }
 
-        val reactionEmojis = reactionCounts.mapNotNull {  reactionCount ->
-            val textReaction = LegacyReaction.reactionMap[reactionCount.reaction] ?: reactionCount.reaction
+        val reactionEmojis = reactionCounts.mapNotNull { reactionCount ->
+            val textReaction =
+                LegacyReaction.reactionMap[reactionCount.reaction] ?: reactionCount.reaction
             val r = Reaction(textReaction)
             emojiNameMap[textReaction.replace(":", "")]
                 ?: instanceEmojis?.get(r.getName())
@@ -236,6 +206,61 @@ class NoteDTOEntityConverter @Inject constructor(
             maxReactionsPerAccount = 1,
             emojiNameMap = emojiNameMap,
         )
+    }
+
+    private suspend fun getEmojis(
+        account: Account,
+        noteDTO: NoteDTO,
+        aspects: Map<String, Float>,
+        fileCaches: Map<String, ImageCache>,
+        instanceEmojis: Map<String, CustomEmoji>?,
+    ): List<CustomEmoji> {
+        val emojis = noteDTO.emojiList
+        val emojiModels = emojis.map {
+            it.toModel(aspects[it.url ?: it.uri], fileCaches[it.url ?: it.uri]?.cachePath)
+        }
+
+        val emojisResultInText = CustomEmojiParser.parse(
+            sourceHost = noteDTO.user.host ?: account.getHost(),
+            emojis = emojiModels,
+            text = noteDTO.text ?: "",
+            instanceEmojis = instanceEmojis,
+        )
+
+        val emojisResultInCw = CustomEmojiParser.parse(
+            sourceHost = noteDTO.user.host ?: account.getHost(),
+            emojis = emojiModels,
+            text = noteDTO.cw ?: "",
+            instanceEmojis = instanceEmojis,
+        )
+        val emojisInText = emojisResultInText.emojis.mapNotNull {
+            (it.result as? EmojiResolvedType.Resolved?)?.emoji
+        }
+
+        val emojisInCw = emojisResultInCw.emojis.mapNotNull {
+            (it.result as? EmojiResolvedType.Resolved?)?.emoji
+        }
+
+        val noteEmojis = if (instanceEmojis == null) {
+            val unresolvedEmojiTags = emojisResultInText.emojis.mapNotNull {
+                (it.result as? EmojiResolvedType.UnResolved)?.tag
+            } + emojisResultInCw.emojis.mapNotNull {
+                (it.result as? EmojiResolvedType.UnResolved)?.tag
+            }
+            val reactionTags = noteDTO.reactionEmojiList.mapNotNull {
+                Reaction(it.name).getName()
+            }
+            customEmojiRepository.findByNames(
+                noteDTO.user.host ?: account.getHost(),
+                unresolvedEmojiTags + reactionTags
+            ).getOrElse {
+                emptyList()
+            }
+        } else {
+            emptyList()
+        } + emojisInCw + emojisInText + emojiModels
+
+        return noteEmojis
     }
 }
 
