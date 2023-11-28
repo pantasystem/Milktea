@@ -49,6 +49,9 @@ class NoteDTOEntityConverterTest {
                 onBlocking {
                     findAndConvertToMap(any())
                 } doReturn Result.success(emptyMap())
+                onBlocking {
+                    findByNames(any(), any())
+                } doReturn Result.success(emptyList())
             }
         )
 
@@ -145,6 +148,9 @@ class NoteDTOEntityConverterTest {
                 onBlocking {
                     findAndConvertToMap(any())
                 } doReturn Result.success(emptyMap())
+                onBlocking {
+                    findByNames(any(), any())
+                } doReturn Result.success(emptyList())
             }
         )
 
@@ -243,6 +249,9 @@ class NoteDTOEntityConverterTest {
                 onBlocking {
                     findAndConvertToMap(any())
                 } doReturn Result.success(emptyMap())
+                onBlocking {
+                    findByNames(any(), any())
+                } doReturn Result.success(emptyList())
             }
         )
 
