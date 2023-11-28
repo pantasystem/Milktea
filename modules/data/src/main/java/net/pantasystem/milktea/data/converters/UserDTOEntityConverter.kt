@@ -2,6 +2,7 @@ package net.pantasystem.milktea.data.converters
 
 import net.pantasystem.milktea.api.misskey.users.UserDTO
 import net.pantasystem.milktea.model.account.Account
+import net.pantasystem.milktea.model.emoji.CustomEmoji
 import net.pantasystem.milktea.model.emoji.CustomEmojiAspectRatioDataSource
 import net.pantasystem.milktea.model.emoji.CustomEmojiParser
 import net.pantasystem.milktea.model.emoji.CustomEmojiRepository
@@ -19,7 +20,7 @@ class UserDTOEntityConverter @Inject constructor(
     private val imageCacheRepository: ImageCacheRepository,
 ) {
 
-    suspend fun convert(account: Account, userDTO: UserDTO, isDetail: Boolean = false): User {
+    suspend fun convert(account: Account, userDTO: UserDTO, isDetail: Boolean = false, instanceEmojis: Map<String, CustomEmoji>? = null): User {
         val instanceInfo = userDTO.instance?.let {
             User.InstanceInfo(
                 name = it.name,
@@ -49,14 +50,31 @@ class UserDTOEntityConverter @Inject constructor(
                 cachePath = fileCaches[it.url ?: it.uri]?.cachePath
             )
         } ?: emptyList()
-        emojis = (emojis + CustomEmojiParser.parse(
+
+        val parsedResult = CustomEmojiParser.parse(
             userDTO.host ?: account.getHost(),
             emojis,
             userDTO.name ?: userDTO.userName,
-            customEmojiRepository.findAndConvertToMap(account.getHost()).getOrNull(),
-        ).emojis.mapNotNull {
+            instanceEmojis ?: customEmojiRepository.getAndConvertToMap(account.getHost()),
+        )
+
+        val resolvedEmojis = parsedResult.emojis.mapNotNull {
             (it.result as? EmojiResolvedType.Resolved)?.emoji
-        }).distinctBy {
+        }
+        val finallyResolvedEmojis = if (instanceEmojis == null) {
+            val tags = parsedResult.emojis.mapNotNull {
+                it.result as? EmojiResolvedType.UnResolved
+            }.map {
+                it.tag
+            }
+            customEmojiRepository.findByNames(userDTO.host ?: account.getHost(), tags).getOrElse {
+                emptyList()
+            } + resolvedEmojis
+        } else {
+            resolvedEmojis
+        }
+
+        emojis = (emojis + finallyResolvedEmojis).distinctBy {
             it.name to it.host to it.url to it.uri
         }
 
