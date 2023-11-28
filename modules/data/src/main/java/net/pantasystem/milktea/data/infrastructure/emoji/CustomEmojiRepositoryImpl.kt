@@ -210,7 +210,13 @@ internal class CustomEmojiRepositoryImpl @Inject constructor(
 
     override suspend fun findByNames(host: String, names: List<String>): Result<List<CustomEmoji>>  = runCancellableCatching {
         withContext(ioDispatcher) {
-            val records = customEmojiDAO.findByNames(host, names)
+            val allEmojis = customEmojiCache.getMap(host)
+            val inMemEmojis = names.mapNotNull {
+                allEmojis?.get(it)
+            }
+            val records = customEmojiDAO.findByNames(host, names.filter {
+                allEmojis?.get(it) == null
+            })
             val aspects = aspectRatioDataSource.findIn(records.mapNotNull {
                 it.url ?: it.uri
             }).getOrElse { emptyList() }.associateBy {
@@ -221,7 +227,7 @@ internal class CustomEmojiRepositoryImpl @Inject constructor(
             }).associateBy {
                 it.sourceUrl
             }
-            records.map { record ->
+            inMemEmojis + records.map { record ->
                 record.toModel(
                     aspects[record.url ?: record.uri]?.aspectRatio,
                     fileCaches[record.url ?: record.uri]?.cachePath,
