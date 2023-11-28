@@ -446,7 +446,8 @@ internal class NoteRecordTest {
                 isReactionAvailable = true,
             ),
             app = null,
-            maxReactionsPerAccount = 3
+            maxReactionsPerAccount = 3,
+            emojiNameMap = emptyMap()
         )
         val actual =record.toModel()
         Assertions.assertEquals(expectedNote.id, actual.id)
