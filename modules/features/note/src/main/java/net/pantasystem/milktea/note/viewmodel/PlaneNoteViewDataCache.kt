@@ -181,7 +181,6 @@ class PlaneNoteViewDataCache(
                 translationStore,
                 noteDataSource,
                 configRepository,
-                emojiRepository,
                 coroutineScope,
             )
         } else {
@@ -191,7 +190,6 @@ class PlaneNoteViewDataCache(
                 translationStore,
                 noteDataSource,
                 configRepository,
-                emojiRepository,
                 coroutineScope
             )
         }.also {

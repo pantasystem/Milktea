@@ -14,7 +14,6 @@ import net.pantasystem.milktea.common_android.mfm.MFMParser
 import net.pantasystem.milktea.common_android.resource.StringSource
 import net.pantasystem.milktea.common_android_ui.getTextType
 import net.pantasystem.milktea.model.account.Account
-import net.pantasystem.milktea.model.emoji.CustomEmojiRepository
 import net.pantasystem.milktea.model.file.AboutMediaType
 import net.pantasystem.milktea.model.file.AppFile
 import net.pantasystem.milktea.model.file.FilePreviewSource
@@ -33,7 +32,6 @@ open class PlaneNoteViewData(
     noteTranslationStore: NoteTranslationStore,
     noteDataSource: NoteDataSource,
     configRepository: LocalConfigRepository,
-    emojiRepository: CustomEmojiRepository,
     coroutineScope: CoroutineScope,
 ) : NoteViewData {
 

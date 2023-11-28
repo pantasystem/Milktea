@@ -11,7 +11,6 @@ import kotlinx.coroutines.plus
 import net.pantasystem.milktea.app_store.notes.NoteTranslationStore
 import net.pantasystem.milktea.model.account.CurrentAccountWatcher
 import net.pantasystem.milktea.model.account.page.Pageable
-import net.pantasystem.milktea.model.emoji.CustomEmojiRepository
 import net.pantasystem.milktea.model.filter.WordFilterService
 import net.pantasystem.milktea.model.note.Note
 import net.pantasystem.milktea.model.note.NoteCaptureAPIAdapter
@@ -31,7 +30,6 @@ class NoteDetailNotesFlowBuilder(
     private val noteTranslationStore: NoteTranslationStore,
     private val viewModelScope: CoroutineScope,
     private val noteDataSource: NoteDataSource,
-    private val emojiRepository: CustomEmojiRepository,
     private val configRepository: LocalConfigRepository,
     private val noteCaptureAPIAdapter: NoteCaptureAPIAdapter,
     ) {
@@ -39,13 +37,12 @@ class NoteDetailNotesFlowBuilder(
     class Factory @Inject constructor(
         private val noteWordFilterService: WordFilterService,
         private val noteRelationGetter: NoteRelationGetter,
-        private val emojiRepository: CustomEmojiRepository,
         private val configRepository: LocalConfigRepository,
         private val noteCaptureAPIAdapter: NoteCaptureAPIAdapter,
         private val noteDataSource: NoteDataSource,
         private val noteTranslationStore: NoteTranslationStore,
 
-    ) {
+        ) {
         fun create(
             cache: PlaneNoteViewDataCache,
             currentAccountWatcher: CurrentAccountWatcher,
@@ -59,7 +56,6 @@ class NoteDetailNotesFlowBuilder(
                 noteTranslationStore,
                 scope,
                 noteDataSource,
-                emojiRepository,
                 configRepository,
                 noteCaptureAPIAdapter,
             )
@@ -107,7 +103,6 @@ class NoteDetailNotesFlowBuilder(
                             noteTranslationStore,
                             viewModelScope,
                             noteDataSource,
-                            emojiRepository,
                             configRepository,
                         ).also {
                             it.capture()
@@ -129,7 +124,6 @@ class NoteDetailNotesFlowBuilder(
                             noteTranslationStore,
                             noteDataSource,
                             configRepository,
-                            emojiRepository,
                             viewModelScope,
                         ).also {
                             it.capture()

@@ -4,7 +4,6 @@ import androidx.lifecycle.MutableLiveData
 import kotlinx.coroutines.CoroutineScope
 import net.pantasystem.milktea.app_store.notes.NoteTranslationStore
 import net.pantasystem.milktea.model.account.Account
-import net.pantasystem.milktea.model.emoji.CustomEmojiRepository
 import net.pantasystem.milktea.model.note.NoteDataSource
 import net.pantasystem.milktea.model.note.NoteRelation
 import net.pantasystem.milktea.model.setting.LocalConfigRepository
@@ -15,7 +14,6 @@ class HasReplyToNoteViewData(
     noteTranslationStore: NoteTranslationStore,
     noteDataSource: NoteDataSource,
     configRepository: LocalConfigRepository,
-    emojiRepository: CustomEmojiRepository,
     coroutineScope: CoroutineScope,
 ) : PlaneNoteViewData(
     noteRelation,
@@ -23,7 +21,6 @@ class HasReplyToNoteViewData(
     noteTranslationStore,
     noteDataSource,
     configRepository,
-    emojiRepository,
     coroutineScope
 ) {
     val reply = noteRelation.reply
@@ -40,7 +37,6 @@ class HasReplyToNoteViewData(
             noteTranslationStore,
             noteDataSource,
             configRepository,
-            emojiRepository,
             coroutineScope
         )
     }
