@@ -170,7 +170,6 @@ class NoteDTOEntityConverter @Inject constructor(
             customEmojiRepository.findByNames(noteDTO.user.host ?: account.getHost(), unresolvedEmojiTags + reactionTags).getOrElse {
                 emptyList()
             } + emojisInCw + emojisInText + emojiModels
-            emptyList()
         } else {
             emojiModels + emojisInCw + emojisInText
         }
