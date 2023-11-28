@@ -120,20 +120,22 @@ class ImageCacheRepositoryImpl @Inject constructor(
     override suspend fun findBySourceUrls(urls: List<String>): List<ImageCache> {
         return withContext(coroutineDispatcher) {
             val now = Clock.System.now()
-            val records = imageCacheStore.query().inValues(
-                ImageCacheRecord_.sourceUrl,
-                urls.toTypedArray(),
-                QueryBuilder.StringOrder.CASE_SENSITIVE
-            ).build().find()
-            records.mapNotNull { record ->
-                val model = record.toModel()
-                if (now - model.cachedAt > cacheExpireDuration) {
-                    null
-                } else {
-                    model
+            urls.chunked(100) { urls ->
+                val records = imageCacheStore.query().inValues(
+                    ImageCacheRecord_.sourceUrl,
+                    urls.toTypedArray(),
+                    QueryBuilder.StringOrder.CASE_SENSITIVE
+                ).build().find()
+                records.mapNotNull { record ->
+                    val model = record.toModel()
+                    if (now - model.cachedAt > cacheExpireDuration) {
+                        null
+                    } else {
+                        model
+                    }
                 }
             }
-        }
+        }.flatten()
     }
 
     private suspend fun upInsert(cache: ImageCache) {
