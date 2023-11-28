@@ -216,7 +216,8 @@ class NoteDTOEntityConverter @Inject constructor(
                 },
                 isRequireNyaize = isRequireNyaize,
             ),
-            maxReactionsPerAccount = 1
+            maxReactionsPerAccount = 1,
+            emojiNameMap = emojiNameMap,
         )
     }
 }

@@ -44,7 +44,9 @@ data class Note(
     val app: AppType.Misskey?,
     val channelId: Channel.Id?,
     val type: Type,
-    val maxReactionsPerAccount: Int) : Entity {
+    val maxReactionsPerAccount: Int,
+    val emojiNameMap: Map<String, CustomEmoji>?,
+) : Entity {
     class Id(
         val accountId: Long,
         val noteId: String,
@@ -131,9 +133,6 @@ data class Note(
     val isAcceptingOnlyLikeReaction: Boolean =
         type is Type.Misskey && type.isAcceptingOnlyLikeReaction
 
-    val emojiNameMap = emojis?.associateBy {
-        it.name
-    }
 
     val isReacted: Boolean = reactionCounts.any {
         it.me
@@ -303,6 +302,7 @@ fun Note.Companion.make(
         app = app,
         channelId = channelId,
         type = type,
-        maxReactionsPerAccount = maxReactionsPerAccount
+        maxReactionsPerAccount = maxReactionsPerAccount,
+        emojiNameMap = emojis?.associateBy { it.name },
     )
 }

@@ -198,6 +198,12 @@ data class NoteRecord(
 
     fun toModel(): Note {
 
+        val emojis = emojis?.map { CustomEmoji(
+            name = it.key,
+            url = it.value,
+            aspectRatio = customEmojiAspectRatioMap?.get(it.value)?.toFloatOrNull(),
+            cachePath = customEmojiUrlAndCachePathMap?.get(it.value)
+        ) }
         return Note(
             id = Note.Id(accountId, noteId),
             createdAt = createdAt.toInstant(),
@@ -221,12 +227,7 @@ data class NoteRecord(
                         it == entry.key
                     } ?: false
                 ) },
-            emojis = emojis?.map { CustomEmoji(
-                name = it.key,
-                url = it.value,
-                aspectRatio = customEmojiAspectRatioMap?.get(it.value)?.toFloatOrNull(),
-                cachePath = customEmojiUrlAndCachePathMap?.get(it.value)
-            ) },
+            emojis = emojis,
             repliesCount = repliesCount,
             fileIds = fileIds?.map { FileProperty.Id(accountId, it) },
             poll = getPoll(),
@@ -266,6 +267,7 @@ data class NoteRecord(
                 else -> throw IllegalArgumentException()
             },
             app = null,
+            emojiNameMap = emojis?.associateBy { it.name }
         )
     }
 

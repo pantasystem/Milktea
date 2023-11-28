@@ -86,6 +86,11 @@ class TootDTOEntityConverter @Inject constructor(
         imageCaches: Map<String, ImageCache>,
     ): Note {
         return with(statusDTO) {
+            val emojis = emojis.map {
+                it.toEmoji(imageCaches[it.url]?.cachePath)
+            } + (emojiReactions?.mapNotNull {
+                it.getEmoji(imageCaches[it.url]?.cachePath)
+            } ?: emptyList())
             Note(
                 id = Note.Id(account.accountId, id),
                 text = this.content,
@@ -103,11 +108,7 @@ class TootDTOEntityConverter @Inject constructor(
                     visibilityEx
                 ),
                 localOnly = null,
-                emojis = emojis.map {
-                    it.toEmoji(imageCaches[it.url]?.cachePath)
-                } + (emojiReactions?.mapNotNull {
-                    it.getEmoji(imageCaches[it.url]?.cachePath)
-                } ?: emptyList()),
+                emojis = emojis,
                 app = null,
                 reactionCounts = emojiReactions?.map {
                     ReactionCount(
@@ -149,6 +150,7 @@ class TootDTOEntityConverter @Inject constructor(
                     pureText = text,
                     isReactionAvailable = isReactionAvailable
                 ),
+                emojiNameMap = emojis.associateBy { it.name }
             )
         }
     }
