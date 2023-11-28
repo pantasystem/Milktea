@@ -19,7 +19,6 @@ import net.pantasystem.milktea.model.instance.InstanceInfoType
 import net.pantasystem.milktea.model.note.Note
 import net.pantasystem.milktea.model.note.Visibility
 import net.pantasystem.milktea.model.note.poll.Poll
-import net.pantasystem.milktea.model.note.reaction.LegacyReaction
 import net.pantasystem.milktea.model.note.reaction.Reaction
 import net.pantasystem.milktea.model.note.reaction.ReactionCount
 import net.pantasystem.milktea.model.user.User
@@ -147,14 +146,6 @@ class NoteDTOEntityConverter @Inject constructor(
             it.name
         }
 
-        val reactionEmojis = reactionCounts.mapNotNull { reactionCount ->
-            val textReaction =
-                LegacyReaction.reactionMap[reactionCount.reaction] ?: reactionCount.reaction
-            val r = Reaction(textReaction)
-            emojiNameMap[textReaction.replace(":", "")]
-                ?: instanceEmojis?.get(r.getName())
-        }
-
         return Note(
             id = Note.Id(account.accountId, noteDTO.id),
             createdAt = noteDTO.createdAt,
@@ -166,7 +157,7 @@ class NoteDTOEntityConverter @Inject constructor(
             viaMobile = noteDTO.viaMobile,
             visibility = visibility,
             localOnly = noteDTO.localOnly,
-            emojis = noteEmojis + reactionEmojis,
+            emojis = noteEmojis,
             app = null,
             fileIds = noteDTO.fileIds?.map { FileProperty.Id(account.accountId, it) },
             poll = noteDTO.poll?.toPoll(),
@@ -220,16 +211,20 @@ class NoteDTOEntityConverter @Inject constructor(
             it.toModel(aspects[it.url ?: it.uri], fileCaches[it.url ?: it.uri]?.cachePath)
         }
 
+        val emojiModelsMap = emojiModels.associateBy {
+            it.name
+        }
+
         val emojisResultInText = CustomEmojiParser.parse(
             sourceHost = noteDTO.user.host ?: account.getHost(),
-            emojis = emojiModels,
+            emojiMap = emojiModelsMap,
             text = noteDTO.text ?: "",
             instanceEmojis = instanceEmojis,
         )
 
         val emojisResultInCw = CustomEmojiParser.parse(
             sourceHost = noteDTO.user.host ?: account.getHost(),
-            emojis = emojiModels,
+            emojiMap = emojiModelsMap,
             text = noteDTO.cw ?: "",
             instanceEmojis = instanceEmojis,
         )
@@ -240,6 +235,23 @@ class NoteDTOEntityConverter @Inject constructor(
         val emojisInCw = emojisResultInCw.emojis.mapNotNull {
             (it.result as? EmojiResolvedType.Resolved?)?.emoji
         }
+
+        val reactions = noteDTO.reactionCounts?.map {
+            Reaction(it.key)
+        }?.filter {
+            it.isCustomEmojiFormat()
+        }
+        val remoteReactionEmojis = reactions?.mapNotNull {
+            emojiModelsMap[it.reaction.replace(":", "")]
+                ?: instanceEmojis?.get(it.getName())
+        } ?: emptyList()
+
+        val localReactionEmojis = customEmojiRepository.findByNames(
+            account.getHost(),
+            reactions?.mapNotNull {
+                it.getName()
+            } ?: emptyList()
+        ).getOrElse { emptyList() }
 
         val noteEmojis = if (instanceEmojis == null) {
             val unresolvedEmojiTags = emojisResultInText.emojis.mapNotNull {
@@ -258,7 +270,7 @@ class NoteDTOEntityConverter @Inject constructor(
             }
         } else {
             emptyList()
-        } + emojisInCw + emojisInText + emojiModels
+        } + emojisInCw + emojisInText + emojiModels + remoteReactionEmojis + localReactionEmojis
 
         return noteEmojis
     }

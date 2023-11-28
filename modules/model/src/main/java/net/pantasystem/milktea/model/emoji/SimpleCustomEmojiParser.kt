@@ -2,11 +2,7 @@ package net.pantasystem.milktea.model.emoji
 
 object CustomEmojiParser {
 
-
-    fun parse(sourceHost: String?, emojis: List<CustomEmoji>?, text: String, instanceEmojis: Map<String, CustomEmoji>? = null): CustomEmojiParsedResult {
-        val emojiMap = emojis?.associateBy {
-            it.name
-        }
+    fun parse(sourceHost: String?, emojiMap: Map<String, CustomEmoji>?, text: String, instanceEmojis: Map<String, CustomEmoji>? = null): CustomEmojiParsedResult {
         var cursor = 0
         var colonIndex = -1
         val emojiPosList = mutableListOf<EmojiPos>()
@@ -44,10 +40,10 @@ object CustomEmojiParser {
                     } else {
                         emojiPosList.add(
                             EmojiPos(
-                            result = emoji,
-                            start = colonIndex,
-                            end = cursor + 1
-                        )
+                                result = emoji,
+                                start = colonIndex,
+                                end = cursor + 1
+                            )
                         )
                         -1
                     }
@@ -56,6 +52,12 @@ object CustomEmojiParser {
             cursor ++
         }
         return CustomEmojiParsedResult(text, emojiPosList)
+    }
+    fun parse(sourceHost: String?, emojis: List<CustomEmoji>?, text: String, instanceEmojis: Map<String, CustomEmoji>? = null): CustomEmojiParsedResult {
+        val emojiMap = emojis?.associateBy {
+            it.name
+        }
+        return parse(sourceHost, emojiMap, text, instanceEmojis)
     }
 }
 
