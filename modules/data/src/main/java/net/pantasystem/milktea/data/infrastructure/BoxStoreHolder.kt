@@ -12,6 +12,6 @@ class BoxStoreHolder @Inject constructor(
 ) {
 
     val boxStore: BoxStore by lazy {
-        MyObjectBox.builder().androidContext(context).build()
+        MyObjectBox.builder().maxReaders(1024).androidContext(context).build()
     }
 }
