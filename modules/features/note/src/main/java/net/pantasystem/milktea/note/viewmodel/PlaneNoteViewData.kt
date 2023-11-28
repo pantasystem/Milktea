@@ -66,7 +66,7 @@ open class PlaneNoteViewData(
     val cwNode = MFMParser.parse(
         toShowNote.note.cw,
         toShowNote.note.emojiNameMap,
-        instanceEmojis = emojiRepository.getAndConvertToMap(account.getHost()),
+        instanceEmojis = emptyMap(),
         userHost = toShowNote.user
             .host,
         accountHost = account.getHost(),
@@ -90,7 +90,7 @@ open class PlaneNoteViewData(
     val textNode = getTextType(
         account,
         toShowNote,
-        emojiRepository.getAndConvertToMap(account.getHost()),
+        emptyMap(),
         (toShowNote.note.type as? Note.Type.Misskey)?.isRequireNyaize ?: false
     )
 
@@ -166,7 +166,7 @@ open class PlaneNoteViewData(
     val subNoteAvatarUrl = subNote?.user?.avatarUrl
     val subNoteTextNode = subNote?.let {
         getTextType(
-            account, it, emojiRepository.getAndConvertToMap(account.getHost()),
+            account, it, emptyMap(),
             (it.note.type as? Note.Type.Misskey)?.isRequireNyaize ?: false
         )
     }
@@ -175,7 +175,7 @@ open class PlaneNoteViewData(
     val subCwNode = MFMParser.parse(
         subNote?.note?.cw,
         emojis = subNote?.note?.emojiNameMap,
-        instanceEmojis = emojiRepository.getAndConvertToMap(account.getHost()),
+        instanceEmojis = emptyMap(),
         accountHost = account.getHost(),
         userHost = subNote?.user?.host,
         isRequireProcessNyaize = (toShowNote.note.type as? Note.Type.Misskey)?.isRequireNyaize

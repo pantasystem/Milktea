@@ -7,7 +7,11 @@ import net.pantasystem.milktea.api.misskey.notes.ReactionAcceptanceType
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.channel.Channel
 import net.pantasystem.milktea.model.drive.FileProperty
+import net.pantasystem.milktea.model.emoji.CustomEmoji
 import net.pantasystem.milktea.model.emoji.CustomEmojiAspectRatioDataSource
+import net.pantasystem.milktea.model.emoji.CustomEmojiParser
+import net.pantasystem.milktea.model.emoji.CustomEmojiRepository
+import net.pantasystem.milktea.model.emoji.EmojiResolvedType
 import net.pantasystem.milktea.model.image.ImageCache
 import net.pantasystem.milktea.model.image.ImageCacheRepository
 import net.pantasystem.milktea.model.instance.InstanceInfoService
@@ -25,12 +29,14 @@ class NoteDTOEntityConverter @Inject constructor(
     private val customEmojiAspectRatioDataSource: CustomEmojiAspectRatioDataSource,
     private val imageCacheRepository: ImageCacheRepository,
     private val instanceInfoService: InstanceInfoService,
+    private val customEmojiRepository: CustomEmojiRepository,
 ) {
 
     suspend fun convertAll(
         account: Account,
         noteDTOs: List<NoteDTO>,
-        instanceInfoType: InstanceInfoType? = null
+        instanceInfoType: InstanceInfoType? = null,
+        instanceEmojis: Map<String, CustomEmoji>? = null,
     ): List<Note> {
         val emojis = noteDTOs.flatMap {
             it.emojiList + (it.reactionEmojiList)
@@ -38,6 +44,7 @@ class NoteDTOEntityConverter @Inject constructor(
         val instanceInfo = instanceInfoType?.takeIf {
             it.uri == account.normalizedInstanceUri
         } ?: instanceInfoService.find(account.normalizedInstanceUri).getOrNull()
+
         val aspects = customEmojiAspectRatioDataSource.findIn(emojis.mapNotNull {
             it.url ?: it.uri
         }).getOrElse {
@@ -51,13 +58,16 @@ class NoteDTOEntityConverter @Inject constructor(
             it.sourceUrl
         }
 
+        val allEmojis = instanceEmojis ?: customEmojiRepository.findAndConvertToMap(account.getHost()).getOrElse { emptyMap() }
+
         return noteDTOs.map {
             convert(
                 account = account,
                 noteDTO = it,
                 instanceInfoType = instanceInfo,
                 aspects = aspects,
-                fileCaches = fileCaches
+                fileCaches = fileCaches,
+                instanceEmojis = allEmojis,
             )
         }
     }
@@ -65,7 +75,8 @@ class NoteDTOEntityConverter @Inject constructor(
     suspend fun convert(
         account: Account,
         noteDTO: NoteDTO,
-        instanceInfoType: InstanceInfoType? = null
+        instanceInfoType: InstanceInfoType? = null,
+        instanceEmojis: Map<String, CustomEmoji>? = null,
     ): Note {
         val emojis = noteDTO.emojiList
 
@@ -82,12 +93,15 @@ class NoteDTOEntityConverter @Inject constructor(
             it.sourceUrl
         }
         val info = instanceInfoType ?: instanceInfoService.find(account.normalizedInstanceUri).getOrNull()
+
+        val allEmojis = instanceEmojis ?: customEmojiRepository.findAndConvertToMap(account.getHost()).getOrElse { emptyMap() }
         return convert(
             account = account,
             noteDTO = noteDTO,
             instanceInfoType = info,
             aspects = aspects,
-            fileCaches = fileCaches
+            fileCaches = fileCaches,
+            instanceEmojis = allEmojis
         )
     }
 
@@ -96,7 +110,8 @@ class NoteDTOEntityConverter @Inject constructor(
         noteDTO: NoteDTO,
         instanceInfoType: InstanceInfoType? = null,
         aspects: Map<String, Float>,
-        fileCaches: Map<String, ImageCache>
+        fileCaches: Map<String, ImageCache>,
+        instanceEmojis: Map<String, CustomEmoji>? = null,
     ): Note {
         val emojis = noteDTO.emojiList
         val isRequireNyaize = (instanceInfoType?.isRequirePerformNyaizeFrontend ?: false)
@@ -108,6 +123,28 @@ class NoteDTOEntityConverter @Inject constructor(
                 User.Id(account.accountId, id)
             } ?: emptyList()
         )
+
+        val emojiModels = emojis.map {
+            it.toModel(aspects[it.url ?: it.uri], fileCaches[it.url ?: it.uri]?.cachePath)
+        }
+        val emojisInText = CustomEmojiParser.parse(
+            sourceHost = noteDTO.user.host ?: account.getHost(),
+            emojis = emojiModels,
+            text = noteDTO.text ?: "",
+            instanceEmojis = instanceEmojis,
+        ).emojis.mapNotNull {
+            (it.result as? EmojiResolvedType.Resolved?)?.emoji
+        }
+
+        val emojisInCw = CustomEmojiParser.parse(
+            sourceHost = noteDTO.user.host ?: account.getHost(),
+            emojis = emojiModels,
+            text = noteDTO.cw ?: "",
+            instanceEmojis = instanceEmojis,
+        ).emojis.mapNotNull {
+            (it.result as? EmojiResolvedType.Resolved?)?.emoji
+        }
+
         return Note(
             id = Note.Id(account.accountId, noteDTO.id),
             createdAt = noteDTO.createdAt,
@@ -119,9 +156,7 @@ class NoteDTOEntityConverter @Inject constructor(
             viaMobile = noteDTO.viaMobile,
             visibility = visibility,
             localOnly = noteDTO.localOnly,
-            emojis = emojis.map {
-                it.toModel(aspects[it.url ?: it.uri], fileCaches[it.url ?: it.uri]?.cachePath)
-            },
+            emojis = emojiModels + emojisInCw + emojisInText,
             app = null,
             fileIds = noteDTO.fileIds?.map { FileProperty.Id(account.accountId, it) },
             poll = noteDTO.poll?.toPoll(),
