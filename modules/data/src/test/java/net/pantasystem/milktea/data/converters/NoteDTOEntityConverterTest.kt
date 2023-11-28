@@ -44,6 +44,11 @@ class NoteDTOEntityConverterTest {
                         )
                     )
                 )
+            },
+            mock() {
+                onBlocking {
+                    findAndConvertToMap(any())
+                } doReturn Result.success(emptyMap())
             }
         )
 
@@ -135,6 +140,11 @@ class NoteDTOEntityConverterTest {
                         )
                     )
                 )
+            },
+            mock() {
+                onBlocking {
+                    findAndConvertToMap(any())
+                } doReturn Result.success(emptyMap())
             }
         )
 
@@ -228,6 +238,11 @@ class NoteDTOEntityConverterTest {
                         )
                     )
                 )
+            },
+            mock() {
+                onBlocking {
+                    findAndConvertToMap(any())
+                } doReturn Result.success(emptyMap())
             }
         )
 
