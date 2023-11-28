@@ -96,18 +96,17 @@ class NoteDTOEntityConverter @Inject constructor(
         }
         val info = instanceInfoType ?: instanceInfoService.find(account.normalizedInstanceUri).getOrNull()
 
-        val allEmojis = instanceEmojis ?: customEmojiRepository.findAndConvertToMap(account.getHost()).getOrElse { emptyMap() }
         return convert(
             account = account,
             noteDTO = noteDTO,
             instanceInfoType = info,
             aspects = aspects,
             fileCaches = fileCaches,
-            instanceEmojis = allEmojis
+            instanceEmojis = instanceEmojis
         )
     }
 
-    private fun convert(
+    private suspend fun convert(
         account: Account,
         noteDTO: NoteDTO,
         instanceInfoType: InstanceInfoType? = null,
@@ -129,21 +128,25 @@ class NoteDTOEntityConverter @Inject constructor(
         val emojiModels = emojis.map {
             it.toModel(aspects[it.url ?: it.uri], fileCaches[it.url ?: it.uri]?.cachePath)
         }
-        val emojisInText = CustomEmojiParser.parse(
+
+        val emojisResultInText = CustomEmojiParser.parse(
             sourceHost = noteDTO.user.host ?: account.getHost(),
             emojis = emojiModels,
             text = noteDTO.text ?: "",
             instanceEmojis = instanceEmojis,
-        ).emojis.mapNotNull {
-            (it.result as? EmojiResolvedType.Resolved?)?.emoji
-        }
+        )
 
-        val emojisInCw = CustomEmojiParser.parse(
+        val emojisResultInCw = CustomEmojiParser.parse(
             sourceHost = noteDTO.user.host ?: account.getHost(),
             emojis = emojiModels,
             text = noteDTO.cw ?: "",
             instanceEmojis = instanceEmojis,
-        ).emojis.mapNotNull {
+        )
+        val emojisInText = emojisResultInText.emojis.mapNotNull {
+            (it.result as? EmojiResolvedType.Resolved?)?.emoji
+        }
+
+        val emojisInCw = emojisResultInCw.emojis.mapNotNull {
             (it.result as? EmojiResolvedType.Resolved?)?.emoji
         }
 
@@ -155,7 +158,22 @@ class NoteDTOEntityConverter @Inject constructor(
             )
         } ?: emptyList()
 
-        val noteEmojis = emojiModels + emojisInCw + emojisInText
+        val noteEmojis = if (instanceEmojis == null) {
+            val unresolvedEmojiTags = emojisResultInText.emojis.mapNotNull {
+                (it.result as? EmojiResolvedType.UnResolved)?.tag
+            } + emojisResultInCw.emojis.mapNotNull {
+                (it.result as? EmojiResolvedType.UnResolved)?.tag
+            }
+            val reactionTags = noteDTO.reactionEmojiList.mapNotNull {
+                Reaction(it.name).getName()
+            }
+            customEmojiRepository.findByNames(noteDTO.user.host ?: account.getHost(), unresolvedEmojiTags + reactionTags).getOrElse {
+                emptyList()
+            } + emojisInCw + emojisInText + emojiModels
+            emptyList()
+        } else {
+            emojiModels + emojisInCw + emojisInText
+        }
 
         val emojiNameMap = noteEmojis.associateBy {
             it.name
