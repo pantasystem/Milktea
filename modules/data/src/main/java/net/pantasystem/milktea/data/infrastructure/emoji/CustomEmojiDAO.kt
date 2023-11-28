@@ -58,5 +58,11 @@ interface CustomEmojiDAO {
     """)
     suspend fun search(host: String, keyword: String): List<CustomEmojiRecord>
 
+    @Query("""
+        SELECT * FROM custom_emojis
+            WHERE emojiHost = :host AND name IN (:names)
+    """)
+    suspend fun findByNames(host: String, names: List<String>): List<CustomEmojiRecord>
+
 
 }

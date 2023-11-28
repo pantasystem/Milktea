@@ -187,7 +187,9 @@ internal class CustomEmojiRepositoryImpl @Inject constructor(
         val cached = customEmojiCache.getMap(host)
         if (cached.isNullOrEmpty()) {
 
-            val converted = loadAndConvert(host)
+            val converted = withContext(ioDispatcher) {
+                loadAndConvert(host)
+            }
             customEmojiCache.put(host, converted)
         } else {
             cached
@@ -202,6 +204,14 @@ internal class CustomEmojiRepositoryImpl @Inject constructor(
                 it.name.contains(keyword)
             }?.let {
                 emit(it)
+            }
+        }
+    }
+
+    override suspend fun findByNames(host: String, names: List<String>): Result<List<CustomEmoji>>  = runCancellableCatching {
+        withContext(ioDispatcher) {
+            customEmojiDAO.findByNames(host, names).map {
+                it.toModel()
             }
         }
     }

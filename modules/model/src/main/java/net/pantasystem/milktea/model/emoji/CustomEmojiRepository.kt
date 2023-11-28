@@ -13,6 +13,9 @@ interface CustomEmojiRepository {
      */
     suspend fun findByName(host: String, name: String): Result<List<CustomEmoji>>
 
+    suspend fun findByNames(host: String, names: List<String>): Result<List<CustomEmoji>>
+
+
     suspend fun addEmojis(host: String, emojis: List<EmojiWithAlias>): Result<Unit>
 
     suspend fun deleteEmojis(host: String, emojis: List<CustomEmoji>): Result<Unit>
