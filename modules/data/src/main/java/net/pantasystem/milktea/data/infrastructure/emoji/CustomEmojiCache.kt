@@ -14,12 +14,14 @@ class CustomEmojiCache @Inject constructor() : MemoryCacheCleaner.Cleanable {
     private val mappedCache = LRUCache<String, Map<String, CustomEmoji>>(3)
     private val listCache = LRUCache<String, List<CustomEmoji>>(3)
 
-    suspend fun put(host: String, emojis: List<CustomEmoji>) {
-        lock.withLock {
-            mappedCache.put(host, emojis.associateBy {
+    suspend fun put(host: String, emojis: List<CustomEmoji>): Map<String, CustomEmoji> {
+        return lock.withLock {
+            val mapped = emojis.associateBy {
                 it.name
-            })
+            }
+            mappedCache.put(host, mapped)
             listCache.put(host, emojis)
+            mapped
         }
     }
 

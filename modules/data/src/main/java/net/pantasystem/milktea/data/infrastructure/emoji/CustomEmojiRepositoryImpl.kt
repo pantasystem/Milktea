@@ -43,34 +43,8 @@ internal class CustomEmojiRepositoryImpl @Inject constructor(
             if (emojisInMemory != null) {
                 return@withContext emojisInMemory
             }
-            val nodeInfo = nodeInfoRepository.find(host).getOrThrow()
 
-            val emojis =  customEmojiDAO.findByHost(host).ifEmpty {
-                val remoteEmojis = fetch(nodeInfo).getOrThrow()
-                customEmojiInserter.convertAndReplaceAll(
-                    host,
-                    remoteEmojis,
-                )
-            }
-
-
-            val aspects = aspectRatioDataSource.findIn(emojis.mapNotNull {
-                it.url ?: it.uri
-            }).getOrElse { emptyList() }.associateBy {
-                it.uri
-            }
-            val fileCaches = imageCacheRepository.findBySourceUrls(emojis.mapNotNull {
-                it.url ?: it.uri
-            }).associateBy {
-                it.sourceUrl
-            }
-
-            val converted = emojis.map {
-                it.toModel(
-                    aspectRatio = aspects[it.url ?: it.uri]?.aspectRatio,
-                    cachePath = fileCaches[it.url ?: it.uri]?.cachePath,
-                )
-            }
+            val converted = loadAndConvert(host)
 
             customEmojiCache.put(host, converted)
             converted
@@ -141,6 +115,37 @@ internal class CustomEmojiRepositoryImpl @Inject constructor(
         }.flowOn(ioDispatcher)
     }
 
+    private suspend fun loadAndConvert(host: String): List<CustomEmoji> {
+        val nodeInfo = nodeInfoRepository.find(host).getOrThrow()
+
+        val emojis =  customEmojiDAO.findByHost(host).ifEmpty {
+            val remoteEmojis = fetch(nodeInfo).getOrThrow()
+            customEmojiInserter.convertAndReplaceAll(
+                host,
+                remoteEmojis,
+            )
+        }
+
+
+        val aspects = aspectRatioDataSource.findIn(emojis.mapNotNull {
+            it.url ?: it.uri
+        }).getOrElse { emptyList() }.associateBy {
+            it.uri
+        }
+        val fileCaches = imageCacheRepository.findBySourceUrls(emojis.mapNotNull {
+            it.url ?: it.uri
+        }).associateBy {
+            it.sourceUrl
+        }
+
+        return emojis.map {
+            it.toModel(
+                aspectRatio = aspects[it.url ?: it.uri]?.aspectRatio,
+                cachePath = fileCaches[it.url ?: it.uri]?.cachePath,
+            )
+        }
+    }
+
     private suspend fun fetch(nodeInfo: NodeInfo): Result<List<EmojiWithAlias>> = runCancellableCatching {
         customEmojiApiAdapter.fetch(nodeInfo)
     }
@@ -181,11 +186,12 @@ internal class CustomEmojiRepositoryImpl @Inject constructor(
     ): Result<Map<String, CustomEmoji>> = runCancellableCatching{
         val cached = customEmojiCache.getMap(host)
         if (cached.isNullOrEmpty()) {
-            findBy(host).getOrThrow()
+
+            val converted = loadAndConvert(host)
+            customEmojiCache.put(host, converted)
         } else {
-            return@runCancellableCatching cached
+            cached
         }
-        customEmojiCache.getMap(host) ?: emptyMap()
     }
 
     override fun observeWithSearch(host: String, keyword: String): Flow<List<CustomEmoji>> {
