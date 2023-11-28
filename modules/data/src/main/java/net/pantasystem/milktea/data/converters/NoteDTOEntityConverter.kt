@@ -19,6 +19,8 @@ import net.pantasystem.milktea.model.instance.InstanceInfoType
 import net.pantasystem.milktea.model.note.Note
 import net.pantasystem.milktea.model.note.Visibility
 import net.pantasystem.milktea.model.note.poll.Poll
+import net.pantasystem.milktea.model.note.reaction.LegacyReaction
+import net.pantasystem.milktea.model.note.reaction.Reaction
 import net.pantasystem.milktea.model.note.reaction.ReactionCount
 import net.pantasystem.milktea.model.user.User
 import javax.inject.Inject
@@ -145,6 +147,27 @@ class NoteDTOEntityConverter @Inject constructor(
             (it.result as? EmojiResolvedType.Resolved?)?.emoji
         }
 
+        val reactionCounts = noteDTO.reactionCounts?.map {
+            ReactionCount(
+                reaction = it.key,
+                count = it.value,
+                me = noteDTO.myReaction == it.key
+            )
+        } ?: emptyList()
+
+        val noteEmojis = emojiModels + emojisInCw + emojisInText
+
+        val emojiNameMap = noteEmojis.associateBy {
+            it.name
+        }
+
+        val reactionEmojis = reactionCounts.mapNotNull {  reactionCount ->
+            val textReaction = LegacyReaction.reactionMap[reactionCount.reaction] ?: reactionCount.reaction
+            val r = Reaction(textReaction)
+            emojiNameMap[textReaction.replace(":", "")]
+                ?: instanceEmojis?.get(r.getName())
+        }
+
         return Note(
             id = Note.Id(account.accountId, noteDTO.id),
             createdAt = noteDTO.createdAt,
@@ -156,17 +179,11 @@ class NoteDTOEntityConverter @Inject constructor(
             viaMobile = noteDTO.viaMobile,
             visibility = visibility,
             localOnly = noteDTO.localOnly,
-            emojis = emojiModels + emojisInCw + emojisInText,
+            emojis = noteEmojis + reactionEmojis,
             app = null,
             fileIds = noteDTO.fileIds?.map { FileProperty.Id(account.accountId, it) },
             poll = noteDTO.poll?.toPoll(),
-            reactionCounts = noteDTO.reactionCounts?.map {
-                ReactionCount(
-                    reaction = it.key,
-                    count = it.value,
-                    me = noteDTO.myReaction == it.key
-                )
-            } ?: emptyList(),
+            reactionCounts = reactionCounts,
             renoteCount = noteDTO.renoteCount,
             repliesCount = noteDTO.replyCount,
             uri = noteDTO.uri,

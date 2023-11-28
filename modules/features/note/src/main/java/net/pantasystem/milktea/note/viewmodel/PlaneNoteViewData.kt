@@ -151,7 +151,7 @@ open class PlaneNoteViewData(
             ReactionViewData.from(
                 reactions,
                 n,
-                emojiRepository.getAndConvertToMap(account.getHost())
+                emptyMap()
             )
         }
     }.flowOn(Dispatchers.Default).stateIn(

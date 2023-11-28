@@ -25,6 +25,7 @@ data class ReactionViewData(
                 val textReaction = LegacyReaction.reactionMap[reactionCount.reaction] ?: reactionCount.reaction
                 val r = Reaction(textReaction)
                 val emoji = noteEmojis?.get(textReaction.replace(":", ""))
+                    ?: noteEmojis?.get(r.getName())
                     ?: instanceEmojis?.get(r.getName())
                 ReactionViewData(
                     noteId = note.id,
