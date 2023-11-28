@@ -27,6 +27,9 @@ class UserDTOEntityConverterTest {
                 onBlocking {
                     findAndConvertToMap(any())
                 } doReturn Result.success(emptyMap())
+                onBlocking {
+                    findByNames(any(), any())
+                } doReturn Result.success(emptyList())
             },
             mock() {
                 onBlocking {
@@ -115,6 +118,9 @@ class UserDTOEntityConverterTest {
                 onBlocking {
                     getAndConvertToMap(any())
                 } doReturn mapOf()
+                onBlocking {
+                    findByNames(any(), any())
+                } doReturn Result.success(emptyList())
             },
             mock() {
                 onBlocking {
