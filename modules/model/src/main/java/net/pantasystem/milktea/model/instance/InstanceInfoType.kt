@@ -112,8 +112,8 @@ sealed interface InstanceInfoType {
     val isCwAllowBlank: Boolean get() {
         return when(this) {
             is Firefish -> true
-            is Mastodon -> false
-            is Misskey -> meta.getVersion() >= Version("2023.11.0") || meta.getVersion() >= Version("")
+            is Mastodon -> true
+            is Misskey -> meta.getVersion() < Version("2023.11.0")
             is Pleroma -> true
         }
     }
