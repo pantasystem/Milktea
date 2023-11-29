@@ -145,6 +145,10 @@ class KeysKtTest {
                     "IsShowWarningDisplayingSensitiveMedia",
                     key.str()
                 )
+                Keys.IsEnableHapticFeedbackOnNewPost -> Assertions.assertEquals(
+                    "IsEnableHapticFeedbackOnNewPost",
+                    key.str()
+                )
             }
         }
     }
@@ -152,8 +156,8 @@ class KeysKtTest {
 
     @Test
     fun checkAllKeysCount() {
-        Assertions.assertEquals(37, Keys.allKeys.size)
-        Assertions.assertEquals(37, Keys.allKeys.map { it.str() }.toSet().size)
+        Assertions.assertEquals(38, Keys.allKeys.size)
+        Assertions.assertEquals(38, Keys.allKeys.map { it.str() }.toSet().size)
     }
 
 
