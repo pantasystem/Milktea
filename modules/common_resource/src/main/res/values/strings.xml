@@ -648,4 +648,6 @@
     <string name="confirm_display_sensitive_media_dialog_neutral_button">Do not warn</string>
     <!-- reaction-acceptance -->
 
+    <string name="settings_enable_haptic_feedback_on_new_post">Enable haptic feedback on new post</string>
+
 </resources>
