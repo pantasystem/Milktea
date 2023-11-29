@@ -33,6 +33,7 @@ import net.pantasystem.milktea.common_viewmodel.CurrentPageableTimelineViewModel
 import net.pantasystem.milktea.common_viewmodel.ScrollToTopViewModel
 import net.pantasystem.milktea.model.account.page.Page
 import net.pantasystem.milktea.model.account.page.Pageable
+import net.pantasystem.milktea.model.setting.DefaultConfig
 import net.pantasystem.milktea.model.setting.LocalConfigRepository
 import net.pantasystem.milktea.note.R
 import net.pantasystem.milktea.note.databinding.FragmentTimelineBinding
@@ -353,6 +354,8 @@ class TimelineFragment : Fragment(R.layout.fragment_timeline), PageableView {
     }
 
     private fun performNewPostReceivedVibrateFeedback() {
-        HapticFeedbackController.performTickVibrateHapticFeedback(requireContext())
+        if (configRepository.get().getOrElse { DefaultConfig.config }.isEnableHapticFeedbackOnNewPost) {
+            HapticFeedbackController.performTickVibrateHapticFeedback(requireContext())
+        }
     }
 }
