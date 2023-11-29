@@ -185,6 +185,10 @@ class ConfigKtTest {
                     config.isShowWarningDisplayingSensitiveMedia,
                     (u as PrefType.BoolPref).value
                 )
+                Keys.IsEnableHapticFeedbackOnNewPost -> Assertions.assertEquals(
+                    config.isEnableHapticFeedbackOnNewPost,
+                    (u as PrefType.BoolPref).value
+                )
             }
         }
     }

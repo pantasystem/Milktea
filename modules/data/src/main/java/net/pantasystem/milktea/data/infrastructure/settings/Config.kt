@@ -164,6 +164,9 @@ fun Config.Companion.from(map: Map<Keys, PrefType?>): Config {
         isShowWarningDisplayingSensitiveMedia = map.getValue<PrefType.BoolPref>(
             Keys.IsShowWarningDisplayingSensitiveMedia
         )?.value ?: DefaultConfig.config.isShowWarningDisplayingSensitiveMedia,
+        isEnableHapticFeedbackOnNewPost = map.getValue<PrefType.BoolPref>(
+            Keys.IsEnableHapticFeedbackOnNewPost
+        )?.value ?: DefaultConfig.config.isEnableHapticFeedbackOnNewPost,
     )
 }
 
@@ -321,6 +324,9 @@ fun Config.pref(key: Keys): PrefType {
         }
         Keys.IsShowWarningDisplayingSensitiveMedia -> {
             PrefType.BoolPref(isShowWarningDisplayingSensitiveMedia)
+        }
+        Keys.IsEnableHapticFeedbackOnNewPost -> {
+            PrefType.BoolPref(isEnableHapticFeedbackOnNewPost)
         }
     }
 }

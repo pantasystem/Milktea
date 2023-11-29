@@ -39,6 +39,7 @@ val Keys.Companion.allKeys by lazy {
         Keys.IsSafeSearchEnabled,
         Keys.IsConfirmedSafeSearchEnabled,
         Keys.IsShowWarningDisplayingSensitiveMedia,
+        Keys.IsEnableHapticFeedbackOnNewPost,
     )
 }
 
@@ -112,6 +113,8 @@ sealed interface Keys {
 
     data object IsShowWarningDisplayingSensitiveMedia : Keys
 
+    data object IsEnableHapticFeedbackOnNewPost : Keys
+
     companion object
 }
 
@@ -154,5 +157,6 @@ fun Keys.str(): String {
         is Keys.IsSafeSearchEnabled -> "ExcludeIfExistsSensitiveMedia"
         is Keys.IsConfirmedSafeSearchEnabled -> "IsConfirmedSafeSearchEnabled"
         is Keys.IsShowWarningDisplayingSensitiveMedia -> "IsShowWarningDisplayingSensitiveMedia"
+        is Keys.IsEnableHapticFeedbackOnNewPost -> "IsEnableHapticFeedbackOnNewPost"
     }
 }

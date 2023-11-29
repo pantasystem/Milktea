@@ -95,6 +95,7 @@ data class Config(
     val mediaDisplayMode: MediaDisplayMode,
     val isEnableSafeSearch: IsSafeSearchEnabled,
     val isShowWarningDisplayingSensitiveMedia: Boolean,
+    val isEnableHapticFeedbackOnNewPost: Boolean,
 ) {
     companion object
 
@@ -164,6 +165,7 @@ object DefaultConfig {
             isConfirmed = false,
         ),
         isShowWarningDisplayingSensitiveMedia = true,
+        isEnableHapticFeedbackOnNewPost = true,
     )
 
     fun getRememberVisibilityConfig(accountId: Long): RememberVisibility.Remember {
