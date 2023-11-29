@@ -237,6 +237,15 @@ class SettingMovementActivity : AppCompatActivity() {
                                     Text(stringResource(id = R.string.is_stop_note_capture_when_background))
                                 }
                             }
+                            SettingSwitchTile(
+                                checked = currentConfigState.isEnableHapticFeedbackOnNewPost,
+                                onChanged = {
+                                    currentConfigState =
+                                        currentConfigState.copy(isEnableHapticFeedbackOnNewPost = it)
+                                }
+                            ) {
+                                Text(stringResource(id = R.string.settings_enable_haptic_feedback_on_new_post))
+                            }
                         }
                         SettingSection(title = stringResource(id = R.string.media)) {
                             Box(
