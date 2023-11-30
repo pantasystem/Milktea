@@ -123,10 +123,6 @@ class NoteEditorViewModel @Inject constructor(
             initialValue = 3000
         )
 
-    private val isCwAllowBlank = instanceInfoType.map {
-        it?.isCwAllowBlank ?: true
-    }.stateIn(viewModelScope, started = SharingStarted.Eagerly, initialValue = true)
-
 
     val enableFeatures = _currentAccount.filterNotNull().map {
         featureEnables.enableFeatures(it.normalizedInstanceUri)
@@ -245,8 +241,9 @@ class NoteEditorViewModel @Inject constructor(
         logger.error("observe meta error", it)
     }.stateIn(viewModelScope + Dispatchers.IO, started = SharingStarted.Lazily, initialValue = 1500)
 
-    val isPostAvailable = uiState.map {
-        it.checkValidate(textMaxLength = maxTextLength.value, maxFileCount = maxFileCount.value, isCwAllowBlank = isCwAllowBlank.value)
+    val isPostAvailable = combine(instanceInfoType, uiState) { instanceInfo, uiState ->
+        val isCwAllowBlank = instanceInfo?.isCwAllowBlank ?: true
+        uiState.checkValidate(textMaxLength = maxTextLength.value, maxFileCount = maxFileCount.value, isCwAllowBlank = isCwAllowBlank)
     }.stateIn(
         viewModelScope,
         SharingStarted.WhileSubscribed(5_000),
