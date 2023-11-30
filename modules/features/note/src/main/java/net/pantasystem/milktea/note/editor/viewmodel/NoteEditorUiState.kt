@@ -63,7 +63,7 @@ data class NoteEditorUiState(
             return false
         }
 
-        if(!isCwAllowBlank) {
+        if (!isCwAllowBlank && formState.hasCw && formState.cw.isNullOrEmpty()) {
             return false
         }
 
