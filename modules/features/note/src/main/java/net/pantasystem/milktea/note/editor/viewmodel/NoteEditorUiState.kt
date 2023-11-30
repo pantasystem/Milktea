@@ -58,8 +58,12 @@ data class NoteEditorUiState(
     val totalFilesCount: Int
         get() = this.files.size
 
-    fun checkValidate(textMaxLength: Int = 3000, maxFileCount: Int = 4): Boolean {
+    fun checkValidate(textMaxLength: Int = 3000, maxFileCount: Int = 4, isCwAllowBlank: Boolean = true): Boolean {
         if (this.files.size > maxFileCount) {
+            return false
+        }
+
+        if (!isCwAllowBlank && formState.hasCw && formState.cw.isNullOrEmpty()) {
             return false
         }
 
