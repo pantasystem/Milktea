@@ -231,62 +231,36 @@ class NoteEditorFragment : Fragment(R.layout.fragment_note_editor), EmojiSelecti
         toolbarBase.apply {
             setContent {
                 MilkteaStyleConfigApplyAndTheme(configRepository = configRepository) {
-                    val currentUser by noteEditorViewModel.user.collectAsState()
-                    val uiState by noteEditorViewModel.uiState.collectAsState()
-                    val isPostAvailable by noteEditorViewModel.isPostAvailable.collectAsState()
-                    val feedback = rememberHapticFeedback()
-                    NoteEditorToolbar(
-                        currentUser = currentUser,
-                        visibility = uiState.sendToState.visibility,
-                        validInputs = isPostAvailable,
-                        textCount = uiState.formState.text?.let {
-                            it.codePointCount(0, it.length)
-                        } ?: 0,
-                        onNavigateUpButtonClicked = {
-                            feedback.performClickHapticFeedback()
-                            finishOrConfirmSaveAsDraftOrDelete()
+                    NoteEditorToolbarBinding(
+                        noteEditorViewModel = noteEditorViewModel,
+                        accountViewModel = accountViewModel,
+                        onShowAlarmPermissionDescriptionDialogIfPermissionDenied = {
+                            if (!alarmManager.canScheduleExactAlarms()) {
+                                MaterialAlertDialogBuilder(requireContext())
+                                    .setTitle(R.string.alarm_permission_description_title)
+                                    .setMessage(R.string.alarm_permission_description_message)
+                                    .setPositiveButton(android.R.string.ok) { _, _ ->
+                                        startActivity(
+                                            Intent(
+                                                ACTION_REQUEST_SCHEDULE_EXACT_ALARM
+                                            )
+                                        )
+                                    }
+                                    .setNegativeButton(android.R.string.cancel) { _, _ ->
+                                        // do nothing
+                                    }
+                                    .show()
+                                return@NoteEditorToolbarBinding true
+                            }
+                            false
                         },
-                        onAvatarIconClicked = {
-                            feedback.performClickHapticFeedback()
-                            accountViewModel.showSwitchDialog()
-                        },
-                        onVisibilityButtonClicked = {
-                            feedback.performClickHapticFeedback()
+                        onFinishOrConfirmSaveAsDraftOrDelete = ::finishOrConfirmSaveAsDraftOrDelete,
+                        onShowVisibilitySelectionDialog = {
                             val dialog = VisibilitySelectionDialogV2()
                             dialog.show(
                                 childFragmentManager,
                                 VisibilitySelectionDialogV2.FRAGMENT_TAG
                             )
-                        },
-                        onScheduleButtonClicked = {
-                            feedback.performClickHapticFeedback()
-                            if (uiState.sendToState.schedulePostAt == null) {
-                                // check alarm permission
-                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                                    if (!alarmManager.canScheduleExactAlarms()) {
-                                        MaterialAlertDialogBuilder(requireContext())
-                                            .setTitle(R.string.alarm_permission_description_title)
-                                            .setMessage(R.string.alarm_permission_description_message)
-                                            .setPositiveButton(android.R.string.ok) { _, _ ->
-                                                startActivity(
-                                                    Intent(
-                                                        ACTION_REQUEST_SCHEDULE_EXACT_ALARM
-                                                    )
-                                                )
-                                            }
-                                            .setNegativeButton(android.R.string.cancel) { _, _ ->
-                                                // do nothing
-                                            }
-                                            .show()
-                                        return@NoteEditorToolbar
-                                    }
-                                }
-                            }
-                            noteEditorViewModel.toggleReservationAt()
-                        },
-                        onPostButtonClicked = {
-                            feedback.performClickHapticFeedback()
-                            noteEditorViewModel.post()
                         },
                     )
                 }
