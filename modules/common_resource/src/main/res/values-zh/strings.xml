@@ -640,5 +640,6 @@
     <string name="confirm_display_sensitive_media_dialog_positive_button">显示</string>
     <string name="confirm_display_sensitive_media_dialog_neutral_button">不要警告</string>
 
-    <string name="settings_enable_haptic_feedback_on_new_post">Enable haptic feedback on new post</string>
+
+    <string name="settings_enable_haptic_feedback_on_new_post">新帖子的触觉反馈</string>
 </resources>
