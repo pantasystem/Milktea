@@ -53,6 +53,14 @@ class InstanceTickerRepositoryImpl @Inject constructor(
         }
     }
 
+    override suspend fun get(host: String): Result<InstanceTicker?> = runCancellableCatching {
+        withContext(ioDispatcher) {
+            val record = instanceTickerDAO.find(host)
+
+            record?.toModel()
+        }
+    }
+
     override suspend fun findIn(hosts: List<String>): Result<List<InstanceTicker>> = runCancellableCatching {
         withContext(ioDispatcher) {
             val records = instanceTickerDAO.findIn(hosts)

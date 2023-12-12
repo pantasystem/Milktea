@@ -3,7 +3,7 @@ package net.pantasystem.milktea.data.converters
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import net.pantasystem.milktea.api.mastodon.accounts.MastodonAccountDTO
-import net.pantasystem.milktea.common.mapCancellableCatching
+import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.emoji.CustomEmoji
 import net.pantasystem.milktea.model.instance.ticker.InstanceTickerRepository
@@ -15,7 +15,10 @@ import javax.inject.Singleton
 class MastodonAccountDTOEntityConverter @Inject constructor(
     private val instanceTickerRepository: InstanceTickerRepository,
     private val coroutineScope: CoroutineScope,
+    loggerFactory: Logger.Factory
 ) {
+
+    private val logger = loggerFactory.create("AccountDTOEntityConverter")
 
     suspend fun convert(account: Account, dto: MastodonAccountDTO, related: User.Related? = null): User {
         val host = dto.acct.split("@").getOrNull(1) ?: account.getHost()
@@ -24,7 +27,9 @@ class MastodonAccountDTOEntityConverter @Inject constructor(
 
         coroutineScope.launch {
             if (!isSameHost) {
-                instanceTickerRepository.find(host)
+                instanceTickerRepository.find(host).onFailure {
+                    logger.error("Failed to find instance ticker", it)
+                }
             }
         }
 
@@ -46,15 +51,17 @@ class MastodonAccountDTOEntityConverter @Inject constructor(
             isCat = false,
             nickname = null,
             isSameHost = isSameHost,
-            instance = if (isSameHost) null else instanceTickerRepository.find(host).mapCancellableCatching {
-                User.InstanceInfo(
-                    name = it.name,
-                    faviconUrl = it.faviconUrl,
-                    iconUrl = it.iconUrl,
-                    softwareName = it.softwareName,
-                    softwareVersion = it.softwareVersion,
-                    themeColor = it.themeColor,
-                )
+            instance = if (isSameHost) null else instanceTickerRepository.get(host).mapCatching {
+                it?.let {
+                    User.InstanceInfo(
+                        name = it.name,
+                        faviconUrl = it.faviconUrl,
+                        iconUrl = it.iconUrl,
+                        softwareName = it.softwareName,
+                        softwareVersion = it.softwareVersion,
+                        themeColor = it.themeColor,
+                    )
+                }
             }.getOrNull(),
             avatarBlurhash = null,
             info = User.Info(

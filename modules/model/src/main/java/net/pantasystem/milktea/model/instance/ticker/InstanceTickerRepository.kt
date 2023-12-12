@@ -6,6 +6,8 @@ interface InstanceTickerRepository {
 
     suspend fun find(host: String): Result<InstanceTicker>
 
+    suspend fun get(host: String): Result<InstanceTicker?>
+
     suspend fun findIn(hosts: List<String>): Result<List<InstanceTicker>>
 
 }
