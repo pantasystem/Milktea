@@ -51,8 +51,10 @@ class MastodonAccountDTOEntityConverter @Inject constructor(
             isCat = false,
             nickname = null,
             isSameHost = isSameHost,
-            instance = if (isSameHost) null else instanceTickerRepository.get(host).mapCatching {
-                it?.let {
+            instance = if (isSameHost) null else instanceTickerRepository.get(host).mapCatching { instanceTicker ->
+                instanceTicker?.takeIf {
+                    it.isValid()
+                }?.let {
                     User.InstanceInfo(
                         name = it.name,
                         faviconUrl = it.faviconUrl,

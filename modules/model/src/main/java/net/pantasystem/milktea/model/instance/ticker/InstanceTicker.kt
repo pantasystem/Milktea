@@ -8,4 +8,9 @@ data class InstanceTicker(
     val softwareName: String?,
     val softwareVersion: String?,
     val themeColor: String?,
-)
+) {
+
+    fun isValid(): Boolean {
+        return uri.isNotEmpty() && name != null && themeColor != null
+    }
+}
