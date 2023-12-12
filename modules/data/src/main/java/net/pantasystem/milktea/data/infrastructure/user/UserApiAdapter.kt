@@ -11,6 +11,7 @@ import net.pantasystem.milktea.api.misskey.users.from
 import net.pantasystem.milktea.common.throwIfHasError
 import net.pantasystem.milktea.data.api.mastodon.MastodonAPIProvider
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
+import net.pantasystem.milktea.data.converters.MastodonAccountDTOEntityConverter
 import net.pantasystem.milktea.data.converters.UserDTOEntityConverter
 import net.pantasystem.milktea.data.infrastructure.note.reaction.impl.history.ReactionHistoryDao
 import net.pantasystem.milktea.data.infrastructure.toUserRelated
@@ -60,6 +61,7 @@ internal class UserApiAdapterImpl @Inject constructor(
     private val mastodonAPIProvider: MastodonAPIProvider,
     private val userDTOEntityConverter: UserDTOEntityConverter,
     private val nodeInfoRepository: NodeInfoRepository,
+    private val mastodonAccountDTOEntityConverter: MastodonAccountDTOEntityConverter,
 ) : UserApiAdapter {
 
     override suspend fun show(userId: User.Id, detail: Boolean): User {
@@ -89,9 +91,9 @@ internal class UserApiAdapterImpl @Inject constructor(
                         listOf(res.id)
                     ).throwIfHasError().body()
                     val related = requireNotNull(relationship).first().toUserRelated()
-                    res.toModel(account, related)
+                    mastodonAccountDTOEntityConverter.convert(account, res, related)
                 } else {
-                    res.toModel(account)
+                    mastodonAccountDTOEntityConverter.convert(account, res)
                 }
             }
         }
@@ -129,7 +131,7 @@ internal class UserApiAdapterImpl @Inject constructor(
                         type = "accounts"
                     ).throwIfHasError().body()
                 ).accounts.map {
-                    it.toModel(account)
+                    mastodonAccountDTOEntityConverter.convert(account, it)
                 }
 
             }
@@ -166,7 +168,9 @@ internal class UserApiAdapterImpl @Inject constructor(
                                             .getAccount(it)
                                             .throwIfHasError()
                                             .body()
-                                    ).toModel(account)
+                                    ).let {
+                                        mastodonAccountDTOEntityConverter.convert(account, it)
+                                    }
                                 }
                             }.awaitAll()
 
@@ -218,7 +222,9 @@ internal class UserApiAdapterImpl @Inject constructor(
                 } else {
                     emptyMap()
                 }
-                dto?.toModel(account, relationships?.get(dto.id)?.toUserRelated())
+                dto?.let {
+                    mastodonAccountDTOEntityConverter.convert(account, it, relationships?.get(it.id)?.toUserRelated())
+                }
             }
         } ?: throw UserNotFoundException(
             null,
@@ -244,6 +250,7 @@ class UserSuggestionsApiAdapterImpl @Inject constructor(
     private val reactionHistoryDao: ReactionHistoryDao,
     private val userDataSource: UserDataSource,
     private val userDTOEntityConverter: UserDTOEntityConverter,
+    private val mastodonAccountDTOEntityConverter: MastodonAccountDTOEntityConverter,
 ): UserSuggestionsApiAdapter {
     override suspend fun showSuggestions(accountId: Long, query: FindUsersQuery): List<User> {
         val account = accountRepository.get(accountId).getOrThrow()
@@ -266,7 +273,7 @@ class UserSuggestionsApiAdapterImpl @Inject constructor(
                     }
                 }
                 val models = accounts.map {
-                    it.toModel(account, relationships[it.id]?.toUserRelated())
+                    mastodonAccountDTOEntityConverter.convert(account, it, relationships[it.id]?.toUserRelated())
                 }
                 models
             }

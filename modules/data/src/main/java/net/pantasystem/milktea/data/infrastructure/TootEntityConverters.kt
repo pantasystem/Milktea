@@ -7,6 +7,7 @@ import net.pantasystem.milktea.api.mastodon.notification.MstNotificationDTO
 import net.pantasystem.milktea.api.mastodon.poll.TootPollDTO
 import net.pantasystem.milktea.api.mastodon.status.StatusVisibilityType
 import net.pantasystem.milktea.api.mastodon.status.TootStatusDTO
+import net.pantasystem.milktea.data.converters.MastodonAccountDTOEntityConverter
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.drive.FileProperty
 import net.pantasystem.milktea.model.instance.MastodonInstanceInfo
@@ -62,13 +63,14 @@ fun TootMediaAttachment.toFileProperty(account: Account, isSensitive: Boolean): 
 }
 
 
-fun TootStatusDTO.toEntities(
+suspend fun TootStatusDTO.toEntities(
     account: Account,
+    dtoEntityConverter: MastodonAccountDTOEntityConverter,
 ): TootDTOUnpacked {
     val users = mutableListOf<User>()
     val notes = mutableListOf<TootStatusDTO>()
     val files = mutableListOf<FileProperty>()
-    pickEntities(account, notes, users, files)
+    pickEntities(account, notes, users, files, dtoEntityConverter)
     return TootDTOUnpacked(
         this,
         files = files,
@@ -77,13 +79,14 @@ fun TootStatusDTO.toEntities(
     )
 }
 
-fun TootStatusDTO.pickEntities(
+suspend fun TootStatusDTO.pickEntities(
     account: Account,
     notes: MutableList<TootStatusDTO>,
     users: MutableList<User>,
     files: MutableList<FileProperty>,
+    dtoEntityConverter: MastodonAccountDTOEntityConverter,
 ) {
-    val user = this.account.toModel(account)
+    val user = dtoEntityConverter.convert(account, this.account)
     notes.add(this)
     users.add(user)
     files.addAll(
@@ -91,8 +94,8 @@ fun TootStatusDTO.pickEntities(
             it.toFileProperty(account, sensitive)
         }
     )
-    this.reblog?.pickEntities(account, notes, users, files)
-    this.quote?.pickEntities(account, notes, users, files)
+    this.reblog?.pickEntities(account, notes, users, files, dtoEntityConverter)
+    this.quote?.pickEntities(account, notes, users, files, dtoEntityConverter)
 }
 
 fun MastodonAccountRelationshipDTO.toUserRelated(): User.Related {

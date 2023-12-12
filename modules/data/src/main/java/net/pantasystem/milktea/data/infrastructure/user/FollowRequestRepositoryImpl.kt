@@ -3,6 +3,7 @@ package net.pantasystem.milktea.data.infrastructure.user
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import net.pantasystem.milktea.common_android.hilt.IODispatcher
+import net.pantasystem.milktea.data.converters.MastodonAccountDTOEntityConverter
 import net.pantasystem.milktea.data.converters.UserDTOEntityConverter
 import net.pantasystem.milktea.data.infrastructure.toUserRelated
 import net.pantasystem.milktea.model.account.AccountRepository
@@ -15,6 +16,7 @@ class FollowRequestRepositoryImpl @Inject constructor(
     private val followRequestApiAdapter: FollowRequestApiAdapter,
     private val accountRepository: AccountRepository,
     private val userDTOEntityConverter: UserDTOEntityConverter,
+    private val mastodonAccountDTOEntityConverter: MastodonAccountDTOEntityConverter,
     @IODispatcher private val ioDispatcher: CoroutineDispatcher,
 ): FollowRequestRepository {
 
@@ -88,7 +90,7 @@ class FollowRequestRepositoryImpl @Inject constructor(
             )) {
                 is FindFollowRequestsResult.Mastodon -> {
                     val users = result.accounts.map {
-                        it.toModel(account)
+                        mastodonAccountDTOEntityConverter.convert(account, it)
                     }
                     userDataSource.addAll(users)
                     FollowRequestsResult(

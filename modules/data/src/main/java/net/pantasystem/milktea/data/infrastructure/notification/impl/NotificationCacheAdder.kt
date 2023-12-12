@@ -2,6 +2,7 @@ package net.pantasystem.milktea.data.infrastructure.notification.impl
 
 import net.pantasystem.milktea.api.mastodon.notification.MstNotificationDTO
 import net.pantasystem.milktea.api.misskey.notification.NotificationDTO
+import net.pantasystem.milktea.data.converters.MastodonAccountDTOEntityConverter
 import net.pantasystem.milktea.data.converters.NotificationDTOEntityConverter
 import net.pantasystem.milktea.data.converters.TootDTOEntityConverter
 import net.pantasystem.milktea.data.converters.UserDTOEntityConverter
@@ -30,6 +31,7 @@ class NotificationCacheAdder @Inject constructor(
     private val notificationDTOEntityConverter: NotificationDTOEntityConverter,
     private val markerRepository: MarkerRepository,
     private val tootDTOEntityConverter: TootDTOEntityConverter,
+    private val mastodonAccountDTOEntityConverter: MastodonAccountDTOEntityConverter,
 ) {
     suspend fun addAndConvert(account: Account, notificationDTO: NotificationDTO, skipExists: Boolean = false): NotificationRelation {
         val user = notificationDTO.user?.let {
@@ -67,7 +69,7 @@ class NotificationCacheAdder @Inject constructor(
         }.getOrElse {
             ""
         }
-        val user = mstNotificationDTO.account.toModel(account)
+        val user = mastodonAccountDTOEntityConverter.convert(account, mstNotificationDTO.account)
         val noteRelation = mstNotificationDTO.status?.let {
             tootDTOEntityConverter.convert(it, account)
         }?.let {
