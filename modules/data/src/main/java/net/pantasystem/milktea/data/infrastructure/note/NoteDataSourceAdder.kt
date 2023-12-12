@@ -4,6 +4,7 @@ import net.pantasystem.milktea.api.mastodon.status.TootStatusDTO
 import net.pantasystem.milktea.api.misskey.notes.NoteDTO
 import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.data.converters.FilePropertyDTOEntityConverter
+import net.pantasystem.milktea.data.converters.MastodonAccountDTOEntityConverter
 import net.pantasystem.milktea.data.converters.NoteDTOEntityConverter
 import net.pantasystem.milktea.data.converters.TootDTOEntityConverter
 import net.pantasystem.milktea.data.converters.UserDTOEntityConverter
@@ -32,7 +33,8 @@ class NoteDataSourceAdder @Inject constructor(
     private val filePropertyDTOEntityConverter: FilePropertyDTOEntityConverter,
     private val tootDTOEntityConverter: TootDTOEntityConverter,
     private val instanceInfoService: InstanceInfoService,
-    private val loggerFactory: Logger.Factory
+    private val loggerFactory: Logger.Factory,
+    private val mastodonAccountDTOEntityConverter: MastodonAccountDTOEntityConverter,
 ) {
 
     private val logger by lazy {
@@ -193,6 +195,7 @@ class NoteDataSourceAdder @Inject constructor(
         val entities = statuses.map {
             it.toEntities(
                 account,
+                mastodonAccountDTOEntityConverter,
             )
         }
         val notes = entities.flatMap {
@@ -262,7 +265,7 @@ class NoteDataSourceAdder @Inject constructor(
         status: TootStatusDTO,
         skipExists: Boolean = false
     ): Note {
-        val entities = status.toEntities(account)
+        val entities = status.toEntities(account, mastodonAccountDTOEntityConverter)
         val willReturnNote = tootDTOEntityConverter.convert(entities.toot, account)
         noteDataSource.add(willReturnNote)
         if (skipExists) {

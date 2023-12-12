@@ -15,6 +15,7 @@ import net.pantasystem.milktea.common.*
 import net.pantasystem.milktea.common.paginator.*
 import net.pantasystem.milktea.data.api.mastodon.MastodonAPIProvider
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
+import net.pantasystem.milktea.data.converters.MastodonAccountDTOEntityConverter
 import net.pantasystem.milktea.data.converters.UserDTOEntityConverter
 import net.pantasystem.milktea.data.infrastructure.note.NoteDataSourceAdder
 import net.pantasystem.milktea.data.infrastructure.toUserRelated
@@ -37,6 +38,7 @@ class FollowFollowerPagingStoreImpl(
     val noteDataSourceAdder: NoteDataSourceAdder,
     val userDTOEntityConverter: UserDTOEntityConverter,
     val nodeInfoRepository: NodeInfoRepository,
+    val mastodonAccountDTOEntityConverter: MastodonAccountDTOEntityConverter,
 ) : FollowFollowerPagingStore {
 
     class Factory @Inject constructor(
@@ -48,6 +50,7 @@ class FollowFollowerPagingStoreImpl(
         val noteDataSourceAdder: NoteDataSourceAdder,
         val userDTOEntityConverter: UserDTOEntityConverter,
         val nodeInfoRepository: NodeInfoRepository,
+        private val mastodonAccountDTOEntityConverter: MastodonAccountDTOEntityConverter,
     ) : FollowFollowerPagingStore.Factory {
         override fun create(type: RequestType): FollowFollowerPagingStore {
             return FollowFollowerPagingStoreImpl(
@@ -60,6 +63,7 @@ class FollowFollowerPagingStoreImpl(
                 mastodonAPIProvider = mastodonAPIProvider,
                 userDTOEntityConverter = userDTOEntityConverter,
                 nodeInfoRepository = nodeInfoRepository,
+                mastodonAccountDTOEntityConverter = mastodonAccountDTOEntityConverter,
             )
         }
     }
@@ -72,6 +76,7 @@ class FollowFollowerPagingStoreImpl(
         mastodonAPIProvider = mastodonAPIProvider,
         userDTOEntityConverter = userDTOEntityConverter,
         nodeInfoRepository = nodeInfoRepository,
+        mastodonAccountDTOEntityConverter = mastodonAccountDTOEntityConverter,
     )
 
     private val previousPagingController = PreviousPagingController.create(
@@ -134,6 +139,7 @@ class FollowFollowerPagingModelImpl(
     val mastodonAPIProvider: MastodonAPIProvider,
     val userDTOEntityConverter: UserDTOEntityConverter,
     val nodeInfoRepository: NodeInfoRepository,
+    private val mastodonAccountDTOEntityConverter: MastodonAccountDTOEntityConverter,
 ) : StateLocker,
     PreviousLoader<FollowFollowerResponseItemType>,
     EntityConverter<FollowFollowerResponseItemType, UserIdAndNextId>,
@@ -152,7 +158,7 @@ class FollowFollowerPagingModelImpl(
                     userDTOEntityConverter.convert(account, it.userDTO, true)
                 }
                 is FollowFollowerResponseItemType.Mastodon -> {
-                    it.userDTO.toModel(account, it.relationship?.toUserRelated())
+                    mastodonAccountDTOEntityConverter.convert(account, it.userDTO,  it.relationship?.toUserRelated())
                 }
                 is FollowFollowerResponseItemType.V10 -> {
                     userDTOEntityConverter.convert(account, it.userDTO, true)

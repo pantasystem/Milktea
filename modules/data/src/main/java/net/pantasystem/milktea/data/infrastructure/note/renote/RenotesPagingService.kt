@@ -20,6 +20,7 @@ import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.common.throwIfHasError
 import net.pantasystem.milktea.data.api.mastodon.MastodonAPIProvider
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
+import net.pantasystem.milktea.data.converters.MastodonAccountDTOEntityConverter
 import net.pantasystem.milktea.data.infrastructure.note.NoteDataSourceAdder
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.AccountRepository
@@ -37,6 +38,7 @@ class RenotesPagingServiceImpl(
     val accountRepository: AccountRepository,
     val noteDataSourceAdder: NoteDataSourceAdder,
     val userDataSource: UserDataSource,
+    mastodonAccountDTOEntityConverter: MastodonAccountDTOEntityConverter,
     ) : RenotesPagingService {
 
     class Factory @Inject constructor(
@@ -45,6 +47,7 @@ class RenotesPagingServiceImpl(
         val noteDataSourceAdder: NoteDataSourceAdder,
         val mastodonAPIProvider: MastodonAPIProvider,
         val userDataSource: UserDataSource,
+        private val mastodonAccountDTOEntityConverter: MastodonAccountDTOEntityConverter,
     ) : RenotesPagingService.Factory {
         override fun create(noteId: Note.Id): RenotesPagingService {
             return RenotesPagingServiceImpl(
@@ -54,6 +57,7 @@ class RenotesPagingServiceImpl(
                 accountRepository,
                 noteDataSourceAdder,
                 userDataSource,
+                mastodonAccountDTOEntityConverter,
             )
         }
     }
@@ -63,7 +67,8 @@ class RenotesPagingServiceImpl(
         mastodonAPIProvider,
         accountRepository,
         noteDataSourceAdder,
-        userDataSource
+        userDataSource,
+        mastodonAccountDTOEntityConverter,
     )
     private val controller =
         PreviousPagingController(pagingImpl, pagingImpl, pagingImpl, pagingImpl)
@@ -94,6 +99,7 @@ class RenotesPagingImpl(
     val accountRepository: AccountRepository,
     val noteDataSourceAdder: NoteDataSourceAdder,
     val userDataSource: UserDataSource,
+    val mastodonAccountDTOEntityConverter: MastodonAccountDTOEntityConverter,
 ) : PreviousLoader<RenoteNetworkDTO>,
     EntityConverter<RenoteNetworkDTO, RenoteType>,
     StateLocker,
@@ -152,7 +158,7 @@ class RenotesPagingImpl(
         return list.map {
             when(it) {
                 is RenoteNetworkDTO.Reblog -> {
-                    val model = it.accountDTO.toModel(account = account)
+                    val model = mastodonAccountDTOEntityConverter.convert(account, it.accountDTO)
                     userDataSource.add(model).getOrThrow()
                     RenoteType.Reblog(model.id)
                 }

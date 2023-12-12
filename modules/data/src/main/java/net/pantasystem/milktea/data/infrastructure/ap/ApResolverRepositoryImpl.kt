@@ -9,6 +9,7 @@ import net.pantasystem.milktea.common.throwIfHasError
 import net.pantasystem.milktea.common_android.hilt.IODispatcher
 import net.pantasystem.milktea.data.api.mastodon.MastodonAPIProvider
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
+import net.pantasystem.milktea.data.converters.MastodonAccountDTOEntityConverter
 import net.pantasystem.milktea.data.converters.UserDTOEntityConverter
 import net.pantasystem.milktea.data.infrastructure.note.NoteDataSourceAdder
 import net.pantasystem.milktea.model.account.Account
@@ -25,6 +26,7 @@ class ApResolverRepositoryImpl @Inject constructor(
     private val noteDataSourceAdder: NoteDataSourceAdder,
     private val userDataSource: UserDataSource,
     private val userDTOEntityConverter: UserDTOEntityConverter,
+    private val mastodonAccountDTOEntityConverter: MastodonAccountDTOEntityConverter,
     @IODispatcher private val ioDispatcher: CoroutineDispatcher
 ): ApResolverRepository {
 
@@ -60,7 +62,7 @@ class ApResolverRepositoryImpl @Inject constructor(
                     ).throwIfHasError().body()
                     requireNotNull(body).let { res ->
                         val accounts = res.accounts.map {
-                            it.toModel(account)
+                            mastodonAccountDTOEntityConverter.convert(account, it)
                         }
                         userDataSource.addAll(accounts)
                         val statuses = res.statuses.map {
