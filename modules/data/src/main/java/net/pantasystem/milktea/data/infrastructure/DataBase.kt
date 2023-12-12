@@ -29,6 +29,8 @@ import net.pantasystem.milktea.data.infrastructure.instance.db.MastodonInstanceI
 import net.pantasystem.milktea.data.infrastructure.instance.db.MetaDAO
 import net.pantasystem.milktea.data.infrastructure.instance.db.MetaDTO
 import net.pantasystem.milktea.data.infrastructure.instance.db.PleromaMetadataFeatures
+import net.pantasystem.milktea.data.infrastructure.instance.ticker.db.InstanceTickerDAO
+import net.pantasystem.milktea.data.infrastructure.instance.ticker.db.InstanceTickerRecord
 import net.pantasystem.milktea.data.infrastructure.list.UserListDao
 import net.pantasystem.milktea.data.infrastructure.list.UserListMemberIdRecord
 import net.pantasystem.milktea.data.infrastructure.list.UserListMemberView
@@ -132,8 +134,10 @@ import net.pantasystem.milktea.data.infrastructure.user.renote.mute.db.RenoteMut
 
         CustomEmojiRecord::class,
         CustomEmojiAliasRecord::class,
+
+        InstanceTickerRecord::class,
     ],
-    version = 60,
+    version = 61,
     exportSchema = true,
     autoMigrations = [
         AutoMigration(from = 11, to = 12),
@@ -183,6 +187,7 @@ import net.pantasystem.milktea.data.infrastructure.user.renote.mute.db.RenoteMut
         AutoMigration(from = 56, to = 57),
         AutoMigration(from = 58, to = 59),
         AutoMigration(from = 59, to = 60),
+        AutoMigration(from = 60, to = 61),
     ],
     views = [UserView::class, GroupMemberView::class, UserListMemberView::class]
 )
@@ -241,4 +246,6 @@ abstract class DataBase : RoomDatabase() {
     abstract fun renoteMuteDao(): RenoteMuteDao
 
     abstract fun customEmojiDao(): CustomEmojiDAO
+
+    abstract fun instanceTickerDAO(): InstanceTickerDAO
 }

@@ -134,4 +134,8 @@ object DbModule {
     @Provides
     @Singleton
     fun provideCustomEmojiDao(db: DataBase) = db.customEmojiDao()
+
+    @Provides
+    @Singleton
+    fun provideInstanceTickerDao(db: DataBase) = db.instanceTickerDAO()
 }
