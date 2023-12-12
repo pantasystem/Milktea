@@ -19,6 +19,7 @@ import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.common.throwIfHasError
 import net.pantasystem.milktea.data.api.mastodon.MastodonAPIProvider
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
+import net.pantasystem.milktea.data.converters.MastodonAccountDTOEntityConverter
 import net.pantasystem.milktea.data.converters.UserDTOEntityConverter
 import net.pantasystem.milktea.data.infrastructure.account.newAccount
 import net.pantasystem.milktea.data.infrastructure.auth.Authorization
@@ -48,6 +49,7 @@ class AuthStateHelper @Inject constructor(
     private val userDataSource: UserDataSource,
     private val userDTOEntityConverter: UserDTOEntityConverter,
     private val instanceInfoService: InstanceInfoService,
+    private val mastodonAccountDTOEntityConverter: MastodonAccountDTOEntityConverter,
 ) {
 
 
@@ -199,7 +201,10 @@ class AuthStateHelper @Inject constructor(
         ).getOrThrow()
         val user = when (val token = a.accessToken) {
             is AccessToken.Mastodon -> {
-                token.account.toModel(account)
+                mastodonAccountDTOEntityConverter.convert(
+                    account,
+                    token.account,
+                )
             }
             is AccessToken.Misskey -> {
                 userDTOEntityConverter.convert(
@@ -216,7 +221,10 @@ class AuthStateHelper @Inject constructor(
                 ) as User.Detail
             }
             is AccessToken.Pleroma -> {
-                (a.accessToken as AccessToken.Pleroma).account.toModel(account)
+                mastodonAccountDTOEntityConverter.convert(
+                    account,
+                    token.account,
+                )
             }
             is AccessToken.Firefish -> {
                 userDTOEntityConverter.convert(
