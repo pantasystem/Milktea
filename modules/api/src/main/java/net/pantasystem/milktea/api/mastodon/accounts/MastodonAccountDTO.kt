@@ -57,51 +57,7 @@ data class MastodonAccountDTO(
 
     @SerialName("statuses_count")
     val statusesCount: Long,
-) {
-//    fun toModel(account: Account, related: User.Related? = null): User {
-//        return User.Detail(
-//            User.Id(account.accountId, this.id),
-//            userName = username,
-//            name = displayName,
-//            avatarUrl = avatar,
-//            emojis = emojis.map {
-//                CustomEmoji(
-//                    name = it.shortcode,
-//                    uri = it.url,
-//                    url = it.url,
-//                    category = it.category,
-//                )
-//            },
-//            host = acct.split("@").getOrNull(1) ?: account.getHost(),
-//            isBot = bot,
-//            isCat = false,
-//            nickname = null,
-//            isSameHost = acct.split("@").getOrNull(1) == null
-//                    || acct.split("@").getOrNull(1) == account.getHost(),
-//            instance = null,
-//            avatarBlurhash = null,
-//            info = User.Info(
-//                followersCount = followersCount.toInt(),
-//                followingCount = followingCount.toInt(),
-//                notesCount = statusesCount.toInt(),
-//                hostLower = null,
-//                pinnedNoteIds = null,
-//                bannerUrl = header,
-//                url = url,
-//                isLocked = locked,
-//                birthday = null,
-//                fields = emptyList(),
-//                createdAt = createdAt,
-//                updatedAt = null,
-//                isPublicReactions = false,
-//                description = note,
-//                ffVisibility = null,
-//            ),
-//            related = related,
-//            badgeRoles = emptyList(),
-//        )
-//    }
-}
+)
 
 
 @Serializable
