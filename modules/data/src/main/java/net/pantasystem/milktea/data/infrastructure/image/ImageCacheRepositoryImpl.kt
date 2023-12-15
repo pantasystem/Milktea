@@ -121,10 +121,10 @@ class ImageCacheRepositoryImpl @Inject constructor(
     override suspend fun findBySourceUrls(urls: List<String>): Result<List<ImageCache>> = runCancellableCatching {
         withContext(coroutineDispatcher) {
             val now = Clock.System.now()
-            urls.chunked(100) { urls ->
+            urls.chunked(50) { list ->
                 val records = imageCacheStore.query().inValues(
                     ImageCacheRecord_.sourceUrl,
-                    urls.toTypedArray(),
+                    list.toTypedArray(),
                     QueryBuilder.StringOrder.CASE_SENSITIVE
                 ).build().find()
                 records.mapNotNull { record ->

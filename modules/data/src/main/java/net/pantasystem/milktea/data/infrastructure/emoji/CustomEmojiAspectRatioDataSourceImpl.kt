@@ -25,10 +25,10 @@ class CustomEmojiAspectRatioDataSourceImpl @Inject constructor(
     override suspend fun findIn(uris: List<String>): Result<List<CustomEmojiAspectRatio>> =
         runCancellableCatching {
             withContext(coroutineDispatcher) {
-                uris.chunked(125) { uris ->
+                uris.chunked(50) { list ->
                     aspectBox.query().inValues(
                         CustomEmojiAspectRatioRecord_.uri,
-                        uris.toTypedArray(),
+                        list.toTypedArray(),
                         QueryBuilder.StringOrder.CASE_SENSITIVE
                     ).build().find().map {
                         CustomEmojiAspectRatio(
