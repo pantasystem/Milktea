@@ -27,9 +27,16 @@ inline fun <R> runCancellableCatching(block: () -> R): Result<R> {
 }
 
 inline fun <R, T> Result<T>.mapCancellableCatching(transform: (value: T) -> R): Result<R> {
-    val successResult = getOrNull()
-    return when {
-        successResult != null -> runCancellableCatching { transform(successResult) }
-        else -> Result.failure(exceptionOrNull() ?: error("Unreachable state"))
+    return try {
+        val result = getOrThrow()
+        runCancellableCatching {
+            transform(result)
+        }
+    } catch (e: CancellationException) {
+        throw e
+    } catch (e: OutOfMemoryError) {
+        throw e
+    } catch (e: Exception) {
+        return Result.failure(e)
     }
 }
