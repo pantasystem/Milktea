@@ -39,7 +39,7 @@ class UserDTOEntityConverterTest {
             mock() {
                 onBlocking {
                     findBySourceUrls(any())
-                } doReturn emptyList()
+                } doReturn Result.success(emptyList())
             }
         )
 
@@ -130,7 +130,7 @@ class UserDTOEntityConverterTest {
             mock() {
                 onBlocking {
                     findBySourceUrls(any())
-                } doReturn emptyList()
+                } doReturn Result.success(emptyList())
             }
         )
 

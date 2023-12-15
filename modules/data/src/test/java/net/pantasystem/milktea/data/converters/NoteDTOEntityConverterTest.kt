@@ -31,7 +31,7 @@ class NoteDTOEntityConverterTest {
             mock() {
                 onBlocking {
                     findBySourceUrls(any())
-                } doReturn emptyList()
+                } doReturn Result.success(emptyList())
             },
             mock() {
                 onBlocking {
@@ -129,7 +129,7 @@ class NoteDTOEntityConverterTest {
             mock() {
                 onBlocking {
                     findBySourceUrls(any())
-                } doReturn emptyList()
+                } doReturn Result.success(emptyList())
             },
             mock() {
                 onBlocking {
@@ -230,7 +230,7 @@ class NoteDTOEntityConverterTest {
             mock() {
                 onBlocking {
                     findBySourceUrls(any())
-                } doReturn emptyList()
+                } doReturn Result.success(emptyList())
             },
             mock() {
                 onBlocking {
