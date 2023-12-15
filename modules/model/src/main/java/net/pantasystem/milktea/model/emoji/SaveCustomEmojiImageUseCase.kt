@@ -12,7 +12,7 @@ class SaveCustomEmojiImageUseCase @Inject constructor(
 ) : UseCase {
     suspend operator fun invoke(emoji: CustomEmoji): Result<ImageCache?> = runCancellableCatching {
         val url = emoji.url ?: emoji.uri ?: return@runCancellableCatching null
-        val result = imageCacheRepository.save(url)
+        val result = imageCacheRepository.save(url).getOrThrow()
         val width = result.width?.takeIf {
             it > 0
         } ?: return@runCancellableCatching result

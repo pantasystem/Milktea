@@ -63,7 +63,7 @@ internal class CustomEmojiRepositoryImpl @Inject constructor(
             }
             val fileCaches = imageCacheRepository.findBySourceUrls(dtoList.mapNotNull {
                 it.url ?: it.uri
-            }).associateBy {
+            }).getOrElse { emptyList() }.associateBy {
                 it.sourceUrl
             }
             dtoList.map {
@@ -87,7 +87,7 @@ internal class CustomEmojiRepositoryImpl @Inject constructor(
             }
             val fileCaches = imageCacheRepository.findBySourceUrls(remoteEmojis.mapNotNull {
                 it.emoji.url ?: it.emoji.uri
-            }).associateBy {
+            }).getOrElse { emptyList() }.associateBy {
                 it.sourceUrl
             }
             val emojis = remoteEmojis.map {
@@ -134,7 +134,7 @@ internal class CustomEmojiRepositoryImpl @Inject constructor(
         }
         val fileCaches = imageCacheRepository.findBySourceUrls(emojis.mapNotNull {
             it.url ?: it.uri
-        }).associateBy {
+        }).getOrElse { emptyList() }.associateBy {
             it.sourceUrl
         }
 
@@ -224,7 +224,7 @@ internal class CustomEmojiRepositoryImpl @Inject constructor(
             }
             val fileCaches = imageCacheRepository.findBySourceUrls(records.mapNotNull {
                 it.url ?: it.uri
-            }).associateBy {
+            }).getOrElse { emptyList() }.associateBy {
                 it.sourceUrl
             }
             inMemEmojis + records.map { record ->
@@ -252,7 +252,7 @@ internal class CustomEmojiRepositoryImpl @Inject constructor(
         }
         val fileCaches = imageCacheRepository.findBySourceUrls(emojis.mapNotNull {
             it.url ?: it.uri
-        }).associateBy {
+        }).getOrElse { emptyList() }.associateBy {
             it.sourceUrl
         }
         return emojis.map {

@@ -265,7 +265,7 @@ class NoteCaptureAPIAdapterImpl(
                             imageCache = (e.body.emoji?.url ?: e.body.emoji?.url)?.let {
                                 imageCacheRepository.findBySourceUrl(
                                     it
-                                )
+                                ).getOrNull()
                             },
                         )
                     )
@@ -303,7 +303,7 @@ class NoteCaptureAPIAdapterImpl(
                             note.onEmojiReacted(
                                 account, e.reaction,
                                 (e.reaction.url ?: e.reaction.staticUrl)?.let {
-                                    imageCacheRepository.findBySourceUrl(it)
+                                    imageCacheRepository.findBySourceUrl(it).getOrNull()
                                 }
                             ),
                         )

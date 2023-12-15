@@ -55,7 +55,7 @@ class NoteDTOEntityConverter @Inject constructor(
         }
         val fileCaches = imageCacheRepository.findBySourceUrls(emojis.mapNotNull {
             it.url ?: it.uri
-        }).associateBy {
+        }).getOrElse { emptyList() }.associateBy {
             it.sourceUrl
         }
 
@@ -92,7 +92,7 @@ class NoteDTOEntityConverter @Inject constructor(
         }
         val fileCaches = imageCacheRepository.findBySourceUrls(emojis.mapNotNull {
             it.url ?: it.uri
-        }).associateBy {
+        }).getOrElse { emptyList() }.associateBy {
             it.sourceUrl
         }
         val info =

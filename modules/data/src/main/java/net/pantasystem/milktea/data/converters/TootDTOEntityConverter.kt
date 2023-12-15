@@ -43,7 +43,7 @@ class TootDTOEntityConverter @Inject constructor(
                 it.url
             }?: emptyList())
         }
-        val imageCaches = imageCacheRepository.findBySourceUrls(urls).associateBy {
+        val imageCaches = imageCacheRepository.findBySourceUrls(urls).getOrElse { emptyList() }.associateBy {
             it.sourceUrl
         }
         return statusDTOs.map {
@@ -66,7 +66,7 @@ class TootDTOEntityConverter @Inject constructor(
         }?: emptyList()) + (statusDTO.emojiReactions?.mapNotNull {
             it.url
         }?: emptyList())
-        val imageCaches = imageCacheRepository.findBySourceUrls(urls).associateBy {
+        val imageCaches = imageCacheRepository.findBySourceUrls(urls).getOrElse { emptyList() }.associateBy {
             it.sourceUrl
         }
         return convert(

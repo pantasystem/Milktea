@@ -40,7 +40,7 @@ class UserDTOEntityConverter @Inject constructor(
         }.associateBy {
             it.uri
         }
-        val fileCaches = imageCacheRepository.findBySourceUrls(urls).associateBy {
+        val fileCaches = imageCacheRepository.findBySourceUrls(urls).getOrElse { emptyList() }.associateBy {
             it.sourceUrl
         }
 
