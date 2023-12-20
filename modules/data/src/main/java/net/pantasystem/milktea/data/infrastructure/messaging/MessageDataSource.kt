@@ -10,6 +10,7 @@ import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.messaging.Message
 import net.pantasystem.milktea.model.messaging.MessagingId
 import net.pantasystem.milktea.model.messaging.UnReadMessages
+import javax.inject.Inject
 
 interface MessageDataSource {
     suspend fun add(message: Message): Result<AddResult>
@@ -23,7 +24,7 @@ interface MessageDataSource {
     suspend fun readAllMessages(accountId: Long): Result<Unit>
 }
 
-class InMemoryMessageDataSource(
+class InMemoryMessageDataSource @Inject constructor(
     private val accountRepository: AccountRepository
 ) : MessageDataSource, UnReadMessages {
 
