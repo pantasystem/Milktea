@@ -6,6 +6,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import javax.inject.Inject
 
 data class ChannelState(
     val channels: Map<Channel.Id, Channel>
@@ -63,7 +64,7 @@ interface ChannelStateModel  {
 }
 
 
-class ChannelStateModelOnMemory : ChannelStateModel {
+class ChannelStateModelOnMemory @Inject constructor(): ChannelStateModel {
     private val _state = MutableStateFlow(ChannelState(emptyMap()))
     override val state: StateFlow<ChannelState>
         get() = _state

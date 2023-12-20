@@ -4,14 +4,20 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import net.pantasystem.milktea.common.mapCancellableCatching
 import net.pantasystem.milktea.common.runCancellableCatching
+import net.pantasystem.milktea.common_android.hilt.IODispatcher
 import net.pantasystem.milktea.model.account.AccountRepository
-import net.pantasystem.milktea.model.channel.*
+import net.pantasystem.milktea.model.channel.Channel
+import net.pantasystem.milktea.model.channel.ChannelRepository
+import net.pantasystem.milktea.model.channel.ChannelStateModel
+import net.pantasystem.milktea.model.channel.CreateChannel
+import net.pantasystem.milktea.model.channel.UpdateChannel
+import javax.inject.Inject
 
-class ChannelRepositoryImpl(
+class ChannelRepositoryImpl @Inject constructor(
     private val channelAPIAdapter: ChannelAPIAdapter,
     private val channelStateModel: ChannelStateModel,
     private val accountRepository: AccountRepository,
-    private val ioDispatcher: CoroutineDispatcher,
+    @IODispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : ChannelRepository {
     override suspend fun findOne(id: Channel.Id): Result<Channel> {
         return runCancellableCatching {
