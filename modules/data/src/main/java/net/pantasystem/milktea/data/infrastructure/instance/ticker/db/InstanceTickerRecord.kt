@@ -5,6 +5,7 @@ import androidx.room.Entity
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import net.pantasystem.milktea.model.instance.ticker.InstanceTicker
+import kotlin.time.Duration.Companion.days
 
 
 @Entity(
@@ -49,5 +50,9 @@ data class InstanceTickerRecord(
             softwareVersion = softwareVersion,
             themeColor = themeColor,
         )
+    }
+
+    fun isRecordExpired(): Boolean {
+        return cachedAt < Clock.System.now().minus(7.days)
     }
 }
