@@ -19,6 +19,7 @@ import net.pantasystem.milktea.app_store.account.AccountStore
 import net.pantasystem.milktea.app_store.setting.SettingStore
 import net.pantasystem.milktea.common.ui.ApplyMenuTint
 import net.pantasystem.milktea.common.ui.ApplyTheme
+import net.pantasystem.milktea.common_android.resource.getString
 import net.pantasystem.milktea.common_android_ui.PageableFragmentFactory
 import net.pantasystem.milktea.common_navigation.SearchNavType
 import net.pantasystem.milktea.common_navigation.SearchNavigation
