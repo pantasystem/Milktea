@@ -3,6 +3,7 @@ package net.pantasystem.milktea.data.infrastructure.note
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.sync.Mutex
+import net.pantasystem.milktea.api.mastodon.notification.MstNotificationDTO
 import net.pantasystem.milktea.api.mastodon.status.TootStatusDTO
 import net.pantasystem.milktea.common.MastodonLinkHeaderDecoder
 import net.pantasystem.milktea.common.PageableState
@@ -60,25 +61,30 @@ internal class MastodonTimelineStorePagingStoreImpl(
                 pageableTimeline.hashtag,
                 minId = getSinceId(),
             ).getBodyOrFail()
+
             is Pageable.Mastodon.HomeTimeline -> api.getHomeTimeline(
                 minId = getSinceId(),
                 visibilities = getVisibilitiesParameter(getAccount()),
             ).getBodyOrFail()
+
             is Pageable.Mastodon.ListTimeline -> api.getListTimeline(
                 minId = getSinceId(),
                 listId = pageableTimeline.listId,
             ).getBodyOrFail()
+
             is Pageable.Mastodon.LocalTimeline -> api.getPublicTimeline(
                 local = true,
                 minId = getSinceId(),
                 visibilities = getVisibilitiesParameter(getAccount()),
                 onlyMedia = pageableTimeline.getOnlyMedia()
             ).getBodyOrFail()
+
             is Pageable.Mastodon.PublicTimeline -> api.getPublicTimeline(
                 minId = getSinceId(),
                 visibilities = getVisibilitiesParameter(getAccount()),
                 onlyMedia = pageableTimeline.getOnlyMedia()
             ).getBodyOrFail()
+
             is Pageable.Mastodon.UserTimeline -> {
                 api.getAccountTimeline(
                     accountId = pageableTimeline.userId,
@@ -90,6 +96,7 @@ internal class MastodonTimelineStorePagingStoreImpl(
                     updateMinIdFrom(it)
                 }.getBodyOrFail()
             }
+
             Pageable.Mastodon.BookmarkTimeline -> {
                 api.getBookmarks(
                     minId = minId
@@ -97,17 +104,22 @@ internal class MastodonTimelineStorePagingStoreImpl(
                     updateMinIdFrom(it)
                 }.getBodyOrFail()
             }
+
             is Pageable.Mastodon.SearchTimeline -> {
                 return@runCancellableCatching emptyList()
             }
+
             is Pageable.Mastodon.TrendTimeline -> {
                 return@runCancellableCatching emptyList()
             }
+
             is Pageable.Mastodon.Mention -> {
                 api.getNotifications(
                     minId = minId,
-                    types = listOf("mention"),
-                    excludeTypes = listOf("status", "reblog", "follow", "follow_request", "favourite", "poll", "update", "update", "admin.sign_up", "admin.report", "emoji_reaction")
+                    types = listOf(MstNotificationDTO.NotificationType.Mention.value),
+                    excludeTypes = MstNotificationDTO.NotificationType.values()
+                        .filterNot { it == MstNotificationDTO.NotificationType.Mention }
+                        .map { it.value },
                 ).throwIfHasError().also {
                     updateMinIdFrom(it)
                 }.body()?.mapNotNull {
@@ -170,25 +182,30 @@ internal class MastodonTimelineStorePagingStoreImpl(
                 maxId = maxId,
                 onlyMedia = pageableTimeline.getOnlyMedia()
             ).getBodyOrFail()
+
             is Pageable.Mastodon.HomeTimeline -> api.getHomeTimeline(
                 maxId = maxId,
                 visibilities = getVisibilitiesParameter(getAccount())
             ).getBodyOrFail()
+
             is Pageable.Mastodon.ListTimeline -> api.getListTimeline(
                 maxId = maxId,
                 listId = pageableTimeline.listId,
-                ).getBodyOrFail()
+            ).getBodyOrFail()
+
             is Pageable.Mastodon.LocalTimeline -> api.getPublicTimeline(
                 local = true,
                 maxId = maxId,
                 visibilities = getVisibilitiesParameter(getAccount()),
                 onlyMedia = pageableTimeline.getOnlyMedia()
             ).getBodyOrFail()
+
             is Pageable.Mastodon.PublicTimeline -> api.getPublicTimeline(
                 maxId = maxId,
                 visibilities = getVisibilitiesParameter(getAccount()),
                 onlyMedia = pageableTimeline.getOnlyMedia()
             ).getBodyOrFail()
+
             is Pageable.Mastodon.UserTimeline -> {
                 api.getAccountTimeline(
                     accountId = pageableTimeline.userId,
@@ -200,6 +217,7 @@ internal class MastodonTimelineStorePagingStoreImpl(
                     updateMaxIdFrom(it)
                 }.body()
             }
+
             Pageable.Mastodon.BookmarkTimeline -> {
                 api.getBookmarks(
                     maxId = maxId,
@@ -207,6 +225,7 @@ internal class MastodonTimelineStorePagingStoreImpl(
                     updateMaxIdFrom(it)
                 }.body()
             }
+
             is Pageable.Mastodon.SearchTimeline -> {
                 api.search(
                     q = pageableTimeline.query,
@@ -218,16 +237,20 @@ internal class MastodonTimelineStorePagingStoreImpl(
                     updateMaxIdFrom(it)
                 }.body()?.statuses
             }
+
             is Pageable.Mastodon.TrendTimeline -> {
                 api.getTrendStatuses(
                     offset = (getState().content as? StateContent.Exist)?.rawContent?.size ?: 0
                 ).getBodyOrFail()
             }
+
             is Pageable.Mastodon.Mention -> {
                 api.getNotifications(
                     maxId = maxId,
-                    types = listOf("mention"),
-                    excludeTypes = listOf("status", "reblog", "follow", "follow_request", "favourite", "poll", "update", "update", "admin.sign_up", "admin.report", "emoji_reaction")
+                    types = listOf(MstNotificationDTO.NotificationType.Mention.value),
+                    excludeTypes = MstNotificationDTO.NotificationType.values()
+                        .filterNot { it == MstNotificationDTO.NotificationType.Mention }
+                        .map { it.value },
                 ).throwIfHasError().also {
                     updateMaxIdFrom(it)
                 }.body()?.mapNotNull {
@@ -253,7 +276,7 @@ internal class MastodonTimelineStorePagingStoreImpl(
     }
 
     private fun isEmpty(): Boolean {
-        return when(val content = _state.value.content) {
+        return when (val content = _state.value.content) {
             is StateContent.Exist -> content.rawContent.isEmpty()
             is StateContent.NotExist -> true
         }
@@ -289,7 +312,7 @@ internal class MastodonTimelineStorePagingStoreImpl(
         val decoder = MastodonLinkHeaderDecoder(response.headers()["link"])
 
         // NOTE: 次のページネーションのIdが取得できない場合は次のIdが取得できるまで同じIdを使い回し続ける
-        when(val nextId = decoder.getMaxId()) {
+        when (val nextId = decoder.getMaxId()) {
             null -> Unit
             else -> {
                 maxId = nextId
@@ -309,7 +332,7 @@ internal class MastodonTimelineStorePagingStoreImpl(
         val decoder = MastodonLinkHeaderDecoder(response.headers()["link"])
 
         // NOTE: 次のページネーションのIdが取得できない場合は次のIdが取得できるまで同じIdを使い回し続ける
-        when(val nextId = decoder.getMinId()) {
+        when (val nextId = decoder.getMinId()) {
             null -> Unit
             else -> {
                 minId = nextId

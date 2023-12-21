@@ -30,39 +30,41 @@ data class MstNotificationDTO(
     val emojiReaction: EmojiReaction? = null,
 ) {
     @kotlinx.serialization.Serializable
-    enum class NotificationType {
+    enum class NotificationType(
+        val value: String
+    ) {
         @SerialName("mention")
-        Mention,
+        Mention("mention"),
 
         @SerialName("status")
-        Status,
+        Status("status"),
 
         @SerialName("reblog")
-        Reblog,
+        Reblog("reblog"),
 
         @SerialName("follow")
-        Follow,
+        Follow("follow"),
 
         @SerialName("follow_request")
-        FollowRequest,
+        FollowRequest("follow_request"),
 
         @SerialName("favourite")
-        Favourite,
+        Favourite("favourite"),
 
         @SerialName("poll")
-        Poll,
+        Poll("poll"),
 
         @SerialName("update")
-        Update,
+        Update("update"),
 
         @SerialName("admin.sign_up")
-        AdminSingUp,
+        AdminSingUp("admin.sign_up"),
 
         @SerialName("admin.report")
-        AdminReport,
+        AdminReport("admin.report"),
 
         @SerialName("emoji_reaction")
-        EmojiReaction
+        EmojiReaction("emoji_reaction"),
     }
 
     @kotlinx.serialization.Serializable
