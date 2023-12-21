@@ -7,6 +7,7 @@ import androidx.core.content.ContextCompat
 import androidx.databinding.BindingAdapter
 import com.bumptech.glide.Glide
 import dagger.hilt.android.EntryPointAccessors
+import net.pantasystem.milktea.common_android.resource.getString
 import net.pantasystem.milktea.common_android.ui.text.CustomEmojiDecorator
 import net.pantasystem.milktea.common_android.ui.text.DrawableEmojiSpan
 import net.pantasystem.milktea.common_android.ui.text.EmojiAdapter

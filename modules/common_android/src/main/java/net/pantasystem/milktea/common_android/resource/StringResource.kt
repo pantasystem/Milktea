@@ -3,21 +3,23 @@ package net.pantasystem.milktea.common_android.resource
 import android.content.Context
 import androidx.annotation.StringRes
 
-sealed class StringSource {
-    abstract fun getString(context: Context): String
+sealed interface StringSource {
+    fun build(getStringResource: GetStringResource): String
 
-    private data class Raw(private val text: String) : StringSource() {
-        override fun getString(context: Context): String = text
+    private data class Raw(private val text: String) : StringSource {
+
+        override fun build(getStringResource: GetStringResource): String = text
     }
 
-    private data class Resource(@StringRes private val textRes: Int) : StringSource() {
-        override fun getString(context: Context): String = context.getString(textRes)
+    private data class Resource(@StringRes private val textRes: Int) : StringSource {
+
+        override fun build(getStringResource: GetStringResource): String = getStringResource(textRes)
     }
 
-    private class FormatResource(@StringRes private val textRes: Int, private vararg val formatArgs: Any) : StringSource() {
-        override fun getString(context: Context): String {
-            val formatArgs = formatArgs.map { if (it is StringSource) it.getString(context) else it }.toTypedArray()
-            return context.getString(textRes, *formatArgs)
+    private class FormatResource(@StringRes private val textRes: Int, private vararg val formatArgs: Any) : StringSource {
+        override fun build(getStringResource: GetStringResource): String {
+            val formatArgs = formatArgs.map { if (it is StringSource) it.build(getStringResource) else it }.toTypedArray()
+            return getStringResource(textRes, *formatArgs)
         }
 
         override fun equals(other: Any?): Boolean {
@@ -39,8 +41,10 @@ sealed class StringSource {
         }
     }
 
-    private data class StringSourceList(private val list: List<StringSource>) : StringSource() {
-        override fun getString(context: Context): String = list.joinToString(separator = "") { it.getString(context) }
+    private data class StringSourceList(private val list: List<StringSource>) : StringSource {
+        override fun build(getStringResource: GetStringResource): String {
+            return list.joinToString(separator = "") { it.build(getStringResource) }
+        }
     }
 
     operator fun plus(other: StringSource): StringSource = StringSourceList(listOf(this, other))
@@ -52,4 +56,19 @@ sealed class StringSource {
 
         operator fun invoke(@StringRes textRes: Int, vararg formatArgs: Any): StringSource = FormatResource(textRes, *formatArgs)
     }
+}
+
+interface GetStringResource {
+    operator fun invoke(@StringRes textRes: Int): String
+
+    operator fun invoke(@StringRes textRes: Int, vararg formatArgs: Any): String
+
+}
+
+fun StringSource.getString(context: Context): String {
+    return build(object : GetStringResource {
+        override fun invoke(textRes: Int): String = context.getString(textRes)
+
+        override fun invoke(textRes: Int, vararg formatArgs: Any): String = context.getString(textRes, *formatArgs)
+    })
 }

@@ -25,6 +25,7 @@ import kotlinx.coroutines.flow.filterNot
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
+import net.pantasystem.milktea.common_android.resource.getString
 import net.pantasystem.milktea.common_android_ui.tab.TabbedFlexboxListMediator
 import net.pantasystem.milktea.model.note.reaction.LegacyReaction
 import net.pantasystem.milktea.model.note.reaction.Reaction

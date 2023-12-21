@@ -3,6 +3,7 @@ package net.pantasystem.milktea.user.profile
 import android.content.Context
 import android.widget.Toast
 import net.pantasystem.milktea.common.APIError
+import net.pantasystem.milktea.common_android.resource.getString
 import net.pantasystem.milktea.common_android_ui.APIErrorStringConverter
 import net.pantasystem.milktea.model.account.UnauthorizedException
 import net.pantasystem.milktea.note.R

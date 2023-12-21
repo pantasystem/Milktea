@@ -10,6 +10,7 @@ import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import net.pantasystem.milktea.common_android.resource.getString
 import net.pantasystem.milktea.common_android_ui.report.ReportDialog
 import net.pantasystem.milktea.note.NoteEditorActivity
 import net.pantasystem.milktea.note.dialog.ConfirmDeleteAndEditNoteDialog

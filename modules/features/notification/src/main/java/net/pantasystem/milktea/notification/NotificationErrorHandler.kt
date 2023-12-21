@@ -3,6 +3,7 @@ package net.pantasystem.milktea.notification
 import android.content.Context
 import android.widget.Toast
 import net.pantasystem.milktea.common.APIError
+import net.pantasystem.milktea.common_android.resource.getString
 import net.pantasystem.milktea.common_android_ui.APIErrorStringConverter
 
 class NotificationErrorHandler(

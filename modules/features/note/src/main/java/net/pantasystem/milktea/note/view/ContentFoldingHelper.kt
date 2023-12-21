@@ -5,6 +5,7 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.core.view.isVisible
 import androidx.databinding.BindingAdapter
+import net.pantasystem.milktea.common_android.resource.getString
 import net.pantasystem.milktea.common_android.ui.VisibilityHelper.setMemoVisibility
 import net.pantasystem.milktea.note.viewmodel.CwTextGenerator
 import net.pantasystem.milktea.note.viewmodel.PlaneNoteViewData
