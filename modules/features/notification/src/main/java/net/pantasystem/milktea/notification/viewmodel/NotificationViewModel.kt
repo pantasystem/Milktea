@@ -148,6 +148,17 @@ class NotificationViewModel @Inject constructor(
             notificationPagingStore.loadPrevious().onFailure {
                 logger.error("通知の読み込みに失敗", it)
                 _error.tryEmit(it)
+            }.onSuccess {
+                if (it == 0) {
+                    runCancellableCatching {
+                        getCurrentAccount()
+                    }.mapCancellableCatching {
+                        notificationRepository.markAsRead(it.accountId)
+                    }.onFailure { e ->
+                        logger.error("failed mark as read", e)
+                        _error.tryEmit(e)
+                    }
+                }
             }
         }
     }

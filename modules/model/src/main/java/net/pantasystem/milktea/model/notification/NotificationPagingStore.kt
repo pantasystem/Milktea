@@ -12,7 +12,7 @@ interface NotificationPagingStore {
 
     val notifications: Flow<PageableState<List<NotificationRelation>>>
 
-    suspend fun loadPrevious(): Result<Unit>
+    suspend fun loadPrevious(): Result<Int>
 
     suspend fun clear()
 

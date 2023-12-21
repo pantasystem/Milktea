@@ -3,7 +3,6 @@ package net.pantasystem.milktea.data.infrastructure.notification.impl
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.sync.withLock
-import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import net.pantasystem.milktea.api.mastodon.notification.MstNotificationDTO
@@ -81,9 +80,9 @@ class NotificationPagingStoreImpl(
         }
     }
 
-    override suspend fun loadPrevious(): Result<Unit> = runCancellableCatching {
+    override suspend fun loadPrevious(): Result<Int> = runCancellableCatching {
         if (delegate.mutex.isLocked) {
-            return@runCancellableCatching
+            return@runCancellableCatching -1
         }
         unreadNotificationDAO.deleteWhereAccountId(getAccount().accountId)
         previousPagingController.loadPrevious().getOrThrow()
