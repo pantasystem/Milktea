@@ -886,6 +886,14 @@ sealed class Pageable : Serializable {
             }
         }
 
+        data object Mention : Mastodon() {
+            override fun toParams(): PageParams {
+                return PageParams(
+                    type = PageType.MASTODON_MENTION_TIMELINE
+                )
+            }
+        }
+
     }
 
     object CalckeyRecommendedTimeline : Pageable(), UntilPaginate, SincePaginate {

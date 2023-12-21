@@ -36,5 +36,7 @@ enum class PageType(val defaultName: String, val label: String){
 
     CLIP_NOTES("ClipNotes", "CLIP_NOTES"),
 
+    MASTODON_MENTION_TIMELINE("MastodonMentionTimeline", "MASTODON_MENTION_TIMELINE"),
+
     //USER_PINは別
 }

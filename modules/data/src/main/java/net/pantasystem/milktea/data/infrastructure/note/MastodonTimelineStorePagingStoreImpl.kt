@@ -103,7 +103,17 @@ internal class MastodonTimelineStorePagingStoreImpl(
             is Pageable.Mastodon.TrendTimeline -> {
                 return@runCancellableCatching emptyList()
             }
-
+            is Pageable.Mastodon.Mention -> {
+                api.getNotifications(
+                    minId = minId,
+                    types = listOf("mention"),
+                    excludeTypes = listOf("status", "reblog", "follow", "follow_request", "favourite", "poll", "update", "update", "admin.sign_up", "admin.report", "emoji_reaction")
+                ).throwIfHasError().also {
+                    updateMinIdFrom(it)
+                }.body()?.mapNotNull {
+                    it.status
+                } ?: throw IllegalStateException("response is null")
+            }
         }.let { list ->
             if (isShouldUseLinkHeader()) {
                 filterNotExistsStatuses(list)
@@ -213,6 +223,17 @@ internal class MastodonTimelineStorePagingStoreImpl(
                     offset = (getState().content as? StateContent.Exist)?.rawContent?.size ?: 0
                 ).getBodyOrFail()
             }
+            is Pageable.Mastodon.Mention -> {
+                api.getNotifications(
+                    maxId = maxId,
+                    types = listOf("mention"),
+                    excludeTypes = listOf("status", "reblog", "follow", "follow_request", "favourite", "poll", "update", "update", "admin.sign_up", "admin.report", "emoji_reaction")
+                ).throwIfHasError().also {
+                    updateMaxIdFrom(it)
+                }.body()?.mapNotNull {
+                    it.status
+                } ?: throw IllegalStateException("response is null")
+            }
         }!!.let { list ->
             if (isShouldUseLinkHeader()) {
                 filterNotExistsStatuses(list)
@@ -241,6 +262,7 @@ internal class MastodonTimelineStorePagingStoreImpl(
     private fun isShouldUseLinkHeader(): Boolean {
         return pageableTimeline is Pageable.Mastodon.BookmarkTimeline
                 || pageableTimeline is Pageable.Mastodon.UserTimeline
+                || pageableTimeline is Pageable.Mastodon.Mention
     }
 
     /**

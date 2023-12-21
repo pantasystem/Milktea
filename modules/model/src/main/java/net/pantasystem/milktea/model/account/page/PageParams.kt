@@ -233,6 +233,9 @@ data class PageParams(
                 MASTODON_TREND_TIMELINE -> {
                     Pageable.Mastodon.TrendTimeline
                 }
+                MASTODON_MENTION_TIMELINE -> {
+                    Pageable.Mastodon.Mention
+                }
             }
         } catch (e: NullPointerException) {
             throw IllegalStateException("パラメーターに問題があります: $this")

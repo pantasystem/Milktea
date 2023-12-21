@@ -3,7 +3,39 @@ package net.pantasystem.milktea.common_android_ui.account.page
 import android.content.Context
 import net.pantasystem.milktea.common_android_ui.R
 import net.pantasystem.milktea.model.account.page.PageType
-import net.pantasystem.milktea.model.account.page.PageType.*
+import net.pantasystem.milktea.model.account.page.PageType.ANTENNA
+import net.pantasystem.milktea.model.account.page.PageType.CALCKEY_RECOMMENDED_TIMELINE
+import net.pantasystem.milktea.model.account.page.PageType.CHANNEL_TIMELINE
+import net.pantasystem.milktea.model.account.page.PageType.CLIP_NOTES
+import net.pantasystem.milktea.model.account.page.PageType.DETAIL
+import net.pantasystem.milktea.model.account.page.PageType.FAVORITE
+import net.pantasystem.milktea.model.account.page.PageType.FEATURED
+import net.pantasystem.milktea.model.account.page.PageType.GALLERY_FEATURED
+import net.pantasystem.milktea.model.account.page.PageType.GALLERY_POPULAR
+import net.pantasystem.milktea.model.account.page.PageType.GALLERY_POSTS
+import net.pantasystem.milktea.model.account.page.PageType.GLOBAL
+import net.pantasystem.milktea.model.account.page.PageType.HOME
+import net.pantasystem.milktea.model.account.page.PageType.I_LIKED_GALLERY_POSTS
+import net.pantasystem.milktea.model.account.page.PageType.LOCAL
+import net.pantasystem.milktea.model.account.page.PageType.MASTODON_BOOKMARK_TIMELINE
+import net.pantasystem.milktea.model.account.page.PageType.MASTODON_HOME_TIMELINE
+import net.pantasystem.milktea.model.account.page.PageType.MASTODON_LIST_TIMELINE
+import net.pantasystem.milktea.model.account.page.PageType.MASTODON_LOCAL_TIMELINE
+import net.pantasystem.milktea.model.account.page.PageType.MASTODON_MENTION_TIMELINE
+import net.pantasystem.milktea.model.account.page.PageType.MASTODON_PUBLIC_TIMELINE
+import net.pantasystem.milktea.model.account.page.PageType.MASTODON_SEARCH_TIMELINE
+import net.pantasystem.milktea.model.account.page.PageType.MASTODON_TAG_TIMELINE
+import net.pantasystem.milktea.model.account.page.PageType.MASTODON_TREND_TIMELINE
+import net.pantasystem.milktea.model.account.page.PageType.MASTODON_USER_TIMELINE
+import net.pantasystem.milktea.model.account.page.PageType.MENTION
+import net.pantasystem.milktea.model.account.page.PageType.MY_GALLERY_POSTS
+import net.pantasystem.milktea.model.account.page.PageType.NOTIFICATION
+import net.pantasystem.milktea.model.account.page.PageType.SEARCH
+import net.pantasystem.milktea.model.account.page.PageType.SEARCH_HASH
+import net.pantasystem.milktea.model.account.page.PageType.SOCIAL
+import net.pantasystem.milktea.model.account.page.PageType.USER
+import net.pantasystem.milktea.model.account.page.PageType.USERS_GALLERY_POSTS
+import net.pantasystem.milktea.model.account.page.PageType.USER_LIST
 
 
 object PageTypeHelper{
@@ -44,6 +76,7 @@ object PageTypeHelper{
             MASTODON_SEARCH_TIMELINE -> context.getString(R.string.search)
             MASTODON_TAG_TIMELINE -> context.getString(R.string.tag)
             MASTODON_TREND_TIMELINE -> context.getString(R.string.featured)
+            MASTODON_MENTION_TIMELINE -> context.getString(R.string.mention)
         }
     }
 }
