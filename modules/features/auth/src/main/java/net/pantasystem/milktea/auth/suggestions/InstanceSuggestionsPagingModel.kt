@@ -1,6 +1,5 @@
 package net.pantasystem.milktea.auth.suggestions
 
-import androidx.compose.ui.text.intl.Locale
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
@@ -8,7 +7,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
-import net.pantasystem.milktea.api.misskey.InstanceInfoAPIBuilder
+import net.pantasystem.milktea.api.milktea.instance.ticker.InstanceTickerAPIServiceBuilder
 import net.pantasystem.milktea.api.misskey.infos.SimpleInstanceInfo
 import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.common.PageableState
@@ -22,7 +21,7 @@ import net.pantasystem.milktea.common.throwIfHasError
 import javax.inject.Inject
 
 class InstanceSuggestionsPagingModel @Inject constructor(
-    private val instancesInfoAPIBuilder: InstanceInfoAPIBuilder,
+    private val instanceTickerAPIBuilder: InstanceTickerAPIServiceBuilder,
     private val loggerFactory: Logger.Factory,
 ) : StateLocker,
     PaginationState<SimpleInstanceInfo>,
@@ -56,10 +55,10 @@ class InstanceSuggestionsPagingModel @Inject constructor(
 
     override suspend fun loadPrevious(): Result<List<SimpleInstanceInfo>> =
         runCancellableCatching {
-            instancesInfoAPIBuilder.build().getInstances(
+            instanceTickerAPIBuilder.build("https://milktea-instance-ticker.milktea.workers.dev/").getInstances(
                 offset = _offset,
                 name = _name,
-                lang = Locale.current.language,
+//                lang = Locale.current.language,
             ).throwIfHasError().body()!!.also {
                 _offset += it.size
             }

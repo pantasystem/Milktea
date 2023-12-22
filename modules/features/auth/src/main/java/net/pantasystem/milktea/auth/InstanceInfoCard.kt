@@ -56,7 +56,7 @@ fun MisskeyInstanceInfoCard(
                 Modifier.weight(1f)
             ) {
                 Text(
-                    info.name,
+                    info.name ?: info.url,
                     fontSize = 18.sp,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis

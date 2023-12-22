@@ -5,8 +5,8 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class SimpleInstanceInfo(
-    @SerialName("url") val url: String,
-    @SerialName("name") val name: String,
+    @SerialName("uri") val url: String,
+    @SerialName("name") val name: String? = null,
     @SerialName("description") val description: String? = null,
     @SerialName("iconUrl") val iconUrl: String? = null,
 )
