@@ -27,7 +27,7 @@ class SyncAccountInfoUseCase @Inject constructor(
             accountRepository.add(
                 account.copy(
                     instanceType = remoteSoftwareType,
-                    userName = account.userName
+                    userName = user.userName
                 ), false
             )
         }
