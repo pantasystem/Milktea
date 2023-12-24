@@ -17,7 +17,6 @@ data class ReactionViewData(
         fun from(
             reactions: List<ReactionCount>,
             note: Note,
-            instanceEmojis: Map<String, CustomEmoji>?,
         ): List<ReactionViewData> {
             val noteEmojis = note.emojiNameMap
             return reactions.map { reactionCount ->
@@ -26,7 +25,6 @@ data class ReactionViewData(
                 val r = Reaction(textReaction)
                 val emoji = noteEmojis?.get(textReaction.replace(":", ""))
                     ?: noteEmojis?.get(r.getName())
-                    ?: instanceEmojis?.get(r.getName())
                 ReactionViewData(
                     noteId = note.id,
                     reaction = textReaction,

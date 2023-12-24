@@ -149,7 +149,6 @@ open class PlaneNoteViewData(
             ReactionViewData.from(
                 reactions,
                 n,
-                emptyMap()
             )
         }
     }.flowOn(Dispatchers.Default).stateIn(
