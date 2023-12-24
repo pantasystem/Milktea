@@ -36,4 +36,15 @@ data class Reaction(val reaction: String) {
                 && reaction.startsWith(":")
                 && reaction.endsWith(":")
     }
+
+    fun isLegacyFormat(): Boolean {
+        return LegacyReaction.reactionMap.containsKey(reaction)
+    }
+
+    fun getLegacyEmoji(): String? {
+        if (isLegacyFormat()) {
+            return LegacyReaction.reactionMap[reaction]
+        }
+        return null
+    }
 }

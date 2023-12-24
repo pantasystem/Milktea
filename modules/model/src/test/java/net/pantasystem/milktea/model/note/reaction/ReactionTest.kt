@@ -100,4 +100,13 @@ class ReactionTest {
         val reaction = Reaction("name@.")
         Assertions.assertEquals("name", reaction.getNameAndHost())
     }
+
+    @Test
+    fun isCustomEmojiFormat_GiveLegacyEmoji() {
+        LegacyReaction.defaultReaction.forEach {
+            Assertions.assertFalse(Reaction(it).isCustomEmojiFormat())
+            Assertions.assertTrue(Reaction(it).isLegacyFormat())
+            Assertions.assertEquals(LegacyReaction.reactionMap[it], Reaction(it).getLegacyEmoji())
+        }
+    }
 }
