@@ -196,4 +196,110 @@ class SyncAccountInfoUseCaseTest {
             )
         }
     }
+
+    @Test
+    fun userNameAndInstanceTypeChanged() = runTest {
+        val account = Account(
+            accountId = 1,
+            remoteId = "1",
+            instanceDomain = "https://misskey.io",
+            instanceType = Account.InstanceType.MISSKEY,
+            userName = "panta",
+            pages = emptyList(),
+            token = "test",
+        )
+        val accountRepository: AccountRepository = mock() {
+            onBlocking {
+                add(any(), any())
+            } doReturn Result.success(
+                account,
+            )
+        }
+        val nodeInfoRepository: NodeInfoRepository = mock() {
+            onBlocking {
+                find(any())
+            } doReturn Result.success(
+                NodeInfo(
+                    host = "misskey.io",
+                    software = NodeInfo.Software(
+                        name = "firefish",
+                        version = "12.34.56"
+                    ),
+                    version = "12.34.56"
+                )
+            )
+        }
+        val useCase = SyncAccountInfoUseCase(
+            accountRepository = accountRepository,
+            nodeInfoRepository = nodeInfoRepository,
+            userRepository = mock() {
+                onBlocking {
+                    find(any(), any())
+                } doReturn User.Detail.make(
+                    id = User.Id(1L, "1"),
+                    userName = "panta",
+                )
+            }
+        )
+        useCase(
+            account.copy(
+                instanceType = Account.InstanceType.FIREFISH,
+                userName = "panta2",
+            )
+        ).getOrThrow()
+
+        verifyBlocking(accountRepository) {
+            add(
+                account.copy(
+                    instanceType = Account.InstanceType.FIREFISH,
+                    userName = "panta",
+                ),
+                false
+            )
+        }
+    }
+
+    @Test
+    fun unchanged() = runTest {
+        val account = Account(
+            accountId = 1,
+            remoteId = "1",
+            instanceDomain = "https://misskey.io",
+            instanceType = Account.InstanceType.MISSKEY,
+            userName = "panta",
+            pages = emptyList(),
+            token = "test",
+        )
+        val accountRepository: AccountRepository = mock()
+        val nodeInfoRepository: NodeInfoRepository = mock() {
+            onBlocking {
+                find(any())
+            } doReturn Result.success(
+                NodeInfo(
+                    host = "misskey.io",
+                    software = NodeInfo.Software(
+                        name = "misskey",
+                        version = "12.34.56"
+                    ),
+                    version = "12.34.56"
+                )
+            )
+        }
+        val useCase = SyncAccountInfoUseCase(
+            accountRepository = accountRepository,
+            nodeInfoRepository = nodeInfoRepository,
+            userRepository = mock() {
+                onBlocking {
+                    find(any(), any())
+                } doReturn User.Detail.make(
+                    id = User.Id(1L, "1"),
+                    userName = "panta",
+                )
+            }
+        )
+        useCase(
+            account
+        ).getOrThrow()
+
+    }
 }
