@@ -952,4 +952,99 @@ class ToggleReactionUseCaseTest {
         )
         Assertions.assertNull(sendReaction)
     }
+
+
+    // ソフトウェア種別がmisskeyでCustomEmojiRepositoryに絵文字が存在しない場合
+    @Test
+    fun getSendReaction_whenMisskeyAndCustomEmojiRepositoryIsEmpty() = runTest {
+        val instanceType = InstanceInfoType.Misskey(
+            NodeInfo("", "", NodeInfo.Software("misskey", "")),
+            Meta(uri = "")
+        )
+        val useCase = ToggleReactionUseCase(
+            getAccount = mock(),
+            noteRepository = mock(),
+            reactionHistoryRepository = mock(),
+            checkEmoji = object : CheckEmoji {
+                override suspend fun checkEmoji(char: CharSequence): Boolean {
+                    return false
+                }
+            },
+            reactionRepository = mock(),
+            customEmojiRepository = mock() {
+                onBlocking {
+                    findByName(any(), any())
+                } doReturn Result.success(emptyList())
+            },
+            instanceInfoService = mock() {
+                onBlocking {
+                    find(any())
+                } doReturn Result.success(
+                    instanceType
+                )
+            },
+            userRepository = mock()
+        )
+        val sendReaction = useCase.getSendReaction(
+            instanceType,
+            Account(
+                "testId",
+                "https://misskey.io",
+                instanceType = Account.InstanceType.MISSKEY,
+                token = "test",
+                userName = "test",
+                accountId = 0L,
+                pages = emptyList(),
+            ),
+            ":kawaii:"
+        )
+        Assertions.assertEquals("👍", sendReaction)
+    }
+
+    // ソフトウェア種別がmisskeyでCustomEmojiRepositoryに絵文字が存在する場合
+    @Test
+    fun getSendReaction_whenMisskeyAndCustomEmojiRepositoryIsNotEmpty() = runTest {
+        val instanceType = InstanceInfoType.Misskey(
+            NodeInfo("", "", NodeInfo.Software("misskey", "")),
+            Meta(uri = "")
+        )
+        val useCase = ToggleReactionUseCase(
+            getAccount = mock(),
+            noteRepository = mock(),
+            reactionHistoryRepository = mock(),
+            checkEmoji = object : CheckEmoji {
+                override suspend fun checkEmoji(char: CharSequence): Boolean {
+                    return false
+                }
+            },
+            reactionRepository = mock(),
+            customEmojiRepository = mock() {
+                onBlocking {
+                    findByName(any(), any())
+                } doReturn Result.success(listOf(CustomEmoji("kawaii")))
+            },
+            instanceInfoService = mock() {
+                onBlocking {
+                    find(any())
+                } doReturn Result.success(
+                    instanceType
+                )
+            },
+            userRepository = mock()
+        )
+        val sendReaction = useCase.getSendReaction(
+            instanceType,
+            Account(
+                "testId",
+                "https://misskey.io",
+                instanceType = Account.InstanceType.MISSKEY,
+                token = "test",
+                userName = "test",
+                accountId = 0L,
+                pages = emptyList(),
+            ),
+            ":kawaii:"
+        )
+        Assertions.assertEquals(":kawaii:", sendReaction)
+    }
 }
