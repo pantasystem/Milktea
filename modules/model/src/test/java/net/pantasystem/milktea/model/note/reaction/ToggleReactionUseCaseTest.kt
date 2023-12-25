@@ -1,6 +1,7 @@
 package net.pantasystem.milktea.model.note.reaction
 
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.runTest
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.GetAccount
 import net.pantasystem.milktea.model.emoji.CustomEmoji
@@ -13,6 +14,7 @@ import net.pantasystem.milktea.model.note.NoteRepository
 import net.pantasystem.milktea.model.note.generateEmptyNote
 import net.pantasystem.milktea.model.note.reaction.history.ReactionHistory
 import net.pantasystem.milktea.model.note.reaction.history.ReactionHistoryRepository
+import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
@@ -52,7 +54,7 @@ class ToggleReactionUseCaseTest {
         val meta = Meta(
             uri = "misskey.io",
 
-        )
+            )
         val reactionHistoryDao = mock<ReactionHistoryRepository>()
         val account = Account(
             "testId",
@@ -95,7 +97,15 @@ class ToggleReactionUseCaseTest {
             instanceInfoService = mock() {
                 onBlocking {
                     find(any())
-                } doReturn Result.success(InstanceInfoType.Misskey(nodeInfo = NodeInfo("", "", NodeInfo.Software("", "")),meta))
+                } doReturn Result.success(
+                    InstanceInfoType.Misskey(
+                        nodeInfo = NodeInfo(
+                            "",
+                            "",
+                            NodeInfo.Software("", "")
+                        ), meta
+                    )
+                )
             },
             userRepository = mock() {
                 onBlocking {
@@ -142,7 +152,7 @@ class ToggleReactionUseCaseTest {
         val meta = Meta(
             uri = "https://misskey.io",
 
-        )
+            )
         val reactionHistoryDao = mock<ReactionHistoryRepository>()
         val account = Account(
             "testId",
@@ -179,7 +189,15 @@ class ToggleReactionUseCaseTest {
             instanceInfoService = mock() {
                 onBlocking {
                     find(any())
-                } doReturn Result.success(InstanceInfoType.Misskey(NodeInfo("", "", NodeInfo.Software("", "")), meta))
+                } doReturn Result.success(
+                    InstanceInfoType.Misskey(
+                        NodeInfo(
+                            "",
+                            "",
+                            NodeInfo.Software("", "")
+                        ), meta
+                    )
+                )
             },
             userRepository = mock() {
                 onBlocking {
@@ -270,7 +288,15 @@ class ToggleReactionUseCaseTest {
             instanceInfoService = mock() {
                 onBlocking {
                     find(any())
-                } doReturn Result.success(InstanceInfoType.Misskey(NodeInfo("", "", NodeInfo.Software("", "")), meta))
+                } doReturn Result.success(
+                    InstanceInfoType.Misskey(
+                        NodeInfo(
+                            "",
+                            "",
+                            NodeInfo.Software("", "")
+                        ), meta
+                    )
+                )
             },
             userRepository = mock() {
                 onBlocking {
@@ -349,7 +375,15 @@ class ToggleReactionUseCaseTest {
             instanceInfoService = mock() {
                 onBlocking {
                     find(any())
-                } doReturn Result.success(InstanceInfoType.Misskey(NodeInfo("", "", NodeInfo.Software("", "")), meta))
+                } doReturn Result.success(
+                    InstanceInfoType.Misskey(
+                        NodeInfo(
+                            "",
+                            "",
+                            NodeInfo.Software("", "")
+                        ), meta
+                    )
+                )
             },
             customEmojiRepository = mock() {
                 onBlocking {
@@ -435,7 +469,15 @@ class ToggleReactionUseCaseTest {
             instanceInfoService = mock() {
                 onBlocking {
                     find(any())
-                } doReturn Result.success(InstanceInfoType.Misskey(NodeInfo("", "", NodeInfo.Software("", "")), meta))
+                } doReturn Result.success(
+                    InstanceInfoType.Misskey(
+                        NodeInfo(
+                            "",
+                            "",
+                            NodeInfo.Software("", "")
+                        ), meta
+                    )
+                )
             },
             customEmojiRepository = mock() {
                 onBlocking {
@@ -524,7 +566,15 @@ class ToggleReactionUseCaseTest {
             instanceInfoService = mock() {
                 onBlocking {
                     find(any())
-                } doReturn Result.success(InstanceInfoType.Misskey(NodeInfo("", "", NodeInfo.Software("", "")), meta))
+                } doReturn Result.success(
+                    InstanceInfoType.Misskey(
+                        NodeInfo(
+                            "",
+                            "",
+                            NodeInfo.Software("", "")
+                        ), meta
+                    )
+                )
             },
             userRepository = mock() {
                 onBlocking {
@@ -781,5 +831,125 @@ class ToggleReactionUseCaseTest {
                 )
             )
         }
+    }
+
+    @Test
+    fun getSendReaction_whenMastodonAndCanMultipleReaction() = runTest {
+
+        val instanceType = InstanceInfoType.Mastodon(
+            NodeInfo("", "", NodeInfo.Software("mastodon", "")),
+            MastodonInstanceInfo(
+                uri = "",
+                title = "",
+                description = "",
+                email = "",
+                version = "",
+                urls = MastodonInstanceInfo.Urls(streamingApi = null),
+                configuration = MastodonInstanceInfo.Configuration(
+                    emojiReactions = MastodonInstanceInfo.Configuration.EmojiReactions(
+                        maxReactions = 1000,
+                        maxReactionsPerAccount = 2
+                    ),
+                    polls = null,
+                    statuses = null,
+                ),
+                fedibirdCapabilities = listOf("emoji_reaction"),
+                pleroma = null,
+            )
+        )
+        val useCase = ToggleReactionUseCase(
+            getAccount = mock(),
+            noteRepository = mock(),
+            reactionHistoryRepository = mock(),
+            checkEmoji = object : CheckEmoji {
+                override suspend fun checkEmoji(char: CharSequence): Boolean {
+                    return false
+                }
+            },
+            reactionRepository = mock(),
+            customEmojiRepository = mock(),
+            instanceInfoService = mock() {
+                onBlocking {
+                    find(any())
+                } doReturn Result.success(
+                    instanceType
+                )
+            },
+            userRepository = mock()
+        )
+        val sendReaction = useCase.getSendReaction(
+            instanceType,
+            Account(
+                "testId",
+                "https://fedibird.com",
+                instanceType = Account.InstanceType.MASTODON,
+                token = "test",
+                userName = "test",
+                accountId = 0L,
+                pages = emptyList(),
+            ),
+            ":kawaii:"
+        )
+        Assertions.assertEquals("kawaii", sendReaction)
+    }
+
+    @Test
+    fun getSendReaction_whenMastodonAndCanNotMultipleReaction() = runTest {
+
+        val instanceType = InstanceInfoType.Mastodon(
+            NodeInfo("", "", NodeInfo.Software("mastodon", "")),
+            MastodonInstanceInfo(
+                uri = "",
+                title = "",
+                description = "",
+                email = "",
+                version = "",
+                urls = MastodonInstanceInfo.Urls(streamingApi = null),
+                configuration = MastodonInstanceInfo.Configuration(
+                    emojiReactions = MastodonInstanceInfo.Configuration.EmojiReactions(
+                        maxReactions = 1000,
+                        maxReactionsPerAccount = 0
+                    ),
+                    polls = null,
+                    statuses = null,
+                ),
+                fedibirdCapabilities = listOf("emoji_reaction"),
+                pleroma = null,
+            )
+        )
+        val useCase = ToggleReactionUseCase(
+            getAccount = mock(),
+            noteRepository = mock(),
+            reactionHistoryRepository = mock(),
+            checkEmoji = object : CheckEmoji {
+                override suspend fun checkEmoji(char: CharSequence): Boolean {
+                    return false
+                }
+            },
+            reactionRepository = mock(),
+            customEmojiRepository = mock(),
+            instanceInfoService = mock() {
+                onBlocking {
+                    find(any())
+                } doReturn Result.success(
+                    instanceType
+                )
+            },
+            userRepository = mock()
+        )
+        val sendReaction = useCase.getSendReaction(
+            instanceType,
+            Account(
+                "testId",
+                "https://fedibird.com",
+                instanceType = Account.InstanceType.MASTODON,
+                token = "test",
+                userName = "test",
+                accountId = 0L,
+                pages = emptyList(),
+            ),
+            ":kawaii:"
+        )
+        Assertions.assertNull(sendReaction)
     }
 }
