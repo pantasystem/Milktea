@@ -19,12 +19,6 @@ abstract class DraftNoteDao {
     abstract fun insertUserIds(userIds: List<UserIdDTO>)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    abstract fun insertLocalFiles(files: List<DraftLocalFile>): List<Long>
-
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    abstract fun insertDriveFiles(files: List<DriveFileRecord>): List<Long>
-
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
     abstract suspend fun insertDriveFile(file: DriveFileRecord): Long
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
@@ -36,14 +30,6 @@ abstract class DraftNoteDao {
     fun getDraftNote(accountId: Long, draftNoteId: Long): DraftNote?{
         return getDraftNoteRelation(accountId, draftNoteId)?.toDraftNote(accountId)
     }
-
-    @Transaction
-    @Query("select * from draft_note_table where accountId = :accountId")
-    abstract fun findDraftNotesRelation(accountId: Long): List<DraftNoteRelation>
-
-    @Transaction
-    @Query("select * from draft_note_table where accountId = :accountId and text like '%'||:word||'%'")
-    abstract fun searchByWordDraftNotesRelation(accountId: Long, word: String): List<DraftNoteRelation>
 
     @Transaction
     @Query("select * from draft_note_table where accountId = :accountId and draft_note_id = :draftNoteId")
