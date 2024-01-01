@@ -1,6 +1,5 @@
 package net.pantasystem.milktea.note.editor.viewmodel
 
-//import net.pantasystem.milktea.model.instance.InstanceInfoRepository
 import android.net.Uri
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
@@ -64,7 +63,6 @@ class NoteEditorViewModel @Inject constructor(
     localConfigRepository: LocalConfigRepository,
     private val featureEnables: FeatureEnables,
     private val noteRelationGetter: NoteRelationGetter,
-//    private val instanceInfoRepository: InstanceInfoRepository,
     private val updateSensitiveUseCase: UpdateAppFileSensitiveUseCase,
     private val apResolverRepository: ApResolverRepository,
     userRepository: UserRepository,
