@@ -156,9 +156,7 @@ class MainActivity : AppCompatActivity(), ToolbarSetter {
             context = this
         ).setup()
 
-        if (savedInstanceState == null) {
-            handleIntent()
-        }
+        handleIntent(savedInstanceState)
 
 
         val mainEventDispatcher = mainEventDispatcherFactory.create()
@@ -219,11 +217,13 @@ class MainActivity : AppCompatActivity(), ToolbarSetter {
         }
     }
 
-    private fun handleIntent() {
-        mainActivityInitialIntentHandlerFactory.create(
-            binding.appBarMain.bottomNavigation,
-            this,
-        ).invoke(intent)
+    private fun handleIntent(savedInstanceState: Bundle?) {
+        if (savedInstanceState == null) {
+            mainActivityInitialIntentHandlerFactory.create(
+                binding.appBarMain.bottomNavigation,
+                this,
+            ).invoke(intent)
+        }
     }
 
     private fun setupOnBackPressedDispatcherCallBack() {
