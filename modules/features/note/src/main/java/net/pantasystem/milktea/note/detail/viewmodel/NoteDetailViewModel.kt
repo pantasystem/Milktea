@@ -94,7 +94,7 @@ class NoteDetailViewModel @Inject constructor(
 //                noteRepository.syncConversation(note.id).getOrThrow()
                 noteRepository.syncThreadContext(note.id).getOrThrow()
 //                recursiveSync(note.id).getOrThrow()
-                noteRepository.sync(note.id)
+                noteRepository.sync(note.id).getOrThrow()
             } catch (e: Exception) {
                 Log.w("NoteDetailViewModel", "loadDetail失敗", e)
             }
