@@ -8,6 +8,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import net.pantasystem.milktea.common.Logger
+import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.account.CurrentAccountWatcher
 import net.pantasystem.milktea.model.account.page.Pageable
@@ -127,7 +128,10 @@ class NoteDetailViewModel @Inject constructor(
 
     suspend fun getUrl(): String {
         val account = currentAccountWatcher.getAccount()
-        return "${account.normalizedInstanceUri}/notes/${pageable.noteId}"
+        return when(account.instanceType) {
+            Account.InstanceType.MISSKEY, Account.InstanceType.FIREFISH -> "${account.normalizedInstanceUri}/notes/${pageable.noteId}"
+            Account.InstanceType.PLEROMA, Account.InstanceType.MASTODON -> "${account.normalizedInstanceUri}/web/statuses/${pageable.noteId}"
+        }
     }
 
 
