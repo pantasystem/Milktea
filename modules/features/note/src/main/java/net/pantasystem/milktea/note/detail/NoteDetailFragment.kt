@@ -118,8 +118,10 @@ class NoteDetailFragment : Fragment(R.layout.fragment_note_detail) {
 
         binding.showInBrowser.setOnClickListener {
             viewLifecycleOwner.lifecycleScope.launch {
-                val url = noteDetailViewModel.getUrl()
-                showShareLink(url)
+                noteDetailViewModel.getUrl().onSuccess { url ->
+                    showShareLink(url)
+                }
+
             }
         }
 
