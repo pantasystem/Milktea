@@ -4,6 +4,7 @@ import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import net.pantasystem.milktea.model.Entity
 import net.pantasystem.milktea.model.EntityId
+import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.app.AppType
 import net.pantasystem.milktea.model.channel.Channel
 import net.pantasystem.milktea.model.drive.FileProperty
@@ -234,6 +235,17 @@ data class Note(
                     )
         }
 
+    }
+
+    fun getOriginUrl(account: Account): String {
+        // リモートの投稿の場合はuriかurlにリモートの投稿のソースとなるURLが入っているはず
+        if (url != null || uri != null) {
+            return url ?: uri!!
+        }
+        return when (type) {
+            is Type.Mastodon -> "${account.normalizedInstanceUri}/web/statuses/${id.noteId}"
+            is Type.Misskey -> "${account.normalizedInstanceUri}/notes/${id.noteId}"
+        }
     }
 }
 
