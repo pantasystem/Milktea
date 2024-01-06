@@ -85,8 +85,9 @@ class NoteOptionDialog : BottomSheetDialogFragment() {
                         },
                         onShareButtonClicked = {
                             feedback.performClickHapticFeedback()
-                            val baseUrl = uiState.currentAccount?.normalizedInstanceUri
-                            val url = "$baseUrl/notes/${it?.id?.noteId}"
+                            val url = uiState.currentAccount?.let { account ->
+                                it?.getOriginUrl(account)
+                            }
                             val intent = Intent().apply {
                                 action = ACTION_SEND
                                 type = "text/plain"
