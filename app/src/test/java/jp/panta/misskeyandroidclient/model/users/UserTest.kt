@@ -69,4 +69,45 @@ class UserTest {
         )
         assertEquals("https://example.com/@Panta@misskey.io", profileUrl)
     }
+
+    @Test
+    fun displayUserName_GiveSameHost() {
+        val user = User.Simple(
+            id = User.Id(0, "id"),
+            avatarUrl = "",
+            emojis = emptyList(),
+            host = "misskey.io",
+            isBot = false,
+            isCat = false,
+            name = "Panta",
+            userName = "Panta",
+            nickname = null,
+            isSameHost = true,
+            instance = null,
+            avatarBlurhash = null,
+            badgeRoles = emptyList(),
+        )
+        assertEquals("@Panta", user.displayUserName)
+    }
+
+    @Test
+    fun displayUserName_GiveDifferentHost() {
+        val user = User.Simple(
+            id = User.Id(0, "id"),
+            avatarUrl = "",
+            emojis = emptyList(),
+            host = "misskey.io",
+            isBot = false,
+            isCat = false,
+            name = "Panta",
+            userName = "Panta",
+            nickname = null,
+            isSameHost = false,
+            instance = null,
+            avatarBlurhash = null,
+            badgeRoles = emptyList(),
+        )
+        assertEquals("@Panta@misskey.io", user.displayUserName)
+    }
+
 }
