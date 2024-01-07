@@ -1,10 +1,13 @@
 package net.pantasystem.milktea.model.note
 
+import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.drive.FileProperty
 import net.pantasystem.milktea.model.note.poll.Poll
 import net.pantasystem.milktea.model.note.reaction.ReactionCount
 import net.pantasystem.milktea.model.user.User
-import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertFalse
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 
 
@@ -381,5 +384,118 @@ class NoteTest {
         assertEquals(2, note.getMyReactionCount())
     }
 
+
+    @Test
+    fun getOriginUrl_UrlAsNullAndHostTypeMisskey() {
+        val note = Note.make(
+            Note.Id(0L, "a0b"),
+            User.Id(0L, ""),
+            uri = null,
+            url = null,
+            type = Note.Type.Misskey()
+        )
+
+        val url = note.getOriginUrl(
+            Account(
+                remoteId = "remoteId",
+                instanceDomain = "https://example.com",
+                userName = "Florine Ryan",
+                instanceType = Account.InstanceType.MISSKEY,
+                token = "gubergren"
+            )
+        )
+        assertEquals("https://example.com/notes/a0b", url)
+    }
+
+    @Test
+    fun getOriginUrl_UrlAsNullAndHostTypeMastodon() {
+        val note = Note.make(
+            Note.Id(0L, "a0b"),
+            User.Id(0L, ""),
+            uri = null,
+            url = null,
+            type = Note.Type.Mastodon(
+                reblogged = null,
+                favorited = null,
+                bookmarked = null,
+                muted = null,
+                favoriteCount = null,
+                tags = listOf(),
+                mentions = listOf(),
+                isFedibirdQuote = false,
+                pollId = null,
+                isSensitive = null,
+                pureText = null,
+                isReactionAvailable = false
+            ),
+        )
+
+        val url = note.getOriginUrl(
+            Account(
+                remoteId = "remoteId",
+                instanceDomain = "https://example.com",
+                userName = "Florine Ryan",
+                instanceType = Account.InstanceType.MASTODON,
+                token = "gubergren"
+            )
+        )
+        assertEquals("https://example.com/web/statuses/a0b", url)
+    }
+
+    @Test
+    fun getOriginUrl_UrlNotNull() {
+        val note = Note.make(
+            Note.Id(0L, "a0b"),
+            User.Id(0L, ""),
+            uri = null,
+            url = "https://example.com/web/statuses/a0b",
+            type = Note.Type.Mastodon(
+                reblogged = null,
+                favorited = null,
+                bookmarked = null,
+                muted = null,
+                favoriteCount = null,
+                tags = listOf(),
+                mentions = listOf(),
+                isFedibirdQuote = false,
+                pollId = null,
+                isSensitive = null,
+                pureText = null,
+                isReactionAvailable = false
+            ),
+        )
+        val url = note.getOriginUrl(
+            Account(
+                remoteId = "remoteId",
+                instanceDomain = "https://a.example.com",
+                userName = "Florine Ryan",
+                instanceType = Account.InstanceType.MASTODON,
+                token = "gubergren"
+            )
+        )
+        assertEquals("https://example.com/web/statuses/a0b", url)
+    }
+
+    @Test
+    fun getOriginUrl_UrlNotNullAndHostTypeMisskey() {
+        val note = Note.make(
+            Note.Id(0L, "a0b"),
+            User.Id(0L, ""),
+            uri = null,
+            url = "https://example.com/notes/a0b",
+            type = Note.Type.Misskey()
+        )
+
+        val url = note.getOriginUrl(
+            Account(
+                remoteId = "remoteId",
+                instanceDomain = "https://a.example.com",
+                userName = "Florine Ryan",
+                instanceType = Account.InstanceType.MISSKEY,
+                token = "gubergren"
+            )
+        )
+        assertEquals("https://example.com/notes/a0b", url)
+    }
 
 }
