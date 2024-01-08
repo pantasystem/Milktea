@@ -3,7 +3,12 @@ package net.pantasystem.milktea.model
 
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.BufferOverflow
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.shareIn
 import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.model.gallery.GalleryPost
@@ -11,10 +16,12 @@ import net.pantasystem.milktea.model.gallery.GalleryPost
 /**
  * アプリケーションのスコープの範囲内で完了するタスク
  */
+@Deprecated("複雑でわかりづらいのでWorkerかStoreに移行したい")
 fun interface ITask<T> {
     suspend fun execute(): T
 }
 
+@Deprecated("複雑でわかりづらいのでWorkerかStoreに移行したい")
 sealed class TaskState<T> {
     data class Success<T>(val res: T) : TaskState<T>()
     data class Error<T>(val e: Throwable, val task: ITask<T>) : TaskState<T>()
@@ -24,11 +31,13 @@ sealed class TaskState<T> {
 /**
  * 別のCoroutineScopeでタスクを実行する
  */
+@Deprecated("複雑でわかりづらいのでWorkerかStoreに移行したい")
 interface TaskExecutor<T> {
     val tasks: Flow<TaskState<T>>
     fun dispatch(task: ITask<T>, isLazy: Boolean = false): Flow<TaskState<T>>
 }
 
+@Deprecated("複雑でわかりづらいのでWorkerかStoreに移行したい")
 class TaskExecutorImpl<T>(
     val coroutineScope: CoroutineScope,
     val logger: Logger
@@ -58,6 +67,7 @@ class TaskExecutorImpl<T>(
     }
 }
 
+@Deprecated("複雑でわかりづらいのでWorkerかStoreに移行したい")
 class CreateGalleryTaskExecutor(
     private val taskExecutorImpl: TaskExecutor<GalleryPost>
 ) : TaskExecutor<GalleryPost> by taskExecutorImpl
