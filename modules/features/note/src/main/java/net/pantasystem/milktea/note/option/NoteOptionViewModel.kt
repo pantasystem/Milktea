@@ -8,7 +8,10 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import net.pantasystem.milktea.app_store.handler.AppGlobalError
+import net.pantasystem.milktea.app_store.handler.UserActionAppGlobalErrorStore
 import net.pantasystem.milktea.common.Logger
+import net.pantasystem.milktea.common_android.resource.StringSource
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.account.page.Pageable
@@ -24,6 +27,7 @@ class NoteOptionViewModel @Inject constructor(
     private val noteRelationGetter: NoteRelationGetter,
     private val loggerFactory: Logger.Factory,
     private val featureEnables: FeatureEnables,
+    private val userActionAppGlobalErrorStore: UserActionAppGlobalErrorStore,
     private val savedStateHandle: SavedStateHandle
 ) : ViewModel() {
     companion object {
@@ -98,6 +102,14 @@ class NoteOptionViewModel @Inject constructor(
         viewModelScope.launch {
             noteRepository.createThreadMute(noteId).onFailure {
                 logger.error("create thread mute failed", it)
+                userActionAppGlobalErrorStore.dispatch(
+                    AppGlobalError(
+                        "NoteOptionViewModel.createThreadMute",
+                        AppGlobalError.ErrorLevel.Error,
+                        StringSource("Create thread mute failed"),
+                        it
+                    )
+                )
             }
             savedStateHandle[NOTE_ID] = noteId
         }
@@ -107,6 +119,14 @@ class NoteOptionViewModel @Inject constructor(
         viewModelScope.launch {
             noteRepository.deleteThreadMute(noteId).onFailure {
                 logger.error("delete thread mute failed", it)
+                userActionAppGlobalErrorStore.dispatch(
+                    AppGlobalError(
+                        "NoteOptionViewModel.deleteThreadMute",
+                        AppGlobalError.ErrorLevel.Error,
+                        StringSource("Delete thread mute failed"),
+                        it
+                    )
+                )
             }
             savedStateHandle[NOTE_ID] = noteId
         }

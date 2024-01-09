@@ -13,6 +13,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import net.pantasystem.milktea.app_store.account.AccountStore
 import net.pantasystem.milktea.common.ui.ApplyTheme
+import net.pantasystem.milktea.common_android_ui.error.UserActionAppGlobalErrorListener
 import net.pantasystem.milktea.common_compose.MilkteaStyleConfigApplyAndTheme
 import net.pantasystem.milktea.common_navigation.UserListArgs
 import net.pantasystem.milktea.common_navigation.UserListNavigation
@@ -63,6 +64,9 @@ class ListListActivity : AppCompatActivity() {
     @Inject
     internal lateinit var configRepository: LocalConfigRepository
 
+    @Inject
+    internal lateinit var userActionAppGlobalErrorListener: UserActionAppGlobalErrorListener
+
 
     private val addUserId: User.Id? by lazy {
         val addUserIdSt = intent.getStringExtra(EXTRA_ADD_USER_ID)
@@ -79,6 +83,10 @@ class ListListActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         applyTheme()
 
+        userActionAppGlobalErrorListener(
+            lifecycle = lifecycle,
+            fragmentManager = supportFragmentManager
+        )
 
         mListListViewModel.setAddTargetUserId(addUserId)
 

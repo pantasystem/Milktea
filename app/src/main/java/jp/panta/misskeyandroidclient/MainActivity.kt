@@ -41,6 +41,7 @@ import net.pantasystem.milktea.common.ui.ApplyTheme
 import net.pantasystem.milktea.common.ui.ToolbarSetter
 import net.pantasystem.milktea.common_android_ui.account.AccountSwitchingDialog
 import net.pantasystem.milktea.common_android_ui.account.viewmodel.AccountViewModel
+import net.pantasystem.milktea.common_android_ui.error.UserActionAppGlobalErrorListener
 import net.pantasystem.milktea.common_android_ui.report.ReportViewModel
 import net.pantasystem.milktea.common_navigation.MainNavigation
 import net.pantasystem.milktea.common_viewmodel.CurrentPageableTimelineViewModel
@@ -77,6 +78,9 @@ class MainActivity : AppCompatActivity(), ToolbarSetter {
 
     @Inject
     internal lateinit var channelAPIMainEventDispatcherAdapter: ChannelAPIMainEventDispatcherAdapter
+
+    @Inject
+    internal lateinit var userActionAppGlobalErrorListener: UserActionAppGlobalErrorListener
 
     private val notesViewModel: NotesViewModel by viewModels()
 
@@ -167,6 +171,10 @@ class MainActivity : AppCompatActivity(), ToolbarSetter {
         }
 
         GoogleApiAvailability.getInstance().makeGooglePlayServicesAvailable(this)
+        userActionAppGlobalErrorListener(
+            lifecycle = lifecycle,
+            fragmentManager = supportFragmentManager
+        )
     }
 
     override fun setToolbar(toolbar: Toolbar, visibleTitle: Boolean) {

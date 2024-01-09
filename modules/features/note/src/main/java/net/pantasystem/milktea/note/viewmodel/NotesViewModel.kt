@@ -7,6 +7,8 @@ import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
+import net.pantasystem.milktea.app_store.handler.AppGlobalError
+import net.pantasystem.milktea.app_store.handler.UserActionAppGlobalErrorStore
 import net.pantasystem.milktea.app_store.notes.NoteTranslationStore
 import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.common.mapCancellableCatching
@@ -48,6 +50,7 @@ class NotesViewModel @Inject constructor(
     private val deleteReactionUseCase: DeleteReactionsUseCase,
     private val voteUseCase: VoteUseCase,
     private val configRepository: LocalConfigRepository,
+    private val userActionAppGlobalErrorStore: UserActionAppGlobalErrorStore,
     loggerFactory: Logger.Factory
 ) : ViewModel() {
     private val logger by lazy {
@@ -76,6 +79,15 @@ class NotesViewModel @Inject constructor(
                 quoteRenoteTarget.tryEmit(
                     QuoteRenoteData.ofTimeline(it.id)
                 )
+            }.onFailure {
+                userActionAppGlobalErrorStore.dispatch(
+                    AppGlobalError(
+                        tag = "NotesViewModel.showQuoteNoteEditor",
+                        level = AppGlobalError.ErrorLevel.Warning,
+                        message = StringSource("Load note failed"),
+                        throwable = it
+                    )
+                )
             }
         }
     }
@@ -85,6 +97,15 @@ class NotesViewModel @Inject constructor(
             recursiveSearchHasContentNote(noteId).onSuccess {
                 quoteRenoteTarget.tryEmit(
                     QuoteRenoteData.ofChannel(it.id, requireNotNull(it.channelId))
+                )
+            }.onFailure {
+                userActionAppGlobalErrorStore.dispatch(
+                    AppGlobalError(
+                        tag = "NotesViewModel.showQuoteToChannelNoteEditor",
+                        level = AppGlobalError.ErrorLevel.Warning,
+                        message = StringSource("Load note failed"),
+                        throwable = it
+                    )
                 )
             }
         }
@@ -108,6 +129,14 @@ class NotesViewModel @Inject constructor(
         viewModelScope.launch {
             toggleReactionUseCase(noteId, reaction).onFailure {
                 logger.error("リアクション失敗", it)
+                userActionAppGlobalErrorStore.dispatch(
+                    AppGlobalError(
+                        tag = "NotesViewModel.toggleReaction",
+                        level = AppGlobalError.ErrorLevel.Warning,
+                        message = StringSource("Reaction failed"),
+                        throwable = it
+                    )
+                )
             }
         }
     }
@@ -116,6 +145,14 @@ class NotesViewModel @Inject constructor(
         viewModelScope.launch {
             deleteReactionUseCase(noteId).onFailure {
                 logger.error("リアクションの解除に失敗", it)
+                userActionAppGlobalErrorStore.dispatch(
+                    AppGlobalError(
+                        tag = "NotesViewModel.deleteReactions",
+                        level = AppGlobalError.ErrorLevel.Warning,
+                        message = StringSource("Delete reactions failed"),
+                        throwable = it
+                    )
+                )
             }
         }
     }
@@ -132,12 +169,18 @@ class NotesViewModel @Inject constructor(
 
     fun deleteFavorite(noteId: Note.Id) {
         viewModelScope.launch {
-            val result = deleteFavoriteUseCase(noteId).getOrNull() != null
-            _statusMessage.tryEmit(if (result) {
-                StringSource(R.string.removed_from_favorites)
-            } else {
-                StringSource(R.string.failed_to_delete_favorites)
-            })
+            deleteFavoriteUseCase(noteId).onFailure {
+                userActionAppGlobalErrorStore.dispatch(
+                    AppGlobalError(
+                        tag = "NotesViewModel.deleteFavorite",
+                        level = AppGlobalError.ErrorLevel.Warning,
+                        message = StringSource(R.string.failed_to_delete_favorites),
+                        throwable = it
+                    )
+                )
+            }.onSuccess {
+                _statusMessage.tryEmit(StringSource(R.string.removed_from_favorites))
+            }
         }
     }
 
@@ -145,7 +188,14 @@ class NotesViewModel @Inject constructor(
     fun addBookmark(noteId: Note.Id) {
         viewModelScope.launch {
             createBookmarkUseCase(noteId).onFailure {
-                logger.error("add book mark error", it)
+                userActionAppGlobalErrorStore.dispatch(
+                    AppGlobalError(
+                        tag = "NotesViewModel.addBookmark",
+                        level = AppGlobalError.ErrorLevel.Warning,
+                        message = StringSource("Add bookmark failed"),
+                        throwable = it
+                    )
+                )
             }
         }
     }
@@ -154,6 +204,14 @@ class NotesViewModel @Inject constructor(
         viewModelScope.launch {
             deleteBookmarkUseCase(noteId).onFailure {
                 logger.error("remove book mark error", it)
+                userActionAppGlobalErrorStore.dispatch(
+                    AppGlobalError(
+                        tag = "NotesViewModel.removeBookmark",
+                        level = AppGlobalError.ErrorLevel.Warning,
+                        message = StringSource("Remove bookmark failed"),
+                        throwable = it
+                    )
+                )
             }
         }
     }
@@ -164,6 +222,14 @@ class NotesViewModel @Inject constructor(
                 _statusMessage.tryEmit(StringSource(R.string.successfully_deleted))
             }.onFailure {
                 logger.error("ノート削除に失敗", it)
+                userActionAppGlobalErrorStore.dispatch(
+                    AppGlobalError(
+                        tag = "NotesViewModel.removeNote",
+                        level = AppGlobalError.ErrorLevel.Error,
+                        message = StringSource("Delete note failed"),
+                        throwable = it
+                    )
+                )
             }
         }
 
@@ -175,6 +241,14 @@ class NotesViewModel @Inject constructor(
                 _openNoteEditorEvent.tryEmit(it)
             }.onFailure {
                 logger.error("削除に失敗しました", it)
+                userActionAppGlobalErrorStore.dispatch(
+                    AppGlobalError(
+                        tag = "NotesViewModel.removeAndEditNote",
+                        level = AppGlobalError.ErrorLevel.Error,
+                        message = StringSource("Delete note failed"),
+                        throwable = it
+                    )
+                )
             }
         }
 
@@ -187,6 +261,14 @@ class NotesViewModel @Inject constructor(
         viewModelScope.launch {
             voteUseCase(noteId, choice).onFailure {
                 logger.error("投票に失敗しました", it)
+                userActionAppGlobalErrorStore.dispatch(
+                    AppGlobalError(
+                        tag = "NotesViewModel.vote",
+                        level = AppGlobalError.ErrorLevel.Warning,
+                        message = StringSource("Vote failed"),
+                        throwable = it
+                    )
+                )
             }.onSuccess {
                 logger.debug("投票に成功しました")
             }
@@ -197,6 +279,14 @@ class NotesViewModel @Inject constructor(
         viewModelScope.launch {
             toggleFavoriteUseCase(note.id).onFailure {
                 logger.error("favoriteに失敗", it)
+                userActionAppGlobalErrorStore.dispatch(
+                    AppGlobalError(
+                        tag = "NotesViewModel.onToggleFavoriteUseCase",
+                        level = AppGlobalError.ErrorLevel.Warning,
+                        message = StringSource("Toggle favorite failed"),
+                        throwable = it
+                    )
+                )
             }
         }
     }
@@ -215,6 +305,14 @@ class NotesViewModel @Inject constructor(
                 configRepository.save(it)
             }.onFailure {
                 logger.error("警告表示の抑制に失敗", it)
+                userActionAppGlobalErrorStore.dispatch(
+                    AppGlobalError(
+                        tag = "NotesViewModel.neverShowSensitiveMediaDialog",
+                        level = AppGlobalError.ErrorLevel.Warning,
+                        message = StringSource("Never show sensitive media dialog failed"),
+                        throwable = it
+                    )
+                )
             }
         }
     }
