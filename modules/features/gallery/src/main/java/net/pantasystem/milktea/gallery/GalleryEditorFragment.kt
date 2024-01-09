@@ -23,7 +23,6 @@ import net.pantasystem.milktea.gallery.viewmodel.GalleryEditorViewModel
 import net.pantasystem.milktea.model.drive.DriveFileRepository
 import net.pantasystem.milktea.model.drive.FileProperty
 import net.pantasystem.milktea.model.drive.FilePropertyDataSource
-import net.pantasystem.milktea.model.file.toAppFile
 import net.pantasystem.milktea.model.setting.LocalConfigRepository
 import javax.inject.Inject
 
@@ -166,8 +165,7 @@ class GalleryEditorFragment : Fragment() {
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
             val uri = it.data?.data
             if (uri != null) {
-
-                viewModel.addFile(uri.toAppFile(requireContext()))
+                viewModel.addFile(uri)
             }
         }
 

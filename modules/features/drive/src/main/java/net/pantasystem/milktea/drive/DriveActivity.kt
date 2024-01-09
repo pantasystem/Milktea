@@ -157,7 +157,7 @@ class DriveActivity : AppCompatActivity() {
         }
 
     private fun uploadFile(uri: Uri) {
-        _driveViewModel.uploadFile(uri.toAppFile(this))
+        _driveViewModel.uploadFile(uri)
     }
 
 

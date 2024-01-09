@@ -1,5 +1,6 @@
 package net.pantasystem.milktea.drive.viewmodel
 
+import android.net.Uri
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -23,6 +24,7 @@ import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.common.PageableState
 import net.pantasystem.milktea.common.convert
 import net.pantasystem.milktea.common.mapCancellableCatching
+import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.common_navigation.EXTRA_ACCOUNT_ID
 import net.pantasystem.milktea.common_navigation.EXTRA_INT_SELECTABLE_FILE_MAX_SIZE
 import net.pantasystem.milktea.model.account.Account
@@ -35,6 +37,7 @@ import net.pantasystem.milktea.model.drive.DriveFileRepository
 import net.pantasystem.milktea.model.drive.FileProperty
 import net.pantasystem.milktea.model.drive.FilePropertyDataSource
 import net.pantasystem.milktea.model.file.AppFile
+import net.pantasystem.milktea.model.file.UriToAppFileUseCase
 import net.pantasystem.milktea.model.setting.LocalConfigRepository
 import javax.inject.Inject
 
@@ -49,6 +52,7 @@ class DriveViewModel @Inject constructor(
     private val directoryPagingStore: DriveDirectoryPagingStore,
     private val filePagingStore: FilePropertyPagingStore,
     private val filePropertyRepository: DriveFileRepository,
+    private val uriToAppFileUseCase: UriToAppFileUseCase,
     loggerFactory: Logger.Factory,
     buildDriveUiState: DriveUiStateBuilder,
 ) : ViewModel() {
@@ -301,7 +305,7 @@ class DriveViewModel @Inject constructor(
         }
     }
 
-    fun uploadFile(file: AppFile.Local) {
+    private fun uploadFile(file: AppFile.Local) {
         viewModelScope.launch {
             try {
                 val currentDir = getCurrentDirId()
@@ -315,6 +319,14 @@ class DriveViewModel @Inject constructor(
             } catch (e: Exception) {
                 logger.info("ファイルアップロードに失敗した")
             }
+        }
+    }
+
+    fun uploadFile(uri: Uri) {
+        runCancellableCatching {
+            uriToAppFileUseCase(uri)
+        }.onSuccess {
+            uploadFile(it)
         }
     }
 

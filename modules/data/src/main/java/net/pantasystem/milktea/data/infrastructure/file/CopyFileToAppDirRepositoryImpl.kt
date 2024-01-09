@@ -10,7 +10,6 @@ import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.common_android.hilt.IODispatcher
 import net.pantasystem.milktea.model.file.AppFile
 import net.pantasystem.milktea.model.file.CopyFileToAppDirRepository
-import net.pantasystem.milktea.model.file.toAppFile
 import java.io.File
 import javax.inject.Inject
 

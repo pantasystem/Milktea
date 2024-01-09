@@ -1,9 +1,17 @@
 package net.pantasystem.milktea.gallery.viewmodel
 
+import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
@@ -17,6 +25,7 @@ import net.pantasystem.milktea.model.drive.FileProperty
 import net.pantasystem.milktea.model.drive.FilePropertyDataSource
 import net.pantasystem.milktea.model.file.AppFile
 import net.pantasystem.milktea.model.file.FilePreviewSource
+import net.pantasystem.milktea.model.file.UriToAppFileUseCase
 import net.pantasystem.milktea.model.gallery.CreateGalleryPost
 import net.pantasystem.milktea.model.gallery.GalleryPost
 import net.pantasystem.milktea.model.gallery.GalleryRepository
@@ -64,6 +73,7 @@ class GalleryEditorViewModel @Inject constructor(
     val accountRepository: AccountRepository,
     private val taskExecutor: CreateGalleryTaskExecutor,
     val driveFileRepository: DriveFileRepository,
+    private val uriToAppFileUseCase: UriToAppFileUseCase,
     loggerFactory: Logger.Factory,
 ) : ViewModel() {
 
@@ -198,6 +208,18 @@ class GalleryEditorViewModel @Inject constructor(
                     mutable.add(file)
                 }
             )
+        }
+    }
+
+    fun addFile(uri: Uri) {
+        viewModelScope.launch {
+            runCancellableCatching {
+                uriToAppFileUseCase(uri)
+            }.onSuccess { appFile ->
+                addFile(appFile)
+            }.onFailure {
+                logger.error("ファイルの追加に失敗しました。", it)
+            }
         }
     }
 
