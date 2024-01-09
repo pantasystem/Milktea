@@ -2,6 +2,8 @@ package net.pantasystem.milktea.note.editor.viewmodel
 
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.channel.Channel
+import net.pantasystem.milktea.model.file.AppFile
+import net.pantasystem.milktea.model.file.FilePreviewSource
 import net.pantasystem.milktea.model.note.CreateNote
 import net.pantasystem.milktea.model.note.Note
 import net.pantasystem.milktea.model.note.PollChoiceState
@@ -48,7 +50,11 @@ class NoteEditorUiStateTest {
         )
 
         val account = Account(
-            remoteId = "", instanceDomain = "", userName = "", instanceType = Account.InstanceType.MISSKEY, token = ""
+            remoteId = "",
+            instanceDomain = "",
+            userName = "",
+            instanceType = Account.InstanceType.MISSKEY,
+            token = ""
         )
         val note = state.toCreateNote(
             account
@@ -186,6 +192,81 @@ class NoteEditorUiStateTest {
             state.checkValidate(
                 isCwAllowBlank = false,
             )
+        )
+    }
+
+    @Test
+    fun checkValidate_GiveValidFiles() {
+        val state = NoteEditorUiState(
+            files = listOf(
+                FilePreviewSource.Local(
+                    file = AppFile.Local(
+                        name = "name",
+                        path = "path",
+                        thumbnailUrl = "thumbnailUrl",
+                        type = "type",
+                        isSensitive = false,
+                        folderId = null,
+                        fileSize = null,
+                        comment = null,
+                        id = 4695,
+                    ),
+                ),
+            )
+        )
+
+        Assertions.assertTrue(
+            state.checkValidate()
+        )
+    }
+
+    @Test
+    fun checkValidate_GiveInvalidFileSize() {
+        val state = NoteEditorUiState(
+            files = (0..16).map {
+                FilePreviewSource.Local(
+                    file = AppFile.Local(
+                        name = "name",
+                        path = "path",
+                        thumbnailUrl = "thumbnailUrl",
+                        type = "type",
+                        isSensitive = false,
+                        folderId = null,
+                        fileSize = null,
+                        comment = null,
+                        id = it.toLong(),
+                    ),
+                )
+            }
+        )
+
+        Assertions.assertFalse(
+            state.checkValidate(maxFileCount = 16)
+        )
+    }
+
+    @Test
+    fun checkValidate_GiveValidJustFileSize() {
+        val state = NoteEditorUiState(
+            files = (1..16).map {
+                FilePreviewSource.Local(
+                    file = AppFile.Local(
+                        name = "name",
+                        path = "path",
+                        thumbnailUrl = "thumbnailUrl",
+                        type = "type",
+                        isSensitive = false,
+                        folderId = null,
+                        fileSize = null,
+                        comment = null,
+                        id = it.toLong(),
+                    ),
+                )
+            }
+        )
+
+        Assertions.assertTrue(
+            state.checkValidate(maxFileCount = 16)
         )
     }
 
