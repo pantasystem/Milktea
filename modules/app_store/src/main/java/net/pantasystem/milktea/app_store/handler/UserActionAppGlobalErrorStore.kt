@@ -5,6 +5,7 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import net.pantasystem.milktea.common_android.resource.StringSource
 import javax.inject.Inject
+import javax.inject.Singleton
 
 /**
  * アプリ全体で共通としてユーザの操作によって発生したエラーをハンドリングするクラスです。
@@ -13,9 +14,10 @@ import javax.inject.Inject
  * 複数のレイヤーから呼び出してしまうと、重複して同じエラーを報告してしまう可能性が考えられるため、ViewModelから呼び出すことを前提としています。
  * また古い実装の場合このクラスを経由しないケースがあるため、このクラスに必ずエラーが報告されないケースもあるため、エラーの発生元を確認するようにしてください。
  */
-class UserActionAppGlobalErrorHandler @Inject constructor() {
+@Singleton
+class UserActionAppGlobalErrorStore @Inject constructor() {
     private val _errorFlow = MutableSharedFlow<AppGlobalError>(
-        extraBufferCapacity = 100,
+        extraBufferCapacity = 999,
         onBufferOverflow = BufferOverflow.DROP_OLDEST,
     )
     val errorFlow = _errorFlow.asSharedFlow()

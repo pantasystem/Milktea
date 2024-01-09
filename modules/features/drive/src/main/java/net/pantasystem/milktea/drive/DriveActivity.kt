@@ -17,6 +17,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import net.pantasystem.milktea.common.ui.ApplyTheme
 import net.pantasystem.milktea.common_android.platform.PermissionUtil
+import net.pantasystem.milktea.common_android_ui.error.UserActionAppGlobalErrorListener
 import net.pantasystem.milktea.common_compose.MilkteaStyleConfigApplyAndTheme
 import net.pantasystem.milktea.common_navigation.DriveNavigation
 import net.pantasystem.milktea.common_navigation.DriveNavigationArgs
@@ -53,6 +54,9 @@ class DriveActivity : AppCompatActivity() {
     @Inject
     internal lateinit var configRepository: LocalConfigRepository
 
+    @Inject
+    internal lateinit var userActionAPpGlobalErrorListener: UserActionAppGlobalErrorListener
+
     @OptIn(
         ExperimentalPagerApi::class,
         ExperimentalMaterialApi::class,
@@ -62,6 +66,10 @@ class DriveActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setTheme.invoke()
 
+        userActionAPpGlobalErrorListener(
+            lifecycle = lifecycle,
+            fragmentManager = supportFragmentManager
+        )
 
 
         setContent {

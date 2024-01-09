@@ -20,11 +20,14 @@ import kotlinx.coroutines.launch
 import net.pantasystem.milktea.app_store.account.AccountStore
 import net.pantasystem.milktea.app_store.drive.DriveDirectoryPagingStore
 import net.pantasystem.milktea.app_store.drive.FilePropertyPagingStore
+import net.pantasystem.milktea.app_store.handler.AppGlobalError
+import net.pantasystem.milktea.app_store.handler.UserActionAppGlobalErrorStore
 import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.common.PageableState
 import net.pantasystem.milktea.common.convert
 import net.pantasystem.milktea.common.mapCancellableCatching
 import net.pantasystem.milktea.common.runCancellableCatching
+import net.pantasystem.milktea.common_android.resource.StringSource
 import net.pantasystem.milktea.common_navigation.EXTRA_ACCOUNT_ID
 import net.pantasystem.milktea.common_navigation.EXTRA_INT_SELECTABLE_FILE_MAX_SIZE
 import net.pantasystem.milktea.model.account.Account
@@ -53,6 +56,7 @@ class DriveViewModel @Inject constructor(
     private val filePagingStore: FilePropertyPagingStore,
     private val filePropertyRepository: DriveFileRepository,
     private val uriToAppFileUseCase: UriToAppFileUseCase,
+    private val userActionAppGlobalErrorHandler: UserActionAppGlobalErrorStore,
     loggerFactory: Logger.Factory,
     buildDriveUiState: DriveUiStateBuilder,
 ) : ViewModel() {
@@ -242,6 +246,14 @@ class DriveViewModel @Inject constructor(
                 filePropertyRepository.toggleNsfw(id)
             } catch (e: Exception) {
                 logger.info("nsfwの更新に失敗しました", e = e)
+                userActionAppGlobalErrorHandler.dispatch(
+                    AppGlobalError(
+                        "DriveViewModel.toggleNsfw",
+                        AppGlobalError.ErrorLevel.Error,
+                        StringSource("Nsfw update failed"),
+                        e,
+                    )
+                )
             }
         }
     }
@@ -251,6 +263,14 @@ class DriveViewModel @Inject constructor(
         viewModelScope.launch {
             filePropertyRepository.delete(id).onFailure { e ->
                 logger.info("ファイルの削除に失敗しました", e = e)
+                userActionAppGlobalErrorHandler.dispatch(
+                    AppGlobalError(
+                        "DriveViewModel.deleteFile",
+                        AppGlobalError.ErrorLevel.Error,
+                        StringSource("File delete failed"),
+                        e,
+                    )
+                )
             }
         }
     }
@@ -263,6 +283,14 @@ class DriveViewModel @Inject constructor(
                     .update(comment = newCaption)
             ).onFailure {
                 logger.info("キャプションの更新に失敗しました。", e = it)
+                userActionAppGlobalErrorHandler.dispatch(
+                    AppGlobalError(
+                        "DriveViewModel.updateCaption",
+                        AppGlobalError.ErrorLevel.Error,
+                        StringSource("Caption update failed"),
+                        it,
+                    )
+                )
             }
         }
     }
@@ -274,6 +302,14 @@ class DriveViewModel @Inject constructor(
                     .update(name = name)
             ).onFailure {
                 logger.error("update file name failed", it)
+                userActionAppGlobalErrorHandler.dispatch(
+                    AppGlobalError(
+                        "DriveViewModel.updateFileName",
+                        AppGlobalError.ErrorLevel.Error,
+                        StringSource("File name update failed"),
+                        it,
+                    )
+                )
             }
         }
     }
@@ -318,6 +354,14 @@ class DriveViewModel @Inject constructor(
                 filePagingStore.onCreated(e.id)
             } catch (e: Exception) {
                 logger.info("ファイルアップロードに失敗した")
+                userActionAppGlobalErrorHandler.dispatch(
+                    AppGlobalError(
+                        "DriveViewModel.uploadFile",
+                        AppGlobalError.ErrorLevel.Error,
+                        StringSource("File upload failed"),
+                        e,
+                    )
+                )
             }
         }
     }
