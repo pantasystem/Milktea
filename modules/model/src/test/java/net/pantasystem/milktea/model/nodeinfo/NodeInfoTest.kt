@@ -1,6 +1,6 @@
 package net.pantasystem.milktea.model.nodeinfo
 
-import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 
 internal class NodeInfoTest {
@@ -97,6 +97,22 @@ internal class NodeInfoTest {
         )
         assertEquals(
             NodeInfo.SoftwareType.Mastodon.Fedibird("fedibird", "3.0"),
+            nodeInfo.type
+        )
+    }
+
+    @Test
+    fun type_GiveKmyblue() {
+        val nodeInfo = NodeInfo(
+            version = "2.0",
+            host = "example.com",
+            software = NodeInfo.Software(
+                name = "kmyblue",
+                version = "3.0"
+            )
+        )
+        assertEquals(
+            NodeInfo.SoftwareType.Mastodon.Kmyblue("kmyblue", "3.0"),
             nodeInfo.type
         )
     }
