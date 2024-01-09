@@ -268,7 +268,7 @@ internal class MastodonTimelineStorePagingStoreImpl(
 
     private suspend fun getVisibilitiesParameter(account: Account): List<String>? {
         val nodeInfo = nodeInfoRepository.find(account.getHost()).getOrNull() ?: return null
-        return if (nodeInfo.type is NodeInfo.SoftwareType.Mastodon.Fedibird) {
+        return if (nodeInfo.type is NodeInfo.SoftwareType.Mastodon.Fedibird || nodeInfo.type is NodeInfo.SoftwareType.Mastodon.Kmyblue) {
             listOf("public", "unlisted", "private", "limited", "direct", "personal")
         } else {
             null

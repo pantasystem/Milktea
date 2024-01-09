@@ -34,7 +34,7 @@ class TootDTOEntityConverter @Inject constructor(
         val instanceInfo = instanceInfoRepository.find(account.normalizedInstanceUri)
         val isReactionAvailable = (instanceInfo.onFailure {
             logger.error("Failed to find instance info", it)
-        }.getOrNull()?.isReactionAvailable ?: false) || nodeInfo?.type is NodeInfo.SoftwareType.Mastodon.Fedibird
+        }.getOrNull()?.isReactionAvailable ?: false) || nodeInfo?.type is NodeInfo.SoftwareType.Mastodon.Fedibird || nodeInfo?.type is NodeInfo.SoftwareType.Mastodon.Kmyblue
 
         val urls = statusDTOs.flatMap { statusDTO ->
             (statusDTO.emojiReactions?.mapNotNull {
@@ -60,6 +60,7 @@ class TootDTOEntityConverter @Inject constructor(
             }
             .getOrNull()?.isReactionAvailable
             ?: false) || nodeInfo?.type is NodeInfo.SoftwareType.Mastodon.Fedibird
+                || nodeInfo?.type is NodeInfo.SoftwareType.Mastodon.Kmyblue
 
         val urls = (statusDTO.emojiReactions?.mapNotNull {
             it.url

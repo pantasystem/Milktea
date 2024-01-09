@@ -50,6 +50,10 @@ data class NodeInfo(
                 override val version: String,
             ) : Mastodon
 
+            data class Kmyblue(
+                override val name: String,
+                override val version: String,
+            ) : Mastodon
         }
 
         sealed interface Pleroma : SoftwareType {
@@ -85,6 +89,7 @@ data class NodeInfo(
         "pleroma" -> SoftwareType.Pleroma.Normal(version = software.version, name = software.name)
         "akkoma" -> SoftwareType.Pleroma.Akkoma(version = software.version, name = software.name)
         "firefish" -> SoftwareType.Firefish(version = software.version, name = software.name)
+        "kmyblue" -> SoftwareType.Mastodon.Kmyblue(version = software.version, name = software.name)
         else -> SoftwareType.Other(version = software.version, name = software.name)
     }
 }

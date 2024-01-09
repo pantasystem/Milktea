@@ -56,8 +56,10 @@ class ReactionRepositoryImpl @Inject constructor(
                             }
                         }
                         Account.InstanceType.MASTODON, Account.InstanceType.PLEROMA -> {
-                            if (nodeInfoRepository.find(account.getHost())
-                                    .getOrThrow().type !is NodeInfo.SoftwareType.Mastodon.Fedibird
+                            val nodeInfo = nodeInfoRepository.find(account.getHost())
+                                .getOrThrow()
+                            if (nodeInfo.type !is NodeInfo.SoftwareType.Mastodon.Fedibird
+                                && nodeInfo.type !is NodeInfo.SoftwareType.Mastodon.Kmyblue
                             ) {
                                 if (!note.isSupportEmojiReaction) {
                                     throw IllegalArgumentException("Mastodon is not support reaction, host:${account.getHost()}, username:${account.userName}")
@@ -99,8 +101,10 @@ class ReactionRepositoryImpl @Inject constructor(
                             .getOrThrow() != AddResult.Canceled))
                     }
                     Account.InstanceType.MASTODON, Account.InstanceType.PLEROMA -> {
-                        if (nodeInfoRepository.find(account.getHost())
-                                .getOrThrow().type !is NodeInfo.SoftwareType.Mastodon.Fedibird
+                        val nodeInfo = nodeInfoRepository.find(account.getHost())
+                            .getOrThrow()
+                        if (nodeInfo.type !is NodeInfo.SoftwareType.Mastodon.Fedibird
+                            && nodeInfo.type !is NodeInfo.SoftwareType.Mastodon.Kmyblue
                         ) {
                             if (!note.isSupportEmojiReaction) {
                                 return@withContext false
