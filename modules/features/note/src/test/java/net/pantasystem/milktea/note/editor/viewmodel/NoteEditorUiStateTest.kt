@@ -136,4 +136,57 @@ class NoteEditorUiStateTest {
             state,
         )
     }
+
+    @Test
+    fun checkValidate_GiveInvalidDataCaseEmptyFields() {
+        val state = NoteEditorUiState()
+        Assertions.assertFalse(
+            state.checkValidate()
+        )
+    }
+
+    @Test
+    fun checkValidate_GiveValidDataCaseSomeText() {
+        val state = NoteEditorUiState(
+            formState = NoteEditorFormState(
+                text = "hogehoge"
+            )
+        )
+        Assertions.assertTrue(
+            state.checkValidate()
+        )
+    }
+
+    @Test
+    fun checkValidate_GiveInvalidDataTextOverflow() {
+        val state = NoteEditorUiState(
+            formState = NoteEditorFormState(
+                text = "a".repeat(3001)
+            )
+        )
+
+        Assertions.assertFalse(
+            state.checkValidate(
+                textMaxLength = 3000,
+            )
+        )
+    }
+
+    @Test
+    fun checkValidate_GiveInvalidDataCaseCwAllowBlank() {
+        val state = NoteEditorUiState(
+            formState = NoteEditorFormState(
+                text = "hogehoge",
+                cw = "",
+                hasCw = true,
+            )
+        )
+
+        Assertions.assertFalse(
+            state.checkValidate(
+                isCwAllowBlank = false,
+            )
+        )
+    }
+
 }
