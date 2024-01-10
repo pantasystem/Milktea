@@ -9,6 +9,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import net.pantasystem.milktea.app_store.setting.SettingStore
 import net.pantasystem.milktea.common.ui.ApplyTheme
 import net.pantasystem.milktea.common_android_ui.PageableFragmentFactory
+import net.pantasystem.milktea.common_android_ui.error.UserActionAppGlobalErrorListener
 import net.pantasystem.milktea.favorite.databinding.ActivityFavoriteBinding
 import net.pantasystem.milktea.model.account.page.Pageable
 import net.pantasystem.milktea.note.view.NoteActionHandler
@@ -32,9 +33,13 @@ class FavoriteActivity : AppCompatActivity() {
     @Inject
     internal lateinit var applyTheme: ApplyTheme
 
+    @Inject
+    internal lateinit var userActionAppGlobalErrorListener: UserActionAppGlobalErrorListener
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         applyTheme()
+        userActionAppGlobalErrorListener(lifecycle, supportFragmentManager)
         mBinding = DataBindingUtil.setContentView(this, R.layout.activity_favorite)
         setSupportActionBar(mBinding.favoriteToolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
