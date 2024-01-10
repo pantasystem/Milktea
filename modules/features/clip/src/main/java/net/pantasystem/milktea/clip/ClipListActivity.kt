@@ -10,6 +10,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import dagger.hilt.android.AndroidEntryPoint
 import net.pantasystem.milktea.common.ui.ApplyTheme
+import net.pantasystem.milktea.common_android_ui.error.UserActionAppGlobalErrorListener
 import net.pantasystem.milktea.common_compose.MilkteaStyleConfigApplyAndTheme
 import net.pantasystem.milktea.common_navigation.ClipDetailNavigation
 import net.pantasystem.milktea.common_navigation.ClipListNavigation
@@ -29,6 +30,9 @@ class ClipListActivity : AppCompatActivity() {
     @Inject
     internal lateinit var configRepository: LocalConfigRepository
 
+    @Inject
+    internal lateinit var userActionAppGlobalErrorListener: UserActionAppGlobalErrorListener
+
     private val mode: ClipListNavigationArgs.Mode by lazy {
         intent.getStringExtra(ClipListNavigationImpl.EXTRA_MODE)?.let {
             ClipListNavigationArgs.Mode.valueOf(it)
@@ -41,6 +45,7 @@ class ClipListActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
 
         applyTheme()
+        userActionAppGlobalErrorListener(lifecycle, supportFragmentManager)
 
         setContent {
             val uiState by clipListViewModel.uiState.collectAsState()

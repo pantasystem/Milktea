@@ -53,6 +53,7 @@ dependencies {
     implementation project(path: ':modules:common_viewmodel')
     implementation project(path: ':modules:common_compose')
     implementation project(path: ':modules:features:note')
+    implementation project(path: ':modules:common_android')
     testImplementation libs.junit
     androidTestImplementation libs.androidx.test.ext.junit
     androidTestImplementation libs.androidx.test.espresso.core

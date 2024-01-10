@@ -8,10 +8,13 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import net.pantasystem.milktea.app_store.account.AccountStore
+import net.pantasystem.milktea.app_store.handler.AppGlobalError
+import net.pantasystem.milktea.app_store.handler.UserActionAppGlobalErrorStore
 import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.common.ResultState
 import net.pantasystem.milktea.common.asLoadingStateFlow
 import net.pantasystem.milktea.common.initialState
+import net.pantasystem.milktea.common_android.resource.StringSource
 import net.pantasystem.milktea.common_navigation.ClipListNavigationArgs
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.clip.Clip
@@ -26,6 +29,7 @@ class ClipListViewModel @Inject constructor(
     private val accountStore: AccountStore,
     private val toggleClipAddToTabUseCase: ToggleClipAddToTabUseCase,
     private val savedStateHandle: SavedStateHandle,
+    private val userActionAppGlobalErrorStore: UserActionAppGlobalErrorStore,
 ) : ViewModel() {
 
     private val logger by lazy(LazyThreadSafetyMode.NONE) {
@@ -113,7 +117,16 @@ class ClipListViewModel @Inject constructor(
             toggleClipAddToTabUseCase(
                 clipItemState.clip,
                 savedStateHandle[ClipListNavigationImpl.EXTRA_ADD_TAB_TO_ACCOUNT_ID]
-            )
+            ).onFailure {
+                userActionAppGlobalErrorStore.dispatch(
+                    AppGlobalError(
+                        "ClipListViewModel.onToggleAddToTabButtonClicked",
+                        AppGlobalError.ErrorLevel.Error,
+                        StringSource.invoke("add/remove clip to tab failed"),
+                        it
+                    )
+                )
+            }
         }
     }
 
