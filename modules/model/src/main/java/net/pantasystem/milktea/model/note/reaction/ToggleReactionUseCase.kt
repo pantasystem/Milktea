@@ -1,6 +1,6 @@
 package net.pantasystem.milktea.model.note.reaction
 
-import net.pantasystem.milktea.common.mapCancellableCatching
+import net.pantasystem.milktea.common.flatMapCancellableCatching
 import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.model.UseCase
 import net.pantasystem.milktea.model.account.Account
@@ -85,8 +85,8 @@ class ToggleReactionUseCase @Inject constructor(
 
             // NOTE: Suggestionを表示するためにユーザのデータが必要になるので、キャッシュを更新しておく
             userRepository.sync(note.userId).getOrThrow()
-        }.mapCancellableCatching {
-            noteRepository.sync(noteId).getOrThrow()
+        }.flatMapCancellableCatching {
+            noteRepository.sync(noteId)
         }
     }
 

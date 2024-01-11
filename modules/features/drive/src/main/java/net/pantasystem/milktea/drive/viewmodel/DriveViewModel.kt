@@ -26,7 +26,7 @@ import net.pantasystem.milktea.app_store.handler.UserActionAppGlobalErrorStore
 import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.common.PageableState
 import net.pantasystem.milktea.common.convert
-import net.pantasystem.milktea.common.mapCancellableCatching
+import net.pantasystem.milktea.common.flatMapCancellableCatching
 import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.common_android.resource.StringSource
 import net.pantasystem.milktea.common_navigation.EXTRA_ACCOUNT_ID
@@ -196,7 +196,7 @@ class DriveViewModel @Inject constructor(
 
     fun setUsingGridView(value: Boolean) {
         viewModelScope.launch {
-            configRepository.get().mapCancellableCatching { config ->
+            configRepository.get().flatMapCancellableCatching { config ->
                 configRepository.save(
                     config.copy(isDriveUsingGridView = value)
                 )

@@ -16,6 +16,7 @@ import net.pantasystem.milktea.app_store.account.AccountStore
 import net.pantasystem.milktea.app_store.handler.AppGlobalError
 import net.pantasystem.milktea.app_store.handler.UserActionAppGlobalErrorStore
 import net.pantasystem.milktea.common.Logger
+import net.pantasystem.milktea.common.flatMapCancellableCatching
 import net.pantasystem.milktea.common.mapCancellableCatching
 import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.common_android.resource.StringSource
@@ -208,8 +209,8 @@ class UserDetailViewModel @Inject constructor(
 
     private fun sync() {
         viewModelScope.launch {
-            getUserId().mapCancellableCatching { userId ->
-                userRepository.sync(userId).getOrThrow()
+            getUserId().flatMapCancellableCatching { userId ->
+                userRepository.sync(userId)
             }.onFailure {
                 logger.error("user sync error", it)
                 userActionAppGlobalErrorStore.dispatch(
@@ -358,8 +359,8 @@ class UserDetailViewModel @Inject constructor(
 
     fun toggleUserTimelineTab() {
         viewModelScope.launch {
-            getUserId().mapCancellableCatching {
-                toggleUserTimelineAddTabUseCase(it).getOrThrow()
+            getUserId().flatMapCancellableCatching {
+                toggleUserTimelineAddTabUseCase(it)
             }.onFailure {
                 logger.error("toggle user timeline tab failed", it)
                 userActionAppGlobalErrorStore.dispatch(
@@ -376,8 +377,8 @@ class UserDetailViewModel @Inject constructor(
 
     fun toggleNotifyUserPosts() {
         viewModelScope.launch {
-            getUserId().mapCancellableCatching {
-                toggleNotifyUserPostsUseCase(it).getOrThrow()
+            getUserId().flatMapCancellableCatching {
+                toggleNotifyUserPostsUseCase(it)
             }.onFailure {
                 logger.error("toggle user notify posts failed", it)
                 userActionAppGlobalErrorStore.dispatch(
@@ -394,8 +395,8 @@ class UserDetailViewModel @Inject constructor(
 
     fun muteRenotes() {
         viewModelScope.launch {
-            getUserId().mapCancellableCatching {
-                renoteMuteRepository.create(it).getOrThrow()
+            getUserId().flatMapCancellableCatching {
+                renoteMuteRepository.create(it)
             }.onFailure {
                 userActionAppGlobalErrorStore.dispatch(
                     AppGlobalError(
@@ -411,8 +412,8 @@ class UserDetailViewModel @Inject constructor(
 
     fun unMuteRenotes() {
         viewModelScope.launch {
-            getUserId().mapCancellableCatching {
-                renoteMuteRepository.delete(it).getOrThrow()
+            getUserId().flatMapCancellableCatching {
+                renoteMuteRepository.delete(it)
             }.onFailure {
                 userActionAppGlobalErrorStore.dispatch(
                     AppGlobalError(

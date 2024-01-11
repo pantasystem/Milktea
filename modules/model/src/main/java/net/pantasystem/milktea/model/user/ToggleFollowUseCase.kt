@@ -1,6 +1,6 @@
 package net.pantasystem.milktea.model.user
 
-import net.pantasystem.milktea.common.mapCancellableCatching
+import net.pantasystem.milktea.common.flatMapCancellableCatching
 import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.model.UseCase
 import net.pantasystem.milktea.model.user.follow.FollowRepository
@@ -21,7 +21,7 @@ class ToggleFollowUseCase @Inject constructor(
             } else {
                 followRepository.create(userId)
             }
-        }.mapCancellableCatching {
+        }.flatMapCancellableCatching {
             userRepository.sync(userId)
         }
     }

@@ -152,7 +152,7 @@ class NotificationViewModel @Inject constructor(
                 if (it == 0) {
                     runCancellableCatching {
                         getCurrentAccount()
-                    }.mapCancellableCatching {
+                    }.flatMapCancellableCatching {
                         notificationRepository.markAsRead(it.accountId)
                     }.onFailure { e ->
                         logger.error("failed mark as read", e)
@@ -235,7 +235,7 @@ class NotificationViewModel @Inject constructor(
         viewModelScope.launch {
             runCancellableCatching {
                 getCurrentAccount()
-            }.mapCancellableCatching {
+            }.flatMapCancellableCatching {
                 notificationRepository.markAsRead(it.accountId)
             }.onSuccess {
                 loadInit()

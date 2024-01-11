@@ -11,6 +11,7 @@ import kotlinx.coroutines.launch
 import net.pantasystem.milktea.app_store.account.AccountStore
 import net.pantasystem.milktea.app_store.setting.SettingStore
 import net.pantasystem.milktea.common.Logger
+import net.pantasystem.milktea.common.flatMapCancellableCatching
 import net.pantasystem.milktea.common.mapCancellableCatching
 import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.model.emoji.EmojiEventHandler
@@ -118,7 +119,7 @@ class MainViewModel @Inject constructor(
 
     fun onPushNotificationConfirmed() {
         viewModelScope.launch {
-            configRepository.get().mapCancellableCatching {
+            configRepository.get().flatMapCancellableCatching{
                 configRepository.save(it.copy(isConfirmedPostNotification = true))
             }.onFailure {
                 logger.error("設定状態の保存に失敗", it)

@@ -40,3 +40,16 @@ inline fun <R, T> Result<T>.mapCancellableCatching(transform: (value: T) -> R): 
         return Result.failure(e)
     }
 }
+
+inline fun<R, T> Result<T>.flatMapCancellableCatching(transform: (value: T) -> Result<R>): Result<R> {
+    return try {
+        val result = getOrThrow()
+        transform(result)
+    } catch (e: CancellationException) {
+        throw e
+    } catch (e: OutOfMemoryError) {
+        throw e
+    } catch (e: Exception) {
+        return Result.failure(e)
+    }
+}

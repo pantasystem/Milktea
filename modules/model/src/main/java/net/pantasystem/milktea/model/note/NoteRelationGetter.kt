@@ -1,6 +1,6 @@
 package net.pantasystem.milktea.model.note
 
-import net.pantasystem.milktea.common.mapCancellableCatching
+import net.pantasystem.milktea.common.flatMapCancellableCatching
 import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.model.drive.FileProperty
 import net.pantasystem.milktea.model.drive.FilePropertyDataSource
@@ -35,14 +35,14 @@ class NoteRelationGetter @Inject constructor(
                 }
 
             }
-        }.mapCancellableCatching {
+        }.flatMapCancellableCatching {
             get(
                 it,
                 deep,
                 usersMap = usersMap,
                 notesMap = notesMap,
                 filesMap = filesMap,
-            ).getOrThrow()
+            )
         }
     }
 

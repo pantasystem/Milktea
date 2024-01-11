@@ -1,6 +1,6 @@
 package net.pantasystem.milktea.model.user.mute
 
-import net.pantasystem.milktea.common.mapCancellableCatching
+import net.pantasystem.milktea.common.flatMapCancellableCatching
 import net.pantasystem.milktea.model.UseCase
 import net.pantasystem.milktea.model.user.User
 import net.pantasystem.milktea.model.user.UserRepository
@@ -12,8 +12,8 @@ class UnMuteUserUseCase @Inject constructor(
 ) : UseCase {
 
     suspend operator fun invoke(userId: User.Id): Result<Unit> {
-        return muteRepository.delete(userId).mapCancellableCatching {
-            userRepository.sync(userId).getOrThrow()
+        return muteRepository.delete(userId).flatMapCancellableCatching {
+            userRepository.sync(userId)
         }
     }
 }

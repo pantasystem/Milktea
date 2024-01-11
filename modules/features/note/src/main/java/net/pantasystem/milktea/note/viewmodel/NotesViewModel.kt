@@ -12,6 +12,7 @@ import net.pantasystem.milktea.app_store.handler.UserActionAppGlobalErrorAction
 import net.pantasystem.milktea.app_store.handler.UserActionAppGlobalErrorStore
 import net.pantasystem.milktea.app_store.notes.NoteTranslationStore
 import net.pantasystem.milktea.common.Logger
+import net.pantasystem.milktea.common.flatMapCancellableCatching
 import net.pantasystem.milktea.common.mapCancellableCatching
 import net.pantasystem.milktea.common_android.resource.StringSource
 import net.pantasystem.milktea.model.note.DeleteAndEditUseCase
@@ -316,7 +317,7 @@ class NotesViewModel @Inject constructor(
         viewModelScope.launch {
             configRepository.get().mapCancellableCatching {
                 it.copy(isShowWarningDisplayingSensitiveMedia = false)
-            }.mapCancellableCatching {
+            }.flatMapCancellableCatching {
                 configRepository.save(it)
             }.onFailure {
                 logger.error("警告表示の抑制に失敗", it)
