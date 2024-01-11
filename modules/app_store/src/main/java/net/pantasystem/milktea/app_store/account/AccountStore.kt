@@ -106,7 +106,7 @@ class AccountStore @Inject constructor(
     }
 
     suspend fun removePage(page: Page): Boolean {
-        val account = _state.value.get(page.accountId)
+        val account = _state.value[page.accountId]
             ?: _state.value.currentAccount
             ?: return false
         val updated = account.copy(pages = account.pages.filterNot { it.pageId == page.pageId })

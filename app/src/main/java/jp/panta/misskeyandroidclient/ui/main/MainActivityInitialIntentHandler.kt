@@ -8,6 +8,7 @@ import com.google.firebase.crashlytics.FirebaseCrashlytics
 import dagger.hilt.android.scopes.ActivityScoped
 import jp.panta.misskeyandroidclient.R
 import kotlinx.coroutines.launch
+import net.pantasystem.milktea.app_store.account.AccountStore
 import net.pantasystem.milktea.common.mapCancellableCatching
 import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.common_navigation.UserDetailNavigation
@@ -31,12 +32,14 @@ class MainActivityInitialIntentHandler(
     private val activity: AppCompatActivity,
     private val userDetailNavigation: UserDetailNavigation,
     private val accountRepository: AccountRepository,
+    private val accountStore: AccountStore,
 ) {
 
     @ActivityScoped
     class Factory @Inject constructor(
         private val userDetailNavigation: UserDetailNavigation,
         private val accountRepository: AccountRepository,
+        private val accountStore: AccountStore,
     ) {
         fun create(
             bottomNavigationView: BottomNavigationView,
@@ -47,6 +50,7 @@ class MainActivityInitialIntentHandler(
                 activity,
                 userDetailNavigation,
                 accountRepository,
+                accountStore,
             )
         }
     }
@@ -57,7 +61,7 @@ class MainActivityInitialIntentHandler(
         if (pushNotification != null) {
             activity.lifecycleScope.launch {
                 accountRepository.get(pushNotification.accountId).mapCancellableCatching {
-                    accountRepository.setCurrentAccount(it).getOrThrow()
+                    accountStore.setCurrent(it)
                 }.onSuccess {
                     navigateBy(pushNotification)
                 }.onFailure {
