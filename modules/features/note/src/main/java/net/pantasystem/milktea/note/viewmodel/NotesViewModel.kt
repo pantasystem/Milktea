@@ -8,6 +8,7 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
 import net.pantasystem.milktea.app_store.handler.AppGlobalError
+import net.pantasystem.milktea.app_store.handler.UserActionAppGlobalErrorAction
 import net.pantasystem.milktea.app_store.handler.UserActionAppGlobalErrorStore
 import net.pantasystem.milktea.app_store.notes.NoteTranslationStore
 import net.pantasystem.milktea.common.Logger
@@ -222,14 +223,21 @@ class NotesViewModel @Inject constructor(
                 _statusMessage.tryEmit(StringSource(R.string.successfully_deleted))
             }.onFailure {
                 logger.error("ノート削除に失敗", it)
-                userActionAppGlobalErrorStore.dispatch(
-                    AppGlobalError(
-                        tag = "NotesViewModel.removeNote",
-                        level = AppGlobalError.ErrorLevel.Error,
-                        message = StringSource("Delete note failed"),
-                        throwable = it
+                if (userActionAppGlobalErrorStore.dispatchAndAwaitUserAction(
+                        AppGlobalError(
+                            tag = "NotesViewModel.removeNote",
+                            level = AppGlobalError.ErrorLevel.Error,
+                            message = StringSource("Delete note failed"),
+                            throwable = it,
+                            retryable = true
+                        ),
+                        UserActionAppGlobalErrorAction.Type.Retry
                     )
-                )
+                ) {
+                    removeNote(
+                        noteId
+                    )
+                }
             }
         }
 
@@ -241,14 +249,21 @@ class NotesViewModel @Inject constructor(
                 _openNoteEditorEvent.tryEmit(it)
             }.onFailure {
                 logger.error("削除に失敗しました", it)
-                userActionAppGlobalErrorStore.dispatch(
-                    AppGlobalError(
-                        tag = "NotesViewModel.removeAndEditNote",
-                        level = AppGlobalError.ErrorLevel.Error,
-                        message = StringSource("Delete note failed"),
-                        throwable = it
+                if (userActionAppGlobalErrorStore.dispatchAndAwaitUserAction(
+                        AppGlobalError(
+                            tag = "NotesViewModel.removeAndEditNote",
+                            level = AppGlobalError.ErrorLevel.Error,
+                            message = StringSource("Delete note failed"),
+                            throwable = it,
+                            retryable = true
+                        ),
+                        UserActionAppGlobalErrorAction.Type.Retry
                     )
-                )
+                ) {
+                    removeAndEditNote(
+                        noteId
+                    )
+                }
             }
         }
 

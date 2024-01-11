@@ -9,6 +9,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import net.pantasystem.milktea.app_store.handler.AppGlobalError
+import net.pantasystem.milktea.app_store.handler.UserActionAppGlobalErrorAction
 import net.pantasystem.milktea.app_store.handler.UserActionAppGlobalErrorStore
 import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.common_android.resource.StringSource
@@ -76,7 +77,11 @@ class NoteOptionViewModel @Inject constructor(
         featureEnables.enableFeatures(it.normalizedInstanceUri)
     }.distinctUntilChanged()
 
-    val uiState = combine(noteInfo, currentAccount, enableFeatures) { (id, state, note), ac, features ->
+    val uiState = combine(
+        noteInfo,
+        currentAccount,
+        enableFeatures
+    ) { (id, state, note), ac, features ->
         NoteOptionUiState(
             noteId = id,
             noteState = state,
@@ -102,14 +107,19 @@ class NoteOptionViewModel @Inject constructor(
         viewModelScope.launch {
             noteRepository.createThreadMute(noteId).onFailure {
                 logger.error("create thread mute failed", it)
-                userActionAppGlobalErrorStore.dispatch(
-                    AppGlobalError(
-                        "NoteOptionViewModel.createThreadMute",
-                        AppGlobalError.ErrorLevel.Error,
-                        StringSource("Create thread mute failed"),
-                        it
+                if (userActionAppGlobalErrorStore.dispatchAndAwaitUserAction(
+                        AppGlobalError(
+                            "NoteOptionViewModel.createThreadMute",
+                            AppGlobalError.ErrorLevel.Error,
+                            StringSource("Create thread mute failed"),
+                            it,
+                            true
+                        ),
+                        UserActionAppGlobalErrorAction.Type.Retry
                     )
-                )
+                ) {
+                    createThreadMute(noteId)
+                }
             }
             savedStateHandle[NOTE_ID] = noteId
         }
@@ -119,14 +129,19 @@ class NoteOptionViewModel @Inject constructor(
         viewModelScope.launch {
             noteRepository.deleteThreadMute(noteId).onFailure {
                 logger.error("delete thread mute failed", it)
-                userActionAppGlobalErrorStore.dispatch(
-                    AppGlobalError(
-                        "NoteOptionViewModel.deleteThreadMute",
-                        AppGlobalError.ErrorLevel.Error,
-                        StringSource("Delete thread mute failed"),
-                        it
+                if (userActionAppGlobalErrorStore.dispatchAndAwaitUserAction(
+                        AppGlobalError(
+                            "NoteOptionViewModel.deleteThreadMute",
+                            AppGlobalError.ErrorLevel.Error,
+                            StringSource("Delete thread mute failed"),
+                            it,
+                            true
+                        ),
+                        UserActionAppGlobalErrorAction.Type.Retry
                     )
-                )
+                ) {
+                    deleteThreadMute(noteId)
+                }
             }
             savedStateHandle[NOTE_ID] = noteId
         }
@@ -143,5 +158,6 @@ data class NoteOptionUiState(
     val currentAccount: Account? = null,
     val isSupportReactionUsers: Boolean = false,
 ) {
-    val isVisibleReactionUsersSelection = currentAccount != null && note?.id != null && isSupportReactionUsers
+    val isVisibleReactionUsersSelection =
+        currentAccount != null && note?.id != null && isSupportReactionUsers
 }
