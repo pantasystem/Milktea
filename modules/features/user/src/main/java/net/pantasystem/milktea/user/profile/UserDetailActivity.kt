@@ -35,6 +35,7 @@ import net.pantasystem.milktea.common_android.ui.getParentActivity
 import net.pantasystem.milktea.common_android.ui.haptic.HapticFeedbackController
 import net.pantasystem.milktea.common_android_ui.PageableFragmentFactory
 import net.pantasystem.milktea.common_android_ui.UserPinnedNotesFragmentFactory
+import net.pantasystem.milktea.common_android_ui.error.UserActionAppGlobalErrorListener
 import net.pantasystem.milktea.common_android_ui.report.ReportDialog
 import net.pantasystem.milktea.common_compose.haptic.rememberHapticFeedback
 import net.pantasystem.milktea.common_navigation.*
@@ -63,23 +64,6 @@ import nl.dionsegijn.konfetti.core.emitter.Emitter
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
-class UserDetailNavigationImpl @Inject constructor(
-    val activity: Activity,
-) : UserDetailNavigation {
-
-    override fun newIntent(args: UserDetailNavigationArgs): Intent {
-        return when (args) {
-            is UserDetailNavigationArgs.UserId -> UserDetailActivity.newInstance(
-                activity,
-                args.userId
-            )
-            is UserDetailNavigationArgs.UserName -> UserDetailActivity.newInstance(
-                activity,
-                args.userName
-            )
-        }
-    }
-}
 
 @AndroidEntryPoint
 class UserDetailActivity : AppCompatActivity() {
@@ -119,26 +103,6 @@ class UserDetailActivity : AppCompatActivity() {
     internal lateinit var searchNavigation: SearchNavigation
 
 
-//    @ExperimentalCoroutinesApi
-//    val mViewModel: UserDetailViewModel by viewModels {
-//        val remoteUserId: String? = intent.getStringExtra(EXTRA_USER_ID)
-//        val accountId: Long = intent.getLongExtra(EXTRA_ACCOUNT_ID, -1)
-//        if (!(remoteUserId == null || accountId == -1L)) {
-//            val userId = User.Id(accountId, remoteUserId)
-//            return@viewModels UserDetailViewModel.provideFactory(assistedFactory, userId)
-//        }
-//        val userName = intent.data?.getQueryParameter("userName")
-//            ?: intent.getStringExtra(EXTRA_USER_NAME)
-//            ?: intent.data?.path?.let { path ->
-//                if (path.startsWith("/")) {
-//                    path.substring(1, path.length)
-//                } else {
-//                    path
-//                }
-//            }
-//        return@viewModels UserDetailViewModel.provideFactory(assistedFactory, userName!!)
-//    }
-
     private val mViewModel: UserDetailViewModel by viewModels()
 
 
@@ -169,9 +133,13 @@ class UserDetailActivity : AppCompatActivity() {
     @Inject
     lateinit var userPinnedNotesFragmentFactory: UserPinnedNotesFragmentFactory
 
+    @Inject
+    internal lateinit var userActionAppGlobalErrorListener: UserActionAppGlobalErrorListener
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         applyTheme()
+        userActionAppGlobalErrorListener(lifecycle, supportFragmentManager)
         val binding = DataBindingUtil.setContentView<ActivityUserDetailBinding>(
             this,
             R.layout.activity_user_detail
@@ -553,3 +521,21 @@ class UserDetailActivity : AppCompatActivity() {
     }
 }
 
+
+class UserDetailNavigationImpl @Inject constructor(
+    val activity: Activity,
+) : UserDetailNavigation {
+
+    override fun newIntent(args: UserDetailNavigationArgs): Intent {
+        return when (args) {
+            is UserDetailNavigationArgs.UserId -> UserDetailActivity.newInstance(
+                activity,
+                args.userId
+            )
+            is UserDetailNavigationArgs.UserName -> UserDetailActivity.newInstance(
+                activity,
+                args.userName
+            )
+        }
+    }
+}
