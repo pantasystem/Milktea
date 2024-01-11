@@ -9,6 +9,7 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import net.pantasystem.milktea.app_store.account.AccountStore
 import net.pantasystem.milktea.app_store.handler.AppGlobalError
+import net.pantasystem.milktea.app_store.handler.UserActionAppGlobalErrorAction
 import net.pantasystem.milktea.app_store.handler.UserActionAppGlobalErrorStore
 import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.common.ResultState
@@ -118,14 +119,18 @@ class ClipListViewModel @Inject constructor(
                 clipItemState.clip,
                 savedStateHandle[ClipListNavigationImpl.EXTRA_ADD_TAB_TO_ACCOUNT_ID]
             ).onFailure {
-                userActionAppGlobalErrorStore.dispatch(
-                    AppGlobalError(
-                        "ClipListViewModel.onToggleAddToTabButtonClicked",
-                        AppGlobalError.ErrorLevel.Error,
-                        StringSource.invoke("add/remove clip to tab failed"),
-                        it
+                if (userActionAppGlobalErrorStore.dispatchAndAwaitUserAction(
+                        AppGlobalError(
+                            "ClipListViewModel.onToggleAddToTabButtonClicked",
+                            AppGlobalError.ErrorLevel.Error,
+                            StringSource.invoke("add/remove clip to tab failed"),
+                            it
+                        ),
+                        UserActionAppGlobalErrorAction.Type.Retry
                     )
-                )
+                ) {
+                    onToggleAddToTabButtonClicked(clipItemState)
+                }
             }
         }
     }

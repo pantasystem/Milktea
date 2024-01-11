@@ -9,6 +9,7 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import net.pantasystem.milktea.app_store.account.AccountStore
 import net.pantasystem.milktea.app_store.handler.AppGlobalError
+import net.pantasystem.milktea.app_store.handler.UserActionAppGlobalErrorAction
 import net.pantasystem.milktea.app_store.handler.UserActionAppGlobalErrorStore
 import net.pantasystem.milktea.common.*
 import net.pantasystem.milktea.common_android.resource.StringSource
@@ -126,20 +127,25 @@ class ListListViewModel @Inject constructor(
                 userListRepository.syncOne(userList.id)
             }.onFailure {
                 logger.error("toggle user failed", it)
-                userActionAppGlobalErrorStore.dispatch(
-                    AppGlobalError(
-                        "ListListViewModel.toggle",
-                        AppGlobalError.ErrorLevel.Error,
-                        StringSource(
-                            if (userList.userIds.contains(userId)) {
-                                "Remove user from list failed"
-                            } else {
-                                "Add user to list failed"
-                            }
+                if (userActionAppGlobalErrorStore.dispatchAndAwaitUserAction(
+                        AppGlobalError(
+                            "ListListViewModel.toggle",
+                            AppGlobalError.ErrorLevel.Error,
+                            StringSource(
+                                if (userList.userIds.contains(userId)) {
+                                    "Remove user from list failed"
+                                } else {
+                                    "Add user to list failed"
+                                }
+                            ),
+                            it,
+                            true
                         ),
-                        it
-                    ),
-                )
+                        UserActionAppGlobalErrorAction.Type.Retry
+                    )
+                ) {
+                    toggle(userList, userId)
+                }
             }
         }
     }
@@ -149,14 +155,18 @@ class ListListViewModel @Inject constructor(
             viewModelScope.launch {
                 toggleAddToTabUseCase(ul.id, savedStateHandle[EXTRA_ADD_TAB_TO_ACCOUNT_ID]).onFailure {
                     logger.error("タブtoggle処理失敗", e = it)
-                    userActionAppGlobalErrorStore.dispatch(
-                        AppGlobalError(
-                            "ListListViewModel.toggleTab",
-                            AppGlobalError.ErrorLevel.Error,
-                            StringSource("add/remove tab failed"),
-                            it
+                    if (userActionAppGlobalErrorStore.dispatchAndAwaitUserAction(
+                            AppGlobalError(
+                                "ListListViewModel.toggleTab",
+                                AppGlobalError.ErrorLevel.Error,
+                                StringSource("add/remove tab failed"),
+                                it
+                            ),
+                            UserActionAppGlobalErrorAction.Type.Retry
                         )
-                    )
+                    ) {
+                        toggleTab(userList)
+                    }
                 }
             }
         }
@@ -172,14 +182,19 @@ class ListListViewModel @Inject constructor(
                 logger.debug("作成成功")
             }.onFailure {
                 logger.error("作成失敗", it)
-                userActionAppGlobalErrorStore.dispatch(
-                    AppGlobalError(
-                        "ListListViewModel.createUserList",
-                        AppGlobalError.ErrorLevel.Error,
-                        StringSource("create user list failed"),
-                        it
+                if (userActionAppGlobalErrorStore.dispatchAndAwaitUserAction(
+                        AppGlobalError(
+                            "ListListViewModel.createUserList",
+                            AppGlobalError.ErrorLevel.Error,
+                            StringSource("create user list failed"),
+                            it,
+                            true
+                        ),
+                        UserActionAppGlobalErrorAction.Type.Retry
                     )
-                )
+                ) {
+                    createUserList(name)
+                }
             }
         }
 
