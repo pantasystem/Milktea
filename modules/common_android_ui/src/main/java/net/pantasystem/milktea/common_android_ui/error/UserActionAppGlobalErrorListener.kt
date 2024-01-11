@@ -46,7 +46,7 @@ class UserActionAppGlobalErrorListener @Inject constructor(
                 }
 
                 AppGlobalError.ErrorLevel.Error -> {
-                    val title = when (val error = appGlobalError.throwable) {
+                    val body = when (val error = appGlobalError.throwable) {
                         is IOException -> {
                             context.getString(R.string.network_error)
                         }
@@ -63,8 +63,9 @@ class UserActionAppGlobalErrorListener @Inject constructor(
 
                     }
                     val dialogInstance = UserActionAppGlobalErrorDialog.newInstance(
-                        title = title,
-                        message = appGlobalError.message.getString(context)
+                        title = appGlobalError.message.getString(context),
+                        message = body,
+                        detail = appGlobalError.throwable?.toString(),
                     )
                     fragmentManager.findFragmentByTag("error_dialog")?.let {
                         fragmentManager.beginTransaction().remove(it).commit()
@@ -83,12 +84,15 @@ class UserActionAppGlobalErrorDialog : DialogFragment() {
     companion object {
         const val EXTRA_TITLE = "title"
         const val EXTRA_MESSAGE = "message"
+        const val EXTRA_DETAIL = "detail"
 
-        fun newInstance(title: String, message: String): UserActionAppGlobalErrorDialog {
+        fun newInstance(title: String?, message: String, detail: String?): UserActionAppGlobalErrorDialog {
             return UserActionAppGlobalErrorDialog().apply {
                 arguments = Bundle().apply {
                     putString(EXTRA_TITLE, title)
                     putString(EXTRA_MESSAGE, message)
+                    // 1MB未満にする
+                    putString(EXTRA_DETAIL, detail?.take(1024 * 1024 - 1))
                 }
             }
         }
@@ -96,9 +100,26 @@ class UserActionAppGlobalErrorDialog : DialogFragment() {
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         return MaterialAlertDialogBuilder(requireContext())
-            .setTitle(
-                arguments?.getString(EXTRA_TITLE) ?: ""
-            )
+            .also {  dialog ->
+                if (arguments?.getString(EXTRA_TITLE) != null) {
+                    dialog.setTitle(
+                        arguments?.getString(EXTRA_TITLE) ?: ""
+                    )
+                }
+                if (arguments?.getString(EXTRA_DETAIL) != null) {
+                    dialog.setNeutralButton(R.string.detail) { _, _ ->
+                        val detail = arguments?.getString(EXTRA_DETAIL) ?: ""
+                        if (detail.isNotEmpty()) {
+                            val d = newInstance(
+                                title = null,
+                                message = detail,
+                                detail = null,
+                            )
+                            d.show(parentFragmentManager, "error_dialog")
+                        }
+                    }
+                }
+            }
             .setMessage(
                 arguments?.getString(EXTRA_MESSAGE) ?: ""
             )
