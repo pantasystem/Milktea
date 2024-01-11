@@ -21,6 +21,7 @@ import net.pantasystem.milktea.app_store.account.AccountStore
 import net.pantasystem.milktea.app_store.drive.DriveDirectoryPagingStore
 import net.pantasystem.milktea.app_store.drive.FilePropertyPagingStore
 import net.pantasystem.milktea.app_store.handler.AppGlobalError
+import net.pantasystem.milktea.app_store.handler.UserActionAppGlobalErrorAction
 import net.pantasystem.milktea.app_store.handler.UserActionAppGlobalErrorStore
 import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.common.PageableState
@@ -246,14 +247,18 @@ class DriveViewModel @Inject constructor(
                 filePropertyRepository.toggleNsfw(id)
             } catch (e: Exception) {
                 logger.info("nsfwの更新に失敗しました", e = e)
-                userActionAppGlobalErrorHandler.dispatch(
-                    AppGlobalError(
-                        "DriveViewModel.toggleNsfw",
-                        AppGlobalError.ErrorLevel.Error,
-                        StringSource("Nsfw update failed"),
-                        e,
-                    )
-                )
+                if (userActionAppGlobalErrorHandler.dispatchAndAwaitUserAction(
+                        AppGlobalError(
+                            "DriveViewModel.toggleNsfw",
+                            AppGlobalError.ErrorLevel.Error,
+                            StringSource("Nsfw update failed"),
+                            e,
+                        ),
+                        UserActionAppGlobalErrorAction.Type.Retry
+                )) {
+                    toggleNsfw(id)
+                }
+
             }
         }
     }
@@ -263,14 +268,17 @@ class DriveViewModel @Inject constructor(
         viewModelScope.launch {
             filePropertyRepository.delete(id).onFailure { e ->
                 logger.info("ファイルの削除に失敗しました", e = e)
-                userActionAppGlobalErrorHandler.dispatch(
-                    AppGlobalError(
-                        "DriveViewModel.deleteFile",
-                        AppGlobalError.ErrorLevel.Error,
-                        StringSource("File delete failed"),
-                        e,
-                    )
-                )
+                if (userActionAppGlobalErrorHandler.dispatchAndAwaitUserAction(
+                        AppGlobalError(
+                            "DriveViewModel.deleteFile",
+                            AppGlobalError.ErrorLevel.Error,
+                            StringSource("File delete failed"),
+                            e,
+                        ),
+                        UserActionAppGlobalErrorAction.Type.Retry
+                )) {
+                    deleteFile(id)
+                }
             }
         }
     }
@@ -283,14 +291,17 @@ class DriveViewModel @Inject constructor(
                     .update(comment = newCaption)
             ).onFailure {
                 logger.info("キャプションの更新に失敗しました。", e = it)
-                userActionAppGlobalErrorHandler.dispatch(
-                    AppGlobalError(
-                        "DriveViewModel.updateCaption",
-                        AppGlobalError.ErrorLevel.Error,
-                        StringSource("Caption update failed"),
-                        it,
-                    )
-                )
+                if (userActionAppGlobalErrorHandler.dispatchAndAwaitUserAction(
+                        AppGlobalError(
+                            "DriveViewModel.updateCaption",
+                            AppGlobalError.ErrorLevel.Error,
+                            StringSource("Caption update failed"),
+                            it,
+                        ),
+                        UserActionAppGlobalErrorAction.Type.Retry
+                )) {
+                    updateCaption(id, newCaption)
+                }
             }
         }
     }
@@ -302,14 +313,17 @@ class DriveViewModel @Inject constructor(
                     .update(name = name)
             ).onFailure {
                 logger.error("update file name failed", it)
-                userActionAppGlobalErrorHandler.dispatch(
-                    AppGlobalError(
-                        "DriveViewModel.updateFileName",
-                        AppGlobalError.ErrorLevel.Error,
-                        StringSource("File name update failed"),
-                        it,
-                    )
-                )
+                if (userActionAppGlobalErrorHandler.dispatchAndAwaitUserAction(
+                        AppGlobalError(
+                            "DriveViewModel.updateFileName",
+                            AppGlobalError.ErrorLevel.Error,
+                            StringSource("File name update failed"),
+                            it,
+                        ),
+                        UserActionAppGlobalErrorAction.Type.Retry
+                )) {
+                    updateFileName(id, name)
+                }
             }
         }
     }
@@ -354,14 +368,17 @@ class DriveViewModel @Inject constructor(
                 filePagingStore.onCreated(e.id)
             } catch (e: Exception) {
                 logger.info("ファイルアップロードに失敗した")
-                userActionAppGlobalErrorHandler.dispatch(
-                    AppGlobalError(
-                        "DriveViewModel.uploadFile",
-                        AppGlobalError.ErrorLevel.Error,
-                        StringSource("File upload failed"),
-                        e,
-                    )
-                )
+                if (userActionAppGlobalErrorHandler.dispatchAndAwaitUserAction(
+                        AppGlobalError(
+                            "DriveViewModel.uploadFile",
+                            AppGlobalError.ErrorLevel.Error,
+                            StringSource("File upload failed"),
+                            e,
+                        ),
+                        UserActionAppGlobalErrorAction.Type.Retry
+                )) {
+                    uploadFile(file)
+                }
             }
         }
     }
@@ -391,6 +408,17 @@ class DriveViewModel @Inject constructor(
                     )
                 ).onFailure {
                     logger.error("error create folder", it)
+                    if (userActionAppGlobalErrorHandler.dispatchAndAwaitUserAction(
+                            AppGlobalError(
+                                "DriveViewModel.createDirectory",
+                                AppGlobalError.ErrorLevel.Error,
+                                StringSource("Folder create failed"),
+                                it,
+                            ),
+                            UserActionAppGlobalErrorAction.Type.Retry
+                    )) {
+                        createDirectory(folderName)
+                    }
                 }.onSuccess {
                     directoryPagingStore.onCreated(it)
                 }

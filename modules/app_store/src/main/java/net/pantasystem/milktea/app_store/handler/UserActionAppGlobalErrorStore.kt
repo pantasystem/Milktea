@@ -3,7 +3,9 @@ package net.pantasystem.milktea.app_store.handler
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.first
 import net.pantasystem.milktea.common_android.resource.StringSource
+import java.util.UUID
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -20,9 +22,29 @@ class UserActionAppGlobalErrorStore @Inject constructor() {
         extraBufferCapacity = 999,
         onBufferOverflow = BufferOverflow.DROP_OLDEST,
     )
+
+    private val _userActionFlow = MutableSharedFlow<UserActionAppGlobalErrorAction>(
+        extraBufferCapacity = 999,
+        onBufferOverflow = BufferOverflow.DROP_OLDEST,
+    )
     val errorFlow = _errorFlow.asSharedFlow()
-    fun dispatch(e: AppGlobalError) {
+    val userActionFlow = _userActionFlow.asSharedFlow()
+    fun dispatch(e: AppGlobalError): String {
         _errorFlow.tryEmit(e)
+        return e.id
+    }
+
+    fun onAction(action: UserActionAppGlobalErrorAction) {
+        _userActionFlow.tryEmit(action)
+    }
+
+    suspend fun awaitUserAction(id: String) = userActionFlow.first {
+        id == it.errorId
+    }
+
+    suspend fun dispatchAndAwaitUserAction(e: AppGlobalError, type: UserActionAppGlobalErrorAction.Type): Boolean {
+        val id = dispatch(e.copy(retryable = true))
+        return awaitUserAction(id).type == type
     }
 }
 
@@ -31,12 +53,15 @@ class UserActionAppGlobalErrorStore @Inject constructor() {
  * @param level エラーのレベルです。
  * @param message エラーのメッセージです。
  * @param throwable エラーの発生元となった例外です。
+ * @param retryable エラーが発生した場合にリトライ可能かどうかを示します。
  */
 data class AppGlobalError(
     val tag: String,
     val level: ErrorLevel,
     val message: StringSource,
     val throwable: Throwable? = null,
+    val retryable: Boolean = false,
+    val id: String = UUID.randomUUID().toString(),
 ) {
     enum class ErrorLevel {
         /**
@@ -54,4 +79,17 @@ data class AppGlobalError(
          */
         Error,
     }
+}
+/**
+ * ユーザーがエラーに対して行なったアクションを表すsealed interface
+  */
+data class UserActionAppGlobalErrorAction(
+    val errorId: String,
+    val tag: String,
+    val type: Type,
+) {
+    enum class Type {
+        Dismiss, Retry, Cancel
+    }
+
 }
