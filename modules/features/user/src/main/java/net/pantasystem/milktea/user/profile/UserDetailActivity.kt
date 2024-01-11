@@ -352,9 +352,9 @@ class UserDetailActivity : AppCompatActivity() {
             }
         }
 
-        mViewModel.errors.onEach {
-            UserDetailErrorHandler(this@UserDetailActivity)(it)
-        }.flowWithLifecycle(lifecycle, Lifecycle.State.RESUMED).launchIn(lifecycleScope)
+//        mViewModel.errors.onEach {
+//            UserDetailErrorHandler(this@UserDetailActivity)(it)
+//        }.flowWithLifecycle(lifecycle, Lifecycle.State.RESUMED).launchIn(lifecycleScope)
 
     }
 

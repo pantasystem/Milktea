@@ -13,6 +13,8 @@ import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import kotlinx.datetime.todayIn
 import net.pantasystem.milktea.app_store.account.AccountStore
+import net.pantasystem.milktea.app_store.handler.AppGlobalError
+import net.pantasystem.milktea.app_store.handler.UserActionAppGlobalErrorStore
 import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.common.mapCancellableCatching
 import net.pantasystem.milktea.common.runCancellableCatching
@@ -59,6 +61,7 @@ class UserDetailViewModel @Inject constructor(
     private val toggleUserTimelineAddTabUseCase: ToggleUserTimelineAddTabUseCase,
     private val toggleNotifyUserPostsUseCase: ToggleNotifyUserPostsUseCase,
     private val userIdResolver: UserIdResolver,
+    private val userActionAppGlobalErrorStore: UserActionAppGlobalErrorStore,
     configRepository: LocalConfigRepository,
 ) : ViewModel() {
 
@@ -84,8 +87,8 @@ class UserDetailViewModel @Inject constructor(
     private val fqdnUserName =
         savedStateHandle.getStateFlow<String?>(UserDetailActivity.EXTRA_USER_NAME, null)
 
-    private val _errors = MutableSharedFlow<Throwable>(extraBufferCapacity = 100)
-    val errors = _errors.asSharedFlow()
+//    private val _errors = MutableSharedFlow<Throwable>(extraBufferCapacity = 100)
+//    val errors = _errors.asSharedFlow()
 
     private val userProfileArgType = UserProfileArgTypeCombiner(viewModelScope).create(
         userId,
@@ -110,7 +113,14 @@ class UserDetailViewModel @Inject constructor(
         it?.castAndPartiallyFill()
     }.catch {
         logger.error("observe user error", it)
-        _errors.tryEmit(it)
+        userActionAppGlobalErrorStore.dispatch(
+            AppGlobalError(
+                "UserDetailViewModel.userState",
+                AppGlobalError.ErrorLevel.Warning,
+                StringSource("Load user failed"),
+                it
+            )
+        )
     }.stateIn(viewModelScope, SharingStarted.Lazily, null)
 
     val isTodayBirthday = userState.map {
@@ -202,7 +212,14 @@ class UserDetailViewModel @Inject constructor(
                 userRepository.sync(userId).getOrThrow()
             }.onFailure {
                 logger.error("user sync error", it)
-                _errors.tryEmit(it)
+                userActionAppGlobalErrorStore.dispatch(
+                    AppGlobalError(
+                        "UserDetailViewModel.sync",
+                        AppGlobalError.ErrorLevel.Warning,
+                        StringSource("User data sync failed"),
+                        it
+                    )
+                )
             }
         }
     }
@@ -213,7 +230,14 @@ class UserDetailViewModel @Inject constructor(
             userState.value?.let { user ->
                 toggleFollowUseCase(user.id).onFailure {
                     logger.error("unmute failed", e = it)
-                    _errors.tryEmit(it)
+                    userActionAppGlobalErrorStore.dispatch(
+                        AppGlobalError(
+                            "UserDetailViewModel.changeFollow",
+                            AppGlobalError.ErrorLevel.Warning,
+                            StringSource("follow/unfollow failed"),
+                            it
+                        )
+                    )
                 }
             }
 
@@ -225,7 +249,14 @@ class UserDetailViewModel @Inject constructor(
             userState.value?.let { user ->
                 muteUserUseCase(CreateMute(user.id, expiredAt)).onFailure {
                     logger.error("unmute", e = it)
-                    _errors.tryEmit(it)
+                    userActionAppGlobalErrorStore.dispatch(
+                        AppGlobalError(
+                            "UserDetailViewModel.mute",
+                            AppGlobalError.ErrorLevel.Warning,
+                            StringSource("mute failed"),
+                            it
+                        )
+                    )
                 }
             }
         }
@@ -236,7 +267,14 @@ class UserDetailViewModel @Inject constructor(
             userState.value?.let { user ->
                 unMuteUserUseCase(user.id).onFailure {
                     logger.error("unmute", e = it)
-                    _errors.tryEmit(it)
+                    userActionAppGlobalErrorStore.dispatch(
+                        AppGlobalError(
+                            "UserDetailViewModel.unmute",
+                            AppGlobalError.ErrorLevel.Warning,
+                            StringSource("unmute failed"),
+                            it
+                        )
+                    )
                 }
             }
         }
@@ -247,7 +285,14 @@ class UserDetailViewModel @Inject constructor(
             userState.value?.let { user ->
                 blockUserUseCase(user.id).onFailure {
                     logger.error("block failed", it)
-                    _errors.tryEmit(it)
+                    userActionAppGlobalErrorStore.dispatch(
+                        AppGlobalError(
+                            "UserDetailViewModel.block",
+                            AppGlobalError.ErrorLevel.Warning,
+                            StringSource("block failed"),
+                            it
+                        )
+                    )
                 }
             }
         }
@@ -258,7 +303,14 @@ class UserDetailViewModel @Inject constructor(
             userState.value?.let { user ->
                 unBlockUserUseCase(user.id).onFailure {
                     logger.info("unblock failed", e = it)
-                    _errors.tryEmit(it)
+                    userActionAppGlobalErrorStore.dispatch(
+                        AppGlobalError(
+                            "UserDetailViewModel.unblock",
+                            AppGlobalError.ErrorLevel.Warning,
+                            StringSource("unblock failed"),
+                            it
+                        )
+                    )
                 }
             }
         }
@@ -272,7 +324,14 @@ class UserDetailViewModel @Inject constructor(
                 logger.debug("ニックネーム更新処理成功")
             }.onFailure {
                 logger.error("ニックネーム更新処理失敗", e = it)
-                _errors.tryEmit(it)
+                userActionAppGlobalErrorStore.dispatch(
+                    AppGlobalError(
+                        "UserDetailViewModel.changeNickname",
+                        AppGlobalError.ErrorLevel.Warning,
+                        StringSource("change nickname failed"),
+                        it
+                    )
+                )
             }
         }
     }
@@ -285,7 +344,14 @@ class UserDetailViewModel @Inject constructor(
                 logger.debug("ニックネーム削除処理成功")
             }.onFailure {
                 logger.error("ニックネーム削除失敗", e = it)
-                _errors.tryEmit(it)
+                userActionAppGlobalErrorStore.dispatch(
+                    AppGlobalError(
+                        "UserDetailViewModel.deleteNickname",
+                        AppGlobalError.ErrorLevel.Warning,
+                        StringSource("delete nickname failed"),
+                        it
+                    )
+                )
             }
         }
     }
@@ -296,7 +362,14 @@ class UserDetailViewModel @Inject constructor(
                 toggleUserTimelineAddTabUseCase(it).getOrThrow()
             }.onFailure {
                 logger.error("toggle user timeline tab failed", it)
-                _errors.tryEmit(it)
+                userActionAppGlobalErrorStore.dispatch(
+                    AppGlobalError(
+                        "UserDetailViewModel.toggleUserTimelineTab",
+                        AppGlobalError.ErrorLevel.Warning,
+                        StringSource("add/remove user timeline tab failed"),
+                        it
+                    )
+                )
             }
         }
     }
@@ -307,7 +380,14 @@ class UserDetailViewModel @Inject constructor(
                 toggleNotifyUserPostsUseCase(it).getOrThrow()
             }.onFailure {
                 logger.error("toggle user notify posts failed", it)
-                _errors.tryEmit(it)
+                userActionAppGlobalErrorStore.dispatch(
+                    AppGlobalError(
+                        "UserDetailViewModel.toggleNotifyUserPosts",
+                        AppGlobalError.ErrorLevel.Warning,
+                        StringSource("on/off notify user posts failed"),
+                        it
+                    )
+                )
             }
         }
     }
@@ -317,7 +397,14 @@ class UserDetailViewModel @Inject constructor(
             getUserId().mapCancellableCatching {
                 renoteMuteRepository.create(it).getOrThrow()
             }.onFailure {
-                _errors.tryEmit(it)
+                userActionAppGlobalErrorStore.dispatch(
+                    AppGlobalError(
+                        "UserDetailViewModel.muteRenotes",
+                        AppGlobalError.ErrorLevel.Warning,
+                        StringSource("mute renote failed"),
+                        it
+                    )
+                )
             }
         }
     }
@@ -327,7 +414,14 @@ class UserDetailViewModel @Inject constructor(
             getUserId().mapCancellableCatching {
                 renoteMuteRepository.delete(it).getOrThrow()
             }.onFailure {
-                _errors.tryEmit(it)
+                userActionAppGlobalErrorStore.dispatch(
+                    AppGlobalError(
+                        "UserDetailViewModel.unMuteRenotes",
+                        AppGlobalError.ErrorLevel.Warning,
+                        StringSource("unmute renote failed"),
+                        it
+                    )
+                )
             }
         }
     }
@@ -342,7 +436,14 @@ class UserDetailViewModel @Inject constructor(
                 accountStore.setCurrent(account)
             }.onFailure {
                 logger.error("setCurrentAccount failed", it)
-                _errors.tryEmit(it)
+                userActionAppGlobalErrorStore.dispatch(
+                    AppGlobalError(
+                        "UserDetailViewModel.setCurrentAccount",
+                        AppGlobalError.ErrorLevel.Warning,
+                        StringSource("switch account failed"),
+                        it
+                    )
+                )
             }
         }
     }
