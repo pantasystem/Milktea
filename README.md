@@ -2,7 +2,7 @@
 
 <img src="https://github.com/Kinoshita0623/MisskeyAndroidClient/blob/master/app/src/main/ic_launcher-web.png?raw=true" width="100px">
 <br>
-FedivierseにMilkteaはいかが？<br>
+FediverseにMilkteaはいかが？<br>
 Misskey, MastodonのAndroidクライアント<br>
 
 ## 説明
@@ -15,7 +15,7 @@ Milkteaでは以下のことを達成することを目標とし開発をしま�
 - 競合サービスから移住してきても違和感なく触れるUIであること
 - 独自機能を追加してより使いやすくすること
 - 継続的な開発ができること
-- Fedivierseの存在を意識せずにFediverse lifeをおくれるようにすること
+- Fediverseの存在を意識せずにFediverse lifeをおくれるようにすること
 
 ## 機能
 ### タイムライン
