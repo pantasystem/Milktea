@@ -29,7 +29,8 @@ class NoteOptionViewModel @Inject constructor(
     private val loggerFactory: Logger.Factory,
     private val featureEnables: FeatureEnables,
     private val userActionAppGlobalErrorStore: UserActionAppGlobalErrorStore,
-    private val savedStateHandle: SavedStateHandle
+    private val savedStateHandle: SavedStateHandle,
+    private val getShareNote: GetShareNoteUrlUseCase,
 ) : ViewModel() {
     companion object {
         const val NOTE_ID = "NoteOptionViewModel.NOTE_ID"
@@ -77,11 +78,16 @@ class NoteOptionViewModel @Inject constructor(
         featureEnables.enableFeatures(it.normalizedInstanceUri)
     }.distinctUntilChanged()
 
+    val noteOptionUrl = noteIdFlow.filterNotNull().map {
+        getShareNote(it).getOrNull()
+    }.distinctUntilChanged()
+
     val uiState = combine(
         noteInfo,
         currentAccount,
-        enableFeatures
-    ) { (id, state, note), ac, features ->
+        enableFeatures,
+        noteOptionUrl,
+    ) { (id, state, note), ac, features, shareUrl ->
         NoteOptionUiState(
             noteId = id,
             noteState = state,
@@ -90,6 +96,7 @@ class NoteOptionViewModel @Inject constructor(
             currentAccount = ac,
             noteRelation = note,
             isSupportReactionUsers = features.contains(FeatureType.PostReactionUsers),
+            noteOriginUrl = shareUrl,
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), NoteOptionUiState())
 
@@ -157,6 +164,7 @@ data class NoteOptionUiState(
     val isMyNote: Boolean = false,
     val currentAccount: Account? = null,
     val isSupportReactionUsers: Boolean = false,
+    val noteOriginUrl: String? = null,
 ) {
     val isVisibleReactionUsersSelection =
         currentAccount != null && note?.id != null && isSupportReactionUsers

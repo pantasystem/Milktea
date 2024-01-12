@@ -26,6 +26,7 @@ class NoteDetailViewModel @Inject constructor(
     private val noteReplyStreaming: ReplyStreaming,
     noteDetailNotesBuilderFactory: NoteDetailNotesFlowBuilder.Factory,
     private val savedStateHandle: SavedStateHandle,
+    private val getShareNoteUrl: GetShareNoteUrlUseCase,
 ) : ViewModel() {
 
     companion object {
@@ -130,10 +131,8 @@ class NoteDetailViewModel @Inject constructor(
         val account = currentAccountWatcher.getAccount()
         val note = noteRepository.find(Note.Id(account.accountId, pageable.noteId))
             .getOrThrow()
-        note.getOriginUrl(account)
+        getShareNoteUrl(note.id).getOrThrow()
     }
-
-
 }
 
 sealed interface NoteType {
