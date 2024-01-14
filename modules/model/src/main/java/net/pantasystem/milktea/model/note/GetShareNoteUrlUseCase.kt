@@ -8,11 +8,11 @@ import javax.inject.Singleton
 
 @Singleton
 class GetShareNoteUrlUseCase @Inject constructor(
-    private val recursiveSearchHasContentNoteUseCase: RecursiveSearchHasContentNoteUseCase,
+    private val noteService: NoteService,
     private val accountRepository: AccountRepository,
 ) : UseCase {
     suspend operator fun invoke(noteId: Note.Id): Result<String> {
-        return recursiveSearchHasContentNoteUseCase(noteId).mapCancellableCatching { note ->
+        return noteService.findHasContentNote(noteId).mapCancellableCatching { note ->
             note.getOriginUrl(
                 accountRepository.get(noteId.accountId).getOrThrow()
             )

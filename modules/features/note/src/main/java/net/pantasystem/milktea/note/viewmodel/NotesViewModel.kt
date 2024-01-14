@@ -19,7 +19,7 @@ import net.pantasystem.milktea.model.note.DeleteAndEditUseCase
 import net.pantasystem.milktea.model.note.DeleteNoteUseCase
 import net.pantasystem.milktea.model.note.Note
 import net.pantasystem.milktea.model.note.NoteRelation
-import net.pantasystem.milktea.model.note.RecursiveSearchHasContentNoteUseCase
+import net.pantasystem.milktea.model.note.NoteService
 import net.pantasystem.milktea.model.note.bookmark.CreateBookmarkUseCase
 import net.pantasystem.milktea.model.note.bookmark.DeleteBookmarkUseCase
 import net.pantasystem.milktea.model.note.draft.DraftNote
@@ -39,7 +39,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class NotesViewModel @Inject constructor(
-    private val recursiveSearchHasContentNoteUseCase: RecursiveSearchHasContentNoteUseCase,
+    private val noteService: NoteService,
     private val toggleReactionUseCase: ToggleReactionUseCase,
     private val createFavoriteUseCase: CreateFavoriteUseCase,
     private val deleteFavoriteUseCase: DeleteFavoriteUseCase,
@@ -114,7 +114,7 @@ class NotesViewModel @Inject constructor(
     }
 
     private suspend fun recursiveSearchHasContentNote(noteId: Note.Id): Result<Note> =
-        recursiveSearchHasContentNoteUseCase(noteId)
+        noteService.findHasContentNote(noteId)
 
     /**
      * リアクションを送信する
