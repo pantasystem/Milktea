@@ -81,7 +81,7 @@ data class NodeInfo(
 
     val type = when(software.name) {
         "calckey" -> SoftwareType.Misskey.Calckey(version = software.version, name = software.name)
-        "misskey" -> SoftwareType.Misskey.Normal(version = software.version, name = software.name)
+        "misskey", "sharkey" -> SoftwareType.Misskey.Normal(version = software.version, name = software.name)
         "mastodon" -> SoftwareType.Mastodon.Normal(version = software.version, name = software.name)
         "fedibird" -> SoftwareType.Mastodon.Fedibird(version = software.version, name = software.name)
         "meisskey" -> SoftwareType.Misskey.Meisskey(version = software.version, name = software.name)
