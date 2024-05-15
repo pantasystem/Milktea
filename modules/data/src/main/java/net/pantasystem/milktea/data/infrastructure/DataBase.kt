@@ -43,6 +43,15 @@ import net.pantasystem.milktea.data.infrastructure.note.draft.db.DraftNoteDTO
 import net.pantasystem.milktea.data.infrastructure.note.draft.db.DraftNoteDao
 import net.pantasystem.milktea.data.infrastructure.note.draft.db.PollChoiceDTO
 import net.pantasystem.milktea.data.infrastructure.note.draft.db.UserIdDTO
+import net.pantasystem.milktea.data.infrastructure.note.impl.sqlite.MastodonMentionEntity
+import net.pantasystem.milktea.data.infrastructure.note.impl.sqlite.MastodonTagEntity
+import net.pantasystem.milktea.data.infrastructure.note.impl.sqlite.NoteCustomEmojiEntity
+import net.pantasystem.milktea.data.infrastructure.note.impl.sqlite.NoteDAO
+import net.pantasystem.milktea.data.infrastructure.note.impl.sqlite.NoteEntity
+import net.pantasystem.milktea.data.infrastructure.note.impl.sqlite.NoteFileEntity
+import net.pantasystem.milktea.data.infrastructure.note.impl.sqlite.NotePollChoiceEntity
+import net.pantasystem.milktea.data.infrastructure.note.impl.sqlite.NoteVisibleUserIdEntity
+import net.pantasystem.milktea.data.infrastructure.note.impl.sqlite.ReactionCountEntity
 import net.pantasystem.milktea.data.infrastructure.note.reaction.impl.history.ReactionHistoryDao
 import net.pantasystem.milktea.data.infrastructure.note.reaction.impl.history.ReactionHistoryRecord
 import net.pantasystem.milktea.data.infrastructure.note.reaction.impl.usercustom.ReactionUserSetting
@@ -136,8 +145,17 @@ import net.pantasystem.milktea.data.infrastructure.user.renote.mute.db.RenoteMut
         CustomEmojiAliasRecord::class,
 
         InstanceTickerRecord::class,
+
+        NoteEntity::class,
+        ReactionCountEntity::class,
+        NoteVisibleUserIdEntity::class,
+        NotePollChoiceEntity::class,
+        MastodonTagEntity::class,
+        MastodonMentionEntity::class,
+        NoteCustomEmojiEntity::class,
+        NoteFileEntity::class,
     ],
-    version = 61,
+    version = 62,
     exportSchema = true,
     autoMigrations = [
         AutoMigration(from = 11, to = 12),
@@ -188,6 +206,7 @@ import net.pantasystem.milktea.data.infrastructure.user.renote.mute.db.RenoteMut
         AutoMigration(from = 58, to = 59),
         AutoMigration(from = 59, to = 60),
         AutoMigration(from = 60, to = 61),
+        AutoMigration(from = 61, to = 62),
     ],
     views = [UserView::class, GroupMemberView::class, UserListMemberView::class]
 )
@@ -248,4 +267,6 @@ abstract class DataBase : RoomDatabase() {
     abstract fun customEmojiDao(): CustomEmojiDAO
 
     abstract fun instanceTickerDAO(): InstanceTickerDAO
+
+    abstract fun noteDAO(): NoteDAO
 }

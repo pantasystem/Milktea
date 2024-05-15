@@ -7,7 +7,18 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
-import net.pantasystem.milktea.data.infrastructure.*
+import net.pantasystem.milktea.data.infrastructure.DataBase
+import net.pantasystem.milktea.data.infrastructure.MIGRATION_10_11
+import net.pantasystem.milktea.data.infrastructure.MIGRATION_1_2
+import net.pantasystem.milktea.data.infrastructure.MIGRATION_2_3
+import net.pantasystem.milktea.data.infrastructure.MIGRATION_3_4
+import net.pantasystem.milktea.data.infrastructure.MIGRATION_4_5
+import net.pantasystem.milktea.data.infrastructure.MIGRATION_51_52
+import net.pantasystem.milktea.data.infrastructure.MIGRATION_57_58
+import net.pantasystem.milktea.data.infrastructure.MIGRATION_5_6
+import net.pantasystem.milktea.data.infrastructure.MIGRATION_6_7
+import net.pantasystem.milktea.data.infrastructure.MIGRATION_7_8
+import net.pantasystem.milktea.data.infrastructure.MIGRATION_8_10
 import net.pantasystem.milktea.data.infrastructure.account.db.AccountDAO
 import net.pantasystem.milktea.data.infrastructure.drive.DriveFileRecordDao
 import net.pantasystem.milktea.data.infrastructure.group.GroupDao
@@ -138,4 +149,8 @@ object DbModule {
     @Provides
     @Singleton
     fun provideInstanceTickerDao(db: DataBase) = db.instanceTickerDAO()
+
+    @Provides
+    @Singleton
+    fun provideNoteDao(db: DataBase) = db.noteDAO()
 }

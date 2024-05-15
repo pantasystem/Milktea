@@ -3,6 +3,7 @@ package net.pantasystem.milktea.data.infrastructure.note.impl.sqlite
 import androidx.room.ColumnInfo
 import androidx.room.Embedded
 import androidx.room.Entity
+import androidx.room.PrimaryKey
 import androidx.room.Relation
 import kotlinx.datetime.Instant
 import net.pantasystem.milktea.model.channel.Channel
@@ -12,14 +13,15 @@ import net.pantasystem.milktea.model.note.Note
 import net.pantasystem.milktea.model.note.Visibility
 import net.pantasystem.milktea.model.note.poll.Poll
 import net.pantasystem.milktea.model.note.reaction.ReactionCount
+import net.pantasystem.milktea.model.note.type
 import net.pantasystem.milktea.model.user.User
 
 @Entity(
-    tableName = "notes"
+    tableName = "notes",
 )
 data class NoteEntity(
     @ColumnInfo(name = "id")
-    val id: String,
+    @PrimaryKey(autoGenerate = false) val id: String,
 
     @ColumnInfo(name = "account_id")
     val accountId: Long,
@@ -141,6 +143,51 @@ data class NoteEntity(
         fun makeEntityId(noteId: Note.Id): String {
             return makeEntityId(noteId.accountId, noteId.noteId)
         }
+
+        fun fromModel(model: Note): NoteEntity {
+            return NoteEntity(
+                id = makeEntityId(model.id),
+                accountId = model.id.accountId,
+                noteId = model.id.noteId,
+                createdAt = model.createdAt,
+                text = model.text,
+                cw = model.cw,
+                userId = model.userId.id,
+                replyId = model.replyId?.noteId,
+                repostId = model.renoteId?.noteId,
+                viaMobile = model.viaMobile,
+                visibility = model.visibility.type(),
+                localOnly = model.localOnly,
+                url = model.url,
+                uri = model.uri,
+                repostCount = model.renoteCount,
+                replyCount = model.repliesCount,
+                channelId = model.channelId?.channelId,
+                maxReactionPerAccount = model.maxReactionsPerAccount,
+                pollExpiresAt = model.poll?.expiresAt,
+                pollMultiple = model.poll?.multiple,
+                fedibirdCircleId = (model.visibility as? Visibility.Limited)?.circleId,
+                type = when (model.type) {
+                    is Note.Type.Mastodon -> "mastodon"
+                    is Note.Type.Misskey -> "misskey"
+                },
+                mastodonReblogged = (model.type as? Note.Type.Mastodon)?.reblogged,
+                mastodonFavourited = (model.type as? Note.Type.Mastodon)?.favorited,
+                mastodonBookmarked = (model.type as? Note.Type.Mastodon)?.bookmarked,
+                mastodonMuted = (model.type as? Note.Type.Mastodon)?.muted,
+                mastodonFavouritesCount = (model.type as? Note.Type.Mastodon)?.favoriteCount,
+                mastodonIsFedibirdQuote = (model.type as? Note.Type.Mastodon)?.isFedibirdQuote,
+                mastodonPollId = (model.type as? Note.Type.Mastodon)?.pollId,
+                mastodonIsSensitive = (model.type as? Note.Type.Mastodon)?.isSensitive,
+                mastodonPureText = (model.type as? Note.Type.Mastodon)?.pureText,
+                mastodonIsReactionAvailable = (model.type as? Note.Type.Mastodon)?.isReactionAvailable,
+                misskeyChannelId = (model.type as? Note.Type.Misskey)?.channel?.id?.channelId,
+                misskeyChannelName = (model.type as? Note.Type.Misskey)?.channel?.name,
+                misskeyIsAcceptingOnlyLikeReaction = (model.type as? Note.Type.Misskey)?.isAcceptingOnlyLikeReaction,
+                misskeyIsNotAcceptingSensitiveReaction = (model.type as? Note.Type.Misskey)?.isNotAcceptingSensitiveReaction,
+                misskeyIsRequireNyaize = (model.type as? Note.Type.Misskey)?.isRequireNyaize,
+            )
+        }
     }
 
 
@@ -231,10 +278,25 @@ data class MastodonMentionEntity(
 
     @ColumnInfo(name = "url")
     val url: String,
-)
+) {
+    companion object {
+        fun fromModel(model: Note.Type.Mastodon.Mention, noteId: String): MastodonMentionEntity {
+            return MastodonMentionEntity(
+                noteId = noteId,
+                userId = model.id,
+                username = model.username,
+                acct = model.acct,
+                url = model.url,
+            )
+        }
+    }
+}
 
 @Entity(
     tableName = "note_custom_emojis",
+    primaryKeys = [
+        "note_id", "name"
+    ]
 )
 data class NoteCustomEmojiEntity(
     @ColumnInfo(name = "note_id")
@@ -244,14 +306,35 @@ data class NoteCustomEmojiEntity(
     val name: String,
 
     @ColumnInfo(name = "url")
-    val url: String,
+    val url: String?,
 
     @ColumnInfo(name = "aspect_ratio")
-    val aspectRatio: Float,
+    val aspectRatio: Float?,
 
     @ColumnInfo(name = "cache_path")
-    val cachePath: String,
-)
+    val cachePath: String?,
+) {
+    companion object {
+        fun fromModel(model: CustomEmoji, noteId: String): NoteCustomEmojiEntity {
+            return NoteCustomEmojiEntity(
+                noteId = noteId,
+                name = model.name,
+                url = model.url,
+                aspectRatio = model.aspectRatio,
+                cachePath = model.cachePath,
+            )
+        }
+    }
+
+    fun equalModel(
+        customEmoji: CustomEmoji
+    ): Boolean {
+        return (name == customEmoji.name
+                && url == (customEmoji.url ?: customEmoji.uri)
+                && aspectRatio == customEmoji.aspectRatio
+                && cachePath == customEmoji.cachePath)
+    }
+}
 
 @Entity(
     tableName = "note_files",
@@ -394,5 +477,68 @@ data class NoteWithRelation(
             maxReactionsPerAccount = note.maxReactionPerAccount,
             emojiNameMap = emojis?.associateBy { it.name },
         )
+    }
+
+    companion object {
+        fun fromModel(model: Note): NoteWithRelation {
+            return NoteWithRelation(
+                note = NoteEntity.fromModel(model),
+                reactionCounts = model.reactionCounts.map {
+                    ReactionCountEntity(
+                        noteId = NoteEntity.makeEntityId(model.id),
+                        reaction = it.reaction,
+                        count = it.count,
+                        me = it.me,
+                    )
+                },
+                visibleUserIds = model.visibleUserIds?.map {
+                    NoteVisibleUserIdEntity(
+                        noteId = NoteEntity.makeEntityId(model.id),
+                        userId = it.id,
+                    )
+                },
+                pollChoices = model.poll?.choices?.map {
+                    NotePollChoiceEntity(
+                        noteId = NoteEntity.makeEntityId(model.id),
+                        index = it.index,
+                        text = it.text,
+                        votes = it.votes,
+                        isVoted = it.isVoted,
+                    )
+                },
+                mastodonTags = (model.type as? Note.Type.Mastodon)?.tags?.map {
+                    MastodonTagEntity(
+                        noteId = NoteEntity.makeEntityId(model.id),
+                        tag = it.name,
+                        url = it.url,
+                    )
+                },
+                mastodonMentions = (model.type as? Note.Type.Mastodon)?.mentions?.map {
+                    MastodonMentionEntity(
+                        noteId = NoteEntity.makeEntityId(model.id),
+                        userId = it.id,
+                        username = it.username,
+                        acct = it.acct,
+                        url = it.url,
+                    )
+                },
+                customEmojis = model.emojis?.map {
+                    NoteCustomEmojiEntity(
+                        noteId = NoteEntity.makeEntityId(model.id),
+                        name = it.name,
+                        url = it.url,
+                        aspectRatio = it.aspectRatio,
+                        cachePath = it.cachePath,
+                    )
+                },
+                noteFiles = model.fileIds?.map {
+                    NoteFileEntity(
+                        noteId = NoteEntity.makeEntityId(model.id),
+                        fileId = it.fileId,
+                    )
+                },
+            )
+
+        }
     }
 }

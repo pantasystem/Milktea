@@ -1,5 +1,6 @@
 package net.pantasystem.milktea.data.infrastructure.note.impl.sqlite
 
+import androidx.room.Transaction
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
@@ -42,22 +43,23 @@ class SQLiteNoteDataSource @Inject constructor(
         }
     }
 
-    override suspend fun getIn(noteIds: List<Note.Id>): Result<List<Note>> = runCancellableCatching {
-        val ids = noteIds.map {
-            NoteEntity.makeEntityId(it)
-        }.distinct()
-        if (ids.isEmpty()) {
-            return@runCancellableCatching emptyList()
-        }
-        val entities = withContext(ioDispatcher) {
-            noteDAO.getIn(ids)
-        }
-        withContext(defaultDispatcher)  {
-            entities.map {
-                it.toModel()
+    override suspend fun getIn(noteIds: List<Note.Id>): Result<List<Note>> =
+        runCancellableCatching {
+            val ids = noteIds.map {
+                NoteEntity.makeEntityId(it)
+            }.distinct()
+            if (ids.isEmpty()) {
+                return@runCancellableCatching emptyList()
+            }
+            val entities = withContext(ioDispatcher) {
+                noteDAO.getIn(ids)
+            }
+            withContext(defaultDispatcher) {
+                entities.map {
+                    it.toModel()
+                }
             }
         }
-    }
 
     override suspend fun get(noteId: Note.Id): Result<Note> = runCancellableCatching {
         if (deleteNoteIds.contains(noteId)) {
@@ -69,18 +71,19 @@ class SQLiteNoteDataSource @Inject constructor(
         entity?.toModel() ?: throw NoteNotFoundException(noteId)
     }
 
-    override suspend fun getWithState(noteId: Note.Id): Result<NoteResult> = runCancellableCatching {
-        if (deleteNoteIds.contains(noteId)) {
-            return@runCancellableCatching NoteResult.Deleted
+    override suspend fun getWithState(noteId: Note.Id): Result<NoteResult> =
+        runCancellableCatching {
+            if (deleteNoteIds.contains(noteId)) {
+                return@runCancellableCatching NoteResult.Deleted
+            }
+            val entity = withContext(ioDispatcher) {
+                noteDAO.get(NoteEntity.makeEntityId(noteId))
+            }
+            when (entity) {
+                null -> NoteResult.NotFound
+                else -> NoteResult.Success(entity.toModel())
+            }
         }
-        val entity = withContext(ioDispatcher) {
-            noteDAO.get(NoteEntity.makeEntityId(noteId))
-        }
-        when(entity) {
-            null -> NoteResult.NotFound
-            else -> NoteResult.Success(entity.toModel())
-        }
-    }
 
     override suspend fun findByReplyId(id: Note.Id): Result<List<Note>> = runCancellableCatching {
         val entities = withContext(ioDispatcher) {
@@ -120,13 +123,80 @@ class SQLiteNoteDataSource @Inject constructor(
         count > 0
     }
 
-    override suspend fun add(note: Note): Result<AddResult> {
-        TODO("Not yet implemented")
+    @Transaction
+    override suspend fun add(note: Note): Result<AddResult> = runCancellableCatching {
+        val dbId = NoteEntity.makeEntityId(note.id)
+        val relationEntity = NoteWithRelation.fromModel(note)
+        // exists check
+        val existsEntity = withContext(ioDispatcher) {
+            noteDAO.get(relationEntity.note.id)
+        }
+        val entity = relationEntity.note
+        withContext(ioDispatcher) {
+            if (existsEntity == null) {
+                noteDAO.insert(entity)
+            } else {
+                noteDAO.update(entity)
+            }
+        }
+        val needInsert = existsEntity == null
+        withContext(ioDispatcher) {
+            when (note.type) {
+                is Note.Type.Mastodon -> {
+                    if (needInsert) {
+                        relationEntity.mastodonMentions?.let {
+                            noteDAO.insertMastodonMentions(
+                                it
+                            )
+                        }
+                        relationEntity.mastodonTags?.let {
+                            noteDAO.insertMastodonTags(
+                                it
+                            )
+                        }
+                    }
+                }
+
+                is Note.Type.Misskey -> Unit
+            }
+
+            if (!needInsert) {
+                // detach
+                noteDAO.deletePollChoicesByNoteId(dbId)
+                noteDAO.deleteCustomEmojisByNoteId(dbId)
+                noteDAO.deleteReactionCountsByNoteId(dbId)
+            } else {
+                relationEntity.noteFiles?.let {
+                    noteDAO.insertNoteFiles(it)
+                }
+                relationEntity.visibleUserIds?.let {
+                    noteDAO.insertVisibleIds(it)
+                }
+            }
+
+            relationEntity.reactionCounts?.let {
+                noteDAO.insertReactionCounts(it)
+            }
+
+            relationEntity.pollChoices?.let {
+                noteDAO.insertPollChoices(it)
+            }
+
+            relationEntity.customEmojis?.let {
+                noteDAO.insertCustomEmojis(it)
+            }
+
+        }
+
+        if (existsEntity == null) AddResult.Created else AddResult.Updated
     }
 
-    override suspend fun addAll(notes: List<Note>): Result<List<AddResult>> {
-        TODO("Not yet implemented")
-    }
+    override suspend fun addAll(notes: List<Note>): Result<List<AddResult>> =
+        runCancellableCatching {
+            notes.mapNotNull {
+                add(it).getOrNull()
+            }
+        }
 
     override suspend fun clear(): Result<Unit> {
         return runCancellableCatching {

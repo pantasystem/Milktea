@@ -1,8 +1,11 @@
 package net.pantasystem.milktea.data.infrastructure.note.impl.sqlite
 
 import androidx.room.Dao
+import androidx.room.Insert
+import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
+import androidx.room.Update
 import kotlinx.coroutines.flow.Flow
 
 
@@ -105,4 +108,79 @@ interface NoteDAO {
     )
     @Transaction
     suspend fun count(): Long
+
+    // insert note
+    @Transaction
+    @Insert()
+    suspend fun insert(note: NoteEntity)
+
+    // update
+    @Transaction
+    @Update
+    suspend fun update(note: NoteEntity)
+
+    // insert reaction counts
+    @Transaction
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertReactionCounts(reactionCounts: List<ReactionCountEntity>)
+
+    // delete reaction by note id
+    @Transaction
+    @Query(
+        """
+        DELETE FROM reaction_counts
+            WHERE note_id = :noteId
+        """
+    )
+    suspend fun deleteReactionCountsByNoteId(noteId: String)
+
+    // visible ids insert and delete
+    @Transaction
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertVisibleIds(visibleIds: List<NoteVisibleUserIdEntity>)
+
+
+    // poll choices insert and delete
+    @Transaction
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertPollChoices(pollChoices: List<NotePollChoiceEntity>)
+
+    @Transaction
+    @Query(
+        """
+        DELETE FROM note_poll_choices
+            WHERE note_id = :noteId
+        """
+    )
+    suspend fun deletePollChoicesByNoteId(noteId: String)
+
+    @Transaction
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertMastodonTags(tags: List<MastodonTagEntity>)
+
+    // mastodon mentions insert
+    @Transaction
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertMastodonMentions(mentions: List<MastodonMentionEntity>)
+
+    // custom emojis insert and delete
+    @Transaction
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertCustomEmojis(emojis: List<NoteCustomEmojiEntity>)
+
+    @Transaction
+    @Query(
+        """
+        DELETE FROM note_custom_emojis
+            WHERE note_id = :noteId
+        """
+    )
+    suspend fun deleteCustomEmojisByNoteId(noteId: String)
+
+    // note files
+    @Transaction
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertNoteFiles(files: List<NoteFileEntity>)
+
+
 }

@@ -10,17 +10,25 @@ import dagger.hilt.components.SingletonComponent
 import net.pantasystem.milktea.app_store.notes.NoteTranslationStore
 import net.pantasystem.milktea.app_store.notes.TimelineStore
 import net.pantasystem.milktea.common.getPreferences
-import net.pantasystem.milktea.data.infrastructure.note.*
+import net.pantasystem.milktea.data.infrastructure.note.NoteStreamingImpl
+import net.pantasystem.milktea.data.infrastructure.note.NoteTranslationStoreImpl
+import net.pantasystem.milktea.data.infrastructure.note.ReplyStreamingImpl
+import net.pantasystem.milktea.data.infrastructure.note.TimelineScrollPositionRepositoryImpl
+import net.pantasystem.milktea.data.infrastructure.note.TimelineStoreImpl
 import net.pantasystem.milktea.data.infrastructure.note.draft.DraftNoteRepositoryImpl
 import net.pantasystem.milktea.data.infrastructure.note.impl.DraftNoteServiceImpl
 import net.pantasystem.milktea.data.infrastructure.note.impl.NoteApiAdapter
 import net.pantasystem.milktea.data.infrastructure.note.impl.NoteApiAdapterFactoryImpl
 import net.pantasystem.milktea.data.infrastructure.note.impl.NoteRepositoryImpl
-import net.pantasystem.milktea.data.infrastructure.note.impl.ObjectBoxNoteDataSource
 import net.pantasystem.milktea.data.infrastructure.note.impl.ThreadContextApiAdapter
 import net.pantasystem.milktea.data.infrastructure.note.impl.ThreadContextApiAdapterFactoryImpl
+import net.pantasystem.milktea.data.infrastructure.note.impl.sqlite.SQLiteNoteDataSource
 import net.pantasystem.milktea.data.infrastructure.note.renote.RenotesPagingServiceImpl
-import net.pantasystem.milktea.model.note.*
+import net.pantasystem.milktea.model.note.NoteDataSource
+import net.pantasystem.milktea.model.note.NoteRepository
+import net.pantasystem.milktea.model.note.NoteStreaming
+import net.pantasystem.milktea.model.note.ReplyStreaming
+import net.pantasystem.milktea.model.note.TimelineScrollPositionRepository
 import net.pantasystem.milktea.model.note.draft.DraftNoteRepository
 import net.pantasystem.milktea.model.note.draft.DraftNoteService
 import net.pantasystem.milktea.model.note.repost.RenotesPagingService
@@ -32,7 +40,7 @@ abstract class NoteBindModule{
 
     @Binds
     @Singleton
-    abstract fun noteDataSource(inMem: ObjectBoxNoteDataSource): NoteDataSource
+    abstract fun noteDataSource(inMem: SQLiteNoteDataSource): NoteDataSource
 
     @Binds
     @Singleton
