@@ -266,7 +266,6 @@ data class NoteRecord(
                 }
                 else -> throw IllegalArgumentException()
             },
-            app = null,
             emojiNameMap = emojis?.associateBy { it.name }
         )
     }

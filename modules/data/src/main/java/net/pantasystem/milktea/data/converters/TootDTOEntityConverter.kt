@@ -110,7 +110,6 @@ class TootDTOEntityConverter @Inject constructor(
                 ),
                 localOnly = null,
                 emojis = emojis,
-                app = null,
                 reactionCounts = emojiReactions?.map {
                     ReactionCount(
                         reaction = it.reaction,

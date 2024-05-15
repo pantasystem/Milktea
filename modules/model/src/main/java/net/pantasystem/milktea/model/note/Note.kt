@@ -5,7 +5,6 @@ import kotlinx.datetime.Instant
 import net.pantasystem.milktea.model.Entity
 import net.pantasystem.milktea.model.EntityId
 import net.pantasystem.milktea.model.account.Account
-import net.pantasystem.milktea.model.app.AppType
 import net.pantasystem.milktea.model.channel.Channel
 import net.pantasystem.milktea.model.drive.FileProperty
 import net.pantasystem.milktea.model.emoji.CustomEmoji
@@ -42,7 +41,6 @@ data class Note(
     val poll: Poll?,
     val myReaction: String?,
 
-    val app: AppType.Misskey?,
     val channelId: Channel.Id?,
     val type: Type,
     val maxReactionsPerAccount: Int,
@@ -285,7 +283,6 @@ fun Note.Companion.make(
     fileIds: List<FileProperty.Id>? = null,
     poll: Poll? = null,
     myReaction: String? = null,
-    app: AppType.Misskey? = null,
     channelId: Channel.Id? = null,
     type: Note.Type = Note.Type.Misskey(),
     maxReactionsPerAccount: Int = 1
@@ -311,7 +308,6 @@ fun Note.Companion.make(
         fileIds = fileIds,
         poll = poll,
         myReaction = myReaction,
-        app = app,
         channelId = channelId,
         type = type,
         maxReactionsPerAccount = maxReactionsPerAccount,

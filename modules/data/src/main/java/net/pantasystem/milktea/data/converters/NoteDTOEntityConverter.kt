@@ -158,7 +158,6 @@ class NoteDTOEntityConverter @Inject constructor(
             visibility = visibility,
             localOnly = noteDTO.localOnly,
             emojis = noteEmojis,
-            app = null,
             fileIds = noteDTO.fileIds?.map { FileProperty.Id(account.accountId, it) },
             poll = noteDTO.poll?.toPoll(),
             reactionCounts = reactionCounts,

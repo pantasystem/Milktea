@@ -1,6 +1,13 @@
 
-
-
+pluginManagement {
+    repositories {
+        google()
+        gradlePluginPortal()
+        mavenCentral()
+        maven { url "https://jitpack.io" }
+        maven { url 'https://maven.google.com' }
+    }
+}
 
 dependencyResolutionManagement {
     versionCatalogs {
