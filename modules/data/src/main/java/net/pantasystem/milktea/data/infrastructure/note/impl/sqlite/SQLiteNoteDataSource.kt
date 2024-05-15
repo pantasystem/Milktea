@@ -3,7 +3,10 @@ package net.pantasystem.milktea.data.infrastructure.note.impl.sqlite
 import androidx.room.Transaction
 import androidx.room.withTransaction
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
@@ -29,7 +32,7 @@ class SQLiteNoteDataSource @Inject constructor(
     @IODispatcher private val ioDispatcher: CoroutineDispatcher,
     @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher,
     private val database: DataBase,
-
+    private val noteThreadDAO: NoteThreadDAO,
 ) : NoteDataSource {
 
     private var listeners = setOf<NoteDataSource.Listener>()
@@ -292,15 +295,59 @@ class SQLiteNoteDataSource @Inject constructor(
         noteId: Note.Id,
         context: NoteThreadContext
     ): Result<Unit> {
-        TODO("Not yet implemented")
+        return runCancellableCatching {
+            val entity = NoteThreadEntity(
+                id = NoteEntity.makeEntityId(noteId),
+                accountId = noteId.accountId,
+                targetNoteId = noteId.noteId
+            )
+            val exists = withContext(ioDispatcher) {
+                noteThreadDAO.select(entity.id)
+            }
+            withContext(ioDispatcher) {
+                if (exists == null) {
+                    noteThreadDAO.insert(entity)
+                } else {
+                    noteThreadDAO.update(entity)
+                    noteThreadDAO.detachAncestors(entity.id)
+                    noteThreadDAO.detachDescendants(entity.id)
+                }
+
+                noteThreadDAO.attachAncestors(context.ancestors.map {
+                    NoteAncestorEntity(
+                        threadId = entity.id,
+                        noteId = NoteEntity.makeEntityId(it.id)
+                    )
+                })
+                noteThreadDAO.attachDescendants(context.descendants.map {
+                    NoteDescendantEntity(
+                        threadId = entity.id,
+                        noteId = NoteEntity.makeEntityId(it.id)
+                    )
+                })
+            }
+        }
     }
 
-    override suspend fun clearNoteThreadContext(noteId: Note.Id): Result<Unit> {
-        TODO("Not yet implemented")
+    override suspend fun clearNoteThreadContext(noteId: Note.Id): Result<Unit> = runCancellableCatching{
+        withContext(ioDispatcher) {
+            noteThreadDAO.delete(NoteEntity.makeEntityId(noteId))
+        }
     }
 
-    override suspend fun findNoteThreadContext(noteId: Note.Id): Result<NoteThreadContext> {
-        TODO("Not yet implemented")
+    override suspend fun findNoteThreadContext(noteId: Note.Id): Result<NoteThreadContext> = runCancellableCatching {
+        withContext(ioDispatcher) {
+            val entity = noteThreadDAO.selectWithRelation(NoteEntity.makeEntityId(noteId))
+                ?: return@withContext NoteThreadContext(
+                    ancestors = emptyList(),
+                    descendants = emptyList()
+                )
+
+            NoteThreadContext(
+                ancestors = noteDAO.getIn(entity.ancestors.map { it.noteId }).map { it.toModel() },
+                descendants = noteDAO.getIn(entity.descendants.map { it.noteId }).map { it.toModel() }
+            )
+        }
     }
 
     override suspend fun deleteByUserId(userId: User.Id): Result<Int> = runCancellableCatching {
@@ -330,8 +377,25 @@ class SQLiteNoteDataSource @Inject constructor(
         }
     }
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     override fun observeNoteThreadContext(noteId: Note.Id): Flow<NoteThreadContext?> {
-        TODO("Not yet implemented")
+        return noteThreadDAO.observeWithRelation(NoteEntity.makeEntityId(noteId)).flowOn(ioDispatcher).flatMapLatest { relation ->
+            val ids = (relation?.ancestors?.map { it.noteId } ?: emptyList()) + (relation?.descendants?.map { it.noteId } ?: emptyList())
+            combine(noteDAO.observeByIds(ids)) { array ->
+                val map = array.toList().flatten().associateBy {
+                    it.note.id
+                }
+                NoteThreadContext(
+                    ancestors = (relation?.ancestors ?: emptyList()).mapNotNull {
+                        map[it.noteId]?.toModel()
+                    },
+                    descendants = (relation?.descendants ?: emptyList()).mapNotNull {
+                        map[it.noteId]?.toModel()
+                    }
+                )
+            }
+
+        }
     }
 
     override suspend fun findLocalCount(): Result<Long> = runCancellableCatching {

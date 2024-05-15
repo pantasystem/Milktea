@@ -45,11 +45,15 @@ import net.pantasystem.milktea.data.infrastructure.note.draft.db.PollChoiceDTO
 import net.pantasystem.milktea.data.infrastructure.note.draft.db.UserIdDTO
 import net.pantasystem.milktea.data.infrastructure.note.impl.sqlite.MastodonMentionEntity
 import net.pantasystem.milktea.data.infrastructure.note.impl.sqlite.MastodonTagEntity
+import net.pantasystem.milktea.data.infrastructure.note.impl.sqlite.NoteAncestorEntity
 import net.pantasystem.milktea.data.infrastructure.note.impl.sqlite.NoteCustomEmojiEntity
 import net.pantasystem.milktea.data.infrastructure.note.impl.sqlite.NoteDAO
+import net.pantasystem.milktea.data.infrastructure.note.impl.sqlite.NoteDescendantEntity
 import net.pantasystem.milktea.data.infrastructure.note.impl.sqlite.NoteEntity
 import net.pantasystem.milktea.data.infrastructure.note.impl.sqlite.NoteFileEntity
 import net.pantasystem.milktea.data.infrastructure.note.impl.sqlite.NotePollChoiceEntity
+import net.pantasystem.milktea.data.infrastructure.note.impl.sqlite.NoteThreadDAO
+import net.pantasystem.milktea.data.infrastructure.note.impl.sqlite.NoteThreadEntity
 import net.pantasystem.milktea.data.infrastructure.note.impl.sqlite.NoteVisibleUserIdEntity
 import net.pantasystem.milktea.data.infrastructure.note.impl.sqlite.ReactionCountEntity
 import net.pantasystem.milktea.data.infrastructure.note.reaction.impl.history.ReactionHistoryDao
@@ -154,8 +158,12 @@ import net.pantasystem.milktea.data.infrastructure.user.renote.mute.db.RenoteMut
         MastodonMentionEntity::class,
         NoteCustomEmojiEntity::class,
         NoteFileEntity::class,
+
+        NoteThreadEntity::class,
+        NoteAncestorEntity::class,
+        NoteDescendantEntity::class,
     ],
-    version = 62,
+    version = 63,
     exportSchema = true,
     autoMigrations = [
         AutoMigration(from = 11, to = 12),
@@ -207,6 +215,7 @@ import net.pantasystem.milktea.data.infrastructure.user.renote.mute.db.RenoteMut
         AutoMigration(from = 59, to = 60),
         AutoMigration(from = 60, to = 61),
         AutoMigration(from = 61, to = 62),
+        AutoMigration(from = 62, to = 63),
     ],
     views = [UserView::class, GroupMemberView::class, UserListMemberView::class]
 )
@@ -269,4 +278,6 @@ abstract class DataBase : RoomDatabase() {
     abstract fun instanceTickerDAO(): InstanceTickerDAO
 
     abstract fun noteDAO(): NoteDAO
+
+    abstract fun noteThreadDAO(): NoteThreadDAO
 }

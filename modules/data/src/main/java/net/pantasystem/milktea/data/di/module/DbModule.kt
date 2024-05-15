@@ -153,4 +153,8 @@ object DbModule {
     @Provides
     @Singleton
     fun provideNoteDao(db: DataBase) = db.noteDAO()
+
+    @Provides
+    @Singleton
+    fun provideNoteThreadDao(db: DataBase) = db.noteThreadDAO()
 }
