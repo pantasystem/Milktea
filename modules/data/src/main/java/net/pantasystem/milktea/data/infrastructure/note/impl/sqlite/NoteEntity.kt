@@ -137,6 +137,10 @@ data class NoteEntity(
         fun makeEntityId(accountId: Long, noteId: String): String {
             return "$accountId:$noteId"
         }
+
+        fun makeEntityId(noteId: Note.Id): String {
+            return makeEntityId(noteId.accountId, noteId.noteId)
+        }
     }
 
 
