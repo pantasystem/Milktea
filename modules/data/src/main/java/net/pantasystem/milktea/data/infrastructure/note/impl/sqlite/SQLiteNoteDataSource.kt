@@ -175,8 +175,8 @@ class SQLiteNoteDataSource @Inject constructor(
                     existsEntity?.reactionCounts?.associateBy { it.reaction } ?: emptyMap()
                 )
                 replaceCustomEmojisIfNeed(
-                    relationEntity.customEmojis ?: emptyList(),
-                    existsEntity?.customEmojis ?: emptyList()
+                    relationEntity.customEmojis?.associateBy { it.id } ?: emptyMap(),
+                    existsEntity?.customEmojis?.associateBy { it.id } ?: emptyMap()
                 )
 
                 replacePollChoicesIfNeed(
@@ -193,9 +193,89 @@ class SQLiteNoteDataSource @Inject constructor(
 
     override suspend fun addAll(notes: List<Note>): Result<List<AddResult>> =
         runCancellableCatching {
-            notes.mapNotNull {
-                add(it).getOrNull()
+            val existsNotes = withContext(ioDispatcher) {
+                noteDAO.getIn(notes.map {
+                    NoteEntity.makeEntityId(it.id)
+                })
+            }.associateBy {
+                it.note.id
             }
+            val noteRelations = notes.map {
+                NoteWithRelation.fromModel(it)
+            }
+
+            val needInsertNotes = noteRelations.filter {
+                existsNotes[it.note.id] == null
+            }
+
+            val needUpdateNotes = noteRelations.filter {
+                existsNotes[it.note.id] != null
+            }
+
+            val reactionCountsMap = noteRelations.mapNotNull {
+                it.reactionCounts
+            }.flatten().associateBy {
+                it.id
+            }
+            val existsReactionCountsMap = noteRelations.mapNotNull {
+                it.reactionCounts
+            }.flatten().associateBy {
+                it.id
+            }
+
+            val customEmojis = noteRelations.mapNotNull {
+                it.customEmojis
+            }.flatten().associateBy {
+                it.id
+            }
+            val existsCustomEmojis = noteRelations.mapNotNull {
+                it.customEmojis
+            }.flatten().associateBy {
+                it.id
+            }
+
+            val pollChoices = noteRelations.mapNotNull {
+                it.pollChoices
+            }.flatten()
+            val existsPollChoices = noteRelations.mapNotNull {
+                it.pollChoices
+            }.flatten()
+
+            val mastodonNotes = needInsertNotes.filter {
+                it.note.type == "mastodon"
+            }
+            val mastodonMentions = mastodonNotes.mapNotNull {
+                it.mastodonMentions
+            }.flatten()
+            val mastodonTags = mastodonNotes.mapNotNull {
+                it.mastodonTags
+            }.flatten()
+            val noteFiles = needInsertNotes.mapNotNull {
+                it.noteFiles
+            }.flatten()
+
+            withContext(ioDispatcher) {
+                database.withTransaction {
+                    noteDAO.insertAll(needInsertNotes.map { it.note })
+                    needUpdateNotes.forEach {
+                        noteDAO.update(it.note)
+                    }
+
+                    replaceCustomEmojisIfNeed(customEmojis, existsCustomEmojis)
+                    replaceReactionCountsIfNeed(reactionCountsMap, existsReactionCountsMap)
+                    replacePollChoicesIfNeed(pollChoices, existsPollChoices)
+
+
+                    noteDAO.insertMastodonMentions(mastodonMentions)
+                    noteDAO.insertMastodonTags(mastodonTags)
+                    noteDAO.insertNoteFiles(noteFiles)
+                }
+            }
+
+            val results = noteRelations.map {
+                if (existsNotes[it.note.id] == null) AddResult.Created else AddResult.Updated
+            }
+            results
         }
 
     override suspend fun clear(): Result<Unit> {
@@ -297,22 +377,20 @@ class SQLiteNoteDataSource @Inject constructor(
     }
 
     private suspend fun replaceCustomEmojisIfNeed(
-        customEmojis: List<NoteCustomEmojiEntity>,
-        existsCustomEmojis: List<NoteCustomEmojiEntity>,
+        customEmojis: Map<String, NoteCustomEmojiEntity>,
+        existsCustomEmojis: Map<String, NoteCustomEmojiEntity>,
     ) {
         val deleteList = existsCustomEmojis.filter {
-            !customEmojis.contains(it)
-        }
+            !customEmojis.containsKey(it.key)
+        }.values
 
         val updateOrInsertList = customEmojis.mapNotNull { emoji ->
-            val exists = existsCustomEmojis.find {
-                it.id == emoji.id
-            }
+            val exists = existsCustomEmojis[emoji.key]
             if (exists == null) {
-                emoji
+                emoji.value
             } else {
-                if (exists != emoji) {
-                    emoji
+                if (exists != emoji.value) {
+                    emoji.value
                 } else {
                     null
                 }

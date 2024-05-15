@@ -114,6 +114,11 @@ interface NoteDAO {
     @Insert()
     suspend fun insert(note: NoteEntity)
 
+    // insert notes
+    @Transaction
+    @Insert()
+    suspend fun insertAll(notes: List<NoteEntity>)
+
     // update
     @Transaction
     @Update
