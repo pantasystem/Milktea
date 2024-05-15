@@ -3,6 +3,7 @@ package net.pantasystem.milktea.data.infrastructure.note.impl.sqlite
 import androidx.room.ColumnInfo
 import androidx.room.Embedded
 import androidx.room.Entity
+import androidx.room.Index
 import androidx.room.PrimaryKey
 import androidx.room.Relation
 import kotlinx.datetime.Instant
@@ -195,9 +196,11 @@ data class NoteEntity(
 
 @Entity(
     tableName = "reaction_counts",
-    primaryKeys = ["note_id", "reaction"]
 )
 data class ReactionCountEntity(
+    @PrimaryKey(autoGenerate = false)
+    val id: String,
+
     @ColumnInfo(name = "note_id")
     val noteId: String,
 
@@ -209,7 +212,13 @@ data class ReactionCountEntity(
 
     @ColumnInfo(name = "me")
     val me: Boolean,
-)
+) {
+    companion object {
+        fun makeId(noteId: String, reaction: String): String {
+            return "$noteId:$reaction"
+        }
+    }
+}
 
 @Entity(
     tableName = "note_visible_user_ids",
@@ -225,9 +234,11 @@ data class NoteVisibleUserIdEntity(
 
 @Entity(
     tableName = "note_poll_choices",
-    primaryKeys = ["note_id", "index"]
 )
 data class NotePollChoiceEntity(
+    @PrimaryKey(autoGenerate = false)
+    val id: String,
+
     @ColumnInfo(name = "note_id")
     val noteId: String,
 
@@ -242,7 +253,13 @@ data class NotePollChoiceEntity(
 
     @ColumnInfo(name = "is_voted")
     val isVoted: Boolean,
-)
+) {
+    companion object {
+        fun makeId(noteId: String, index: Int): String {
+            return "$noteId:$index"
+        }
+    }
+}
 
 @Entity(
     tableName = "mastodon_tags",
@@ -294,11 +311,15 @@ data class MastodonMentionEntity(
 
 @Entity(
     tableName = "note_custom_emojis",
-    primaryKeys = [
-        "note_id", "name"
+    indices = [
+        Index("note_id")
     ]
 )
 data class NoteCustomEmojiEntity(
+    @ColumnInfo(name = "id")
+    @PrimaryKey(autoGenerate = false)
+    val id: String,
+
     @ColumnInfo(name = "note_id")
     val noteId: String,
 
@@ -315,8 +336,12 @@ data class NoteCustomEmojiEntity(
     val cachePath: String?,
 ) {
     companion object {
+        fun makeId(noteId: String, name: String): String {
+            return "$noteId:$name"
+        }
         fun fromModel(model: CustomEmoji, noteId: String): NoteCustomEmojiEntity {
             return NoteCustomEmojiEntity(
+                id = makeId(noteId, model.name),
                 noteId = noteId,
                 name = model.name,
                 url = model.url,
@@ -485,6 +510,7 @@ data class NoteWithRelation(
                 note = NoteEntity.fromModel(model),
                 reactionCounts = model.reactionCounts.map {
                     ReactionCountEntity(
+                        id = ReactionCountEntity.makeId(NoteEntity.makeEntityId(model.id), it.reaction),
                         noteId = NoteEntity.makeEntityId(model.id),
                         reaction = it.reaction,
                         count = it.count,
@@ -504,6 +530,7 @@ data class NoteWithRelation(
                         text = it.text,
                         votes = it.votes,
                         isVoted = it.isVoted,
+                        id = NotePollChoiceEntity.makeId(NoteEntity.makeEntityId(model.id), it.index)
                     )
                 },
                 mastodonTags = (model.type as? Note.Type.Mastodon)?.tags?.map {
@@ -523,13 +550,7 @@ data class NoteWithRelation(
                     )
                 },
                 customEmojis = model.emojis?.map {
-                    NoteCustomEmojiEntity(
-                        noteId = NoteEntity.makeEntityId(model.id),
-                        name = it.name,
-                        url = it.url,
-                        aspectRatio = it.aspectRatio,
-                        cachePath = it.cachePath,
-                    )
+                    NoteCustomEmojiEntity.fromModel(it, NoteEntity.makeEntityId(model.id))
                 },
                 noteFiles = model.fileIds?.map {
                     NoteFileEntity(

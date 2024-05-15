@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 62,
-    "identityHash": "6d8577464905b98ab2588b1344dcdeb0",
+    "identityHash": "6d207269b64590aae2f380c7e0af6aa2",
     "entities": [
       {
         "tableName": "reaction_history",
@@ -3560,8 +3560,14 @@
       },
       {
         "tableName": "reaction_counts",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`note_id` TEXT NOT NULL, `reaction` TEXT NOT NULL, `count` INTEGER NOT NULL, `me` INTEGER NOT NULL, PRIMARY KEY(`note_id`, `reaction`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `note_id` TEXT NOT NULL, `reaction` TEXT NOT NULL, `count` INTEGER NOT NULL, `me` INTEGER NOT NULL, PRIMARY KEY(`id`))",
         "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
           {
             "fieldPath": "noteId",
             "columnName": "note_id",
@@ -3590,8 +3596,7 @@
         "primaryKey": {
           "autoGenerate": false,
           "columnNames": [
-            "note_id",
-            "reaction"
+            "id"
           ]
         },
         "indices": [],
@@ -3626,8 +3631,14 @@
       },
       {
         "tableName": "note_poll_choices",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`note_id` TEXT NOT NULL, `index` INTEGER NOT NULL, `text` TEXT NOT NULL, `votes` INTEGER NOT NULL, `is_voted` INTEGER NOT NULL, PRIMARY KEY(`note_id`, `index`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `note_id` TEXT NOT NULL, `index` INTEGER NOT NULL, `text` TEXT NOT NULL, `votes` INTEGER NOT NULL, `is_voted` INTEGER NOT NULL, PRIMARY KEY(`id`))",
         "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
           {
             "fieldPath": "noteId",
             "columnName": "note_id",
@@ -3662,8 +3673,7 @@
         "primaryKey": {
           "autoGenerate": false,
           "columnNames": [
-            "note_id",
-            "index"
+            "id"
           ]
         },
         "indices": [],
@@ -3749,8 +3759,14 @@
       },
       {
         "tableName": "note_custom_emojis",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`note_id` TEXT NOT NULL, `name` TEXT NOT NULL, `url` TEXT, `aspect_ratio` REAL, `cache_path` TEXT, PRIMARY KEY(`note_id`, `name`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `note_id` TEXT NOT NULL, `name` TEXT NOT NULL, `url` TEXT, `aspect_ratio` REAL, `cache_path` TEXT, PRIMARY KEY(`id`))",
         "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
           {
             "fieldPath": "noteId",
             "columnName": "note_id",
@@ -3785,11 +3801,20 @@
         "primaryKey": {
           "autoGenerate": false,
           "columnNames": [
-            "note_id",
-            "name"
+            "id"
           ]
         },
-        "indices": [],
+        "indices": [
+          {
+            "name": "index_note_custom_emojis_note_id",
+            "unique": false,
+            "columnNames": [
+              "note_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_note_custom_emojis_note_id` ON `${TABLE_NAME}` (`note_id`)"
+          }
+        ],
         "foreignKeys": []
       },
       {
@@ -3836,7 +3861,7 @@
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '6d8577464905b98ab2588b1344dcdeb0')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '6d207269b64590aae2f380c7e0af6aa2')"
     ]
   }
 }

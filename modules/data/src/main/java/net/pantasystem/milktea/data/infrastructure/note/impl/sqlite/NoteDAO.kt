@@ -134,6 +134,16 @@ interface NoteDAO {
     )
     suspend fun deleteReactionCountsByNoteId(noteId: String)
 
+
+
+    @Query(
+        """
+            DELETE FROM reaction_counts
+                WHERE id IN (:ids)
+        """
+    )
+    suspend fun deleteReactionCounts(ids: List<String>)
+
     // visible ids insert and delete
     @Transaction
     @Insert(onConflict = OnConflictStrategy.REPLACE)
@@ -167,6 +177,15 @@ interface NoteDAO {
     @Transaction
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertCustomEmojis(emojis: List<NoteCustomEmojiEntity>)
+
+    @Transaction
+    @Query(
+        """
+        DELETE FROM note_custom_emojis
+            WHERE id IN (:ids)
+        """
+    )
+    suspend fun deleteCustomEmojis(ids: List<String>)
 
     @Transaction
     @Query(

@@ -1,6 +1,7 @@
 package net.pantasystem.milktea.data.infrastructure.note.impl.sqlite
 
 import androidx.room.Transaction
+import androidx.room.withTransaction
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
@@ -13,6 +14,7 @@ import kotlinx.coroutines.withContext
 import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.common_android.hilt.DefaultDispatcher
 import net.pantasystem.milktea.common_android.hilt.IODispatcher
+import net.pantasystem.milktea.data.infrastructure.DataBase
 import net.pantasystem.milktea.model.AddResult
 import net.pantasystem.milktea.model.note.Note
 import net.pantasystem.milktea.model.note.NoteDataSource
@@ -25,7 +27,8 @@ import javax.inject.Inject
 class SQLiteNoteDataSource @Inject constructor(
     private val noteDAO: NoteDAO,
     @IODispatcher private val ioDispatcher: CoroutineDispatcher,
-    @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher
+    @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher,
+    private val database: DataBase,
 
 ) : NoteDataSource {
 
@@ -125,66 +128,63 @@ class SQLiteNoteDataSource @Inject constructor(
 
     @Transaction
     override suspend fun add(note: Note): Result<AddResult> = runCancellableCatching {
-        val dbId = NoteEntity.makeEntityId(note.id)
         val relationEntity = NoteWithRelation.fromModel(note)
         // exists check
         val existsEntity = withContext(ioDispatcher) {
             noteDAO.get(relationEntity.note.id)
         }
         val entity = relationEntity.note
-        withContext(ioDispatcher) {
-            if (existsEntity == null) {
-                noteDAO.insert(entity)
-            } else {
-                noteDAO.update(entity)
-            }
-        }
         val needInsert = existsEntity == null
         withContext(ioDispatcher) {
-            when (note.type) {
-                is Note.Type.Mastodon -> {
-                    if (needInsert) {
-                        relationEntity.mastodonMentions?.let {
-                            noteDAO.insertMastodonMentions(
-                                it
-                            )
+            database.withTransaction {
+                if (existsEntity == null) {
+                    noteDAO.insert(entity)
+                } else {
+                    noteDAO.update(entity)
+                }
+                when (note.type) {
+                    is Note.Type.Mastodon -> {
+                        if (needInsert) {
+                            relationEntity.mastodonMentions?.let {
+                                noteDAO.insertMastodonMentions(
+                                    it
+                                )
+                            }
+                            relationEntity.mastodonTags?.let {
+                                noteDAO.insertMastodonTags(
+                                    it
+                                )
+                            }
                         }
-                        relationEntity.mastodonTags?.let {
-                            noteDAO.insertMastodonTags(
-                                it
-                            )
-                        }
+                    }
+
+                    is Note.Type.Misskey -> Unit
+                }
+
+                if (needInsert) {
+                    relationEntity.noteFiles?.let {
+                        noteDAO.insertNoteFiles(it)
+                    }
+                    relationEntity.visibleUserIds?.let {
+                        noteDAO.insertVisibleIds(it)
                     }
                 }
 
-                is Note.Type.Misskey -> Unit
+                replaceReactionCountsIfNeed(
+                    relationEntity.reactionCounts?.associateBy { it.reaction } ?: emptyMap(),
+                    existsEntity?.reactionCounts?.associateBy { it.reaction } ?: emptyMap()
+                )
+                replaceCustomEmojisIfNeed(
+                    relationEntity.customEmojis ?: emptyList(),
+                    existsEntity?.customEmojis ?: emptyList()
+                )
+
+                replacePollChoicesIfNeed(
+                    relationEntity.pollChoices ?: emptyList(),
+                    existsEntity?.pollChoices ?: emptyList()
+                )
             }
 
-            if (!needInsert) {
-                // detach
-                noteDAO.deletePollChoicesByNoteId(dbId)
-                noteDAO.deleteCustomEmojisByNoteId(dbId)
-                noteDAO.deleteReactionCountsByNoteId(dbId)
-            } else {
-                relationEntity.noteFiles?.let {
-                    noteDAO.insertNoteFiles(it)
-                }
-                relationEntity.visibleUserIds?.let {
-                    noteDAO.insertVisibleIds(it)
-                }
-            }
-
-            relationEntity.reactionCounts?.let {
-                noteDAO.insertReactionCounts(it)
-            }
-
-            relationEntity.pollChoices?.let {
-                noteDAO.insertPollChoices(it)
-            }
-
-            relationEntity.customEmojis?.let {
-                noteDAO.insertCustomEmojis(it)
-            }
 
         }
 
@@ -266,6 +266,85 @@ class SQLiteNoteDataSource @Inject constructor(
                 it.on(ev)
             }
         }
+    }
+
+    private suspend fun replaceReactionCountsIfNeed(
+        reactionCountsMap: Map<String, ReactionCountEntity>,
+        existsNoteReactionCountMap: Map<String, ReactionCountEntity>,
+    ) {
+        val deleteList = existsNoteReactionCountMap.filter {
+            !reactionCountsMap.containsKey(it.key)
+        }.values.toList()
+
+        val updateOrInsertList = reactionCountsMap.mapNotNull { (key, value) ->
+            val exists = existsNoteReactionCountMap[key]
+            if (exists == null) {
+                value
+            } else {
+                if (exists != value) {
+                    value
+                } else {
+                    null
+                }
+            }
+        }
+
+        withContext(ioDispatcher) {
+            noteDAO.insertReactionCounts(updateOrInsertList)
+            noteDAO.deleteReactionCounts(deleteList.map { it.id })
+        }
+
+    }
+
+    private suspend fun replaceCustomEmojisIfNeed(
+        customEmojis: List<NoteCustomEmojiEntity>,
+        existsCustomEmojis: List<NoteCustomEmojiEntity>,
+    ) {
+        val deleteList = existsCustomEmojis.filter {
+            !customEmojis.contains(it)
+        }
+
+        val updateOrInsertList = customEmojis.mapNotNull { emoji ->
+            val exists = existsCustomEmojis.find {
+                it.id == emoji.id
+            }
+            if (exists == null) {
+                emoji
+            } else {
+                if (exists != emoji) {
+                    emoji
+                } else {
+                    null
+                }
+            }
+        }
+
+        withContext(ioDispatcher) {
+            noteDAO.insertCustomEmojis(updateOrInsertList)
+            noteDAO.deleteCustomEmojis(deleteList.map { it.id })
+        }
+    }
+
+    private suspend fun replacePollChoicesIfNeed(
+        pollChoices: List<NotePollChoiceEntity>,
+        existsPollChoices: List<NotePollChoiceEntity>,
+    ) {
+        // deleteの調整は必要ない
+        val updateOrInsertList = pollChoices.mapNotNull { choice ->
+            val exists = existsPollChoices.find {
+                it.id == choice.id
+            }
+            if (exists == null) {
+                choice
+            } else {
+                if (exists != choice) {
+                    choice
+                } else {
+                    null
+                }
+            }
+        }
+        noteDAO.insertPollChoices(updateOrInsertList)
     }
 
 }
