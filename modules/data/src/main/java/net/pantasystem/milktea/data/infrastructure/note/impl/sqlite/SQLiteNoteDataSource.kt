@@ -419,19 +419,20 @@ class SQLiteNoteDataSource @Inject constructor(
         val deleteList = existsNoteReactionCountMap.filter {
             !reactionCountsMap.containsKey(it.key)
         }.values.toList()
+        val insertList = reactionCountsMap.filter { (_, value) ->
+            value.id !in existsNoteReactionCountMap
+        }.values.toList()
 
-        val updateOrInsertList = reactionCountsMap.mapNotNull { (key, value) ->
-            val exists = existsNoteReactionCountMap[key]
-            if (exists == null || exists != value) {
-                value
-            } else {
-                null
-            }
-        }
+        val updateList = reactionCountsMap.filter { (_, value) ->
+            value.id in existsNoteReactionCountMap && value != existsNoteReactionCountMap[value.id]
+        }.values.toList()
 
         withContext(ioDispatcher) {
-            noteDAO.insertReactionCounts(updateOrInsertList)
+            noteDAO.insertReactionCounts(insertList)
             noteDAO.deleteReactionCounts(deleteList.map { it.id })
+            updateList.forEach {
+                noteDAO.updateReactionCount(it)
+            }
         }
 
     }

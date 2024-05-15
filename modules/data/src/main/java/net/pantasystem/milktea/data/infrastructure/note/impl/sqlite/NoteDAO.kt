@@ -139,6 +139,11 @@ interface NoteDAO {
     )
     suspend fun deleteReactionCountsByNoteId(noteId: String)
 
+    // delete reaction counts
+    @Transaction
+    @Update
+    suspend fun updateReactionCount(reactionCount: ReactionCountEntity)
+
 
 
     @Query(
