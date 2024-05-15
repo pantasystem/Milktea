@@ -220,8 +220,8 @@ class SQLiteNoteDataSource @Inject constructor(
             }.flatten().associateBy {
                 it.id
             }
-            val existsReactionCountsMap = noteRelations.mapNotNull {
-                it.reactionCounts
+            val existsReactionCountsMap = existsNotes.mapNotNull {
+                it.value.reactionCounts
             }.flatten().associateBy {
                 it.id
             }
@@ -231,8 +231,8 @@ class SQLiteNoteDataSource @Inject constructor(
             }.flatten().associateBy {
                 it.id
             }
-            val existsCustomEmojis = noteRelations.mapNotNull {
-                it.customEmojis
+            val existsCustomEmojis = existsNotes.mapNotNull {
+                it.value.customEmojis
             }.flatten().associateBy {
                 it.id
             }
@@ -240,8 +240,8 @@ class SQLiteNoteDataSource @Inject constructor(
             val pollChoices = noteRelations.mapNotNull {
                 it.pollChoices
             }.flatten()
-            val existsPollChoices = noteRelations.mapNotNull {
-                it.pollChoices
+            val existsPollChoices = existsNotes.mapNotNull {
+                it.value.pollChoices
             }.flatten()
 
             val mastodonNotes = needInsertNotes.filter {
@@ -422,14 +422,10 @@ class SQLiteNoteDataSource @Inject constructor(
 
         val updateOrInsertList = reactionCountsMap.mapNotNull { (key, value) ->
             val exists = existsNoteReactionCountMap[key]
-            if (exists == null) {
+            if (exists == null || exists != value) {
                 value
             } else {
-                if (exists != value) {
-                    value
-                } else {
-                    null
-                }
+                null
             }
         }
 
@@ -450,14 +446,10 @@ class SQLiteNoteDataSource @Inject constructor(
 
         val updateOrInsertList = customEmojis.mapNotNull { emoji ->
             val exists = existsCustomEmojis[emoji.key]
-            if (exists == null) {
+            if (exists == null || exists != emoji.value) {
                 emoji.value
             } else {
-                if (exists != emoji.value) {
-                    emoji.value
-                } else {
-                    null
-                }
+                null
             }
         }
 
@@ -476,14 +468,10 @@ class SQLiteNoteDataSource @Inject constructor(
             val exists = existsPollChoices.find {
                 it.id == choice.id
             }
-            if (exists == null) {
+            if (exists == null || exists != choice) {
                 choice
             } else {
-                if (exists != choice) {
-                    choice
-                } else {
-                    null
-                }
+                null
             }
         }
         noteDAO.insertPollChoices(updateOrInsertList)

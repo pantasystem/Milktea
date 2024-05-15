@@ -1,5 +1,6 @@
 package net.pantasystem.milktea.model.note.reaction
 
+import kotlinx.coroutines.delay
 import net.pantasystem.milktea.common.flatMapCancellableCatching
 import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.model.UseCase
@@ -86,6 +87,7 @@ class ToggleReactionUseCase @Inject constructor(
             // NOTE: Suggestionを表示するためにユーザのデータが必要になるので、キャッシュを更新しておく
             userRepository.sync(note.userId).getOrThrow()
         }.flatMapCancellableCatching {
+            delay(100)
             noteRepository.sync(noteId)
         }
     }
