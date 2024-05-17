@@ -18,7 +18,6 @@ import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.page.Pageable
 import net.pantasystem.milktea.model.account.page.SincePaginate
 import net.pantasystem.milktea.model.account.page.UntilPaginate
-import net.pantasystem.milktea.model.instance.InstanceInfoType
 import net.pantasystem.milktea.model.note.Note
 import net.pantasystem.milktea.model.note.timeline.TimelineRepository
 import net.pantasystem.milktea.model.note.timeline.TimelineType
@@ -27,9 +26,7 @@ import retrofit2.Response
 
 internal class TimelinePagingStoreImpl(
     private val pageableTimeline: Pageable,
-    private val noteAdder: NoteDataSourceAdder,
     private val getAccount: suspend () -> Account,
-    private val getCurrentInstanceInfo: suspend (String) -> InstanceInfoType?,
     private val getInitialLoadQuery: () -> InitialLoadQuery?,
     private val misskeyAPIProvider: MisskeyAPIProvider,
     private val timelineRepository: TimelineRepository,

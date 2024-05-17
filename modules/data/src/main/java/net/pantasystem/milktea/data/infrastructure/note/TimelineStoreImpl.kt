@@ -104,11 +104,7 @@ class TimelineStoreImpl(
             }
             else -> TimelinePagingStoreImpl(
                 pageableTimeline = pageableTimeline,
-                noteAdder = noteAdder,
                 getAccount = getAccount,
-                getCurrentInstanceInfo = {
-                    instanceInfoService.find(it).getOrNull()
-                },
                 getInitialLoadQuery = {
                     initialLoadQuery
                 },
