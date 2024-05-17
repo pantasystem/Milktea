@@ -197,13 +197,6 @@ class TimelineStoreImpl(
             this.initialLoadQuery = initialLoadQuery
             isActiveStreaming = initialLoadQuery == null
             pageableStore.setState(PageableState.Loading.Init())
-            timelineRepository.clear(
-                TimelineType(
-                    getAccount().accountId,
-                    pageableTimeline,
-                    pageId
-                )
-            )
         }
     }
 
