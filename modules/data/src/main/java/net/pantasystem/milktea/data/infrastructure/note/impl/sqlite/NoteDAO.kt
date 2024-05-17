@@ -259,6 +259,7 @@ interface NoteDAO {
                     AND notes.account_id = reply_chain.account_id
         )
         SELECT * FROM reply_chain
+        WHERE id <> :id
         ORDER BY created_at DESC
         """
     )
@@ -277,6 +278,7 @@ interface NoteDAO {
                     AND notes.account_id = parent_chain.account_id
         )
         SELECT * FROM parent_chain
+        WHERE id <> :id
         ORDER BY created_at DESC
         """
     )
