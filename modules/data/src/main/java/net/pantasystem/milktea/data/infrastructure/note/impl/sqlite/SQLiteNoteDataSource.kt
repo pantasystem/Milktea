@@ -30,7 +30,6 @@ class SQLiteNoteDataSource @Inject constructor(
     @IODispatcher private val ioDispatcher: CoroutineDispatcher,
     @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher,
     private val database: DataBase,
-    private val noteThreadDAO: NoteThreadDAO,
 ) : NoteDataSource {
 
     private var listeners = setOf<NoteDataSource.Listener>()
@@ -291,51 +290,6 @@ class SQLiteNoteDataSource @Inject constructor(
             }
         }
     }
-
-    override suspend fun addNoteThreadContext(
-        noteId: Note.Id,
-        context: NoteThreadContext
-    ): Result<Unit> {
-        return runCancellableCatching {
-            val entity = NoteThreadEntity(
-                id = NoteEntity.makeEntityId(noteId),
-                accountId = noteId.accountId,
-                targetNoteId = noteId.noteId
-            )
-            val exists = withContext(ioDispatcher) {
-                noteThreadDAO.select(entity.id)
-            }
-            withContext(ioDispatcher) {
-                if (exists == null) {
-                    noteThreadDAO.insert(entity)
-                } else {
-                    noteThreadDAO.update(entity)
-                    noteThreadDAO.detachAncestors(entity.id)
-                    noteThreadDAO.detachDescendants(entity.id)
-                }
-
-                noteThreadDAO.attachAncestors(context.ancestors.map {
-                    NoteAncestorEntity(
-                        threadId = entity.id,
-                        noteId = NoteEntity.makeEntityId(it.id)
-                    )
-                })
-                noteThreadDAO.attachDescendants(context.descendants.map {
-                    NoteDescendantEntity(
-                        threadId = entity.id,
-                        noteId = NoteEntity.makeEntityId(it.id)
-                    )
-                })
-            }
-        }
-    }
-
-    override suspend fun clearNoteThreadContext(noteId: Note.Id): Result<Unit> =
-        runCancellableCatching {
-            withContext(ioDispatcher) {
-                noteThreadDAO.delete(NoteEntity.makeEntityId(noteId))
-            }
-        }
 
     override suspend fun findNoteThreadContext(noteId: Note.Id): Result<NoteThreadContext> =
         runCancellableCatching {

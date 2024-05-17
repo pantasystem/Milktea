@@ -5,14 +5,31 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.asFlow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.mapNotNull
+import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.account.CurrentAccountWatcher
 import net.pantasystem.milktea.model.account.page.Pageable
-import net.pantasystem.milktea.model.note.*
+import net.pantasystem.milktea.model.note.GetShareNoteUrlUseCase
+import net.pantasystem.milktea.model.note.Note
+import net.pantasystem.milktea.model.note.NoteDataSource
+import net.pantasystem.milktea.model.note.NoteRelation
+import net.pantasystem.milktea.model.note.NoteRepository
+import net.pantasystem.milktea.model.note.NoteThreadContext
+import net.pantasystem.milktea.model.note.ReplyStreaming
 import net.pantasystem.milktea.note.viewmodel.PlaneNoteViewDataCache
 import javax.inject.Inject
 
@@ -103,24 +120,7 @@ class NoteDetailViewModel @Inject constructor(
         }
 
         viewModelScope.launch {
-            noteReplyStreaming.connect { currentAccountWatcher.getAccount() }.mapNotNull { reply ->
-                logger.debug {
-                    "reply:${reply.id}"
-                }
-                val account = currentAccountWatcher.getAccount()
-                val note = noteRepository.find(Note.Id(account.accountId, pageable.noteId))
-                    .getOrThrow()
-                val context = noteDataSource.findNoteThreadContext(note.id).getOrThrow()
-                val isRelatedReply = context.descendants.any {
-                    it.id == reply.id
-                } || note.id == reply.replyId
-                if (isRelatedReply) {
-                    val updatedContext = context.copy(
-                        descendants = context.descendants + reply
-                    )
-                    noteDataSource.addNoteThreadContext(note.id, updatedContext).getOrThrow()
-                }
-            }.catch {
+            noteReplyStreaming.connect { currentAccountWatcher.getAccount() }.catch {
                 logger.error("observe reply error", it)
             }.collect()
         }

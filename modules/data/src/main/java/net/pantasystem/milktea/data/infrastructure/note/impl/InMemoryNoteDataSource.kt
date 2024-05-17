@@ -181,11 +181,6 @@ class InMemoryNoteDataSource @Inject constructor(
         }
     }
 
-    override suspend fun addNoteThreadContext(
-        noteId: Note.Id,
-        context: NoteThreadContext
-    ): Result<Unit> = Result.success(Unit)
-
     override fun observeNoteThreadContext(noteId: Note.Id): Flow<NoteThreadContext?> {
         return emptyFlow()
     }
@@ -193,8 +188,6 @@ class InMemoryNoteDataSource @Inject constructor(
     override suspend fun findNoteThreadContext(noteId: Note.Id): Result<NoteThreadContext> = Result.success(
         NoteThreadContext(emptyList(), emptyList())
     )
-
-    override suspend fun clearNoteThreadContext(noteId: Note.Id): Result<Unit> = Result.success(Unit)
 
     private fun publish(ev: NoteDataSource.Event) = runBlocking {
         listenersLock.withLock {

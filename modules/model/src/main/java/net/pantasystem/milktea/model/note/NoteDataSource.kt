@@ -56,10 +56,6 @@ interface NoteDataSource {
     suspend fun addAll(notes: List<Note>): Result<List<AddResult>>
     suspend fun clear(): Result<Unit>
 
-    suspend fun addNoteThreadContext(noteId: Note.Id, context: NoteThreadContext): Result<Unit>
-
-    suspend fun clearNoteThreadContext(noteId: Note.Id): Result<Unit>
-
     suspend fun findNoteThreadContext(noteId: Note.Id): Result<NoteThreadContext>
 
     /**

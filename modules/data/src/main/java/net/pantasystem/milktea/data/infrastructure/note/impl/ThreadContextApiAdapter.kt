@@ -16,7 +16,6 @@ import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.account.GetAccount
 import net.pantasystem.milktea.model.note.Note
 import net.pantasystem.milktea.model.note.NoteDataSource
-import net.pantasystem.milktea.model.note.NoteThreadContext
 import javax.inject.Inject
 
 /**
@@ -82,18 +81,13 @@ class ThreadContextApiAdapterMastodonPattern @Inject constructor(
                 .throwIfHasError()
                 .body()
         )
-        val ancestors = body.ancestors.map {
+        body.ancestors.map {
             noteDataSourceAdder.addTootStatusDtoIntoDataSource(account, it)
         }
 
-        val descendants = body.descendants.map {
+        body.descendants.map {
             noteDataSourceAdder.addTootStatusDtoIntoDataSource(account, it)
         }
-        noteDataSource.clearNoteThreadContext(noteId)
-        noteDataSource.addNoteThreadContext(noteId, NoteThreadContext(
-            ancestors = ancestors,
-            descendants = descendants
-        ))
     }
 }
 
@@ -108,7 +102,7 @@ class ThreadContextApiAdapterMisskeyPattern @Inject constructor(
 ) : ThreadContextApiAdapter {
     override suspend fun syncThreadContext(noteId: Note.Id): Result<Unit> = runCancellableCatching {
         val account = getAccount.get(noteId.accountId)
-        val ancestors = requireNotNull(
+        requireNotNull(
             misskeyAPIProvider.get(account).conversation(
                 NoteRequest(
                     i = account.token,
@@ -118,12 +112,6 @@ class ThreadContextApiAdapterMisskeyPattern @Inject constructor(
         ).map {
             noteDataSourceAdder.addNoteDtoToDataSource(account, it)
         }
-        noteDataSource.clearNoteThreadContext(noteId)
-        noteDataSource.addNoteThreadContext(noteId, NoteThreadContext(
-            ancestors = ancestors,
-            descendants = emptyList()
-        )
-        )
         syncRecursiveThreadContext4Misskey(noteId, noteId)
     }
 
@@ -135,13 +123,6 @@ class ThreadContextApiAdapterMisskeyPattern @Inject constructor(
         val descendants = getMisskeyDescendants(targetNoteId).map {
             noteDataSourceAdder.addNoteDtoToDataSource(account, it)
         }
-        val threadContext = noteDataSource.findNoteThreadContext(targetNoteId).getOrThrow()
-        noteDataSource.addNoteThreadContext(
-            targetNoteId,
-            threadContext.copy(
-                descendants = threadContext.descendants + descendants
-            )
-        )
         coroutineScope {
             descendants.map { note ->
                 async {
