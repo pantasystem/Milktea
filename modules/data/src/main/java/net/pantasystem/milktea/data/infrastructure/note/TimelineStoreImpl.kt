@@ -108,7 +108,6 @@ class TimelineStoreImpl(
                 getInitialLoadQuery = {
                     initialLoadQuery
                 },
-                misskeyAPIProvider = misskeyAPIProvider,
                 timelineRepository = timelineRepository,
                 pageId = pageId,
             )
