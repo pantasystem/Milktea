@@ -99,7 +99,9 @@ class TimelineStoreImpl(
                     mastodonAPIProvider = mastodonAPIProvider,
                     getAccount = getAccount,
                     noteAdder = noteAdder,
-                    nodeInfoRepository = nodeInfoRepository
+                    nodeInfoRepository = nodeInfoRepository,
+                    timelineRepository = timelineRepository,
+                    pageId = pageId,
                 )
             }
             else -> TimelinePagingStoreImpl(

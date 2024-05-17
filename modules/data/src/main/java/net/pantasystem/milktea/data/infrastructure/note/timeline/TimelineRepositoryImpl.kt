@@ -71,8 +71,8 @@ class TimelineRepositoryImpl @Inject constructor(
                             limit
                         ).mapCancellableCatching { response ->
                             saveToCache(
-                                type.pageId!!,
-                                account.accountId,
+                                accountId = account.accountId,
+                                pageId = type.pageId!!,
                                 response.timelineItems.map { it.noteId },
                             )
                         }
@@ -92,7 +92,7 @@ class TimelineRepositoryImpl @Inject constructor(
             limit
         ).getOrThrow()
         if (type.canCache() && type.pageId != null && sinceDate == null) {
-            saveToCache(type.pageId!!, account.accountId, res.timelineItems.map { it.noteId })
+            saveToCache(accountId = account.accountId, pageId = type.pageId!!, res.timelineItems.map { it.noteId }).getOrThrow()
         }
 
         res
@@ -133,8 +133,8 @@ class TimelineRepositoryImpl @Inject constructor(
                             limit
                         ).mapCancellableCatching { response ->
                             saveToCache(
-                                type.pageId!!,
-                                account.accountId,
+                                accountId = account.accountId,
+                                pageId = type.pageId!!,
                                 response.timelineItems.map { it.noteId },
                             )
                         }
@@ -157,7 +157,7 @@ class TimelineRepositoryImpl @Inject constructor(
             limit
         ).getOrThrow()
         if (type.canCache() && type.pageId != null && untilDate == null) {
-            saveToCache(type.pageId!!, account.accountId, res.timelineItems.map { it.noteId })
+            saveToCache(accountId = account.accountId, pageId = type.pageId!!, res.timelineItems.map { it.noteId }).getOrThrow()
         }
 
         res
@@ -170,7 +170,7 @@ class TimelineRepositoryImpl @Inject constructor(
             }
 
             val account = accountRepository.get(type.accountId).getOrThrow()
-            saveToCache(type.pageId!!, account.accountId, listOf(noteId.noteId))
+            saveToCache(accountId = account.accountId, pageId = type.pageId!!, listOf(noteId.noteId))
         }
 
     override suspend fun clear(type: TimelineType): Result<Unit> = runCancellableCatching {
