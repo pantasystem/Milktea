@@ -248,7 +248,7 @@ internal class MastodonTimelineStorePagingStoreImpl(
                 api.getNotifications(
                     maxId = maxId,
                     types = listOf(MstNotificationDTO.NotificationType.Mention.value),
-                    excludeTypes = MstNotificationDTO.NotificationType.values()
+                    excludeTypes = MstNotificationDTO.NotificationType.entries
                         .filterNot { it == MstNotificationDTO.NotificationType.Mention }
                         .map { it.value },
                 ).throwIfHasError().also {

@@ -24,6 +24,7 @@ import net.pantasystem.milktea.data.infrastructure.note.impl.ThreadContextApiAda
 import net.pantasystem.milktea.data.infrastructure.note.impl.ThreadContextApiAdapterFactoryImpl
 import net.pantasystem.milktea.data.infrastructure.note.impl.sqlite.SQLiteNoteDataSource
 import net.pantasystem.milktea.data.infrastructure.note.renote.RenotesPagingServiceImpl
+import net.pantasystem.milktea.data.infrastructure.note.timeline.TimelineRepositoryImpl
 import net.pantasystem.milktea.model.note.NoteDataSource
 import net.pantasystem.milktea.model.note.NoteRepository
 import net.pantasystem.milktea.model.note.NoteStreaming
@@ -32,6 +33,7 @@ import net.pantasystem.milktea.model.note.TimelineScrollPositionRepository
 import net.pantasystem.milktea.model.note.draft.DraftNoteRepository
 import net.pantasystem.milktea.model.note.draft.DraftNoteService
 import net.pantasystem.milktea.model.note.repost.RenotesPagingService
+import net.pantasystem.milktea.model.note.timeline.TimelineRepository
 import javax.inject.Singleton
 
 @Module
@@ -75,6 +77,10 @@ abstract class NoteBindModule{
 
     @Binds
     internal abstract fun bindThreadContextApiAdapterFactory(impl: ThreadContextApiAdapterFactoryImpl): ThreadContextApiAdapter.Factory
+
+    @Binds
+    @Singleton
+    internal abstract fun bindTimelineRepository(impl: TimelineRepositoryImpl): TimelineRepository
 
 }
 

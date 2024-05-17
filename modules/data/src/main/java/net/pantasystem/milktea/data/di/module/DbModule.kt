@@ -157,4 +157,8 @@ object DbModule {
     @Provides
     @Singleton
     fun provideNoteThreadDao(db: DataBase) = db.noteThreadDAO()
+
+    @Provides
+    @Singleton
+    fun provideTimelineCacheDao(db: DataBase) = db.timelineCacheDAO()
 }

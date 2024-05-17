@@ -60,6 +60,8 @@ import net.pantasystem.milktea.data.infrastructure.note.reaction.impl.history.Re
 import net.pantasystem.milktea.data.infrastructure.note.reaction.impl.history.ReactionHistoryRecord
 import net.pantasystem.milktea.data.infrastructure.note.reaction.impl.usercustom.ReactionUserSetting
 import net.pantasystem.milktea.data.infrastructure.note.reaction.impl.usercustom.ReactionUserSettingDao
+import net.pantasystem.milktea.data.infrastructure.note.timeline.TimelineCacheDAO
+import net.pantasystem.milktea.data.infrastructure.note.timeline.TimelineItemEntity
 import net.pantasystem.milktea.data.infrastructure.note.wordmute.WordFilterConditionRecord
 import net.pantasystem.milktea.data.infrastructure.note.wordmute.WordFilterConditionRegexRecord
 import net.pantasystem.milktea.data.infrastructure.note.wordmute.WordFilterConditionWordRecord
@@ -162,8 +164,10 @@ import net.pantasystem.milktea.data.infrastructure.user.renote.mute.db.RenoteMut
         NoteThreadEntity::class,
         NoteAncestorEntity::class,
         NoteDescendantEntity::class,
+
+        TimelineItemEntity::class,
     ],
-    version = 63,
+    version = 64,
     exportSchema = true,
     autoMigrations = [
         AutoMigration(from = 11, to = 12),
@@ -216,6 +220,7 @@ import net.pantasystem.milktea.data.infrastructure.user.renote.mute.db.RenoteMut
         AutoMigration(from = 60, to = 61),
         AutoMigration(from = 61, to = 62),
         AutoMigration(from = 62, to = 63),
+        AutoMigration(from = 63, to = 64),
     ],
     views = [UserView::class, GroupMemberView::class, UserListMemberView::class]
 )
@@ -280,4 +285,6 @@ abstract class DataBase : RoomDatabase() {
     abstract fun noteDAO(): NoteDAO
 
     abstract fun noteThreadDAO(): NoteThreadDAO
+
+    abstract fun timelineCacheDAO(): TimelineCacheDAO
 }
