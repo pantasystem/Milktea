@@ -1,8 +1,6 @@
 package net.pantasystem.milktea.data.infrastructure.note.timeline
 
-import android.util.Log
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import net.pantasystem.milktea.api.mastodon.status.TootStatusDTO
 import net.pantasystem.milktea.api.misskey.notes.NoteDTO
@@ -21,6 +19,7 @@ import net.pantasystem.milktea.model.account.page.Pageable
 import net.pantasystem.milktea.model.nodeinfo.NodeInfo
 import net.pantasystem.milktea.model.nodeinfo.NodeInfoRepository
 import net.pantasystem.milktea.model.note.Note
+import net.pantasystem.milktea.model.note.NoteRepository
 import net.pantasystem.milktea.model.note.timeline.TimelineRepository
 import net.pantasystem.milktea.model.note.timeline.TimelineResponse
 import net.pantasystem.milktea.model.note.timeline.TimelineType
@@ -35,6 +34,7 @@ class TimelineRepositoryImpl @Inject constructor(
     private val timelineCacheDAO: TimelineCacheDAO,
     private val nodeInfoRepository: NodeInfoRepository,
     private val applicationScope: CoroutineScope,
+    private val noteRepository: NoteRepository,
 ) : TimelineRepository {
 
     override suspend fun findLaterTimeline(
@@ -120,24 +120,27 @@ class TimelineRepositoryImpl @Inject constructor(
             ).getOrThrow()
 
             if (inCache.timelineItems.size >= limit) {
-                coroutineScope {
-                    launch {
-                        if (type.canCache()) {
-                            fetchTimeline(
-                                account,
-                                type.pageable,
-                                untilId,
-                                null,
-                                null,
-                                null,
-                                limit
-                            ).mapCancellableCatching { response ->
-                                saveToCache(
-                                    type.pageId!!,
-                                    account.accountId,
-                                    response.timelineItems.map { it.noteId })
-                            }
+                applicationScope.launch {
+                    val lastItemId = inCache.timelineItems.lastOrNull()
+                    if (type.canCache()) {
+                        fetchTimeline(
+                            account,
+                            type.pageable,
+                            untilId ?: lastItemId?.noteId,
+                            null,
+                            null,
+                            null,
+                            limit
+                        ).mapCancellableCatching { response ->
+                            saveToCache(
+                                type.pageId!!,
+                                account.accountId,
+                                response.timelineItems.map { it.noteId },
+                            )
                         }
+                    }
+                    if (untilId == null && lastItemId != null) {
+                        noteRepository.sync(lastItemId)
                     }
                 }
                 return@runCancellableCatching inCache
@@ -153,7 +156,6 @@ class TimelineRepositoryImpl @Inject constructor(
             null,
             limit
         ).getOrThrow()
-        Log.d("TimelineRepositoryImpl", "findPreviousTimeline: ${res.timelineItems.size}, canCache: ${type.canCache()}, pageId: ${type.pageId}")
         if (type.canCache() && type.pageId != null && untilDate == null) {
             saveToCache(type.pageId!!, account.accountId, res.timelineItems.map { it.noteId })
         }
@@ -161,16 +163,17 @@ class TimelineRepositoryImpl @Inject constructor(
         res
     }
 
-    override suspend fun add(type: TimelineType, noteId: Note.Id): Result<Unit> = runCancellableCatching{
-        if (!type.canCache()) {
-            return@runCancellableCatching
+    override suspend fun add(type: TimelineType, noteId: Note.Id): Result<Unit> =
+        runCancellableCatching {
+            if (!type.canCache()) {
+                return@runCancellableCatching
+            }
+
+            val account = accountRepository.get(type.accountId).getOrThrow()
+            saveToCache(type.pageId!!, account.accountId, listOf(noteId.noteId))
         }
 
-        val account = accountRepository.get(type.accountId).getOrThrow()
-        saveToCache(type.pageId!!, account.accountId, listOf(noteId.noteId))
-    }
-
-    override suspend fun clear(type: TimelineType): Result<Unit> = runCancellableCatching{
+    override suspend fun clear(type: TimelineType): Result<Unit> = runCancellableCatching {
         if (!type.canCache()) {
             return@runCancellableCatching
         }
@@ -292,7 +295,7 @@ class TimelineRepositoryImpl @Inject constructor(
         minId: String?,
     ): Response<List<TootStatusDTO>> {
         val api = mastodonAPIFactory.build(account.normalizedInstanceUri, account.token)
-        return when(pageableTimeline) {
+        return when (pageableTimeline) {
             is Pageable.Mastodon.HashTagTimeline -> api.getHashtagTimeline(
                 pageableTimeline.hashtag,
                 maxId = maxId,
@@ -339,6 +342,7 @@ class TimelineRepositoryImpl @Inject constructor(
                     maxId = maxId,
                 )
             }
+
             else -> throw IllegalArgumentException("unknown class:${pageableTimeline.javaClass}")
         }
     }
@@ -349,7 +353,7 @@ class TimelineRepositoryImpl @Inject constructor(
         untilId: String?,
         sinceId: String?,
         limit: Int
-    ): Result<TimelineResponse> = runCancellableCatching{
+    ): Result<TimelineResponse> = runCancellableCatching {
         val localItems = when {
             untilId != null && sinceId != null -> {
                 timelineCacheDAO.getTimelineItemsUntilIdAndSinceId(
@@ -360,6 +364,7 @@ class TimelineRepositoryImpl @Inject constructor(
                     limit
                 )
             }
+
             untilId != null -> {
                 timelineCacheDAO.getTimelineItemsUntilId(
                     accountId,
@@ -368,6 +373,7 @@ class TimelineRepositoryImpl @Inject constructor(
                     limit
                 )
             }
+
             sinceId != null -> {
                 timelineCacheDAO.getTimelineItemsSinceId(
                     accountId,
@@ -376,6 +382,7 @@ class TimelineRepositoryImpl @Inject constructor(
                     limit
                 )
             }
+
             else -> {
                 timelineCacheDAO.getTimelineItems(
                     accountId,
@@ -385,7 +392,7 @@ class TimelineRepositoryImpl @Inject constructor(
             }
         }
         TimelineResponse(
-            localItems.map { Note.Id(it.accountId, it.noteId)},
+            localItems.map { Note.Id(it.accountId, it.noteId) },
             sinceId = localItems.firstOrNull()?.noteLocalId,
             untilId = localItems.lastOrNull()?.noteLocalId
         )
@@ -419,10 +426,6 @@ class TimelineRepositoryImpl @Inject constructor(
         )
     }
 
-    private fun Response<List<TootStatusDTO>>.getBodyOrFail(): List<TootStatusDTO> {
-        return requireNotNull(throwIfHasError().body())
-    }
-
     private suspend fun getVisibilitiesParameter(account: Account): List<String>? {
         val nodeInfo = nodeInfoRepository.find(account.getHost()).getOrNull() ?: return null
         return if (nodeInfo.type is NodeInfo.SoftwareType.Mastodon.Fedibird || nodeInfo.type is NodeInfo.SoftwareType.Mastodon.Kmyblue) {
@@ -437,7 +440,6 @@ class TimelineRepositoryImpl @Inject constructor(
                 || pageableTimeline is Pageable.Mastodon.UserTimeline
                 || pageableTimeline is Pageable.Mastodon.Mention
     }
-
 
 
 }
