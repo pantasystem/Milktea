@@ -249,19 +249,19 @@ class TimelineStoreImpl(
                         }
                     )
                 )
-                timelineRepository.add(
-                    TimelineType(
-                        getAccount().accountId,
-                        pageableTimeline,
-                        pageId
-                    ),
-                    noteId
-                )
+
                 if (added) {
                     latestReceiveId = noteId
                 }
-
             }
+            timelineRepository.add(
+                TimelineType(
+                    getAccount().accountId,
+                    pageableTimeline,
+                    pageId
+                ),
+                noteId
+            )
         }
     }
 
