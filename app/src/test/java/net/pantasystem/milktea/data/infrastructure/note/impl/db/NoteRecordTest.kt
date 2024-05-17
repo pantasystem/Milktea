@@ -51,7 +51,6 @@ internal class NoteRecordTest {
             fileIds = listOf(FileProperty.Id(0L, "fid1"), FileProperty.Id(0L, "fid2")),
             poll = null,
             myReaction = "like",
-            app = null,
             channelId = null,
             maxReactionsPerAccount = 4
         )
@@ -445,7 +444,6 @@ internal class NoteRecordTest {
                 pureText = "test note",
                 isReactionAvailable = true,
             ),
-            app = null,
             maxReactionsPerAccount = 3,
             emojiNameMap = emptyMap()
         )
@@ -472,7 +470,6 @@ internal class NoteRecordTest {
         Assertions.assertEquals(expectedNote.myReaction, actual.myReaction)
         Assertions.assertEquals(expectedNote.channelId, actual.channelId)
         Assertions.assertEquals(expectedNote.type, actual.type)
-        Assertions.assertEquals(expectedNote.app, actual.app)
         Assertions.assertEquals(expectedNote.maxReactionsPerAccount, actual.maxReactionsPerAccount)
 
 
