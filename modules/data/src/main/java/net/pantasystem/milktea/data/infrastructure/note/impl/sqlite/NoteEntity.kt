@@ -3,6 +3,7 @@ package net.pantasystem.milktea.data.infrastructure.note.impl.sqlite
 import androidx.room.ColumnInfo
 import androidx.room.Embedded
 import androidx.room.Entity
+import androidx.room.ForeignKey
 import androidx.room.Index
 import androidx.room.PrimaryKey
 import androidx.room.Relation
@@ -196,6 +197,18 @@ data class NoteEntity(
 
 @Entity(
     tableName = "reaction_counts",
+    foreignKeys = [
+        ForeignKey(
+            entity = NoteEntity::class,
+            parentColumns = ["id"],
+            childColumns = ["note_id"],
+            onDelete = ForeignKey.CASCADE,
+            onUpdate = ForeignKey.CASCADE,
+        )
+    ],
+    indices = [
+        Index("note_id")
+    ]
 )
 data class ReactionCountEntity(
     @PrimaryKey(autoGenerate = false)
@@ -222,7 +235,19 @@ data class ReactionCountEntity(
 
 @Entity(
     tableName = "note_visible_user_ids",
-    primaryKeys = ["note_id", "user_id"]
+    primaryKeys = ["note_id", "user_id"],
+    foreignKeys = [
+        ForeignKey(
+            entity = NoteEntity::class,
+            parentColumns = ["id"],
+            childColumns = ["note_id"],
+            onDelete = ForeignKey.CASCADE,
+            onUpdate = ForeignKey.CASCADE,
+        )
+    ],
+    indices = [
+        Index("note_id")
+    ],
 )
 data class NoteVisibleUserIdEntity(
     @ColumnInfo(name = "note_id")
@@ -234,6 +259,18 @@ data class NoteVisibleUserIdEntity(
 
 @Entity(
     tableName = "note_poll_choices",
+    foreignKeys = [
+        ForeignKey(
+            entity = NoteEntity::class,
+            parentColumns = ["id"],
+            childColumns = ["note_id"],
+            onDelete = ForeignKey.CASCADE,
+            onUpdate = ForeignKey.CASCADE,
+        )
+    ],
+    indices = [
+        Index("note_id")
+    ]
 )
 data class NotePollChoiceEntity(
     @PrimaryKey(autoGenerate = false)
@@ -263,7 +300,19 @@ data class NotePollChoiceEntity(
 
 @Entity(
     tableName = "mastodon_tags",
-    primaryKeys = ["note_id", "tag"]
+    primaryKeys = ["note_id", "tag"],
+    foreignKeys = [
+        ForeignKey(
+            entity = NoteEntity::class,
+            parentColumns = ["id"],
+            childColumns = ["note_id"],
+            onDelete = ForeignKey.CASCADE,
+            onUpdate = ForeignKey.CASCADE,
+        )
+    ],
+    indices = [
+        Index("note_id")
+    ]
 )
 data class MastodonTagEntity(
     @ColumnInfo(name = "note_id")
@@ -278,7 +327,19 @@ data class MastodonTagEntity(
 
 @Entity(
     tableName = "mastodon_mentions",
-    primaryKeys = ["note_id", "user_id"]
+    primaryKeys = ["note_id", "user_id"],
+    foreignKeys = [
+        ForeignKey(
+            entity = NoteEntity::class,
+            parentColumns = ["id"],
+            childColumns = ["note_id"],
+            onDelete = ForeignKey.CASCADE,
+            onUpdate = ForeignKey.CASCADE,
+        )
+    ],
+    indices = [
+        Index("note_id")
+    ]
 )
 data class MastodonMentionEntity(
     @ColumnInfo(name = "note_id")
@@ -311,6 +372,15 @@ data class MastodonMentionEntity(
 
 @Entity(
     tableName = "note_custom_emojis",
+    foreignKeys = [
+        ForeignKey(
+            entity = NoteEntity::class,
+            parentColumns = ["id"],
+            childColumns = ["note_id"],
+            onDelete = ForeignKey.CASCADE,
+            onUpdate = ForeignKey.CASCADE,
+        )
+    ],
     indices = [
         Index("note_id")
     ]
@@ -339,6 +409,7 @@ data class NoteCustomEmojiEntity(
         fun makeId(noteId: String, name: String): String {
             return "$noteId:$name"
         }
+
         fun fromModel(model: CustomEmoji, noteId: String): NoteCustomEmojiEntity {
             return NoteCustomEmojiEntity(
                 id = makeId(noteId, model.name),
@@ -363,7 +434,19 @@ data class NoteCustomEmojiEntity(
 
 @Entity(
     tableName = "note_files",
-    primaryKeys = ["note_id", "file_id"]
+    primaryKeys = ["note_id", "file_id"],
+    foreignKeys = [
+        ForeignKey(
+            entity = NoteEntity::class,
+            parentColumns = ["id"],
+            childColumns = ["note_id"],
+            onDelete = ForeignKey.CASCADE,
+            onUpdate = ForeignKey.CASCADE,
+        )
+    ],
+    indices = [
+        Index("note_id")
+    ],
 )
 data class NoteFileEntity(
     @ColumnInfo(name = "note_id")
@@ -486,6 +569,7 @@ data class NoteWithRelation(
                     pureText = note.mastodonPureText,
                     isReactionAvailable = note.mastodonIsReactionAvailable ?: false,
                 )
+
                 "misskey" -> Note.Type.Misskey(
                     channel = note.channelId?.let {
                         Note.Type.Misskey.SimpleChannelInfo(
@@ -494,9 +578,11 @@ data class NoteWithRelation(
                         )
                     },
                     isAcceptingOnlyLikeReaction = note.misskeyIsAcceptingOnlyLikeReaction ?: false,
-                    isNotAcceptingSensitiveReaction = note.misskeyIsNotAcceptingSensitiveReaction ?: false,
+                    isNotAcceptingSensitiveReaction = note.misskeyIsNotAcceptingSensitiveReaction
+                        ?: false,
                     isRequireNyaize = note.misskeyIsRequireNyaize ?: false,
                 )
+
                 else -> Note.Type.Misskey()
             },
             maxReactionsPerAccount = note.maxReactionPerAccount,
@@ -510,7 +596,10 @@ data class NoteWithRelation(
                 note = NoteEntity.fromModel(model),
                 reactionCounts = model.reactionCounts.map {
                     ReactionCountEntity(
-                        id = ReactionCountEntity.makeId(NoteEntity.makeEntityId(model.id), it.reaction),
+                        id = ReactionCountEntity.makeId(
+                            NoteEntity.makeEntityId(model.id),
+                            it.reaction
+                        ),
                         noteId = NoteEntity.makeEntityId(model.id),
                         reaction = it.reaction,
                         count = it.count,
@@ -530,7 +619,10 @@ data class NoteWithRelation(
                         text = it.text,
                         votes = it.votes,
                         isVoted = it.isVoted,
-                        id = NotePollChoiceEntity.makeId(NoteEntity.makeEntityId(model.id), it.index)
+                        id = NotePollChoiceEntity.makeId(
+                            NoteEntity.makeEntityId(model.id),
+                            it.index
+                        )
                     )
                 },
                 mastodonTags = (model.type as? Note.Type.Mastodon)?.tags?.map {
