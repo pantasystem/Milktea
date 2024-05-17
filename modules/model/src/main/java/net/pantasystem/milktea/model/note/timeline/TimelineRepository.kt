@@ -29,6 +29,16 @@ interface TimelineRepository {
         limit: Int = 10,
     ): Result<TimelineResponse>
 
+    // 先頭に要素を追加するためのメソッド
+    suspend fun add(
+        type: TimelineType,
+        noteId: Note.Id,
+    ): Result<Unit>
+
+    suspend fun clear(
+        type: TimelineType,
+    ): Result<Unit>
+
 }
 
 data class TimelineResponse(

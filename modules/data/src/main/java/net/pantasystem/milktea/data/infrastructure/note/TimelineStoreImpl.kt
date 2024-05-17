@@ -26,6 +26,7 @@ import net.pantasystem.milktea.model.instance.InstanceInfoService
 import net.pantasystem.milktea.model.nodeinfo.NodeInfoRepository
 import net.pantasystem.milktea.model.note.Note
 import net.pantasystem.milktea.model.note.timeline.TimelineRepository
+import net.pantasystem.milktea.model.note.timeline.TimelineType
 import javax.inject.Inject
 
 
@@ -196,6 +197,13 @@ class TimelineStoreImpl(
             this.initialLoadQuery = initialLoadQuery
             isActiveStreaming = initialLoadQuery == null
             pageableStore.setState(PageableState.Loading.Init())
+            timelineRepository.clear(
+                TimelineType(
+                    getAccount().accountId,
+                    pageableTimeline,
+                    pageId
+                )
+            )
         }
     }
 
@@ -250,6 +258,14 @@ class TimelineStoreImpl(
                             }
                         }
                     )
+                )
+                timelineRepository.add(
+                    TimelineType(
+                        getAccount().accountId,
+                        pageableTimeline,
+                        pageId
+                    ),
+                    noteId
                 )
                 if (added) {
                     latestReceiveId = noteId

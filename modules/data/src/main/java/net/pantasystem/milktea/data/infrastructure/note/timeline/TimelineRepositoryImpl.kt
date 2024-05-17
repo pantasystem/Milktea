@@ -1,6 +1,7 @@
 package net.pantasystem.milktea.data.infrastructure.note.timeline
 
 import android.util.Log
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import net.pantasystem.milktea.api.mastodon.status.TootStatusDTO
@@ -33,6 +34,7 @@ class TimelineRepositoryImpl @Inject constructor(
     private val accountRepository: AccountRepository,
     private val timelineCacheDAO: TimelineCacheDAO,
     private val nodeInfoRepository: NodeInfoRepository,
+    private val applicationScope: CoroutineScope,
 ) : TimelineRepository {
 
     override suspend fun findLaterTimeline(
@@ -57,24 +59,22 @@ class TimelineRepositoryImpl @Inject constructor(
             ).getOrThrow()
 
             if (inCache.timelineItems.size >= limit) {
-                coroutineScope {
-                    launch {
-                        if (type.canCache()) {
-                            fetchTimeline(
-                                account,
-                                type.pageable,
-                                null,
-                                sinceId,
-                                null,
-                                sinceDate,
-                                limit
-                            ).mapCancellableCatching { response ->
-                                saveToCache(
-                                    type.pageId!!,
-                                    account.accountId,
-                                    response.timelineItems.map { it.noteId },
-                                )
-                            }
+                applicationScope.launch {
+                    if (type.canCache()) {
+                        fetchTimeline(
+                            account,
+                            type.pageable,
+                            null,
+                            sinceId,
+                            null,
+                            null,
+                            limit
+                        ).mapCancellableCatching { response ->
+                            saveToCache(
+                                type.pageId!!,
+                                account.accountId,
+                                response.timelineItems.map { it.noteId },
+                            )
                         }
                     }
                 }
@@ -159,6 +159,22 @@ class TimelineRepositoryImpl @Inject constructor(
         }
 
         res
+    }
+
+    override suspend fun add(type: TimelineType, noteId: Note.Id): Result<Unit> = runCancellableCatching{
+        if (!type.canCache()) {
+            return@runCancellableCatching
+        }
+
+        val account = accountRepository.get(type.accountId).getOrThrow()
+        saveToCache(type.pageId!!, account.accountId, listOf(noteId.noteId))
+    }
+
+    override suspend fun clear(type: TimelineType): Result<Unit> = runCancellableCatching{
+        if (!type.canCache()) {
+            return@runCancellableCatching
+        }
+        timelineCacheDAO.clear(type.accountId, type.pageId!!)
     }
 
     private suspend fun fetchTimeline(

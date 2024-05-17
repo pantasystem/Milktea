@@ -81,4 +81,14 @@ interface TimelineCacheDAO {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertAll(items: List<TimelineItemEntity>)
+
+    // clear
+    @Query(
+        """
+        DELETE FROM timeline_item
+        WHERE account_id = :accountId
+        AND page_id = :pageId
+        """
+    )
+    suspend fun clear(accountId: Long, pageId: Long)
 }
