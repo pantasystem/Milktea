@@ -225,6 +225,9 @@ data class ReactionCountEntity(
 
     @ColumnInfo(name = "me")
     val me: Boolean,
+
+    @ColumnInfo(name = "weight")
+    val weight: Int?,
 ) {
     companion object {
         fun makeId(noteId: String, reaction: String): String {
@@ -526,7 +529,9 @@ data class NoteWithRelation(
             url = note.url,
             uri = note.uri,
             renoteCount = note.repostCount,
-            reactionCounts = reactionCounts?.map {
+            reactionCounts = reactionCounts?.sortedBy {
+                it.weight
+            }?.map {
                 ReactionCount(it.reaction, it.count, it.me)
             } ?: emptyList(),
             emojis = emojis,
@@ -594,16 +599,17 @@ data class NoteWithRelation(
         fun fromModel(model: Note): NoteWithRelation {
             return NoteWithRelation(
                 note = NoteEntity.fromModel(model),
-                reactionCounts = model.reactionCounts.map {
+                reactionCounts = model.reactionCounts.mapIndexed { index, reactionCount ->
                     ReactionCountEntity(
                         id = ReactionCountEntity.makeId(
                             NoteEntity.makeEntityId(model.id),
-                            it.reaction
+                            reactionCount.reaction
                         ),
                         noteId = NoteEntity.makeEntityId(model.id),
-                        reaction = it.reaction,
-                        count = it.count,
-                        me = it.me,
+                        reaction = reactionCount.reaction,
+                        count = reactionCount.count,
+                        me = reactionCount.me,
+                        weight = index
                     )
                 },
                 visibleUserIds = model.visibleUserIds?.map {
