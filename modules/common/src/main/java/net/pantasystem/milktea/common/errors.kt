@@ -1,7 +1,6 @@
 package net.pantasystem.milktea.common
 
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 import retrofit2.Response
 
@@ -21,7 +20,7 @@ data class Error(
 sealed interface ErrorType {
     data class Misskey(val error: Error) : ErrorType {
         val errorCodeeType: MisskeyErrorCodes? by lazy {
-            MisskeyErrorCodes.values().find { it.code == error.error.code }
+            MisskeyErrorCodes.entries.find { it.code == error.error.code }
         }
     }
     data class Raw(val body: String) : ErrorType
