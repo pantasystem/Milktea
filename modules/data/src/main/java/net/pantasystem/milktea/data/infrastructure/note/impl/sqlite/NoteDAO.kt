@@ -211,5 +211,76 @@ interface NoteDAO {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertNoteFiles(files: List<NoteFileEntity>)
 
+    // with recursive reply
+    @Query(
+        """
+        WITH RECURSIVE reply_chain AS (
+            SELECT * FROM notes
+                WHERE id = :id
+            UNION ALL
+            SELECT notes.* FROM notes
+                JOIN reply_chain ON notes.reply_id = reply_chain.note_id
+                    AND notes.account_id = reply_chain.account_id
+        )
+        SELECT * FROM reply_chain
+        ORDER BY created_at DESC
+        """
+    )
+    @Transaction
+    suspend fun getWithRecursiveReply(id: String): List<NoteWithRelation>
+
+    // with recursive parents
+    @Query(
+        """
+        WITH RECURSIVE parent_chain AS (
+            SELECT * FROM notes
+                WHERE id = :id
+            UNION ALL
+            SELECT notes.* FROM notes
+                JOIN parent_chain ON notes.note_id = parent_chain.reply_id
+                    AND notes.account_id = parent_chain.account_id
+        )
+        SELECT * FROM parent_chain
+        ORDER BY created_at DESC
+        """
+    )
+    @Transaction
+    suspend fun getWithRecursiveParents(id: String): List<NoteWithRelation>
+
+    // observe with recursive reply
+    @Query(
+        """
+        WITH RECURSIVE reply_chain AS (
+            SELECT * FROM notes
+                WHERE id = :id
+            UNION ALL
+            SELECT notes.* FROM notes
+                JOIN reply_chain ON notes.reply_id = reply_chain.note_id
+                    AND notes.account_id = reply_chain.account_id
+        )
+        SELECT * FROM reply_chain
+        ORDER BY created_at DESC
+        """
+    )
+    @Transaction
+    fun observeWithRecursiveReply(id: String): Flow<List<NoteWithRelation>>
+
+    // observe with recursive parents
+    @Query(
+        """
+        WITH RECURSIVE parent_chain AS (
+            SELECT * FROM notes
+                WHERE id = :id
+            UNION ALL
+            SELECT notes.* FROM notes
+                JOIN parent_chain ON notes.note_id = parent_chain.reply_id
+                    AND notes.account_id = parent_chain.account_id
+        )
+        SELECT * FROM parent_chain
+        ORDER BY created_at DESC
+        """
+    )
+    @Transaction
+    fun observeWithRecursiveParents(id: String): Flow<List<NoteWithRelation>>
 
 }
