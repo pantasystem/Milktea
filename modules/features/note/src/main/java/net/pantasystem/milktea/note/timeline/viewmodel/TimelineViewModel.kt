@@ -39,6 +39,8 @@ import net.pantasystem.milktea.model.account.page.Pageable
 import net.pantasystem.milktea.model.note.Note
 import net.pantasystem.milktea.model.note.NoteStreaming
 import net.pantasystem.milktea.model.note.TimelineScrollPositionRepository
+import net.pantasystem.milktea.model.note.timeline.TimelineRepository
+import net.pantasystem.milktea.model.note.timeline.TimelineType
 import net.pantasystem.milktea.model.setting.LocalConfigRepository
 import net.pantasystem.milktea.note.timeline.viewmodel.filter.ExcludeIfExistsSensitiveMediaFilter
 import net.pantasystem.milktea.note.timeline.viewmodel.filter.ExcludeRepostOrReplyFilter
@@ -55,6 +57,7 @@ class TimelineViewModel @AssistedInject constructor(
     planeNoteViewDataCacheFactory: PlaneNoteViewDataCache.Factory,
     private val configRepository: LocalConfigRepository,
     private val timelineScrollPositionRepository: TimelineScrollPositionRepository,
+    private val timelineRepository: TimelineRepository,
     @Assisted val accountId: AccountId?,
     @Assisted val pageId: PageId?,
     @Assisted val pageable: Pageable,
@@ -225,6 +228,20 @@ class TimelineViewModel @AssistedInject constructor(
                 timelineScrollPositionRepository.get(it)
             }?.takeIf {
                 !ignoreSavedScrollPosition
+            }
+
+            if (ignoreSavedScrollPosition || !isSaveScrollPosition && pageId != null) {
+                try {
+                    timelineRepository.clear(
+                        TimelineType(
+                            accountId = currentAccountWatcher.getAccount().accountId,
+                            pageable = pageable,
+                            pageId = pageId?.value
+                        )
+                    ).getOrThrow()
+                } catch (e: Exception) {
+                    logger.error("clear timeline failed", e)
+                }
             }
 
             timelineStore.clear(initialUntilDate?.let {
