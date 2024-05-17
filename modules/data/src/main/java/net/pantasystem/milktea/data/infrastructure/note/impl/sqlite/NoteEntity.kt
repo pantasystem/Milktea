@@ -540,7 +540,7 @@ data class NoteWithRelation(
                     multiple = note.pollMultiple!!,
                     choices = pollChoices.map {
                         Poll.Choice(it.index, it.text, it.votes, it.isVoted)
-                    }
+                    }.sortedBy { it.index }
                 )
             },
             myReaction = reactionCounts?.firstOrNull { it.me }?.reaction,
