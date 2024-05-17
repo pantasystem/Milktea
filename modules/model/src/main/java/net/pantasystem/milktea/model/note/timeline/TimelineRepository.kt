@@ -94,7 +94,7 @@ data class TimelineType(
             return false
         }
         return when (pageable) {
-            is Pageable.Antenna -> false
+            is Pageable.Antenna -> true
             Pageable.CalckeyRecommendedTimeline -> true
             is Pageable.ChannelTimeline -> true
             is Pageable.ClipNotes -> false
