@@ -1,11 +1,30 @@
 package net.pantasystem.milktea.note.timeline.viewmodel
 
-import androidx.lifecycle.*
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewModelScope
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
-import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.shareIn
+import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.plus
 import kotlinx.datetime.Instant
 import net.pantasystem.milktea.app_store.account.AccountStore
 import net.pantasystem.milktea.app_store.notes.InitialLoadQuery
@@ -69,7 +88,7 @@ class TimelineViewModel @AssistedInject constructor(
     )
 
     val timelineStore: TimelineStore =
-        timelineStoreFactory.create(pageable, viewModelScope, currentAccountWatcher::getAccount)
+        timelineStoreFactory.create(pageable, viewModelScope, currentAccountWatcher::getAccount, pageId?.value)
 
     private val timelineFilterService by lazy {
         timelineFilterServiceFactory.create(pageable)

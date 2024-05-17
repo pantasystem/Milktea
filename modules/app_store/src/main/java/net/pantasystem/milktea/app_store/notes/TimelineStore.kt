@@ -11,7 +11,7 @@ import net.pantasystem.milktea.model.note.Note
 
 interface TimelineStore {
     interface Factory {
-        fun create(pageable: Pageable, coroutineScope: CoroutineScope, getAccount: suspend () -> Account): TimelineStore
+        fun create(pageable: Pageable, coroutineScope: CoroutineScope, getAccount: suspend () -> Account, pageId: Long? = null,): TimelineStore
     }
 
     val timelineState: Flow<PageableState<List<Note.Id>>>

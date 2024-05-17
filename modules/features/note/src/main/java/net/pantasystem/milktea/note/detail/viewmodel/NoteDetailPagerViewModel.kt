@@ -180,9 +180,9 @@ class TimelineStoreHolder(
     private val scope: CoroutineScope,
     private val getAccount: suspend () -> Account,
 ) {
-    var timelineStore = timelineStoreFactory.create(pageable, scope) {
+    var timelineStore = timelineStoreFactory.create(pageable, scope,  {
         getAccount()
-    }
+    })
         private set
 
     fun setPageable(pageable: Pageable) {

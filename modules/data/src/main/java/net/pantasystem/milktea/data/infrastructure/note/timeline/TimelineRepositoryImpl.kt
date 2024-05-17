@@ -1,5 +1,6 @@
 package net.pantasystem.milktea.data.infrastructure.note.timeline
 
+import android.util.Log
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import net.pantasystem.milktea.api.mastodon.status.TootStatusDTO
@@ -18,6 +19,7 @@ import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.account.page.Pageable
 import net.pantasystem.milktea.model.nodeinfo.NodeInfo
 import net.pantasystem.milktea.model.nodeinfo.NodeInfoRepository
+import net.pantasystem.milktea.model.note.Note
 import net.pantasystem.milktea.model.note.timeline.TimelineRepository
 import net.pantasystem.milktea.model.note.timeline.TimelineResponse
 import net.pantasystem.milktea.model.note.timeline.TimelineType
@@ -151,6 +153,7 @@ class TimelineRepositoryImpl @Inject constructor(
             null,
             limit
         ).getOrThrow()
+        Log.d("TimelineRepositoryImpl", "findPreviousTimeline: ${res.timelineItems.size}, canCache: ${type.canCache()}, pageId: ${type.pageId}")
         if (type.canCache() && type.pageId != null && untilDate == null) {
             saveToCache(type.pageId!!, account.accountId, res.timelineItems.map { it.noteId })
         }
@@ -178,7 +181,9 @@ class TimelineRepositoryImpl @Inject constructor(
                     sinceDate,
                     limit,
                 ).getOrThrow()
-                val notes = noteDataSourceAdder.addNoteDtoListToDataSource(account, res)
+                val notes = noteDataSourceAdder.addNoteDtoListToDataSource(account, res.filter {
+                    it.promotionId == null || it.tmpFeaturedId == null
+                })
                 val ids = notes.sortedByDescending {
                     it.noteId
                 }
@@ -328,8 +333,8 @@ class TimelineRepositoryImpl @Inject constructor(
         untilId: String?,
         sinceId: String?,
         limit: Int
-    ): Result<TimelineResponse> {
-        when {
+    ): Result<TimelineResponse> = runCancellableCatching{
+        val localItems = when {
             untilId != null && sinceId != null -> {
                 timelineCacheDAO.getTimelineItemsUntilIdAndSinceId(
                     accountId,
@@ -363,7 +368,12 @@ class TimelineRepositoryImpl @Inject constructor(
                 )
             }
         }
-        TODO()
+        TimelineResponse(
+            localItems.map { Note.Id(it.accountId, it.noteId)},
+            sinceId = localItems.firstOrNull()?.noteLocalId,
+            untilId = localItems.lastOrNull()?.noteLocalId
+        )
+
     }
 
 

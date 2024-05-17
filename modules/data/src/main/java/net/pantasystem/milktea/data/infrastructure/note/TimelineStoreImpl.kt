@@ -25,6 +25,7 @@ import net.pantasystem.milktea.model.account.page.Pageable
 import net.pantasystem.milktea.model.instance.InstanceInfoService
 import net.pantasystem.milktea.model.nodeinfo.NodeInfoRepository
 import net.pantasystem.milktea.model.note.Note
+import net.pantasystem.milktea.model.note.timeline.TimelineRepository
 import javax.inject.Inject
 
 
@@ -32,6 +33,7 @@ const val LIMIT = 10
 const val REMOVE_DIFF_COUNT = 20
 
 class TimelineStoreImpl(
+    private val pageId: Long?,
     private val pageableTimeline: Pageable,
     private val noteAdder: NoteDataSourceAdder,
     private val getAccount: suspend () -> Account,
@@ -40,6 +42,7 @@ class TimelineStoreImpl(
     private val mastodonAPIProvider: MastodonAPIProvider,
     private val nodeInfoRepository: NodeInfoRepository,
     private val instanceInfoService: InstanceInfoService,
+    private val timelineRepository: TimelineRepository,
 ) : TimelineStore {
 
     class Factory @Inject constructor(
@@ -48,13 +51,16 @@ class TimelineStoreImpl(
         private val mastodonAPIProvider: MastodonAPIProvider,
         private val nodeInfoRepository: NodeInfoRepository,
         private val instanceInfoService: InstanceInfoService,
+        private val timelineRepository: TimelineRepository,
     ) : TimelineStore.Factory {
         override fun create(
             pageable: Pageable,
             coroutineScope: CoroutineScope,
-            getAccount: suspend () -> Account
+            getAccount: suspend () -> Account,
+            pageId: Long?,
         ): TimelineStore {
             return TimelineStoreImpl(
+                pageId,
                 pageable,
                 noteAdder,
                 getAccount,
@@ -62,7 +68,8 @@ class TimelineStoreImpl(
                 coroutineScope,
                 mastodonAPIProvider,
                 nodeInfoRepository = nodeInfoRepository,
-                instanceInfoService = instanceInfoService
+                instanceInfoService = instanceInfoService,
+                timelineRepository = timelineRepository
             )
         }
     }
@@ -105,6 +112,8 @@ class TimelineStoreImpl(
                     initialLoadQuery
                 },
                 misskeyAPIProvider = misskeyAPIProvider,
+                timelineRepository = timelineRepository,
+                pageId = pageId,
             )
         }
     }

@@ -80,7 +80,7 @@ data class TimelineType(
         if (!isAllowPageable()) {
             return false
         }
-        if (pageId != null) {
+        if (pageId == null) {
             return false
         }
         return when (pageable) {

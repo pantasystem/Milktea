@@ -13,7 +13,6 @@ import net.pantasystem.milktea.common.paginator.FutureLoader
 import net.pantasystem.milktea.common.paginator.IdGetter
 import net.pantasystem.milktea.common.paginator.PreviousLoader
 import net.pantasystem.milktea.common.runCancellableCatching
-import net.pantasystem.milktea.common.throwIfHasError
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.page.Pageable
@@ -21,6 +20,8 @@ import net.pantasystem.milktea.model.account.page.SincePaginate
 import net.pantasystem.milktea.model.account.page.UntilPaginate
 import net.pantasystem.milktea.model.instance.InstanceInfoType
 import net.pantasystem.milktea.model.note.Note
+import net.pantasystem.milktea.model.note.timeline.TimelineRepository
+import net.pantasystem.milktea.model.note.timeline.TimelineType
 import retrofit2.Response
 
 
@@ -31,7 +32,9 @@ internal class TimelinePagingStoreImpl(
     private val getCurrentInstanceInfo: suspend (String) -> InstanceInfoType?,
     private val getInitialLoadQuery: () -> InitialLoadQuery?,
     private val misskeyAPIProvider: MisskeyAPIProvider,
-) : EntityConverter<NoteDTO, Note.Id>, PreviousLoader<NoteDTO>, FutureLoader<NoteDTO>,
+    private val timelineRepository: TimelineRepository,
+    private val pageId: Long? = null,
+) : EntityConverter<Note.Id, Note.Id>, PreviousLoader<Note.Id>, FutureLoader<Note.Id>,
     IdGetter<Note.Id>, TimelinePagingBase, StreamingReceivableStore {
 
     private val _state =
@@ -53,31 +56,29 @@ internal class TimelinePagingStoreImpl(
         }
     }
 
-    override suspend fun loadPrevious(): Result<List<NoteDTO>> {
+    override suspend fun loadPrevious(): Result<List<Note.Id>> {
         return runCancellableCatching {
             val untilId = getUntilId()?.noteId
             if (pageableTimeline !is UntilPaginate && untilId != null) {
                 return@runCancellableCatching emptyList()
             }
-            val builder = NoteRequest.Builder(
-                i = getAccount.invoke().token,
-                pageable = pageableTimeline,
-                limit = LIMIT
-            )
             val initialLoadQuery = getInitialLoadQuery.invoke()
             val untilDate = (initialLoadQuery as? InitialLoadQuery.UntilDate)?.date
-            val req = builder.build(
-                NoteRequest.Conditions(
-                    untilId = untilId
-                        ?: (initialLoadQuery as? InitialLoadQuery.UntilId)?.noteId?.noteId,
-                    untilDate = if (untilId == null) untilDate?.toEpochMilliseconds() else null,
-                )
-            )
-            getStore()!!.invoke(req).throwIfHasError().body()!!
+            timelineRepository.findPreviousTimeline(
+                TimelineType(
+                    getAccount.invoke().accountId,
+                    pageableTimeline,
+                    pageId,
+                ),
+                untilId = untilId
+                    ?: (initialLoadQuery as? InitialLoadQuery.UntilId)?.noteId?.noteId,
+                untilDate = if (untilId == null) untilDate?.toEpochMilliseconds() else null,
+            ).getOrThrow().timelineItems
+
         }
     }
 
-    override suspend fun loadFuture(): Result<List<NoteDTO>> {
+    override suspend fun loadFuture(): Result<List<Note.Id>> {
         return runCancellableCatching {
             if (pageableTimeline !is SincePaginate) {
                 return@runCancellableCatching emptyList()
@@ -96,21 +97,21 @@ internal class TimelinePagingStoreImpl(
             // FuturePagingControllerではasReverseする処理を行っている。
             // しかしMisskey側の変更によって[5, 4, 3, 2, 1]という順番で取得されるようになったため、
             // sortedByをして、ソート順が変わっても対応できるようにしている。
-            getStore()!!.invoke(req).throwIfHasError().body()!!.sortedBy {
-                it.id
+            timelineRepository.findLaterTimeline(
+                TimelineType(
+                    getAccount.invoke().accountId,
+                    pageableTimeline,
+                    pageId,
+                ),
+                sinceId = getSinceId()?.noteId,
+            ).getOrThrow().timelineItems.sortedBy {
+                it.noteId
             }
         }
     }
 
-    override suspend fun convertAll(list: List<NoteDTO>): List<Note.Id> {
-        val info = getCurrentInstanceInfo(getAccount().normalizedInstanceUri)
-        return noteAdder.addNoteDtoListToDataSource(
-            getAccount.invoke(),
-            list.filter {
-                it.promotionId == null || it.tmpFeaturedId == null
-            },
-            instanceType = info
-        )
+    override suspend fun convertAll(list: List<Note.Id>): List<Note.Id> {
+        return list
     }
 
     override fun getState(): PageableState<List<Note.Id>> {

@@ -12,7 +12,10 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.*
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.flowWithLifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.whenResumed
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.wada811.databinding.dataBinding
@@ -37,7 +40,11 @@ import net.pantasystem.milktea.model.setting.DefaultConfig
 import net.pantasystem.milktea.model.setting.LocalConfigRepository
 import net.pantasystem.milktea.note.R
 import net.pantasystem.milktea.note.databinding.FragmentTimelineBinding
-import net.pantasystem.milktea.note.timeline.viewmodel.*
+import net.pantasystem.milktea.note.timeline.viewmodel.AccountId
+import net.pantasystem.milktea.note.timeline.viewmodel.PageId
+import net.pantasystem.milktea.note.timeline.viewmodel.TimeMachineEventViewModel
+import net.pantasystem.milktea.note.timeline.viewmodel.TimelineViewModel
+import net.pantasystem.milktea.note.timeline.viewmodel.provideViewModel
 import net.pantasystem.milktea.note.view.NoteCardActionHandler
 import net.pantasystem.milktea.note.viewmodel.NotesViewModel
 import javax.inject.Inject
@@ -91,6 +98,8 @@ class TimelineFragment : Fragment(R.layout.fragment_timeline), PageableView {
                 AccountId(it)
             },
             pageId = mPage?.pageId?.let {
+                PageId(it)
+            } ?: pageId?.let {
                 PageId(it)
             },
             pageable = mPageable,
