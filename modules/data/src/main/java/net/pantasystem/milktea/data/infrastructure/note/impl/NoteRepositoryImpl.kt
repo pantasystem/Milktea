@@ -8,6 +8,8 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.withContext
 import net.pantasystem.milktea.common.APIError
+import net.pantasystem.milktea.common.ErrorType
+import net.pantasystem.milktea.common.MisskeyErrorCodes
 import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.common_android.hilt.IODispatcher
 import net.pantasystem.milktea.data.infrastructure.note.NoteDataSourceAdder
@@ -90,6 +92,13 @@ class NoteRepositoryImpl @Inject constructor(
                 // NOTE(pantasystem): 削除フラグが立つようになり次からNoteDeletedExceptionが投げられる
                 noteDataSource.delete(noteId)
                 throw NoteNotFoundException(noteId)
+            } catch (e: APIError.ClientException) {
+                // NOTE: Misskeyの場合、削除されたノートはstatusCode=400でerrorCodeで識別する必要性がある💢
+                if ((e.error as? ErrorType.Misskey)?.errorCodeeType == MisskeyErrorCodes.NoSuchNote) {
+                    noteDataSource.delete(noteId)
+                    throw NoteNotFoundException(noteId)
+                }
+                throw e
             }
             note
         }
@@ -171,7 +180,20 @@ class NoteRepositoryImpl @Inject constructor(
     override suspend fun sync(noteId: Note.Id): Result<Unit> = runCancellableCatching {
         withContext(ioDispatcher) {
             val account = getAccount.get(noteId.accountId)
-            convertAndAdd(account, noteApiAdapterFactory.create(account).showNote(noteId))
+            try {
+                convertAndAdd(account, noteApiAdapterFactory.create(account).showNote(noteId))
+            } catch (e: APIError.NotFoundException) {
+            // NOTE(pantasystem): 削除フラグが立つようになり次からNoteDeletedExceptionが投げられる
+                noteDataSource.delete(noteId)
+                throw NoteNotFoundException(noteId)
+            } catch (e: APIError.ClientException) {
+            // NOTE: Misskeyの場合、削除されたノートはstatusCode=400でerrorCodeで識別する必要性がある💢
+                if ((e.error as? ErrorType.Misskey)?.errorCodeeType == MisskeyErrorCodes.NoSuchNote) {
+                    noteDataSource.delete(noteId)
+                    throw NoteNotFoundException(noteId)
+                }
+                throw e
+            }
         }
     }
 
