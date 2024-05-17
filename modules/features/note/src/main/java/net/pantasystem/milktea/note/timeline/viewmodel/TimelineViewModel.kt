@@ -230,7 +230,7 @@ class TimelineViewModel @AssistedInject constructor(
                 !ignoreSavedScrollPosition
             }
 
-            if (ignoreSavedScrollPosition || !isSaveScrollPosition && pageId != null) {
+            if (ignoreSavedScrollPosition || !isSaveScrollPosition) {
                 try {
                     timelineRepository.clear(
                         TimelineType(
