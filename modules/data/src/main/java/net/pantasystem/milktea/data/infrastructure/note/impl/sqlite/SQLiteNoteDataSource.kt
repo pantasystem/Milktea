@@ -196,32 +196,12 @@ class SQLiteNoteDataSource @Inject constructor(
 
     override suspend fun addAll(notes: List<Note>): Result<List<AddResult>> =
         runCancellableCatching {
-            val existsNotes = withContext(ioDispatcher) {
-                noteDAO.getIn(notes.map {
-                    NoteEntity.makeEntityId(it.id)
-                })
-            }.associateBy {
-                it.note.id
-            }
             val noteRelations = notes.map {
                 NoteWithRelation.fromModel(it)
             }
 
-            val needInsertNotes = noteRelations.filter {
-                existsNotes[it.note.id] == null
-            }
-
-            val needUpdateNotes = noteRelations.filter {
-                existsNotes[it.note.id] != null
-            }
-
             val reactionCountsMap = noteRelations.mapNotNull {
                 it.reactionCounts
-            }.flatten().associateBy {
-                it.id
-            }
-            val existsReactionCountsMap = existsNotes.mapNotNull {
-                it.value.reactionCounts
             }.flatten().associateBy {
                 it.id
             }
@@ -231,34 +211,57 @@ class SQLiteNoteDataSource @Inject constructor(
             }.flatten().associateBy {
                 it.id
             }
-            val existsCustomEmojis = existsNotes.mapNotNull {
-                it.value.customEmojis
-            }.flatten().associateBy {
-                it.id
-            }
 
             val pollChoices = noteRelations.mapNotNull {
                 it.pollChoices
             }.flatten()
-            val existsPollChoices = existsNotes.mapNotNull {
-                it.value.pollChoices
-            }.flatten()
-
-            val mastodonNotes = needInsertNotes.filter {
-                it.note.type == "mastodon"
-            }
-            val mastodonMentions = mastodonNotes.mapNotNull {
-                it.mastodonMentions
-            }.flatten()
-            val mastodonTags = mastodonNotes.mapNotNull {
-                it.mastodonTags
-            }.flatten()
-            val noteFiles = needInsertNotes.mapNotNull {
-                it.noteFiles
-            }.flatten()
 
             withContext(ioDispatcher) {
                 database.withTransaction {
+                    val existsNotes = noteDAO.getIn(
+                        notes.map {
+                            NoteEntity.makeEntityId(it.id)
+                        },
+                    ).associateBy {
+                        it.note.id
+                    }
+
+                    val needInsertNotes = noteRelations.filter {
+                        existsNotes[it.note.id] == null
+                    }
+
+                    val needUpdateNotes = noteRelations.filter {
+                        existsNotes[it.note.id] != null
+                    }
+                    val existsReactionCountsMap = existsNotes.mapNotNull {
+                        it.value.reactionCounts
+                    }.flatten().associateBy {
+                        it.id
+                    }
+
+                    val existsPollChoices = existsNotes.mapNotNull {
+                        it.value.pollChoices
+                    }.flatten()
+
+                    val mastodonNotes = needInsertNotes.filter {
+                        it.note.type == "mastodon"
+                    }
+                    val mastodonMentions = mastodonNotes.mapNotNull {
+                        it.mastodonMentions
+                    }.flatten()
+                    val mastodonTags = mastodonNotes.mapNotNull {
+                        it.mastodonTags
+                    }.flatten()
+                    val noteFiles = needInsertNotes.mapNotNull {
+                        it.noteFiles
+                    }.flatten()
+
+                    val existsCustomEmojis = existsNotes.mapNotNull {
+                        it.value.customEmojis
+                    }.flatten().associateBy {
+                        it.id
+                    }
+
                     noteDAO.insertAll(needInsertNotes.map { it.note })
                     needUpdateNotes.forEach {
                         noteDAO.update(it.note)
@@ -272,13 +275,13 @@ class SQLiteNoteDataSource @Inject constructor(
                     noteDAO.insertMastodonMentions(mastodonMentions)
                     noteDAO.insertMastodonTags(mastodonTags)
                     noteDAO.insertNoteFiles(noteFiles)
-                }
-            }
 
-            val results = noteRelations.map {
-                if (existsNotes[it.note.id] == null) AddResult.Created else AddResult.Updated
+                    noteRelations.map {
+                        if (existsNotes[it.note.id] == null) AddResult.Created else AddResult.Updated
+                    }
+                }
+
             }
-            results
         }
 
     override suspend fun clear(): Result<Unit> {
@@ -329,26 +332,30 @@ class SQLiteNoteDataSource @Inject constructor(
         }
     }
 
-    override suspend fun clearNoteThreadContext(noteId: Note.Id): Result<Unit> = runCancellableCatching{
-        withContext(ioDispatcher) {
-            noteThreadDAO.delete(NoteEntity.makeEntityId(noteId))
+    override suspend fun clearNoteThreadContext(noteId: Note.Id): Result<Unit> =
+        runCancellableCatching {
+            withContext(ioDispatcher) {
+                noteThreadDAO.delete(NoteEntity.makeEntityId(noteId))
+            }
         }
-    }
 
-    override suspend fun findNoteThreadContext(noteId: Note.Id): Result<NoteThreadContext> = runCancellableCatching {
-        withContext(ioDispatcher) {
-            val entity = noteThreadDAO.selectWithRelation(NoteEntity.makeEntityId(noteId))
-                ?: return@withContext NoteThreadContext(
-                    ancestors = emptyList(),
-                    descendants = emptyList()
+    override suspend fun findNoteThreadContext(noteId: Note.Id): Result<NoteThreadContext> =
+        runCancellableCatching {
+            withContext(ioDispatcher) {
+                val entity = noteThreadDAO.selectWithRelation(NoteEntity.makeEntityId(noteId))
+                    ?: return@withContext NoteThreadContext(
+                        ancestors = emptyList(),
+                        descendants = emptyList()
+                    )
+
+                NoteThreadContext(
+                    ancestors = noteDAO.getIn(entity.ancestors.map { it.noteId })
+                        .map { it.toModel() },
+                    descendants = noteDAO.getIn(entity.descendants.map { it.noteId })
+                        .map { it.toModel() }
                 )
-
-            NoteThreadContext(
-                ancestors = noteDAO.getIn(entity.ancestors.map { it.noteId }).map { it.toModel() },
-                descendants = noteDAO.getIn(entity.descendants.map { it.noteId }).map { it.toModel() }
-            )
+            }
         }
-    }
 
     override suspend fun deleteByUserId(userId: User.Id): Result<Int> = runCancellableCatching {
         val count = withContext(ioDispatcher) {
@@ -379,23 +386,25 @@ class SQLiteNoteDataSource @Inject constructor(
 
     @OptIn(ExperimentalCoroutinesApi::class)
     override fun observeNoteThreadContext(noteId: Note.Id): Flow<NoteThreadContext?> {
-        return noteThreadDAO.observeWithRelation(NoteEntity.makeEntityId(noteId)).flowOn(ioDispatcher).flatMapLatest { relation ->
-            val ids = (relation?.ancestors?.map { it.noteId } ?: emptyList()) + (relation?.descendants?.map { it.noteId } ?: emptyList())
-            combine(noteDAO.observeByIds(ids)) { array ->
-                val map = array.toList().flatten().associateBy {
-                    it.note.id
-                }
-                NoteThreadContext(
-                    ancestors = (relation?.ancestors ?: emptyList()).mapNotNull {
-                        map[it.noteId]?.toModel()
-                    },
-                    descendants = (relation?.descendants ?: emptyList()).mapNotNull {
-                        map[it.noteId]?.toModel()
+        return noteThreadDAO.observeWithRelation(NoteEntity.makeEntityId(noteId))
+            .flowOn(ioDispatcher).flatMapLatest { relation ->
+                val ids = (relation?.ancestors?.map { it.noteId }
+                    ?: emptyList()) + (relation?.descendants?.map { it.noteId } ?: emptyList())
+                combine(noteDAO.observeByIds(ids)) { array ->
+                    val map = array.toList().flatten().associateBy {
+                        it.note.id
                     }
-                )
-            }
+                    NoteThreadContext(
+                        ancestors = (relation?.ancestors ?: emptyList()).mapNotNull {
+                            map[it.noteId]?.toModel()
+                        },
+                        descendants = (relation?.descendants ?: emptyList()).mapNotNull {
+                            map[it.noteId]?.toModel()
+                        }
+                    )
+                }
 
-        }
+            }
     }
 
     override suspend fun findLocalCount(): Result<Long> = runCancellableCatching {

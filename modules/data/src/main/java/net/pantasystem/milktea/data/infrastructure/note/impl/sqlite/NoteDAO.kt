@@ -116,7 +116,7 @@ interface NoteDAO {
 
     // insert notes
     @Transaction
-    @Insert()
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insertAll(notes: List<NoteEntity>)
 
     // update
