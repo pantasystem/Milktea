@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 64,
-    "identityHash": "0a5a9b8f4119c2df9f23f591b02dd8f6",
+    "identityHash": "5f90e8bbb683a28ad35fc18907b1ff33",
     "entities": [
       {
         "tableName": "reaction_history",
@@ -4126,6 +4126,15 @@
             ],
             "orders": [],
             "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_timeline_item_account_id_page_id_note_id` ON `${TABLE_NAME}` (`account_id`, `page_id`, `note_id`)"
+          },
+          {
+            "name": "index_timeline_item_note_id",
+            "unique": false,
+            "columnNames": [
+              "note_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_timeline_item_note_id` ON `${TABLE_NAME}` (`note_id`)"
           }
         ],
         "foreignKeys": [
@@ -4159,7 +4168,7 @@
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '0a5a9b8f4119c2df9f23f591b02dd8f6')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '5f90e8bbb683a28ad35fc18907b1ff33')"
     ]
   }
 }

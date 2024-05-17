@@ -39,7 +39,7 @@ class TimelineStoreImpl(
     private val noteAdder: NoteDataSourceAdder,
     private val getAccount: suspend () -> Account,
     private val misskeyAPIProvider: MisskeyAPIProvider,
-    coroutineScope: CoroutineScope,
+    private val coroutineScope: CoroutineScope,
     private val mastodonAPIProvider: MastodonAPIProvider,
     private val nodeInfoRepository: NodeInfoRepository,
     private val instanceInfoService: InstanceInfoService,

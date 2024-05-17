@@ -10,7 +10,8 @@ import net.pantasystem.milktea.data.infrastructure.note.impl.sqlite.NoteEntity
 @Entity(
     tableName = "timeline_item",
     indices = [
-        Index(value = ["account_id", "page_id", "note_id"], unique = true)
+        Index(value = ["account_id", "page_id", "note_id"], unique = true),
+        Index(value = ["note_id"]),
     ],
     foreignKeys = [
         ForeignKey(
@@ -18,7 +19,7 @@ import net.pantasystem.milktea.data.infrastructure.note.impl.sqlite.NoteEntity
             parentColumns = ["id"],
             childColumns = ["note_local_id"],
         )
-    ]
+    ],
 )
 data class TimelineItemEntity(
     @ColumnInfo(name = "account_id")
