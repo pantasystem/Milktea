@@ -39,6 +39,13 @@ interface TimelineRepository {
         type: TimelineType,
     ): Result<Unit>
 
+    suspend fun findFirstLaterId(
+        type: TimelineType,
+    ): Result<String?>
+
+    suspend fun findLastPreviousId(
+        type: TimelineType,
+    ): Result<String?>
 }
 
 data class TimelineResponse(

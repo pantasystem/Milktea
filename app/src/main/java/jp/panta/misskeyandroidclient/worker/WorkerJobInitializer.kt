@@ -10,6 +10,7 @@ import net.pantasystem.milktea.worker.drive.CleanupUnusedCacheWorker
 import net.pantasystem.milktea.worker.emoji.cache.CacheCustomEmojiImageWorker
 import net.pantasystem.milktea.worker.filter.SyncMastodonFilterWorker
 import net.pantasystem.milktea.worker.meta.SyncMetaWorker
+import net.pantasystem.milktea.worker.note.SyncTimelineWorker
 import net.pantasystem.milktea.worker.sw.RegisterAllSubscriptionRegistration
 import net.pantasystem.milktea.worker.user.SyncLoggedInUserInfoWorker
 import net.pantasystem.milktea.worker.user.renote.mute.SyncRenoteMutesWorker
@@ -55,6 +56,9 @@ class WorkerJobInitializer @Inject constructor(
                 CacheCustomEmojiImageWorker.createPeriodicWorkRequest(),
             )
 
+            enqueue(
+                SyncTimelineWorker.createOneTimeWorkRequest()
+            )
             enqueue(
                 SyncRenoteMutesWorker.createOneTimeWorkRequest()
             )

@@ -5,6 +5,7 @@ import kotlinx.coroutines.launch
 import net.pantasystem.milktea.api.mastodon.status.TootStatusDTO
 import net.pantasystem.milktea.api.misskey.notes.NoteDTO
 import net.pantasystem.milktea.api.misskey.notes.NoteRequest
+import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.common.MastodonLinkHeaderDecoder
 import net.pantasystem.milktea.common.mapCancellableCatching
 import net.pantasystem.milktea.common.runCancellableCatching
@@ -35,7 +36,12 @@ class TimelineRepositoryImpl @Inject constructor(
     private val nodeInfoRepository: NodeInfoRepository,
     private val applicationScope: CoroutineScope,
     private val noteRepository: NoteRepository,
+    private val loggerFactory: Logger.Factory,
 ) : TimelineRepository {
+
+    private val logger by lazy {
+        loggerFactory.create("TimelineRepository")
+    }
 
     override suspend fun findLaterTimeline(
         type: TimelineType,
@@ -58,6 +64,9 @@ class TimelineRepositoryImpl @Inject constructor(
                 limit
             ).getOrThrow()
 
+            logger.debug {
+                "findLaterTimeline: inCache.size=${inCache.timelineItems.size} limit=$limit"
+            }
             if (inCache.timelineItems.size >= limit) {
                 applicationScope.launch {
                     if (type.canCache()) {
@@ -74,7 +83,9 @@ class TimelineRepositoryImpl @Inject constructor(
                                 accountId = account.accountId,
                                 pageId = type.pageId!!,
                                 response.timelineItems.map { it.noteId },
-                            )
+                            ).getOrThrow()
+                        }.onFailure {
+                            logger.error("failed sync timeline to cache", it)
                         }
                     }
                 }
@@ -119,6 +130,9 @@ class TimelineRepositoryImpl @Inject constructor(
                 limit
             ).getOrThrow()
 
+            logger.debug {
+                "findPreviousTimeline: inCache.size=${inCache.timelineItems.size} limit=$limit"
+            }
             if (inCache.timelineItems.size >= limit) {
                 applicationScope.launch {
                     val lastItemId = inCache.timelineItems.lastOrNull()
@@ -136,7 +150,9 @@ class TimelineRepositoryImpl @Inject constructor(
                                 accountId = account.accountId,
                                 pageId = type.pageId!!,
                                 response.timelineItems.map { it.noteId },
-                            )
+                            ).getOrThrow()
+                        }.onFailure {
+                            logger.error("failed sync timeline to cache", it)
                         }
                     }
                     if (untilId == null && lastItemId != null) {
@@ -178,6 +194,20 @@ class TimelineRepositoryImpl @Inject constructor(
             return@runCancellableCatching
         }
         timelineCacheDAO.clear(type.accountId, type.pageId!!)
+    }
+
+    override suspend fun findFirstLaterId(type: TimelineType): Result<String?> = runCancellableCatching {
+        if (!type.canCache()) {
+            return@runCancellableCatching null
+        }
+        timelineCacheDAO.findFirstLaterId(type.accountId, type.pageId!!)
+    }
+
+    override suspend fun findLastPreviousId(type: TimelineType): Result<String?> = runCancellableCatching {
+        if (!type.canCache()) {
+            return@runCancellableCatching null
+        }
+        timelineCacheDAO.findLastPreviousId(type.accountId, type.pageId!!)
     }
 
     private suspend fun fetchTimeline(

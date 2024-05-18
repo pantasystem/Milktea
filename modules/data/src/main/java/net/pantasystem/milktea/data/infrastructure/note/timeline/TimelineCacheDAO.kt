@@ -91,4 +91,28 @@ interface TimelineCacheDAO {
         """
     )
     suspend fun clear(accountId: Long, pageId: Long)
+
+    // last previous id
+    @Query(
+        """
+        SELECT note_id FROM timeline_item
+        WHERE account_id = :accountId
+        AND page_id = :pageId
+        ORDER BY note_id ASC
+        LIMIT 1
+        """
+    )
+    suspend fun findLastPreviousId(accountId: Long, pageId: Long): String?
+
+    // first later id
+    @Query(
+        """
+        SELECT note_id FROM timeline_item
+        WHERE account_id = :accountId
+        AND page_id = :pageId
+        ORDER BY note_id DESC
+        LIMIT 1
+        """
+    )
+    suspend fun findFirstLaterId(accountId: Long, pageId: Long): String?
 }
