@@ -59,9 +59,9 @@ internal class MastodonTimelineStorePagingStoreImpl(
                 return@runCancellableCatching emptyList()
             }
         }
-        when (pageableTimeline) {
 
-            is Pageable.Mastodon.HashTagTimeline -> timelineRepository.findLaterTimeline(
+        suspend fun findLater(): List<Note.Id> {
+            return timelineRepository.findLaterTimeline(
                 TimelineType(
                     accountId = getAccount().accountId,
                     pageable = pageableTimeline,
@@ -70,48 +70,10 @@ internal class MastodonTimelineStorePagingStoreImpl(
                 sinceId = minId,
                 limit = 20
             ).getOrThrow().timelineItems
+        }
 
-            is Pageable.Mastodon.HomeTimeline -> timelineRepository.findLaterTimeline(
-                TimelineType(
-                    accountId = getAccount().accountId,
-                    pageable = pageableTimeline,
-                    pageId = pageId,
-                ),
-                sinceId = minId,
-                limit = 20
-            ).getOrThrow().timelineItems
-
-            is Pageable.Mastodon.ListTimeline -> timelineRepository.findLaterTimeline(
-                TimelineType(
-                    accountId = getAccount().accountId,
-                    pageable = pageableTimeline,
-                    pageId = pageId,
-                ),
-                sinceId = minId,
-                limit = 20
-            ).getOrThrow().timelineItems
-
-            is Pageable.Mastodon.LocalTimeline -> timelineRepository.findLaterTimeline(
-                TimelineType(
-                    accountId = getAccount().accountId,
-                    pageable = pageableTimeline,
-                    pageId = pageId,
-                ),
-                sinceId = minId,
-                limit = 20
-            ).getOrThrow().timelineItems
-
-            is Pageable.Mastodon.PublicTimeline -> timelineRepository.findLaterTimeline(
-                TimelineType(
-                    accountId = getAccount().accountId,
-                    pageable = pageableTimeline,
-                    pageId = pageId,
-                ),
-                sinceId = minId,
-                limit = 20
-            ).getOrThrow().timelineItems
-
-            is Pageable.Mastodon.UserTimeline -> timelineRepository.findLaterTimeline(
+        suspend fun findLaterAndUpdateMinId(): List<Note.Id> {
+            return timelineRepository.findLaterTimeline(
                 TimelineType(
                     accountId = getAccount().accountId,
                     pageable = pageableTimeline,
@@ -122,21 +84,16 @@ internal class MastodonTimelineStorePagingStoreImpl(
             ).getOrThrow().also {
                 updateMinIdFrom(it)
             }.timelineItems
+        }
 
-            Pageable.Mastodon.BookmarkTimeline -> {
-                timelineRepository.findLaterTimeline(
-                    TimelineType(
-                        accountId = getAccount().accountId,
-                        pageable = pageableTimeline,
-                        pageId = pageId,
-                    ),
-                    sinceId = minId,
-                    limit = 20
-                ).getOrThrow().also {
-                    updateMinIdFrom(it)
-                }.timelineItems
-            }
-
+        when (pageableTimeline) {
+            is Pageable.Mastodon.HashTagTimeline -> findLater()
+            is Pageable.Mastodon.HomeTimeline -> findLater()
+            is Pageable.Mastodon.ListTimeline -> findLater()
+            is Pageable.Mastodon.LocalTimeline -> findLater()
+            is Pageable.Mastodon.PublicTimeline -> findLater()
+            is Pageable.Mastodon.UserTimeline -> findLaterAndUpdateMinId()
+            Pageable.Mastodon.BookmarkTimeline -> findLaterAndUpdateMinId()
             is Pageable.Mastodon.SearchTimeline -> {
                 return@runCancellableCatching emptyList()
             }
@@ -210,8 +167,8 @@ internal class MastodonTimelineStorePagingStoreImpl(
             }
         }
 
-        when (pageableTimeline) {
-            is Pageable.Mastodon.HashTagTimeline -> timelineRepository.findPreviousTimeline(
+        suspend fun findPrevious(): List<Note.Id> {
+            return timelineRepository.findPreviousTimeline(
                 TimelineType(
                     accountId = getAccount().accountId,
                     pageable = pageableTimeline,
@@ -220,48 +177,10 @@ internal class MastodonTimelineStorePagingStoreImpl(
                 untilId = maxId,
                 limit = 20
             ).getOrThrow().timelineItems
+        }
 
-            is Pageable.Mastodon.HomeTimeline -> timelineRepository.findPreviousTimeline(
-                TimelineType(
-                    accountId = getAccount().accountId,
-                    pageable = pageableTimeline,
-                    pageId = pageId,
-                ),
-                untilId = maxId,
-                limit = 20
-            ).getOrThrow().timelineItems
-
-            is Pageable.Mastodon.ListTimeline -> timelineRepository.findPreviousTimeline(
-                TimelineType(
-                    accountId = getAccount().accountId,
-                    pageable = pageableTimeline,
-                    pageId = pageId,
-                ),
-                untilId = maxId,
-                limit = 20
-            ).getOrThrow().timelineItems
-
-            is Pageable.Mastodon.LocalTimeline -> timelineRepository.findPreviousTimeline(
-                TimelineType(
-                    accountId = getAccount().accountId,
-                    pageable = pageableTimeline,
-                    pageId = pageId,
-                ),
-                untilId = maxId,
-                limit = 20
-            ).getOrThrow().timelineItems
-
-            is Pageable.Mastodon.PublicTimeline -> timelineRepository.findPreviousTimeline(
-                TimelineType(
-                    accountId = getAccount().accountId,
-                    pageable = pageableTimeline,
-                    pageId = null
-                ),
-                untilId = maxId,
-                limit = 20
-            ).getOrThrow().timelineItems
-
-            is Pageable.Mastodon.UserTimeline -> timelineRepository.findPreviousTimeline(
+        suspend fun findPreviousAndUpdateMinId(): List<Note.Id> {
+            return timelineRepository.findPreviousTimeline(
                 TimelineType(
                     accountId = getAccount().accountId,
                     pageable = pageableTimeline,
@@ -272,20 +191,16 @@ internal class MastodonTimelineStorePagingStoreImpl(
             ).getOrThrow().also {
                 updateMaxIdFrom(it)
             }.timelineItems
+        }
 
-            Pageable.Mastodon.BookmarkTimeline -> {
-                timelineRepository.findPreviousTimeline(
-                    TimelineType(
-                        accountId = getAccount().accountId,
-                        pageable = pageableTimeline,
-                        pageId = pageId,
-                    ),
-                    untilId = maxId,
-                    limit = 20
-                ).getOrThrow().also {
-                    updateMaxIdFrom(it)
-                }.timelineItems
-            }
+        when (pageableTimeline) {
+            is Pageable.Mastodon.HashTagTimeline -> findPrevious()
+            is Pageable.Mastodon.HomeTimeline -> findPrevious()
+            is Pageable.Mastodon.ListTimeline -> findPrevious()
+            is Pageable.Mastodon.LocalTimeline -> findPrevious()
+            is Pageable.Mastodon.PublicTimeline -> findPrevious()
+            is Pageable.Mastodon.UserTimeline -> findPreviousAndUpdateMinId()
+            Pageable.Mastodon.BookmarkTimeline -> findPreviousAndUpdateMinId()
 
             is Pageable.Mastodon.SearchTimeline -> {
                 api.search(

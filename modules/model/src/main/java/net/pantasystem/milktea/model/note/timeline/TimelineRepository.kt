@@ -80,8 +80,8 @@ data class TimelineType(
             is Pageable.Mastodon.LocalTimeline -> true
             Pageable.Mastodon.Mention -> false
             is Pageable.Mastodon.PublicTimeline -> true
-            is Pageable.Mastodon.SearchTimeline -> true
-            Pageable.Mastodon.TrendTimeline -> true
+            is Pageable.Mastodon.SearchTimeline -> false
+            Pageable.Mastodon.TrendTimeline -> false
             is Pageable.Mastodon.UserTimeline -> true
             is Pageable.Mention -> true
             is Pageable.Notification -> false
