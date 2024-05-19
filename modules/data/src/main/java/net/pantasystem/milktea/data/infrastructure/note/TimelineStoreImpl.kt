@@ -27,6 +27,7 @@ import net.pantasystem.milktea.model.nodeinfo.NodeInfoRepository
 import net.pantasystem.milktea.model.note.Note
 import net.pantasystem.milktea.model.note.timeline.TimelineRepository
 import net.pantasystem.milktea.model.note.timeline.TimelineType
+import net.pantasystem.milktea.model.note.timeline.favorite.FavoriteTimelineRepository
 import javax.inject.Inject
 
 
@@ -44,6 +45,7 @@ class TimelineStoreImpl(
     private val nodeInfoRepository: NodeInfoRepository,
     private val instanceInfoService: InstanceInfoService,
     private val timelineRepository: TimelineRepository,
+    private val favoriteTimelineRepository: FavoriteTimelineRepository,
 ) : TimelineStore {
 
     class Factory @Inject constructor(
@@ -53,6 +55,7 @@ class TimelineStoreImpl(
         private val nodeInfoRepository: NodeInfoRepository,
         private val instanceInfoService: InstanceInfoService,
         private val timelineRepository: TimelineRepository,
+        private val favoriteTimelineRepository: FavoriteTimelineRepository,
     ) : TimelineStore.Factory {
         override fun create(
             pageable: Pageable,
@@ -70,7 +73,8 @@ class TimelineStoreImpl(
                 mastodonAPIProvider,
                 nodeInfoRepository = nodeInfoRepository,
                 instanceInfoService = instanceInfoService,
-                timelineRepository = timelineRepository
+                timelineRepository = timelineRepository,
+                favoriteTimelineRepository = favoriteTimelineRepository,
             )
         }
     }
@@ -90,7 +94,8 @@ class TimelineStoreImpl(
         when (pageableTimeline) {
             is Pageable.Favorite -> {
                 FavoriteNoteTimelinePagingStoreImpl(
-                    pageableTimeline, noteAdder, getAccount, misskeyAPIProvider, mastodonAPIProvider
+                    getAccount,
+                    favoriteTimelineRepository,
                 )
             }
             is Pageable.Mastodon -> {
