@@ -19,10 +19,8 @@ import net.pantasystem.milktea.common.paginator.PreviousPagingController
 import net.pantasystem.milktea.common.paginator.StateLocker
 import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.data.api.mastodon.MastodonAPIProvider
-import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.page.Pageable
-import net.pantasystem.milktea.model.instance.InstanceInfoService
 import net.pantasystem.milktea.model.nodeinfo.NodeInfoRepository
 import net.pantasystem.milktea.model.note.Note
 import net.pantasystem.milktea.model.note.timeline.TimelineRepository
@@ -39,21 +37,17 @@ class TimelineStoreImpl(
     private val pageableTimeline: Pageable,
     private val noteAdder: NoteDataSourceAdder,
     private val getAccount: suspend () -> Account,
-    private val misskeyAPIProvider: MisskeyAPIProvider,
     private val coroutineScope: CoroutineScope,
     private val mastodonAPIProvider: MastodonAPIProvider,
     private val nodeInfoRepository: NodeInfoRepository,
-    private val instanceInfoService: InstanceInfoService,
     private val timelineRepository: TimelineRepository,
     private val favoriteTimelineRepository: FavoriteTimelineRepository,
 ) : TimelineStore {
 
     class Factory @Inject constructor(
         private val noteAdder: NoteDataSourceAdder,
-        private val misskeyAPIProvider: MisskeyAPIProvider,
         private val mastodonAPIProvider: MastodonAPIProvider,
         private val nodeInfoRepository: NodeInfoRepository,
-        private val instanceInfoService: InstanceInfoService,
         private val timelineRepository: TimelineRepository,
         private val favoriteTimelineRepository: FavoriteTimelineRepository,
     ) : TimelineStore.Factory {
@@ -68,11 +62,9 @@ class TimelineStoreImpl(
                 pageable,
                 noteAdder,
                 getAccount,
-                misskeyAPIProvider,
                 coroutineScope,
                 mastodonAPIProvider,
                 nodeInfoRepository = nodeInfoRepository,
-                instanceInfoService = instanceInfoService,
                 timelineRepository = timelineRepository,
                 favoriteTimelineRepository = favoriteTimelineRepository,
             )
