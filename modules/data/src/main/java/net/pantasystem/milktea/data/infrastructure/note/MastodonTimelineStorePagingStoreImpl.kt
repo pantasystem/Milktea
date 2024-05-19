@@ -18,7 +18,6 @@ import net.pantasystem.milktea.common.throwIfHasError
 import net.pantasystem.milktea.data.api.mastodon.MastodonAPIProvider
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.page.Pageable
-import net.pantasystem.milktea.model.nodeinfo.NodeInfo
 import net.pantasystem.milktea.model.nodeinfo.NodeInfoRepository
 import net.pantasystem.milktea.model.note.Note
 import net.pantasystem.milktea.model.note.timeline.TimelineRepository
@@ -331,15 +330,6 @@ internal class MastodonTimelineStorePagingStoreImpl(
             } else {
                 list
             }
-        }
-    }
-
-    private suspend fun getVisibilitiesParameter(account: Account): List<String>? {
-        val nodeInfo = nodeInfoRepository.find(account.getHost()).getOrNull() ?: return null
-        return if (nodeInfo.type is NodeInfo.SoftwareType.Mastodon.Fedibird || nodeInfo.type is NodeInfo.SoftwareType.Mastodon.Kmyblue) {
-            listOf("public", "unlisted", "private", "limited", "direct", "personal")
-        } else {
-            null
         }
     }
 

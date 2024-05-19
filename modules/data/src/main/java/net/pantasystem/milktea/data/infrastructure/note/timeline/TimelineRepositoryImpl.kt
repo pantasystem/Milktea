@@ -370,6 +370,7 @@ class TimelineRepositoryImpl @Inject constructor(
             Pageable.Mastodon.BookmarkTimeline -> {
                 api.getBookmarks(
                     maxId = maxId,
+                    minId = minId,
                 )
             }
 
