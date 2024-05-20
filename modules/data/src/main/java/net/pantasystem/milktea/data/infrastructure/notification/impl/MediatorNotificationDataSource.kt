@@ -19,15 +19,6 @@ class MediatorNotificationDataSource @Inject constructor(
 ) : NotificationDataSource {
     override suspend fun add(notification: Notification): Result<AddResult> =
         runCancellableCatching {
-            unreadNotificationDAO.delete(notification.id.accountId, notification.id.notificationId)
-            if (!notification.isRead) {
-                unreadNotificationDAO.insert(
-                    UnreadNotification(
-                        notification.id.accountId,
-                        notification.id.notificationId
-                    )
-                )
-            }
             insertAll(
                 listOf(notification)
             )
@@ -109,16 +100,16 @@ class MediatorNotificationDataSource @Inject constructor(
         notificationCacheDAO.insertGroupInvitedNotifications(relations.mapNotNull { it.groupInvitedNotification })
         notificationCacheDAO.insertUnknownNotifications(relations.mapNotNull { it.unknownNotification })
 
-        val reads = notifications.filter { it.isRead }.map {
+        val unReads = notifications.filter { !it.isRead }.map {
             UnreadNotification(it.id.accountId, it.id.notificationId)
         }
-        val unReadNotificationIds = notifications.filter { !it.isRead }.map {
+        val readNotificationIds = notifications.filter { !it.isRead }.map {
             it.id
         }.groupBy { it.accountId }
 
-        unreadNotificationDAO.insertAll(reads)
+        unreadNotificationDAO.insertAll(unReads)
 
-        unReadNotificationIds.forEach { (accountId, ids) ->
+        readNotificationIds.forEach { (accountId, ids) ->
             unreadNotificationDAO.deleteIn(accountId, ids.map { it.notificationId })
         }
 
