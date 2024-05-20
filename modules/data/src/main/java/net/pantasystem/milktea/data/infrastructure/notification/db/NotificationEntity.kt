@@ -35,7 +35,7 @@ import net.pantasystem.milktea.model.user.User
         // account_id
         ForeignKey(
             entity = AccountRecord::class,
-            parentColumns = ["account_id"],
+            parentColumns = ["accountId"],
             childColumns = ["account_id"],
             onDelete = ForeignKey.CASCADE,
             onUpdate = ForeignKey.CASCADE

@@ -4,6 +4,7 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.Transaction
 
 @Dao
 interface NotificationCacheDAO {
@@ -37,6 +38,7 @@ interface NotificationCacheDAO {
                 limit :limit
         """
     )
+    @Transaction
     suspend fun findNotifications(accountId: Long, limit: Int): List<NotificationWithDetails>
 
     @Query(
@@ -47,6 +49,7 @@ interface NotificationCacheDAO {
                 limit :limit
         """
     )
+    @Transaction
     suspend fun findNotificationsByUntilId(accountId: Long, untilId: String, limit: Int): List<NotificationWithDetails>
 
     @Query(
@@ -57,5 +60,6 @@ interface NotificationCacheDAO {
                 limit :limit
         """
     )
+    @Transaction
     suspend fun findNotificationsBySinceId(accountId: Long, sinceId: String, limit: Int): List<NotificationWithDetails>
 }

@@ -75,6 +75,7 @@ import net.pantasystem.milktea.data.infrastructure.notification.db.NotificationJ
 import net.pantasystem.milktea.data.infrastructure.notification.db.NotificationJsonCacheRecordDAO
 import net.pantasystem.milktea.data.infrastructure.notification.db.PollVoteNotificationEntity
 import net.pantasystem.milktea.data.infrastructure.notification.db.ReactionNotificationEntity
+import net.pantasystem.milktea.data.infrastructure.notification.db.UnknownNotificationEntity
 import net.pantasystem.milktea.data.infrastructure.notification.db.UnreadNotification
 import net.pantasystem.milktea.data.infrastructure.notification.db.UnreadNotificationDAO
 import net.pantasystem.milktea.data.infrastructure.search.SearchHistoryDao
@@ -181,7 +182,7 @@ import net.pantasystem.milktea.data.infrastructure.user.renote.mute.db.RenoteMut
         ReactionNotificationEntity::class,
         PollVoteNotificationEntity::class,
         GroupInvitedNotificationEntity::class,
-        UnreadNotification::class,
+        UnknownNotificationEntity::class,
     ],
     version = 66,
     exportSchema = true,
