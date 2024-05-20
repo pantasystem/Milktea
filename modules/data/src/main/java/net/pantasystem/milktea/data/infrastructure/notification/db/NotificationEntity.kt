@@ -330,7 +330,11 @@ data class NotificationWithDetails(
                     NotificationWithDetails(
                         notificationEntity,
                         null,
-                        null,
+                        NoteNotificationEntity(
+                            NotificationEntity.makeId(model.id.accountId, model.id.notificationId),
+                            model.noteId.noteId,
+                            "",
+                        ),
                         null,
                         null,
                         null,
@@ -483,7 +487,7 @@ data class NotificationWithDetails(
                 FollowNotification(
                     Notification.Id(notification.accountId, notification.notificationId),
                     notification.createdAt,
-                    User.Id(notification.accountId, noteNotification!!.userId),
+                    User.Id(notification.accountId, followNotification!!.userId),
                     isRead()
                 )
             }
