@@ -6,5 +6,7 @@ interface NotificationTimelineRepository {
         accountId: Long,
         untilId: String? = null,
         limit: Int = 10,
+        excludeTypes: List<String>? = null,
+        includeTypes: List<String>? = null
     ): Result<List<Notification>>
 }

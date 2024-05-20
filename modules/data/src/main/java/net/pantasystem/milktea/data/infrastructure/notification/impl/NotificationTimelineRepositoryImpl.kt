@@ -1,5 +1,6 @@
 package net.pantasystem.milktea.data.infrastructure.notification.impl
 
+import androidx.room.withTransaction
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import net.pantasystem.milktea.api.mastodon.notification.MstNotificationDTO
@@ -9,7 +10,12 @@ import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.common.throwIfHasError
 import net.pantasystem.milktea.data.api.mastodon.MastodonAPIProvider
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
+import net.pantasystem.milktea.data.infrastructure.DataBase
 import net.pantasystem.milktea.data.infrastructure.notification.db.NotificationCacheDAO
+import net.pantasystem.milktea.data.infrastructure.notification.db.NotificationTimelineEntity
+import net.pantasystem.milktea.data.infrastructure.notification.db.NotificationTimelineExcludedTypeEntity
+import net.pantasystem.milktea.data.infrastructure.notification.db.NotificationTimelineIncludedTypeEntity
+import net.pantasystem.milktea.data.infrastructure.notification.db.NotificationTimelineRelation
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.notification.Notification
@@ -23,6 +29,7 @@ class NotificationTimelineRepositoryImpl @Inject constructor(
     private val notificationAdder: NotificationCacheAdder,
     private val coroutineScope: CoroutineScope,
     private val notificationCacheDAO: NotificationCacheDAO,
+    private val dataBase: DataBase,
 ) : NotificationTimelineRepository {
 
     // 最後に初期読み込みした時間をマップに保存しておく(key = accountId, value = lastFetchTime)
@@ -30,8 +37,15 @@ class NotificationTimelineRepositoryImpl @Inject constructor(
     override suspend fun findPreviousTimeline(
         accountId: Long,
         untilId: String?,
-        limit: Int
+        limit: Int,
+        excludeTypes: List<String>?,
+        includeTypes: List<String>?,
     ): Result<List<Notification>> = runCancellableCatching {
+        makeNotificationTimelineHolder(
+            accountId = accountId,
+            excludeTypes = excludeTypes ?: emptyList(),
+            includeTypes = includeTypes ?: emptyList()
+        )
         val account = accountRepository.get(accountId).getOrThrow()
         val models = if (untilId == null) {
             notificationCacheDAO.findNotifications(accountId, limit)
@@ -60,21 +74,27 @@ class NotificationTimelineRepositoryImpl @Inject constructor(
         fetched
     }
 
-    private suspend fun fetch(account: Account, untilId: String?): Result<List<Notification>> = runCancellableCatching {
-        when (account.instanceType) {
-            Account.InstanceType.MISSKEY, Account.InstanceType.FIREFISH -> {
-                fetchMisskeyNotifications(account, untilId).map {
-                    notificationAdder.addAndConvert(account, it).notification
+    private suspend fun fetch(account: Account, untilId: String?): Result<List<Notification>> =
+        runCancellableCatching {
+            when (account.instanceType) {
+                Account.InstanceType.MISSKEY, Account.InstanceType.FIREFISH -> {
+                    fetchMisskeyNotifications(account, untilId).map {
+                        notificationAdder.addAndConvert(account, it).notification
+                    }
                 }
-            }
-            Account.InstanceType.MASTODON, Account.InstanceType.PLEROMA -> {
-                fetchMastodonNotifications(account, untilId).map {
-                    notificationAdder.addConvert(account, it).notification
+
+                Account.InstanceType.MASTODON, Account.InstanceType.PLEROMA -> {
+                    fetchMastodonNotifications(account, untilId).map {
+                        notificationAdder.addConvert(account, it).notification
+                    }
                 }
             }
         }
-    }
-    private suspend fun fetchMisskeyNotifications(account: Account, untilId: String?): List<NotificationDTO> {
+
+    private suspend fun fetchMisskeyNotifications(
+        account: Account,
+        untilId: String?
+    ): List<NotificationDTO> {
         val res = misskeyAPIProvider.get(account).notification(
             NotificationRequest(
                 i = account.token,
@@ -84,10 +104,63 @@ class NotificationTimelineRepositoryImpl @Inject constructor(
         return res.body() ?: emptyList()
     }
 
-    private suspend fun fetchMastodonNotifications(account: Account, untilId: String?): List<MstNotificationDTO> {
+    private suspend fun fetchMastodonNotifications(
+        account: Account,
+        untilId: String?
+    ): List<MstNotificationDTO> {
         val res = mastodonAPIProvider.get(account).getNotifications(
             maxId = untilId
         )
         return res.body() ?: emptyList()
+    }
+
+    private suspend fun makeNotificationTimelineHolder(
+        accountId: Long,
+        includeTypes: List<String>,
+        excludeTypes: List<String>,
+    ): NotificationTimelineRelation {
+        val dao = dataBase.notificationTimelineDAO()
+        return dataBase.withTransaction {
+            val exists = if (includeTypes.isEmpty() && excludeTypes.isEmpty()) {
+                dao.findEmpty(accountId).firstOrNull()
+            } else if (includeTypes.isEmpty()) {
+                dao.findByExcludeTypes(accountId, excludeTypes).firstOrNull()
+            } else if (excludeTypes.isEmpty()) {
+                dao.findByIncludeTypes(accountId, includeTypes).firstOrNull()
+            }
+            else {
+                dao.findByExcludeTypesAndIncludeTypes(
+                    accountId = accountId,
+                    excludeTypes = excludeTypes,
+                    includeTypes = includeTypes
+                ).firstOrNull()
+            }
+            if (exists == null) {
+                val id = dao.insert(
+                    NotificationTimelineEntity(
+                        accountId = accountId,
+                    )
+                )
+                dao.insertExcludedTypes(
+                    excludeTypes.map {
+                        NotificationTimelineExcludedTypeEntity(
+                            timelineId = id,
+                            type = it
+                        )
+                    }
+                )
+                dao.insertIncludedTypes(
+                    includeTypes.map {
+                        NotificationTimelineIncludedTypeEntity(
+                            timelineId = id,
+                            type = it
+                        )
+                    }
+                )
+                dao.findById(id)!!
+            } else {
+                exists
+            }
+        }
     }
 }
