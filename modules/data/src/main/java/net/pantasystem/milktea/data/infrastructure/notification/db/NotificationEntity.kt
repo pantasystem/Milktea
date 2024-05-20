@@ -131,6 +131,14 @@ data class PollVoteNotificationEntity(
     val choice: Int,
 )
 
+@Entity(
+    tableName = "poll_ended_notifications",
+)
+data class PollEndedNotificationEntity(
+    @PrimaryKey val id: String,
+    @ColumnInfo("note_id") val noteId: String,
+)
+
 // group invited
 @Entity(
     tableName = "group_invited_notifications",
@@ -220,6 +228,13 @@ data class NotificationWithDetails(
         entityColumn = "notificationId",
     )
     val unreadNotification: List<UnreadNotification>?,
+
+    @Relation(
+        entity = PollEndedNotificationEntity::class,
+        parentColumn = "id",
+        entityColumn = "id"
+    )
+    val pollEndedNotification: PollEndedNotificationEntity?,
 ) {
 
     companion object {
@@ -258,6 +273,7 @@ data class NotificationWithDetails(
                     null,
                     null,
                     unreadNotification(),
+                    null,
                 )
 
                 is FollowNotification -> {
@@ -273,6 +289,7 @@ data class NotificationWithDetails(
                         null,
                         null,
                         unreadNotification(),
+                        null,
                     )
                 }
 
@@ -286,6 +303,7 @@ data class NotificationWithDetails(
                         null,
                         null,
                         unreadNotification(),
+                        null,
                     )
                 }
 
@@ -306,6 +324,7 @@ data class NotificationWithDetails(
                         ),
                         null,
                         unreadNotification(),
+                        null,
                     )
                 }
 
@@ -323,6 +342,7 @@ data class NotificationWithDetails(
                         null,
                         null,
                         unreadNotification(),
+                        null,
                     )
                 }
 
@@ -330,16 +350,16 @@ data class NotificationWithDetails(
                     NotificationWithDetails(
                         notificationEntity,
                         null,
-                        NoteNotificationEntity(
-                            NotificationEntity.makeId(model.id.accountId, model.id.notificationId),
-                            model.noteId.noteId,
-                            "",
-                        ),
+                        null,
                         null,
                         null,
                         null,
                         null,
                         unreadNotification(),
+                        PollEndedNotificationEntity(
+                            NotificationEntity.makeId(model.id.accountId, model.id.notificationId),
+                            model.noteId.noteId,
+                        ),
                     )
                 }
 
@@ -356,6 +376,7 @@ data class NotificationWithDetails(
                         null,
                         null,
                         unreadNotification(),
+                        null,
                     )
                 }
 
@@ -373,6 +394,7 @@ data class NotificationWithDetails(
                         null,
                         null,
                         unreadNotification(),
+                        null,
                     )
                 }
 
@@ -390,6 +412,7 @@ data class NotificationWithDetails(
                         null,
                         null,
                         unreadNotification(),
+                        null,
                     )
                 }
 
@@ -410,6 +433,7 @@ data class NotificationWithDetails(
                         null,
                         null,
                         unreadNotification(),
+                        null,
                     )
                 }
 
@@ -423,6 +447,7 @@ data class NotificationWithDetails(
                         null,
                         null,
                         unreadNotification(),
+                        null,
                     )
                 }
 
@@ -440,6 +465,7 @@ data class NotificationWithDetails(
                         null,
                         null,
                         unreadNotification(),
+                        null,
                     )
                 }
 
@@ -457,6 +483,7 @@ data class NotificationWithDetails(
                         null,
                         null,
                         unreadNotification(),
+                        null,
                     )
                 }
 
@@ -473,6 +500,7 @@ data class NotificationWithDetails(
                             model.rawType,
                         ),
                         unreadNotification(),
+                        null,
                     )
                 }
             }
@@ -546,7 +574,7 @@ data class NotificationWithDetails(
                     Notification.Id(notification.accountId, notification.notificationId),
                     notification.createdAt,
                     isRead(),
-                    Note.Id(notification.accountId, noteNotification!!.noteId),
+                    Note.Id(notification.accountId, pollEndedNotification!!.noteId),
                 )
             }
 
