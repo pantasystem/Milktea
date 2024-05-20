@@ -66,8 +66,15 @@ import net.pantasystem.milktea.data.infrastructure.note.wordmute.WordFilterCondi
 import net.pantasystem.milktea.data.infrastructure.note.wordmute.WordFilterConditionRegexRecord
 import net.pantasystem.milktea.data.infrastructure.note.wordmute.WordFilterConditionWordRecord
 import net.pantasystem.milktea.data.infrastructure.note.wordmute.WordFilterConfigDao
+import net.pantasystem.milktea.data.infrastructure.notification.db.FollowNotificationEntity
+import net.pantasystem.milktea.data.infrastructure.notification.db.GroupInvitedNotificationEntity
+import net.pantasystem.milktea.data.infrastructure.notification.db.NoteNotificationEntity
+import net.pantasystem.milktea.data.infrastructure.notification.db.NotificationCacheDAO
+import net.pantasystem.milktea.data.infrastructure.notification.db.NotificationEntity
 import net.pantasystem.milktea.data.infrastructure.notification.db.NotificationJsonCacheRecord
 import net.pantasystem.milktea.data.infrastructure.notification.db.NotificationJsonCacheRecordDAO
+import net.pantasystem.milktea.data.infrastructure.notification.db.PollVoteNotificationEntity
+import net.pantasystem.milktea.data.infrastructure.notification.db.ReactionNotificationEntity
 import net.pantasystem.milktea.data.infrastructure.notification.db.UnreadNotification
 import net.pantasystem.milktea.data.infrastructure.notification.db.UnreadNotificationDAO
 import net.pantasystem.milktea.data.infrastructure.search.SearchHistoryDao
@@ -166,8 +173,17 @@ import net.pantasystem.milktea.data.infrastructure.user.renote.mute.db.RenoteMut
         NoteDescendantEntity::class,
 
         TimelineItemEntity::class,
+
+        // notification
+        NotificationEntity::class,
+        FollowNotificationEntity::class,
+        NoteNotificationEntity::class,
+        ReactionNotificationEntity::class,
+        PollVoteNotificationEntity::class,
+        GroupInvitedNotificationEntity::class,
+        UnreadNotification::class,
     ],
-    version = 65,
+    version = 66,
     exportSchema = true,
     autoMigrations = [
         AutoMigration(from = 11, to = 12),
@@ -222,6 +238,7 @@ import net.pantasystem.milktea.data.infrastructure.user.renote.mute.db.RenoteMut
         AutoMigration(from = 62, to = 63),
         AutoMigration(from = 63, to = 64),
         AutoMigration(from = 64, to = 65),
+        AutoMigration(from = 65, to = 66),
     ],
     views = [UserView::class, GroupMemberView::class, UserListMemberView::class]
 )
@@ -288,4 +305,6 @@ abstract class DataBase : RoomDatabase() {
     abstract fun noteThreadDAO(): NoteThreadDAO
 
     abstract fun timelineCacheDAO(): TimelineCacheDAO
+
+    abstract fun notificationCacheDAO(): NotificationCacheDAO
 }
