@@ -53,7 +53,6 @@ data class NotificationEntity(
     @ColumnInfo(name = "notification_id") val notificationId: String,
     @ColumnInfo(name = "account_id") val accountId: Long,
     @ColumnInfo(name = "created_at") val createdAt: Instant,
-    @ColumnInfo(name = "is_read") val isRead: Boolean,
     @ColumnInfo(name = "type") val type: String
 ) {
     companion object {
@@ -116,7 +115,7 @@ data class ReactionNotificationEntity(
 )
 
 @Entity(
-    tableName="poll_vote_notifications",
+    tableName = "poll_vote_notifications",
     foreignKeys = [
         ForeignKey(
             entity = NotificationEntity::class,
@@ -214,6 +213,13 @@ data class NotificationWithDetails(
         entityColumn = "id"
     )
     val unknownNotification: UnknownNotificationEntity?,
+
+    @Relation(
+        entity = UnreadNotification::class,
+        parentColumn = "notification_id",
+        entityColumn = "notificationId",
+    )
+    val unreadNotification: List<UnreadNotification>?,
 ) {
 
     companion object {
@@ -223,10 +229,22 @@ data class NotificationWithDetails(
                 model.id.notificationId,
                 model.id.accountId,
                 model.createdAt,
-                model.isRead,
                 NotificationType.modelOf(model).value
             )
-            return when(model) {
+
+            fun unreadNotification(): List<UnreadNotification> {
+                return if (model.isRead) {
+                    listOf(
+                        UnreadNotification(
+                            model.id.accountId,
+                            model.id.notificationId
+                        )
+                    )
+                } else {
+                    emptyList()
+                }
+            }
+            return when (model) {
                 is FavoriteNotification -> NotificationWithDetails(
                     notificationEntity,
                     null,
@@ -239,7 +257,9 @@ data class NotificationWithDetails(
                     null,
                     null,
                     null,
+                    unreadNotification(),
                 )
+
                 is FollowNotification -> {
                     NotificationWithDetails(
                         notificationEntity,
@@ -252,8 +272,10 @@ data class NotificationWithDetails(
                         null,
                         null,
                         null,
+                        unreadNotification(),
                     )
                 }
+
                 is FollowRequestAcceptedNotification -> {
                     NotificationWithDetails(
                         notificationEntity,
@@ -263,8 +285,10 @@ data class NotificationWithDetails(
                         null,
                         null,
                         null,
+                        unreadNotification(),
                     )
                 }
+
                 is GroupInvitedNotification -> {
                     NotificationWithDetails(
                         notificationEntity,
@@ -281,8 +305,10 @@ data class NotificationWithDetails(
                             invitationId = model.invitationId.invitationId,
                         ),
                         null,
+                        unreadNotification(),
                     )
                 }
+
                 is MentionNotification -> {
                     NotificationWithDetails(
                         notificationEntity,
@@ -296,8 +322,10 @@ data class NotificationWithDetails(
                         null,
                         null,
                         null,
+                        unreadNotification(),
                     )
                 }
+
                 is PollEndedNotification -> {
                     NotificationWithDetails(
                         notificationEntity,
@@ -307,8 +335,10 @@ data class NotificationWithDetails(
                         null,
                         null,
                         null,
+                        unreadNotification(),
                     )
                 }
+
                 is PollVoteNotification -> {
                     NotificationWithDetails(
                         notificationEntity,
@@ -321,8 +351,10 @@ data class NotificationWithDetails(
                         ),
                         null,
                         null,
+                        unreadNotification(),
                     )
                 }
+
                 is PostNotification -> {
                     NotificationWithDetails(
                         notificationEntity,
@@ -336,8 +368,10 @@ data class NotificationWithDetails(
                         null,
                         null,
                         null,
+                        unreadNotification(),
                     )
                 }
+
                 is QuoteNotification -> {
                     NotificationWithDetails(
                         notificationEntity,
@@ -351,8 +385,10 @@ data class NotificationWithDetails(
                         null,
                         null,
                         null,
+                        unreadNotification(),
                     )
                 }
+
                 is ReactionNotification -> {
                     NotificationWithDetails(
                         notificationEntity,
@@ -369,8 +405,10 @@ data class NotificationWithDetails(
                         null,
                         null,
                         null,
+                        unreadNotification(),
                     )
                 }
+
                 is ReceiveFollowRequestNotification -> {
                     NotificationWithDetails(
                         notificationEntity,
@@ -380,8 +418,10 @@ data class NotificationWithDetails(
                         null,
                         null,
                         null,
+                        unreadNotification(),
                     )
                 }
+
                 is RenoteNotification -> {
                     NotificationWithDetails(
                         notificationEntity,
@@ -395,8 +435,10 @@ data class NotificationWithDetails(
                         null,
                         null,
                         null,
+                        unreadNotification(),
                     )
                 }
+
                 is ReplyNotification -> {
                     NotificationWithDetails(
                         notificationEntity,
@@ -410,8 +452,10 @@ data class NotificationWithDetails(
                         null,
                         null,
                         null,
+                        unreadNotification(),
                     )
                 }
+
                 is UnknownNotification -> {
                     NotificationWithDetails(
                         notificationEntity,
@@ -424,6 +468,7 @@ data class NotificationWithDetails(
                             NotificationEntity.makeId(model.id.accountId, model.id.notificationId),
                             model.rawType,
                         ),
+                        unreadNotification(),
                     )
                 }
             }
@@ -431,42 +476,49 @@ data class NotificationWithDetails(
     }
 
     fun toModel(): Notification {
-        val type = NotificationType.entries.firstOrNull { it.value == notification.type } ?: NotificationType.Unknown
-        return when(type) {
+        val type = NotificationType.entries.firstOrNull { it.value == notification.type }
+            ?: NotificationType.Unknown
+        return when (type) {
             NotificationType.Follow -> {
                 FollowNotification(
                     Notification.Id(notification.accountId, notification.notificationId),
                     notification.createdAt,
                     User.Id(notification.accountId, noteNotification!!.userId),
-                    notification.isRead
+                    isRead()
                 )
             }
+
             NotificationType.Favorite -> {
                 FavoriteNotification(
                     Notification.Id(notification.accountId, notification.notificationId),
                     notification.createdAt,
                     User.Id(notification.accountId, noteNotification!!.userId),
                     Note.Id(notification.accountId, noteNotification.noteId),
-                    notification.isRead
+                    isRead(),
                 )
             }
+
             NotificationType.FollowRequestAccepted -> {
                 FollowRequestAcceptedNotification(
                     Notification.Id(notification.accountId, notification.notificationId),
                     notification.createdAt,
                     User.Id(notification.accountId, noteNotification!!.userId),
-                    notification.isRead
+                    isRead(),
                 )
             }
+
             NotificationType.GroupInvited -> {
                 GroupInvitedNotification(
                     Notification.Id(notification.accountId, notification.notificationId),
-                    notification.isRead,
+                    isRead(),
                     notification.createdAt,
                     Group(
                         Group.Id(notification.accountId, groupInvitedNotification!!.groupId),
                         name = groupInvitedNotification.groupName,
-                        ownerId = User.Id(notification.accountId, groupInvitedNotification.groupOwnerId),
+                        ownerId = User.Id(
+                            notification.accountId,
+                            groupInvitedNotification.groupOwnerId
+                        ),
                         createdAt = groupInvitedNotification.groupCreatedAt,
                         userIds = emptyList(),
                     ),
@@ -474,23 +526,26 @@ data class NotificationWithDetails(
                     InvitationId(notification.accountId, groupInvitedNotification.invitationId),
                 )
             }
+
             NotificationType.Mention -> {
                 MentionNotification(
                     Notification.Id(notification.accountId, notification.notificationId),
                     notification.createdAt,
                     User.Id(notification.accountId, noteNotification!!.userId),
                     Note.Id(notification.accountId, noteNotification.noteId),
-                    notification.isRead
+                    isRead(),
                 )
             }
+
             NotificationType.PollEnded -> {
                 PollEndedNotification(
                     Notification.Id(notification.accountId, notification.notificationId),
                     notification.createdAt,
-                    notification.isRead,
+                    isRead(),
                     Note.Id(notification.accountId, noteNotification!!.noteId),
                 )
             }
+
             NotificationType.PollVote -> {
                 PollVoteNotification(
                     Notification.Id(notification.accountId, notification.notificationId),
@@ -498,27 +553,30 @@ data class NotificationWithDetails(
                     notification.createdAt,
                     User.Id(notification.accountId, noteNotification.userId),
                     pollVoteNotification!!.choice,
-                    notification.isRead
+                    isRead()
                 )
             }
+
             NotificationType.Post -> {
                 PostNotification(
                     Notification.Id(notification.accountId, notification.notificationId),
                     notification.createdAt,
                     User.Id(notification.accountId, noteNotification!!.userId),
                     Note.Id(notification.accountId, noteNotification.noteId),
-                    notification.isRead
+                    isRead()
                 )
             }
+
             NotificationType.Quote -> {
                 QuoteNotification(
                     Notification.Id(notification.accountId, notification.notificationId),
                     notification.createdAt,
                     User.Id(notification.accountId, noteNotification!!.userId),
                     Note.Id(notification.accountId, noteNotification.noteId),
-                    notification.isRead
+                    isRead()
                 )
             }
+
             NotificationType.Reaction -> {
                 ReactionNotification(
                     Notification.Id(notification.accountId, notification.notificationId),
@@ -526,31 +584,34 @@ data class NotificationWithDetails(
                     User.Id(notification.accountId, noteNotification!!.userId),
                     Note.Id(notification.accountId, noteNotification.noteId),
                     reactionNotification!!.reaction,
-                    notification.isRead
+                    isRead()
                 )
             }
+
             NotificationType.ReceiveFollowRequest -> {
                 ReceiveFollowRequestNotification(
                     Notification.Id(notification.accountId, notification.notificationId),
                     notification.createdAt,
                     User.Id(notification.accountId, noteNotification!!.userId),
-                    notification.isRead
+                    isRead()
                 )
             }
+
             NotificationType.Renote -> {
                 RenoteNotification(
                     Notification.Id(notification.accountId, notification.notificationId),
                     notification.createdAt,
                     User.Id(notification.accountId, noteNotification!!.userId),
                     Note.Id(notification.accountId, noteNotification.noteId),
-                    notification.isRead
+                    isRead()
                 )
             }
+
             NotificationType.Unknown -> {
                 UnknownNotification(
                     Notification.Id(notification.accountId, notification.notificationId),
                     notification.createdAt,
-                    notification.isRead,
+                    isRead(),
                     userId = User.Id(notification.accountId, noteNotification!!.userId),
                     rawType = unknownNotification!!.rawType,
                 )
@@ -562,10 +623,16 @@ data class NotificationWithDetails(
                     notification.createdAt,
                     User.Id(notification.accountId, noteNotification!!.userId),
                     Note.Id(notification.accountId, noteNotification.noteId),
-                    notification.isRead
+                    isRead()
                 )
             }
         }
+    }
+
+    fun isRead(): Boolean {
+        return unreadNotification?.any {
+            it.accountId == notification.accountId
+        } ?: true
     }
 }
 
@@ -589,7 +656,7 @@ enum class NotificationType(
 
     companion object {
         fun modelOf(model: Notification): NotificationType {
-            when(model) {
+            when (model) {
                 is FavoriteNotification -> return Favorite
                 is FollowNotification -> return Follow
                 is FollowRequestAcceptedNotification -> return FollowRequestAccepted
