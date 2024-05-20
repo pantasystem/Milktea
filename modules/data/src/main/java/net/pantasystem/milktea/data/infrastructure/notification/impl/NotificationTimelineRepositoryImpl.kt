@@ -24,6 +24,9 @@ class NotificationTimelineRepositoryImpl @Inject constructor(
     private val coroutineScope: CoroutineScope,
     private val notificationCacheDAO: NotificationCacheDAO,
 ) : NotificationTimelineRepository {
+
+    // 最後に初期読み込みした時間をマップに保存しておく(key = accountId, value = lastFetchTime)
+    private var lastFetchTimeMap = mapOf<Long, Long>()
     override suspend fun findPreviousTimeline(
         accountId: Long,
         untilId: String?,
@@ -37,14 +40,24 @@ class NotificationTimelineRepositoryImpl @Inject constructor(
         }.map {
             it.toModel()
         }
-        if (models.size < limit) {
+        val lastInitialFetchTime = lastFetchTimeMap[accountId] ?: System.currentTimeMillis()
+        val now = System.currentTimeMillis()
+        val fetched = if (models.size < limit) {
             fetch(account, untilId).getOrThrow()
         } else {
             coroutineScope.launch {
-                fetch(account, untilId)
+                if (now - lastInitialFetchTime > 1000 * 60 * 3) {
+                    fetch(account, untilId)
+                }
             }
             models
         }
+
+        if (untilId == null) {
+            lastFetchTimeMap += accountId to now
+        }
+
+        fetched
     }
 
     private suspend fun fetch(account: Account, untilId: String?): Result<List<Notification>> = runCancellableCatching {
