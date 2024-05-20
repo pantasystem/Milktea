@@ -1,5 +1,6 @@
 package net.pantasystem.milktea.data.infrastructure.notification.db
 
+import androidx.room.ColumnInfo
 import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.ForeignKey
@@ -48,12 +49,12 @@ import net.pantasystem.milktea.model.user.User
     ]
 )
 data class NotificationEntity(
-    @PrimaryKey val id: String,
-    val notificationId: String,
-    val accountId: Long,
-    val createdAt: Instant,
-    val isRead: Boolean,
-    val type: String
+    @PrimaryKey(autoGenerate = false) val id: String,
+    @ColumnInfo(name = "notification_id") val notificationId: String,
+    @ColumnInfo(name = "account_id") val accountId: Long,
+    @ColumnInfo(name = "created_at") val createdAt: Instant,
+    @ColumnInfo(name = "is_read") val isRead: Boolean,
+    @ColumnInfo(name = "type") val type: String
 ) {
     companion object {
         fun makeId(accountId: Long, notificationId: String): String {
@@ -76,7 +77,7 @@ data class NotificationEntity(
 )
 data class FollowNotificationEntity(
     @PrimaryKey val id: String,
-    val userId: String,
+    @ColumnInfo(name = "user_id") val userId: String,
 )
 
 @Entity(
@@ -93,8 +94,8 @@ data class FollowNotificationEntity(
 )
 data class NoteNotificationEntity(
     @PrimaryKey val id: String,
-    val noteId: String,
-    val userId: String,
+    @ColumnInfo("note_id") val noteId: String,
+    @ColumnInfo("user_id") val userId: String,
 )
 
 @Entity(
@@ -146,11 +147,11 @@ data class PollVoteNotificationEntity(
 )
 data class GroupInvitedNotificationEntity(
     @PrimaryKey val id: String,
-    val groupId: String,
-    val groupName: String,
-    val groupOwnerId: String,
-    val groupCreatedAt: Instant,
-    val invitationId: String,
+    @ColumnInfo("group_id") val groupId: String,
+    @ColumnInfo("group_name") val groupName: String,
+    @ColumnInfo("group_owner_id") val groupOwnerId: String,
+    @ColumnInfo("group_created_at") val groupCreatedAt: Instant,
+    @ColumnInfo("invitation_id") val invitationId: String,
 )
 
 @Entity(
@@ -167,7 +168,7 @@ data class GroupInvitedNotificationEntity(
 )
 data class UnknownNotificationEntity(
     @PrimaryKey val id: String,
-    val rawType: String
+    @ColumnInfo("raw_type") val rawType: String
 )
 
 data class NotificationWithDetails(
