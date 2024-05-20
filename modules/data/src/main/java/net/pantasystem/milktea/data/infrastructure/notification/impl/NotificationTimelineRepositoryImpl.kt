@@ -11,7 +11,6 @@ import net.pantasystem.milktea.common.throwIfHasError
 import net.pantasystem.milktea.data.api.mastodon.MastodonAPIProvider
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
 import net.pantasystem.milktea.data.infrastructure.DataBase
-import net.pantasystem.milktea.data.infrastructure.notification.db.NotificationCacheDAO
 import net.pantasystem.milktea.data.infrastructure.notification.db.NotificationEntity
 import net.pantasystem.milktea.data.infrastructure.notification.db.NotificationTimelineEntity
 import net.pantasystem.milktea.data.infrastructure.notification.db.NotificationTimelineExcludedTypeEntity
@@ -58,11 +57,11 @@ class NotificationTimelineRepositoryImpl @Inject constructor(
         val lastInitialFetchTime = lastFetchTimeMap[accountId] ?: System.currentTimeMillis()
         val now = System.currentTimeMillis()
         val fetched = if (models.size < limit) {
-            fetch(timelineHolder.timeline.id, account, untilId).getOrThrow()
+            fetch(timelineHolder.timeline.id, account, untilId, excludeTypes, includeTypes).getOrThrow()
         } else {
             coroutineScope.launch {
                 if (now - lastInitialFetchTime > 1000 * 60 * 3) {
-                    fetch(timelineHolder.timeline.id, account, untilId)
+                    fetch(timelineHolder.timeline.id, account, untilId, excludeTypes, includeTypes)
                 }
             }
             models
@@ -75,17 +74,23 @@ class NotificationTimelineRepositoryImpl @Inject constructor(
         fetched
     }
 
-    private suspend fun fetch(timelineId: Long, account: Account, untilId: String?): Result<List<Notification>> =
+    private suspend fun fetch(
+        timelineId: Long,
+        account: Account,
+        untilId: String?,
+        excludeTypes: List<String>?,
+        includeTypes: List<String>?,
+    ): Result<List<Notification>> =
         runCancellableCatching {
             when (account.instanceType) {
                 Account.InstanceType.MISSKEY, Account.InstanceType.FIREFISH -> {
-                    fetchMisskeyNotifications(account, untilId).map {
+                    fetchMisskeyNotifications(account, untilId, excludeTypes, includeTypes).map {
                         notificationAdder.addAndConvert(account, it).notification
                     }
                 }
 
                 Account.InstanceType.MASTODON, Account.InstanceType.PLEROMA -> {
-                    fetchMastodonNotifications(account, untilId).map {
+                    fetchMastodonNotifications(account, untilId, excludeTypes, includeTypes).map {
                         notificationAdder.addConvert(account, it).notification
                     }
                 }
@@ -104,12 +109,16 @@ class NotificationTimelineRepositoryImpl @Inject constructor(
 
     private suspend fun fetchMisskeyNotifications(
         account: Account,
-        untilId: String?
+        untilId: String?,
+        excludeTypes: List<String>?,
+        includeTypes: List<String>?,
     ): List<NotificationDTO> {
         val res = misskeyAPIProvider.get(account).notification(
             NotificationRequest(
                 i = account.token,
                 untilId = untilId,
+                excludeTypes = excludeTypes,
+                includeTypes = includeTypes,
             )
         ).throwIfHasError()
         return res.body() ?: emptyList()
@@ -117,10 +126,14 @@ class NotificationTimelineRepositoryImpl @Inject constructor(
 
     private suspend fun fetchMastodonNotifications(
         account: Account,
-        untilId: String?
+        untilId: String?,
+        excludeTypes: List<String>?,
+        includeTypes: List<String>?,
     ): List<MstNotificationDTO> {
         val res = mastodonAPIProvider.get(account).getNotifications(
-            maxId = untilId
+            maxId = untilId,
+            excludeTypes = excludeTypes,
+            types = includeTypes,
         )
         return res.body() ?: emptyList()
     }
