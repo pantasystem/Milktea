@@ -92,13 +92,13 @@ interface NotificationTimelineDAO {
                 SELECT notification_timeline_excluded_types.timelineId FROM notification_timeline_excluded_types
                 WHERE type IN (:excludeTypes)
                 GROUP BY notification_timeline_excluded_types.timelineId
-                HAVING COUNT(notification_timeline_excluded_types.timelineId) = COUNT(:excludeTypes)
+                HAVING COUNT(notification_timeline_excluded_types.timelineId) = COUNT(:excludeTypesCount)
             ) as excludes ON notification_timelines.id = excludes.timelineId
             JOIN (
                 SELECT notification_timeline_included_types.timelineId FROM notification_timeline_included_types
                 WHERE type IN (:includeTypes)
                 GROUP BY notification_timeline_included_types.timelineId
-                HAVING COUNT(notification_timeline_included_types.timelineId) = COUNT(:includeTypes)
+                HAVING COUNT(notification_timeline_included_types.timelineId) = COUNT(:includeTypesCount)
             ) as includes ON notification_timelines.id = includes.timelineId
             WHERE accountId = :accountId
         """
@@ -107,6 +107,8 @@ interface NotificationTimelineDAO {
         accountId: Long,
         excludeTypes: List<String>,
         includeTypes: List<String>,
+        excludeTypesCount: Int = excludeTypes.size,
+        includeTypesCount: Int = includeTypes.size
     ): List<NotificationTimelineRelation>
 
     // リレーションが何一つ設定されていないタイムラインを取得
@@ -131,7 +133,7 @@ interface NotificationTimelineDAO {
                 SELECT notification_timeline_included_types.timelineId FROM notification_timeline_included_types
                 WHERE type IN (:includeTypes)
                 GROUP BY notification_timeline_included_types.timelineId
-                HAVING COUNT(notification_timeline_included_types.timelineId) = COUNT(:includeTypes)
+                HAVING COUNT(notification_timeline_included_types.timelineId) = COUNT(:includeTypesCount)
             ) as includes ON notification_timelines.id = includes.timelineId
             WHERE id NOT IN (
                 SELECT timelineId FROM notification_timeline_excluded_types
@@ -139,7 +141,7 @@ interface NotificationTimelineDAO {
             AND accountId = :accountId
         """
     )
-    suspend fun findByIncludeTypes(accountId: Long, includeTypes: List<String>): List<NotificationTimelineRelation>
+    suspend fun findByIncludeTypes(accountId: Long, includeTypes: List<String>, includeTypesCount: Int = includeTypes.size): List<NotificationTimelineRelation>
 
     // exclude typesに完全一致し、include typesのリレーションが存在しないタイムラインを取得
     @Query(
@@ -149,7 +151,7 @@ interface NotificationTimelineDAO {
                 SELECT notification_timeline_excluded_types.timelineId FROM notification_timeline_excluded_types
                 WHERE type IN (:excludeTypes)
                 GROUP BY notification_timeline_excluded_types.timelineId
-                HAVING COUNT(notification_timeline_excluded_types.timelineId) = COUNT(:excludeTypes)
+                HAVING COUNT(notification_timeline_excluded_types.timelineId) = COUNT(:excludeTypesCount)
             ) as excludes ON notification_timelines.id = excludes.timelineId
             WHERE id NOT IN (
                 SELECT timelineId FROM notification_timeline_included_types
@@ -157,7 +159,7 @@ interface NotificationTimelineDAO {
             AND accountId = :accountId
         """
     )
-    suspend fun findByExcludeTypes(accountId: Long, excludeTypes: List<String>): List<NotificationTimelineRelation>
+    suspend fun findByExcludeTypes(accountId: Long, excludeTypes: List<String>, excludeTypesCount: Int = excludeTypes.size): List<NotificationTimelineRelation>
 
     // find by id
     @Query(
