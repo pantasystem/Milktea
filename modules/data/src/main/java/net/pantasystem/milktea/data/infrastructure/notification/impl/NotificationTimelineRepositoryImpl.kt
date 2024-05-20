@@ -12,9 +12,11 @@ import net.pantasystem.milktea.data.api.mastodon.MastodonAPIProvider
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
 import net.pantasystem.milktea.data.infrastructure.DataBase
 import net.pantasystem.milktea.data.infrastructure.notification.db.NotificationCacheDAO
+import net.pantasystem.milktea.data.infrastructure.notification.db.NotificationEntity
 import net.pantasystem.milktea.data.infrastructure.notification.db.NotificationTimelineEntity
 import net.pantasystem.milktea.data.infrastructure.notification.db.NotificationTimelineExcludedTypeEntity
 import net.pantasystem.milktea.data.infrastructure.notification.db.NotificationTimelineIncludedTypeEntity
+import net.pantasystem.milktea.data.infrastructure.notification.db.NotificationTimelineItemEntity
 import net.pantasystem.milktea.data.infrastructure.notification.db.NotificationTimelineRelation
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.AccountRepository
@@ -28,7 +30,6 @@ class NotificationTimelineRepositoryImpl @Inject constructor(
     private val accountRepository: AccountRepository,
     private val notificationAdder: NotificationCacheAdder,
     private val coroutineScope: CoroutineScope,
-    private val notificationCacheDAO: NotificationCacheDAO,
     private val dataBase: DataBase,
 ) : NotificationTimelineRepository {
 
@@ -41,27 +42,27 @@ class NotificationTimelineRepositoryImpl @Inject constructor(
         excludeTypes: List<String>?,
         includeTypes: List<String>?,
     ): Result<List<Notification>> = runCancellableCatching {
-        makeNotificationTimelineHolder(
+        val timelineHolder = makeNotificationTimelineHolder(
             accountId = accountId,
             excludeTypes = excludeTypes ?: emptyList(),
             includeTypes = includeTypes ?: emptyList()
         )
         val account = accountRepository.get(accountId).getOrThrow()
         val models = if (untilId == null) {
-            notificationCacheDAO.findNotifications(accountId, limit)
+            dataBase.notificationTimelineDAO().findNotifications(timelineHolder.timeline.id, limit)
         } else {
-            notificationCacheDAO.findNotificationsByUntilId(accountId, untilId, limit)
+            dataBase.notificationTimelineDAO().findNotificationsUntilId(timelineHolder.timeline.id, untilId, limit)
         }.map {
             it.toModel()
         }
         val lastInitialFetchTime = lastFetchTimeMap[accountId] ?: System.currentTimeMillis()
         val now = System.currentTimeMillis()
         val fetched = if (models.size < limit) {
-            fetch(account, untilId).getOrThrow()
+            fetch(timelineHolder.timeline.id, account, untilId).getOrThrow()
         } else {
             coroutineScope.launch {
                 if (now - lastInitialFetchTime > 1000 * 60 * 3) {
-                    fetch(account, untilId)
+                    fetch(timelineHolder.timeline.id, account, untilId)
                 }
             }
             models
@@ -74,7 +75,7 @@ class NotificationTimelineRepositoryImpl @Inject constructor(
         fetched
     }
 
-    private suspend fun fetch(account: Account, untilId: String?): Result<List<Notification>> =
+    private suspend fun fetch(timelineId: Long, account: Account, untilId: String?): Result<List<Notification>> =
         runCancellableCatching {
             when (account.instanceType) {
                 Account.InstanceType.MISSKEY, Account.InstanceType.FIREFISH -> {
@@ -88,6 +89,16 @@ class NotificationTimelineRepositoryImpl @Inject constructor(
                         notificationAdder.addConvert(account, it).notification
                     }
                 }
+            }.also { notifications ->
+                dataBase.notificationTimelineDAO().insertNotificationItems(
+                    notifications.map {
+                        NotificationTimelineItemEntity(
+                            timelineId = timelineId,
+                            notificationId = NotificationEntity.makeId(it.id.accountId, it.id.notificationId),
+                            cachedAt = System.currentTimeMillis(),
+                        )
+                    }
+                )
             }
         }
 

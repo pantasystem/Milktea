@@ -63,8 +63,6 @@ class NotificationStoreImpl(
         notificationTimelineRepository.findPreviousTimeline(
             accountId = account.accountId,
             untilId = getUntilId(),
-            excludeTypes = listOf("reaction", "follow", "mention", ),
-            includeTypes = listOf("note", "renote", "reply", "quote", "reaction", "follow", "mention", ),
         ).getOrThrow()
     }
     override suspend fun getSinceId(): String? {

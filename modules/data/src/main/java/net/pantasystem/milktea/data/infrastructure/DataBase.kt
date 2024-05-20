@@ -77,6 +77,7 @@ import net.pantasystem.milktea.data.infrastructure.notification.db.NotificationT
 import net.pantasystem.milktea.data.infrastructure.notification.db.NotificationTimelineEntity
 import net.pantasystem.milktea.data.infrastructure.notification.db.NotificationTimelineExcludedTypeEntity
 import net.pantasystem.milktea.data.infrastructure.notification.db.NotificationTimelineIncludedTypeEntity
+import net.pantasystem.milktea.data.infrastructure.notification.db.NotificationTimelineItemEntity
 import net.pantasystem.milktea.data.infrastructure.notification.db.PollEndedNotificationEntity
 import net.pantasystem.milktea.data.infrastructure.notification.db.PollVoteNotificationEntity
 import net.pantasystem.milktea.data.infrastructure.notification.db.ReactionNotificationEntity
@@ -194,8 +195,10 @@ import net.pantasystem.milktea.data.infrastructure.user.renote.mute.db.RenoteMut
         NotificationTimelineEntity::class,
         NotificationTimelineExcludedTypeEntity::class,
         NotificationTimelineIncludedTypeEntity::class,
+
+        NotificationTimelineItemEntity::class,
     ],
-    version = 68,
+    version = 69,
     exportSchema = true,
     autoMigrations = [
         AutoMigration(from = 11, to = 12),
@@ -253,6 +256,7 @@ import net.pantasystem.milktea.data.infrastructure.user.renote.mute.db.RenoteMut
         AutoMigration(from = 65, to = 66),
         AutoMigration(from = 66, to = 67),
         AutoMigration(from = 67, to = 68),
+        AutoMigration(from = 68, to = 69),
     ],
     views = [UserView::class, GroupMemberView::class, UserListMemberView::class]
 )

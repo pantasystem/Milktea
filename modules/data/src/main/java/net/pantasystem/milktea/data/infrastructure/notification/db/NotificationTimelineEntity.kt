@@ -8,7 +8,6 @@ import androidx.room.OnConflictStrategy
 import androidx.room.PrimaryKey
 import androidx.room.Query
 import androidx.room.Relation
-import kotlinx.datetime.Instant
 
 /**
  * キャッシュの塊を表すエンティティ
@@ -63,12 +62,16 @@ data class NotificationTimelineRelation(
 )
 
 @Entity(
-    tableName = "notification_timeline_items"
+    tableName = "notification_timeline_items",
+    primaryKeys = ["timelineId", "notificationId"],
+    indices = [
+        androidx.room.Index("timelineId"),
+    ]
 )
 data class NotificationTimelineItemEntity(
     val timelineId: Long,
     val notificationId: String,
-    val cachedAt: Instant,
+    val cachedAt: Long,
 )
 
 @Dao
@@ -169,4 +172,34 @@ interface NotificationTimelineDAO {
         """
     )
     suspend fun findById(id: Long): NotificationTimelineRelation?
+
+    // find notifications join notification_timeline_items
+    @Query(
+        """
+            SELECT notifications.* FROM notification_timeline_items
+            JOIN notifications ON notification_timeline_items.notificationId = notifications.id
+            WHERE timelineId = :timelineId
+            ORDER BY notifications.notification_id DESC
+            LIMIT :limit
+        """
+    )
+    suspend fun findNotifications(timelineId: Long, limit: Int): List<NotificationWithDetails>
+
+    // find notifications join notification_timeline_items and untilId
+    @Query(
+        """
+            SELECT notifications.* FROM notification_timeline_items
+            JOIN notifications ON notification_timeline_items.notificationId = notifications.id
+            WHERE timelineId = :timelineId AND notifications.notification_id < :untilId
+            ORDER BY notifications.notification_id DESC
+            LIMIT :limit
+        """
+    )
+    suspend fun findNotificationsUntilId(timelineId: Long, untilId: String, limit: Int): List<NotificationWithDetails>
+
+    // insert notification_timeline_items
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertNotificationItems(entity: List<NotificationTimelineItemEntity>)
+
+
 }
