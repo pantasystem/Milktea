@@ -629,8 +629,8 @@ data class NotificationWithDetails(
         }
     }
 
-    fun isRead(): Boolean {
-        return unreadNotification?.any {
+    private fun isRead(): Boolean {
+        return unreadNotification?.none {
             it.accountId == notification.accountId
         } ?: true
     }
