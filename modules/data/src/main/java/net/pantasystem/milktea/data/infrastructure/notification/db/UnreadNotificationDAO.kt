@@ -1,6 +1,9 @@
 package net.pantasystem.milktea.data.infrastructure.notification.db
 
-import androidx.room.*
+import androidx.room.Dao
+import androidx.room.Insert
+import androidx.room.OnConflictStrategy
+import androidx.room.Query
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -9,9 +12,16 @@ abstract class UnreadNotificationDAO {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     abstract suspend fun insert(unreadNotification: UnreadNotification)
 
+    // insert all
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    abstract suspend fun insertAll(unreadNotifications: List<UnreadNotification>)
+
     @Query("DELETE FROM unread_notifications_table WHERE accountId = :accountId AND notificationId = :notificationId")
     abstract suspend fun delete(accountId: Long, notificationId: String)
 
+    // delete in
+    @Query("DELETE FROM unread_notifications_table WHERE accountId = :accountId AND notificationId IN (:notificationIds)")
+    abstract suspend fun deleteIn(accountId: Long, notificationIds: List<String>)
 
 
     @Query("SELECT un.accountId AS accountId, COUNT(un.notificationId) AS count FROM unread_notifications_table AS un GROUP BY un.accountId")

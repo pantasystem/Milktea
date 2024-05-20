@@ -5,6 +5,7 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface NotificationCacheDAO {
@@ -62,4 +63,53 @@ interface NotificationCacheDAO {
     )
     @Transaction
     suspend fun findNotificationsBySinceId(accountId: Long, sinceId: String, limit: Int): List<NotificationWithDetails>
+
+    // findBy notificationId
+    @Query(
+        """
+            select * from notifications
+                where id = :notificationId
+        """
+    )
+    @Transaction
+    suspend fun findNotification(notificationId: String): NotificationWithDetails?
+
+    // observe in
+    @Query(
+        """
+            select * from notifications
+                where id in (:notificationIds)
+                order by notification_id desc
+        """
+    )
+    @Transaction
+    fun observeIn(notificationIds: List<String>): Flow<List<NotificationWithDetails>>
+
+    // observe one
+    @Query(
+        """
+            select * from notifications
+                where account_id = :accountId and notification_id = :notificationId
+        """
+    )
+    @Transaction
+    fun observeOne(accountId: Long, notificationId: String): Flow<NotificationWithDetails?>
+
+    // remove by id
+    @Query(
+        """
+            delete from notifications
+                where id = :id
+        """
+    )
+    suspend fun remove(id: String)
+
+    // exists
+    @Query(
+        """
+            select count(*) from notifications
+                where id = :id
+        """
+    )
+    suspend fun exists(id: String): Int
 }

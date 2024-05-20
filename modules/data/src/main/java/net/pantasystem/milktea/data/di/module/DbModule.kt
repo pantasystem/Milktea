@@ -161,4 +161,8 @@ object DbModule {
     @Provides
     @Singleton
     fun provideTimelineCacheDao(db: DataBase) = db.timelineCacheDAO()
+
+    @Provides
+    @Singleton
+    fun provideNotificationCacheDao(db: DataBase) = db.notificationCacheDAO()
 }
