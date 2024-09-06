@@ -90,6 +90,7 @@ data class NodeInfo(
         "akkoma" -> SoftwareType.Pleroma.Akkoma(version = software.version, name = software.name)
         "firefish", "iceshrimp" -> SoftwareType.Firefish(version = software.version, name = software.name)
         "kmyblue" -> SoftwareType.Mastodon.Kmyblue(version = software.version, name = software.name)
+        "Iceshrimp.NET" -> SoftwareType.Mastodon.Normal(version = software.version, name = software.name)
         else -> SoftwareType.Other(version = software.version, name = software.name)
     }
 }
