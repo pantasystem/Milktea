@@ -1,7 +1,9 @@
 package net.pantasystem.milktea.data.infrastructure.note.reaction.impl
 
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.flatMapLatest
 import net.pantasystem.milktea.api.misskey.notes.reaction.ReactionHistoryDTO
 import net.pantasystem.milktea.api.misskey.notes.reaction.RequestReactionHistoryDTO
 import net.pantasystem.milktea.common.runCancellableCatching
@@ -25,14 +27,21 @@ class ReactionUserRepositoryImpl @Inject constructor(
     private val userRepository: UserRepository,
     private val userDataSource: UserDataSource,
     private val userDTOEntityConverter: UserDTOEntityConverter,
-    private val dao: ReactionUserDAO,
+    private val reactionAuthorDAO: ReactionAuthorDAO,
 ) : ReactionUserRepository {
 
     override suspend fun syncBy(noteId: Note.Id, reaction: String?): Result<Unit> =
         runCancellableCatching {
             val account = accountRepository.get(noteId.accountId).getOrThrow()
-            dao.remove(noteId, reaction)
-            dao.createEmptyIfNotExists(noteId, reaction)
+            reactionAuthorDAO.remove(ReactionAuthorEntity.generateUniqueId(noteId, reaction))
+            reactionAuthorDAO.upsert(
+                ReactionAuthorEntity(
+                    noteId = noteId.noteId,
+                    accountId = noteId.accountId,
+                    reaction = reaction,
+                    id = ReactionAuthorEntity.generateUniqueId(noteId, reaction),
+                )
+            )
             when (account.instanceType) {
                 Account.InstanceType.MISSKEY, Account.InstanceType.FIREFISH -> {
                     var reactions: List<ReactionHistoryDTO>
@@ -50,7 +59,17 @@ class ReactionUserRepositoryImpl @Inject constructor(
                             ).throwIfHasError().body()
                         )
                         offset += reactions.size
-                        dao.appendAccountIds(noteId, reaction, reactions.map { it.user.id })
+                        reactionAuthorDAO.appendReactionUsers(
+                            reactions.map {
+                                ReactionUserEntity(
+                                    reactionAuthorId = ReactionAuthorEntity.generateUniqueId(
+                                        noteId,
+                                        reaction
+                                    ),
+                                    userId = it.user.id
+                                )
+                            }
+                        )
                         userDataSource.addAll(reactions.map {
                             userDTOEntityConverter.convert(
                                 account,
@@ -60,6 +79,7 @@ class ReactionUserRepositoryImpl @Inject constructor(
                     } while (reactions.size >= 10)
 
                 }
+
                 Account.InstanceType.MASTODON, Account.InstanceType.PLEROMA -> {
                     val resBody = requireNotNull(
                         mastodonAPIProvider.get(account).getStatus(noteId.noteId)
@@ -80,7 +100,25 @@ class ReactionUserRepositoryImpl @Inject constructor(
                     userRepository.syncIn(accountIds.map {
                         User.Id(account.accountId, it)
                     })
-                    dao.update(noteId, reaction, accountIds)
+                    reactionAuthorDAO.upsert(
+                        ReactionAuthorEntity(
+                            noteId = noteId.noteId,
+                            accountId = noteId.accountId,
+                            reaction = reaction,
+                            id = ReactionAuthorEntity.generateUniqueId(noteId, reaction),
+                        )
+                    )
+                    reactionAuthorDAO.appendReactionUsers(
+                        accountIds.map {
+                            ReactionUserEntity(
+                                reactionAuthorId = ReactionAuthorEntity.generateUniqueId(
+                                    noteId,
+                                    reaction
+                                ),
+                                userId = it
+                            )
+                        }
+                    )
                 }
 
             }
@@ -88,20 +126,22 @@ class ReactionUserRepositoryImpl @Inject constructor(
 
     @OptIn(ExperimentalCoroutinesApi::class)
     override fun observeBy(noteId: Note.Id, reaction: String?): Flow<List<User>> {
-        return flow {
-            dao.createEmptyIfNotExists(noteId, reaction)
-            emit(accountRepository.get(noteId.accountId).getOrThrow())
-        }.flatMapLatest { account ->
-            dao.observeBy(noteId, reaction).filterNotNull().flatMapLatest {
-                userDataSource.observeIn(account.accountId, it.accountIds)
-            }
+        return reactionAuthorDAO.observeById(
+            ReactionAuthorEntity.generateUniqueId(noteId, reaction)
+        ).filterNotNull().flatMapLatest { users ->
+            userDataSource.observeIn(noteId.accountId, users.users.map { it.userId })
         }
     }
 
     override suspend fun findBy(noteId: Note.Id, reaction: String?): Result<List<User>> =
         runCancellableCatching {
-            val accountIds = dao.findBy(noteId, reaction)?.accountIds ?: emptyList()
-            userDataSource.getIn(noteId.accountId, accountIds).getOrThrow()
+            val userIds = reactionAuthorDAO.findById(
+                ReactionAuthorEntity.generateUniqueId(
+                    noteId,
+                    reaction
+                )
+            )?.users?.map { it.userId } ?: emptyList()
+            userDataSource.getIn(noteId.accountId, userIds).getOrThrow()
         }
 
 }

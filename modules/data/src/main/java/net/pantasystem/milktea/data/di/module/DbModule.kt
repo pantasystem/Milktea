@@ -165,4 +165,8 @@ object DbModule {
     @Provides
     @Singleton
     fun provideNotificationCacheDao(db: DataBase) = db.notificationCacheDAO()
+
+    @Provides
+    @Singleton
+    fun provideReactionAuthorDAO(db: DataBase) = db.reactionAuthorDAO()
 }

@@ -56,6 +56,9 @@ import net.pantasystem.milktea.data.infrastructure.note.impl.sqlite.NoteThreadDA
 import net.pantasystem.milktea.data.infrastructure.note.impl.sqlite.NoteThreadEntity
 import net.pantasystem.milktea.data.infrastructure.note.impl.sqlite.NoteVisibleUserIdEntity
 import net.pantasystem.milktea.data.infrastructure.note.impl.sqlite.ReactionCountEntity
+import net.pantasystem.milktea.data.infrastructure.note.reaction.impl.ReactionAuthorDAO
+import net.pantasystem.milktea.data.infrastructure.note.reaction.impl.ReactionAuthorEntity
+import net.pantasystem.milktea.data.infrastructure.note.reaction.impl.ReactionUserEntity
 import net.pantasystem.milktea.data.infrastructure.note.reaction.impl.history.ReactionHistoryDao
 import net.pantasystem.milktea.data.infrastructure.note.reaction.impl.history.ReactionHistoryRecord
 import net.pantasystem.milktea.data.infrastructure.note.reaction.impl.usercustom.ReactionUserSetting
@@ -200,8 +203,11 @@ import net.pantasystem.milktea.data.infrastructure.user.renote.mute.db.RenoteMut
         NotificationTimelineItemEntity::class,
 
         FollowRequestAcceptedNotificationEntity::class,
+
+        ReactionAuthorEntity::class,
+        ReactionUserEntity::class,
     ],
-    version = 70,
+    version = 71,
     exportSchema = true,
     autoMigrations = [
         AutoMigration(from = 11, to = 12),
@@ -261,6 +267,7 @@ import net.pantasystem.milktea.data.infrastructure.user.renote.mute.db.RenoteMut
         AutoMigration(from = 67, to = 68),
         AutoMigration(from = 68, to = 69),
         AutoMigration(from = 69, to = 70),
+        AutoMigration(from = 70, to = 71),
     ],
     views = [UserView::class, GroupMemberView::class, UserListMemberView::class]
 )
@@ -331,4 +338,6 @@ abstract class DataBase : RoomDatabase() {
     abstract fun notificationCacheDAO(): NotificationCacheDAO
 
     abstract fun notificationTimelineDAO(): NotificationTimelineDAO
+
+    abstract fun reactionAuthorDAO(): ReactionAuthorDAO
 }
