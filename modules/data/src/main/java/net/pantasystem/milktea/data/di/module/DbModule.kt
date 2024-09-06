@@ -169,4 +169,8 @@ object DbModule {
     @Provides
     @Singleton
     fun provideReactionAuthorDAO(db: DataBase) = db.reactionAuthorDAO()
+
+    @Provides
+    @Singleton
+    fun provideCustomEmojiAspectDAO(db: DataBase) = db.customEmojiAspectDAO()
 }

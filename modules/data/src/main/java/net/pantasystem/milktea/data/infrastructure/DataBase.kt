@@ -13,6 +13,8 @@ import net.pantasystem.milktea.data.infrastructure.account.page.db.TimelinePageT
 import net.pantasystem.milktea.data.infrastructure.drive.DriveFileRecord
 import net.pantasystem.milktea.data.infrastructure.drive.DriveFileRecordDao
 import net.pantasystem.milktea.data.infrastructure.emoji.CustomEmojiAliasRecord
+import net.pantasystem.milktea.data.infrastructure.emoji.CustomEmojiAspectRatioDAO
+import net.pantasystem.milktea.data.infrastructure.emoji.CustomEmojiAspectRatioEntity
 import net.pantasystem.milktea.data.infrastructure.emoji.CustomEmojiDAO
 import net.pantasystem.milktea.data.infrastructure.emoji.CustomEmojiRecord
 import net.pantasystem.milktea.data.infrastructure.filter.db.MastodonFilterDao
@@ -206,8 +208,10 @@ import net.pantasystem.milktea.data.infrastructure.user.renote.mute.db.RenoteMut
 
         ReactionAuthorEntity::class,
         ReactionUserEntity::class,
+
+        CustomEmojiAspectRatioEntity::class,
     ],
-    version = 71,
+    version = 72,
     exportSchema = true,
     autoMigrations = [
         AutoMigration(from = 11, to = 12),
@@ -268,6 +272,7 @@ import net.pantasystem.milktea.data.infrastructure.user.renote.mute.db.RenoteMut
         AutoMigration(from = 68, to = 69),
         AutoMigration(from = 69, to = 70),
         AutoMigration(from = 70, to = 71),
+        AutoMigration(from = 71, to = 72),
     ],
     views = [UserView::class, GroupMemberView::class, UserListMemberView::class]
 )
@@ -340,4 +345,6 @@ abstract class DataBase : RoomDatabase() {
     abstract fun notificationTimelineDAO(): NotificationTimelineDAO
 
     abstract fun reactionAuthorDAO(): ReactionAuthorDAO
+
+    abstract fun customEmojiAspectDAO(): CustomEmojiAspectRatioDAO
 }
