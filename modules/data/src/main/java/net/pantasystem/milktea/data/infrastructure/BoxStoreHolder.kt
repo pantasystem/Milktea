@@ -3,6 +3,7 @@ package net.pantasystem.milktea.data.infrastructure
 import android.content.Context
 import dagger.hilt.android.qualifiers.ApplicationContext
 import io.objectbox.BoxStore
+import net.pantasystem.milktea.data.infrastructure.image.MyObjectBox
 import javax.inject.Inject
 import javax.inject.Singleton
 
