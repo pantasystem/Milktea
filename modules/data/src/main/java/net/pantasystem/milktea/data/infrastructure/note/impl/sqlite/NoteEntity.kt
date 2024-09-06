@@ -541,8 +541,8 @@ data class NoteWithRelation(
                 null
             } else {
                 Poll(
-                    expiresAt = note.pollExpiresAt!!,
-                    multiple = note.pollMultiple!!,
+                    expiresAt = note.pollExpiresAt,
+                    multiple = note.pollMultiple ?: false,
                     choices = pollChoices.map {
                         Poll.Choice(it.index, it.text, it.votes, it.isVoted)
                     }.sortedBy { it.index }
