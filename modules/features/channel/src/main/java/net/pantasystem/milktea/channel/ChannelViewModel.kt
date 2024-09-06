@@ -107,6 +107,23 @@ class ChannelViewModel @Inject constructor(
         }
     }
 
+    fun loadOld(type: ChannelListType) {
+        viewModelScope.launch {
+            val model = when (type) {
+                ChannelListType.OWNED -> ownedChannelPagingModel
+                ChannelListType.FOLLOWED -> followedChannelPagingModel
+                ChannelListType.FEATURED -> featuredChannelPagingModel
+            }
+
+            PreviousPagingController(
+                model,
+                model,
+                model,
+                model,
+            ).loadPrevious()
+        }
+    }
+
     fun follow(channelId: Channel.Id) {
         viewModelScope.launch {
             runCancellableCatching {
