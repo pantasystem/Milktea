@@ -178,6 +178,23 @@ data class UnknownNotificationEntity(
     @ColumnInfo("raw_type") val rawType: String
 )
 
+@Entity(
+    tableName = "follow_request_accepted_notifications",
+    foreignKeys = [
+        ForeignKey(
+            entity = NotificationEntity::class,
+            parentColumns = ["id"],
+            childColumns = ["id"],
+            onDelete = ForeignKey.CASCADE,
+            onUpdate = ForeignKey.CASCADE
+        )
+    ]
+)
+data class FollowRequestAcceptedNotificationEntity(
+    @PrimaryKey val id: String,
+    @ColumnInfo(name = "user_id") val userId: String,
+)
+
 data class NotificationWithDetails(
     @Embedded val notification: NotificationEntity,
     @Relation(
@@ -235,6 +252,13 @@ data class NotificationWithDetails(
         entityColumn = "id"
     )
     val pollEndedNotification: PollEndedNotificationEntity?,
+
+    @Relation(
+        entity = FollowRequestAcceptedNotificationEntity::class,
+        parentColumn = "id",
+        entityColumn = "id"
+    )
+    val followRequestAccepted: FollowRequestAcceptedNotificationEntity?,
 ) {
 
     companion object {
@@ -274,6 +298,7 @@ data class NotificationWithDetails(
                     null,
                     unreadNotification(),
                     null,
+                    null,
                 )
 
                 is FollowNotification -> {
@@ -290,6 +315,7 @@ data class NotificationWithDetails(
                         null,
                         unreadNotification(),
                         null,
+                        null,
                     )
                 }
 
@@ -304,6 +330,10 @@ data class NotificationWithDetails(
                         null,
                         unreadNotification(),
                         null,
+                        FollowRequestAcceptedNotificationEntity(
+                            notificationEntity.id,
+                            userId = model.userId.id,
+                        )
                     )
                 }
 
@@ -325,6 +355,7 @@ data class NotificationWithDetails(
                         null,
                         unreadNotification(),
                         null,
+                        null,
                     )
                 }
 
@@ -343,6 +374,7 @@ data class NotificationWithDetails(
                         null,
                         unreadNotification(),
                         null,
+                        null,
                     )
                 }
 
@@ -360,6 +392,7 @@ data class NotificationWithDetails(
                             NotificationEntity.makeId(model.id.accountId, model.id.notificationId),
                             model.noteId.noteId,
                         ),
+                        null,
                     )
                 }
 
@@ -376,6 +409,7 @@ data class NotificationWithDetails(
                         null,
                         null,
                         unreadNotification(),
+                        null,
                         null,
                     )
                 }
@@ -395,6 +429,7 @@ data class NotificationWithDetails(
                         null,
                         unreadNotification(),
                         null,
+                        null,
                     )
                 }
 
@@ -412,6 +447,7 @@ data class NotificationWithDetails(
                         null,
                         null,
                         unreadNotification(),
+                        null,
                         null,
                     )
                 }
@@ -434,6 +470,7 @@ data class NotificationWithDetails(
                         null,
                         unreadNotification(),
                         null,
+                        null,
                     )
                 }
 
@@ -447,6 +484,7 @@ data class NotificationWithDetails(
                         null,
                         null,
                         unreadNotification(),
+                        null,
                         null,
                     )
                 }
@@ -466,6 +504,7 @@ data class NotificationWithDetails(
                         null,
                         unreadNotification(),
                         null,
+                        null,
                     )
                 }
 
@@ -484,6 +523,7 @@ data class NotificationWithDetails(
                         null,
                         unreadNotification(),
                         null,
+                        null,
                     )
                 }
 
@@ -500,6 +540,7 @@ data class NotificationWithDetails(
                             model.rawType,
                         ),
                         unreadNotification(),
+                        null,
                         null,
                     )
                 }
@@ -534,7 +575,7 @@ data class NotificationWithDetails(
                 FollowRequestAcceptedNotification(
                     Notification.Id(notification.accountId, notification.notificationId),
                     notification.createdAt,
-                    User.Id(notification.accountId, noteNotification!!.userId),
+                    User.Id(notification.accountId, followRequestAccepted!!.userId),
                     isRead(),
                 )
             }

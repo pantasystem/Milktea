@@ -100,6 +100,7 @@ class MediatorNotificationDataSource @Inject constructor(
         notificationCacheDAO.insertGroupInvitedNotifications(relations.mapNotNull { it.groupInvitedNotification })
         notificationCacheDAO.insertUnknownNotifications(relations.mapNotNull { it.unknownNotification })
         notificationCacheDAO.insertPollEndedNotifications(relations.mapNotNull { it.pollEndedNotification })
+        notificationCacheDAO.insertFollowRequestAcceptedNotifications(relations.mapNotNull { it.followRequestAccepted })
 
         val unReads = notifications.filter { !it.isRead }.map {
             UnreadNotification(it.id.accountId, it.id.notificationId)

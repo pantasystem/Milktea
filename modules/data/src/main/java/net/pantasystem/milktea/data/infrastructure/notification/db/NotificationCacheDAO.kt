@@ -34,6 +34,9 @@ interface NotificationCacheDAO {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertPollEndedNotifications(items: List<PollEndedNotificationEntity>)
 
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertFollowRequestAcceptedNotifications(items: List<FollowRequestAcceptedNotificationEntity>)
+
     @Query(
         """
             select * from notifications

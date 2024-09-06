@@ -67,6 +67,7 @@ import net.pantasystem.milktea.data.infrastructure.note.wordmute.WordFilterCondi
 import net.pantasystem.milktea.data.infrastructure.note.wordmute.WordFilterConditionWordRecord
 import net.pantasystem.milktea.data.infrastructure.note.wordmute.WordFilterConfigDao
 import net.pantasystem.milktea.data.infrastructure.notification.db.FollowNotificationEntity
+import net.pantasystem.milktea.data.infrastructure.notification.db.FollowRequestAcceptedNotificationEntity
 import net.pantasystem.milktea.data.infrastructure.notification.db.GroupInvitedNotificationEntity
 import net.pantasystem.milktea.data.infrastructure.notification.db.NoteNotificationEntity
 import net.pantasystem.milktea.data.infrastructure.notification.db.NotificationCacheDAO
@@ -197,8 +198,10 @@ import net.pantasystem.milktea.data.infrastructure.user.renote.mute.db.RenoteMut
         NotificationTimelineIncludedTypeEntity::class,
 
         NotificationTimelineItemEntity::class,
+
+        FollowRequestAcceptedNotificationEntity::class,
     ],
-    version = 69,
+    version = 70,
     exportSchema = true,
     autoMigrations = [
         AutoMigration(from = 11, to = 12),
@@ -257,6 +260,7 @@ import net.pantasystem.milktea.data.infrastructure.user.renote.mute.db.RenoteMut
         AutoMigration(from = 66, to = 67),
         AutoMigration(from = 67, to = 68),
         AutoMigration(from = 68, to = 69),
+        AutoMigration(from = 69, to = 70),
     ],
     views = [UserView::class, GroupMemberView::class, UserListMemberView::class]
 )
