@@ -56,7 +56,7 @@ class NotificationStoreImpl(
     override suspend fun convertAll(list: List<Notification>): List<Notification.Id> {
         return list.map {
             it.id
-        }
+        }.distinct()
     }
 
     override suspend fun loadPrevious(): Result<List<Notification>> = runCancellableCatching {

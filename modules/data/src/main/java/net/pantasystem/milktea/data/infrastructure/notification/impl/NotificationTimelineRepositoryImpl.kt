@@ -86,7 +86,9 @@ class NotificationTimelineRepositoryImpl @Inject constructor(
             lastFetchTimeMap += accountId to now
         }
 
-        fetched
+        fetched.filterNot {
+            it.id.notificationId == untilId
+        }
     }
 
     override suspend fun findLaterTimeline(
@@ -141,7 +143,9 @@ class NotificationTimelineRepositoryImpl @Inject constructor(
             lastFetchTimeMap += accountId to now
         }
 
-        fetched
+        fetched.filterNot {
+            it.id.notificationId == sinceId
+        }
     }
 
     private suspend fun fetch(
