@@ -48,6 +48,7 @@ android {
         unitTests.all {
             useJUnitPlatform()
         }
+        unitTests.includeAndroidResources = true
     }
     namespace 'net.pantasystem.milktea.data'
 }
@@ -115,6 +116,8 @@ dependencies {
     testRuntimeOnly libs.junit.jupiter.engine
     implementation "androidx.exifinterface:exifinterface:1.3.6"
     implementation libs.objectbox.kotlin
+
+    testImplementation libs.robolectric
 
 }
 

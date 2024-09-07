@@ -111,6 +111,8 @@ dependencyResolutionManagement {
             library("objectbox-kotlin", "io.objectbox:objectbox-kotlin:3.5.1")
 
             library("konfetti", "nl.dionsegijn:konfetti-xml:2.0.3")
+
+            library("robolectric", "org.robolectric:robolectric:4.13")
         }
     }
 }

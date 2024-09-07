@@ -1,13 +1,12 @@
 package net.pantasystem.milktea.data.infrastructure.image
 
 import android.content.Context
+import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
-import io.objectbox.BoxStore
-import io.objectbox.kotlin.boxFor
 import kotlinx.coroutines.runBlocking
 import kotlinx.datetime.Clock
 import net.pantasystem.milktea.api.misskey.DefaultOkHttpClientProvider
-import net.pantasystem.milktea.data.infrastructure.BoxStoreHolder
+import net.pantasystem.milktea.data.infrastructure.DataBase
 import net.pantasystem.milktea.model.image.ImageCache
 import org.junit.Assert
 import org.junit.Before
@@ -18,25 +17,23 @@ class ImageCacheRepositoryImplTest {
 
 
     lateinit var repository: ImageCacheRepositoryImpl
-    lateinit var store: BoxStore
+    lateinit var dao: ImageCacheDAO
     @Before
     fun setup() {
         val context = ApplicationProvider.getApplicationContext<Context>()
-        val storeHolder = BoxStoreHolder(context)
-        store = storeHolder.boxStore
+        val database = Room.inMemoryDatabaseBuilder(context, DataBase::class.java).build()
         repository = ImageCacheRepositoryImpl(
-            boxStoreHolder = storeHolder,
             okHttpClientProvider = DefaultOkHttpClientProvider(),
             context = context,
-            coroutineDispatcher = kotlinx.coroutines.Dispatchers.Default
+            coroutineDispatcher = kotlinx.coroutines.Dispatchers.Default,
+            database.imageCacheDAO(),
         )
-        store.removeAllObjects()
+        dao = database.imageCacheDAO()
     }
 
     @Test
     fun deleteExpiredCaches() = runBlocking {
 
-        val cacheStore = store.boxFor<ImageCacheRecord>()
         val data = listOf(
             ImageCache(
                 sourceUrl = "https://example.com/image2.png",
@@ -75,16 +72,16 @@ class ImageCacheRepositoryImplTest {
             )
         )
         data.forEach {
-            cacheStore.put(
-                ImageCacheRecord.from(it)
+            dao.upsert(
+                ImageCacheEntity.from(it)
             )
         }
 
-        Assert.assertEquals(5, cacheStore.count())
+        Assert.assertEquals(5, dao.count())
 
         repository.deleteExpiredCaches()
 
-        Assert.assertEquals(3, cacheStore.count())
+        Assert.assertEquals(3, dao.count())
 
         Assert.assertEquals(
             setOf(
@@ -94,7 +91,7 @@ class ImageCacheRepositoryImplTest {
             ).map {
                   it.sourceUrl
             },
-            cacheStore.all.map { it.toModel() }.toSet().map {
+            dao.findAll().map { it.toModel() }.toSet().map {
                 it.sourceUrl
             }
         )

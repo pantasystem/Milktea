@@ -49,4 +49,7 @@ interface ImageCacheDAO {
 
     @Query("""DELETE FROM image_caches WHERE source_url = :url""")
     suspend fun deleteByUrl(url: String)
+
+    @Query("""SELECT * FROM image_caches""")
+    suspend fun findAll(): List<ImageCacheEntity>
 }
