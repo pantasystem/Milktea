@@ -23,6 +23,8 @@ import net.pantasystem.milktea.data.infrastructure.group.GroupDao
 import net.pantasystem.milktea.data.infrastructure.group.GroupMemberIdRecord
 import net.pantasystem.milktea.data.infrastructure.group.GroupMemberView
 import net.pantasystem.milktea.data.infrastructure.group.GroupRecord
+import net.pantasystem.milktea.data.infrastructure.image.ImageCacheDAO
+import net.pantasystem.milktea.data.infrastructure.image.ImageCacheEntity
 import net.pantasystem.milktea.data.infrastructure.instance.db.FedibirdCapabilitiesRecord
 import net.pantasystem.milktea.data.infrastructure.instance.db.InstanceInfoDao
 import net.pantasystem.milktea.data.infrastructure.instance.db.InstanceInfoRecord
@@ -210,8 +212,10 @@ import net.pantasystem.milktea.data.infrastructure.user.renote.mute.db.RenoteMut
         ReactionUserEntity::class,
 
         CustomEmojiAspectRatioEntity::class,
+
+        ImageCacheEntity::class,
     ],
-    version = 72,
+    version = 73,
     exportSchema = true,
     autoMigrations = [
         AutoMigration(from = 11, to = 12),
@@ -273,6 +277,7 @@ import net.pantasystem.milktea.data.infrastructure.user.renote.mute.db.RenoteMut
         AutoMigration(from = 69, to = 70),
         AutoMigration(from = 70, to = 71),
         AutoMigration(from = 71, to = 72),
+        AutoMigration(from = 72, to = 73)
     ],
     views = [UserView::class, GroupMemberView::class, UserListMemberView::class]
 )
@@ -347,4 +352,6 @@ abstract class DataBase : RoomDatabase() {
     abstract fun reactionAuthorDAO(): ReactionAuthorDAO
 
     abstract fun customEmojiAspectDAO(): CustomEmojiAspectRatioDAO
+
+    abstract fun imageCacheDAO(): ImageCacheDAO
 }

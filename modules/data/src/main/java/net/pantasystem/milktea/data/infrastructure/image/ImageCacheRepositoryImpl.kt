@@ -3,9 +3,6 @@ package net.pantasystem.milktea.data.infrastructure.image
 import android.content.Context
 import android.graphics.BitmapFactory
 import dagger.hilt.android.qualifiers.ApplicationContext
-import io.objectbox.kotlin.awaitCallInTx
-import io.objectbox.kotlin.inValues
-import io.objectbox.query.QueryBuilder
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import kotlinx.datetime.Clock
@@ -13,7 +10,6 @@ import net.pantasystem.milktea.api.misskey.OkHttpClientProvider
 import net.pantasystem.milktea.common.Hash
 import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.common_android.hilt.IODispatcher
-import net.pantasystem.milktea.data.infrastructure.BoxStoreHolder
 import net.pantasystem.milktea.model.image.ImageCache
 import net.pantasystem.milktea.model.image.ImageCacheRepository
 import okhttp3.Request
@@ -23,20 +19,16 @@ import kotlin.time.Duration.Companion.days
 
 
 class ImageCacheRepositoryImpl @Inject constructor(
-    private val boxStoreHolder: BoxStoreHolder,
     private val okHttpClientProvider: OkHttpClientProvider,
     @ApplicationContext val context: Context,
     @IODispatcher val coroutineDispatcher: CoroutineDispatcher,
+    private val imageCacheDAO: ImageCacheDAO,
 ) : ImageCacheRepository {
 
     companion object {
         const val cacheDir = "milktea_image_caches"
         val cacheExpireDuration = 7.days
         val cacheIgnoreUpdateDuration = 3.days
-    }
-
-    private val imageCacheStore by lazy {
-        boxStoreHolder.boxStore.boxFor(ImageCacheRecord::class.java)
     }
 
     override suspend fun save(url: String) = runCancellableCatching {
@@ -73,17 +65,8 @@ class ImageCacheRepositoryImpl @Inject constructor(
     override suspend fun findBySourceUrl(url: String): Result<ImageCache?> = runCancellableCatching {
         withContext(coroutineDispatcher) {
             val now = Clock.System.now()
-            val record = imageCacheStore.query().equal(
-                ImageCacheRecord_.sourceUrl,
-                url,
-                QueryBuilder.StringOrder.CASE_SENSITIVE
-            ).build().findFirst()
-            val model = record?.toModel()
-            if (model != null && now - model.cachedAt > cacheExpireDuration) {
-                imageCacheStore.remove(record)
-                null
-            } else {
-                model
+            imageCacheDAO.findBySourceUrl(url, (now - cacheExpireDuration).toEpochMilliseconds())?.let {
+                it.toModel()
             }
         }
     }
@@ -91,29 +74,21 @@ class ImageCacheRepositoryImpl @Inject constructor(
     override suspend fun deleteExpiredCaches(): Result<Unit> = runCancellableCatching {
         withContext(coroutineDispatcher) {
             val now = Clock.System.now()
-            val query = imageCacheStore.query().lessOrEqual(
-                ImageCacheRecord_.cachedAt,
-                (now - cacheExpireDuration).toEpochMilliseconds()
-            ).build()
-
-            val deleteCacheSize = query.count()
-            for (i in 0 until deleteCacheSize step 100) {
-                val list = query.find(i, 100)
-                list.forEach {
-                    val file = File(it.cachePath)
-                    if (file.exists()) {
-                        file.delete()
-                    }
+            val targets = imageCacheDAO.findOlder((now - cacheExpireDuration).toEpochMilliseconds())
+            targets.forEach {
+                imageCacheDAO.deleteByUrl(it.sourceUrl)
+                val file = File(it.cachePath)
+                if (file.exists()) {
+                    file.delete()
                 }
-                imageCacheStore.remove(list)
+                imageCacheDAO.deleteByUrl(it.sourceUrl)
             }
-
         }
     }
 
     override suspend fun clear(): Result<Unit> = runCancellableCatching {
         withContext(coroutineDispatcher) {
-            imageCacheStore.removeAll()
+            imageCacheDAO.clear()
             File(context.filesDir, cacheDir).deleteRecursively()
         }
     }
@@ -121,41 +96,17 @@ class ImageCacheRepositoryImpl @Inject constructor(
     override suspend fun findBySourceUrls(urls: List<String>): Result<List<ImageCache>> = runCancellableCatching {
         withContext(coroutineDispatcher) {
             val now = Clock.System.now()
-            urls.chunked(50) { list ->
-                val records = imageCacheStore.query().inValues(
-                    ImageCacheRecord_.sourceUrl,
-                    list.toTypedArray(),
-                    QueryBuilder.StringOrder.CASE_SENSITIVE
-                ).build().find()
-                records.mapNotNull { record ->
-                    val model = record.toModel()
-                    if (now - model.cachedAt > cacheExpireDuration) {
-                        null
-                    } else {
-                        model
-                    }
-                }
+            urls.chunked(300).map { list ->
+                imageCacheDAO.findBySourceUrls(
+                    list,
+                    (now - cacheExpireDuration).toEpochMilliseconds(),
+                )
             }
-        }.flatten()
+        }.flatten().map { it.toModel() }
     }
 
     private suspend fun upInsert(cache: ImageCache) {
-        val record = ImageCacheRecord.from(
-            cache
-        )
-        boxStoreHolder.boxStore.awaitCallInTx {
-            val existsRecord = imageCacheStore.query().equal(
-                ImageCacheRecord_.sourceUrl,
-                cache.sourceUrl,
-                QueryBuilder.StringOrder.CASE_SENSITIVE
-            ).build().findFirst()
-            if (existsRecord == null) {
-                imageCacheStore.put(record)
-            } else {
-                existsRecord.applyModel(record.toModel())
-                imageCacheStore.put(existsRecord)
-            }
-        }
+        imageCacheDAO.upsert(ImageCacheEntity.from(cache))
     }
 
     private fun downloadAndSaveFile(url: String, file: File): Pair<Int?, Int?> {
@@ -188,7 +139,7 @@ class ImageCacheRepositoryImpl @Inject constructor(
             }
             dir.listFiles()?.size?.toLong() ?: 0L
         } else {
-            imageCacheStore.count()
+            imageCacheDAO.count()
         }
     }
 }

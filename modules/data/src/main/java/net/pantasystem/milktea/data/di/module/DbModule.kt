@@ -173,4 +173,8 @@ object DbModule {
     @Provides
     @Singleton
     fun provideCustomEmojiAspectDAO(db: DataBase) = db.customEmojiAspectDAO()
+
+    @Provides
+    @Singleton
+    fun provideImageCacheDAO(db: DataBase) = db.imageCacheDAO()
 }
