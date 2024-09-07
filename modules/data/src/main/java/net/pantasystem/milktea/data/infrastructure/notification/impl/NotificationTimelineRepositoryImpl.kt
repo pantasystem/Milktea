@@ -50,18 +50,33 @@ class NotificationTimelineRepositoryImpl @Inject constructor(
         val models = if (untilId == null) {
             dataBase.notificationTimelineDAO().findNotifications(timelineHolder.timeline.id, limit)
         } else {
-            dataBase.notificationTimelineDAO().findNotificationsUntilId(timelineHolder.timeline.id, untilId, limit)
+            dataBase.notificationTimelineDAO()
+                .findNotificationsUntilId(timelineHolder.timeline.id, untilId, limit)
         }.map {
             it.toModel()
         }
         val lastInitialFetchTime = lastFetchTimeMap[accountId] ?: System.currentTimeMillis()
         val now = System.currentTimeMillis()
         val fetched = if (models.size < limit) {
-            fetch(timelineHolder.timeline.id, account, untilId, excludeTypes, includeTypes).getOrThrow()
+            fetch(
+                timelineHolder.timeline.id,
+                account,
+                untilId,
+                null,
+                excludeTypes,
+                includeTypes
+            ).getOrThrow()
         } else {
             coroutineScope.launch {
                 if (now - lastInitialFetchTime > 1000 * 60 * 3) {
-                    fetch(timelineHolder.timeline.id, account, untilId, excludeTypes, includeTypes)
+                    fetch(
+                        timelineHolder.timeline.id,
+                        account,
+                        untilId,
+                        null,
+                        excludeTypes,
+                        includeTypes
+                    )
                 }
             }
             models
@@ -74,23 +89,91 @@ class NotificationTimelineRepositoryImpl @Inject constructor(
         fetched
     }
 
+    override suspend fun findLaterTimeline(
+        accountId: Long,
+        sinceId: String?,
+        limit: Int,
+        excludeTypes: List<String>?,
+        includeTypes: List<String>?
+    ): Result<List<Notification>> = runCancellableCatching {
+        val timelineHolder = makeNotificationTimelineHolder(
+            accountId = accountId,
+            excludeTypes = excludeTypes ?: emptyList(),
+            includeTypes = includeTypes ?: emptyList()
+        )
+        val account = accountRepository.get(accountId).getOrThrow()
+        val models = if (sinceId == null) {
+            dataBase.notificationTimelineDAO().findNotifications(timelineHolder.timeline.id, limit)
+        } else {
+            dataBase.notificationTimelineDAO()
+                .findNotificationsSinceId(timelineHolder.timeline.id, sinceId, limit)
+        }.map {
+            it.toModel()
+        }
+        val lastInitialFetchTime = lastFetchTimeMap[accountId] ?: System.currentTimeMillis()
+        val now = System.currentTimeMillis()
+        val fetched = if (models.size < limit) {
+            fetch(
+                timelineHolder.timeline.id,
+                account,
+                null,
+                sinceId,
+                excludeTypes,
+                includeTypes
+            ).getOrThrow()
+        } else {
+            coroutineScope.launch {
+                if (now - lastInitialFetchTime > 1000 * 60 * 3) {
+                    fetch(
+                        timelineHolder.timeline.id,
+                        account,
+                        null,
+                        sinceId,
+                        excludeTypes,
+                        includeTypes
+                    )
+                }
+            }
+            models
+        }
+
+        if (sinceId == null) {
+            lastFetchTimeMap += accountId to now
+        }
+
+        fetched
+    }
+
     private suspend fun fetch(
         timelineId: Long,
         account: Account,
         untilId: String?,
+        sinceId: String?,
         excludeTypes: List<String>?,
         includeTypes: List<String>?,
     ): Result<List<Notification>> =
         runCancellableCatching {
             when (account.instanceType) {
                 Account.InstanceType.MISSKEY, Account.InstanceType.FIREFISH -> {
-                    fetchMisskeyNotifications(account, untilId, excludeTypes, includeTypes).map {
+                    fetchMisskeyNotifications(
+                        account,
+                        untilId,
+                        sinceId,
+                        excludeTypes,
+                        includeTypes
+                    ).map {
                         notificationAdder.addAndConvert(account, it).notification
                     }
                 }
 
                 Account.InstanceType.MASTODON, Account.InstanceType.PLEROMA -> {
-                    fetchMastodonNotifications(account, untilId, excludeTypes, includeTypes).map {
+                    fetchMastodonNotifications(
+                        account,
+                        untilId,
+                        sinceId,
+                        excludeTypes,
+                        includeTypes
+                    ).map {
                         notificationAdder.addConvert(account, it).notification
                     }
                 }
@@ -99,7 +182,10 @@ class NotificationTimelineRepositoryImpl @Inject constructor(
                     notifications.map {
                         NotificationTimelineItemEntity(
                             timelineId = timelineId,
-                            notificationId = NotificationEntity.makeId(it.id.accountId, it.id.notificationId),
+                            notificationId = NotificationEntity.makeId(
+                                it.id.accountId,
+                                it.id.notificationId
+                            ),
                             cachedAt = System.currentTimeMillis(),
                         )
                     }
@@ -110,6 +196,7 @@ class NotificationTimelineRepositoryImpl @Inject constructor(
     private suspend fun fetchMisskeyNotifications(
         account: Account,
         untilId: String?,
+        sinceId: String?,
         excludeTypes: List<String>?,
         includeTypes: List<String>?,
     ): List<NotificationDTO> {
@@ -117,6 +204,7 @@ class NotificationTimelineRepositoryImpl @Inject constructor(
             NotificationRequest(
                 i = account.token,
                 untilId = untilId,
+                sinceId = sinceId,
                 excludeTypes = excludeTypes,
                 includeTypes = includeTypes,
             )
@@ -127,11 +215,13 @@ class NotificationTimelineRepositoryImpl @Inject constructor(
     private suspend fun fetchMastodonNotifications(
         account: Account,
         untilId: String?,
+        sinceId: String?,
         excludeTypes: List<String>?,
         includeTypes: List<String>?,
     ): List<MstNotificationDTO> {
         val res = mastodonAPIProvider.get(account).getNotifications(
             maxId = untilId,
+            minId = sinceId,
             excludeTypes = excludeTypes,
             types = includeTypes,
         )
@@ -151,8 +241,7 @@ class NotificationTimelineRepositoryImpl @Inject constructor(
                 dao.findByExcludeTypes(accountId, excludeTypes).firstOrNull()
             } else if (excludeTypes.isEmpty()) {
                 dao.findByIncludeTypes(accountId, includeTypes).firstOrNull()
-            }
-            else {
+            } else {
                 dao.findByExcludeTypesAndIncludeTypes(
                     accountId = accountId,
                     excludeTypes = excludeTypes,

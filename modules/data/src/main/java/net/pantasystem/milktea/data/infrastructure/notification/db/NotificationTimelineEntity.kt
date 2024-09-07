@@ -8,6 +8,7 @@ import androidx.room.OnConflictStrategy
 import androidx.room.PrimaryKey
 import androidx.room.Query
 import androidx.room.Relation
+import androidx.room.Transaction
 
 /**
  * キャッシュの塊を表すエンティティ
@@ -196,6 +197,18 @@ interface NotificationTimelineDAO {
         """
     )
     suspend fun findNotificationsUntilId(timelineId: Long, untilId: String, limit: Int): List<NotificationWithDetails>
+
+    @Query(
+        """
+            SELECT notifications.* FROM notification_timeline_items
+            JOIN notifications ON notification_timeline_items.notificationId = notifications.id
+            WHERE timelineId = :timelineId AND notifications.notification_id > :sinceId
+            ORDER BY notifications.notification_id DESC
+            LIMIT :limit
+        """
+    )
+    @Transaction
+    suspend fun findNotificationsSinceId(timelineId: Long, sinceId: String, limit: Int): List<NotificationWithDetails>
 
     // insert notification_timeline_items
     @Insert(onConflict = OnConflictStrategy.REPLACE)

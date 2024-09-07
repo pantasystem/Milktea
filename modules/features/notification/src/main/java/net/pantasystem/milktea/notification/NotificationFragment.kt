@@ -204,6 +204,7 @@ class NotificationFragment : Fragment(R.layout.fragment_notification) {
 
             if (firstVisibleItemPosition == 0) {
                 Log.d("", "先頭")
+                mViewModel.loadFuture()
             }
 
             if (endVisibleItemPosition == (itemCount - 1)) {

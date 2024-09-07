@@ -14,6 +14,8 @@ interface NotificationPagingStore {
 
     suspend fun loadPrevious(): Result<Int>
 
+    suspend fun loadFuture(): Result<Int>
+
     suspend fun clear()
 
     suspend fun onReceiveNewNotification(notificationRelation: NotificationRelation) {

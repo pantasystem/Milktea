@@ -8,11 +8,27 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.BufferOverflow
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.buffer
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.plus
 import net.pantasystem.milktea.app_store.account.AccountStore
-import net.pantasystem.milktea.common.*
+import net.pantasystem.milktea.common.APIError
+import net.pantasystem.milktea.common.Logger
+import net.pantasystem.milktea.common.PageableState
+import net.pantasystem.milktea.common.StateContent
+import net.pantasystem.milktea.common.flatMapCancellableCatching
+import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.common_android.resource.StringSource
 import net.pantasystem.milktea.common_android_ui.APIErrorStringConverter
 import net.pantasystem.milktea.model.account.Account
@@ -22,7 +38,12 @@ import net.pantasystem.milktea.model.account.page.Pageable
 import net.pantasystem.milktea.model.filter.WordFilterService
 import net.pantasystem.milktea.model.group.AcceptGroupInvitationUseCase
 import net.pantasystem.milktea.model.group.RejectGroupInvitationUseCase
-import net.pantasystem.milktea.model.notification.*
+import net.pantasystem.milktea.model.notification.GroupInvitedNotification
+import net.pantasystem.milktea.model.notification.Notification
+import net.pantasystem.milktea.model.notification.NotificationPagingStore
+import net.pantasystem.milktea.model.notification.NotificationRepository
+import net.pantasystem.milktea.model.notification.NotificationStreaming
+import net.pantasystem.milktea.model.notification.ReceiveFollowRequestNotification
 import net.pantasystem.milktea.model.setting.LocalConfigRepository
 import net.pantasystem.milktea.model.user.follow.requests.AcceptFollowRequestUseCase
 import net.pantasystem.milktea.model.user.follow.requests.RejectFollowRequestUseCase
@@ -166,6 +187,15 @@ class NotificationViewModel @Inject constructor(
     fun loadOld() {
         viewModelScope.launch {
             notificationPagingStore.loadPrevious().onFailure {
+                logger.error("通知の読み込みに失敗", it)
+                _error.tryEmit(it)
+            }
+        }
+    }
+
+    fun loadFuture() {
+        viewModelScope.launch {
+            notificationPagingStore.loadFuture().onFailure {
                 logger.error("通知の読み込みに失敗", it)
                 _error.tryEmit(it)
             }

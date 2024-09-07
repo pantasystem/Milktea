@@ -7,6 +7,7 @@ import net.pantasystem.milktea.api.mastodon.notification.MstNotificationDTO
 import net.pantasystem.milktea.api.misskey.notification.NotificationDTO
 import net.pantasystem.milktea.common.PageableState
 import net.pantasystem.milktea.common.StateContent
+import net.pantasystem.milktea.common.paginator.FuturePagingController
 import net.pantasystem.milktea.common.paginator.PreviousPagingController
 import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.data.infrastructure.notification.db.UnreadNotificationDAO
@@ -45,6 +46,13 @@ class NotificationPagingStoreImpl(
         previousLoader = delegate,
     )
 
+    private val futurePagingController = FuturePagingController(
+        entityConverter = delegate,
+        locker = delegate,
+        state = delegate,
+        futureLoader = delegate,
+    )
+
     override val notifications: Flow<PageableState<List<NotificationRelation>>> =
         delegate.state.map { state ->
             state.suspendConvert { list ->
@@ -68,6 +76,13 @@ class NotificationPagingStoreImpl(
         }
         unreadNotificationDAO.deleteWhereAccountId(getAccount().accountId)
         previousPagingController.loadPrevious().getOrThrow()
+    }
+
+    override suspend fun loadFuture(): Result<Int> = runCancellableCatching  {
+        if (delegate.mutex.isLocked) {
+            return@runCancellableCatching -1
+        }
+        futurePagingController.loadFuture().getOrThrow()
     }
 
     override suspend fun onReceiveNewNotification(notificationRelation: NotificationRelation) {

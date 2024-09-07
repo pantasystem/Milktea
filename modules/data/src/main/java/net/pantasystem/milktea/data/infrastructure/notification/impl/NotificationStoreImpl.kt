@@ -6,6 +6,7 @@ import kotlinx.coroutines.sync.Mutex
 import net.pantasystem.milktea.common.PageableState
 import net.pantasystem.milktea.common.StateContent
 import net.pantasystem.milktea.common.paginator.EntityConverter
+import net.pantasystem.milktea.common.paginator.FutureLoader
 import net.pantasystem.milktea.common.paginator.IdGetter
 import net.pantasystem.milktea.common.paginator.PaginationState
 import net.pantasystem.milktea.common.paginator.PreviousLoader
@@ -21,7 +22,7 @@ import javax.inject.Singleton
 class NotificationStoreImpl(
     private val getAccount: suspend () -> Account,
     private val notificationTimelineRepository: NotificationTimelineRepository,
-) : StateLocker, PreviousLoader<Notification>, PaginationState<Notification.Id>,
+) : StateLocker, PreviousLoader<Notification>, PaginationState<Notification.Id>, FutureLoader<Notification>,
     IdGetter<String>, EntityConverter<Notification, Notification.Id> {
 
     @Singleton
@@ -65,8 +66,17 @@ class NotificationStoreImpl(
             untilId = getUntilId(),
         ).getOrThrow()
     }
+
+    override suspend fun loadFuture(): Result<List<Notification>> = runCancellableCatching{
+        val account = getAccount()
+        notificationTimelineRepository.findLaterTimeline(
+            accountId = account.accountId,
+            sinceId = getSinceId(),
+        ).getOrThrow()
+    }
+
     override suspend fun getSinceId(): String? {
-        return null
+        return (_state.value.content as? StateContent.Exist)?.rawContent?.firstOrNull()?.notificationId
     }
 
     override suspend fun getUntilId(): String? {
