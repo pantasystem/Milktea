@@ -8,7 +8,6 @@ plugins {
     id('dagger.hilt.android.plugin')
     id('com.github.triplet.play') version("3.7.0")
     id('com.google.firebase.crashlytics')
-    id('io.objectbox')
 }
 
 
@@ -283,8 +282,6 @@ dependencies {
     testRuntimeOnly libs.junit.jupiter.engine
 
     debugImplementation 'com.squareup.leakcanary:leakcanary-android:2.10'
-
-    implementation libs.objectbox.kotlin
 
     testImplementation "org.mockito.kotlin:mockito-kotlin:4.1.0"
 

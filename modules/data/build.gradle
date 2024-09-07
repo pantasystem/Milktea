@@ -4,7 +4,6 @@ plugins {
     id 'kotlin-kapt'
     id 'dagger.hilt.android.plugin'
     id 'org.jetbrains.kotlin.plugin.serialization' version "$kotlin_version"
-    id 'io.objectbox'
 }
 
 android {
@@ -115,7 +114,6 @@ dependencies {
     testImplementation libs.junit.jupiter.api
     testRuntimeOnly libs.junit.jupiter.engine
     implementation "androidx.exifinterface:exifinterface:1.3.6"
-    implementation libs.objectbox.kotlin
 
     testImplementation libs.robolectric
 
