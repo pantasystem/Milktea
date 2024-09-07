@@ -215,7 +215,7 @@ import net.pantasystem.milktea.data.infrastructure.user.renote.mute.db.RenoteMut
 
         ImageCacheEntity::class,
     ],
-    version = 73,
+    version = 74,
     exportSchema = true,
     autoMigrations = [
         AutoMigration(from = 11, to = 12),
@@ -277,7 +277,8 @@ import net.pantasystem.milktea.data.infrastructure.user.renote.mute.db.RenoteMut
         AutoMigration(from = 69, to = 70),
         AutoMigration(from = 70, to = 71),
         AutoMigration(from = 71, to = 72),
-        AutoMigration(from = 72, to = 73)
+        AutoMigration(from = 72, to = 73),
+        AutoMigration(from = 73, to = 74),
     ],
     views = [UserView::class, GroupMemberView::class, UserListMemberView::class]
 )

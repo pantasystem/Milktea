@@ -1,7 +1,6 @@
 package net.pantasystem.milktea.notification
 
 import android.os.Bundle
-import android.util.Log
 import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
@@ -149,7 +148,7 @@ class NotificationFragment : Fragment(R.layout.fragment_notification) {
         ).launchIn(viewLifecycleOwner.lifecycleScope)
 
         mBinding.notificationSwipeRefresh.setOnRefreshListener {
-            mViewModel.loadInit()
+            mViewModel.loadFuture()
         }
         mBinding.notificationListView.addOnScrollListener(mScrollListener)
 
@@ -197,21 +196,11 @@ class NotificationFragment : Fragment(R.layout.fragment_notification) {
         override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
             super.onScrollStateChanged(recyclerView, newState)
 
-            val firstVisibleItemPosition = mLinearLayoutManager.findFirstVisibleItemPosition()
             val endVisibleItemPosition = mLinearLayoutManager.findLastVisibleItemPosition()
             val itemCount = mLinearLayoutManager.itemCount
 
-
-            if (firstVisibleItemPosition == 0) {
-                Log.d("", "先頭")
-                mViewModel.loadFuture()
-            }
-
             if (endVisibleItemPosition == (itemCount - 1)) {
-                Log.d("", "後ろ")
-                //mTimelineViewModel?.getOldTimeline()
                 mViewModel.loadOld()
-
             }
 
         }

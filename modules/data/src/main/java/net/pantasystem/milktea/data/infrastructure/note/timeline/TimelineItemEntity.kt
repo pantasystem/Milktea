@@ -12,6 +12,7 @@ import net.pantasystem.milktea.data.infrastructure.note.impl.sqlite.NoteEntity
     indices = [
         Index(value = ["account_id", "page_id", "note_id"], unique = true),
         Index(value = ["note_id"]),
+        Index(value = ["note_local_id"])
     ],
     foreignKeys = [
         ForeignKey(
