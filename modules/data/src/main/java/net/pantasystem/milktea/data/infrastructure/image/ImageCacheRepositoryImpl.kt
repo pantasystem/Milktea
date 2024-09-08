@@ -2,12 +2,16 @@ package net.pantasystem.milktea.data.infrastructure.image
 
 import android.content.Context
 import android.graphics.BitmapFactory
+import android.util.Log
+import com.caverock.androidsvg.SVG
+import com.caverock.androidsvg.SVGParseException
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import kotlinx.datetime.Clock
 import net.pantasystem.milktea.api.misskey.OkHttpClientProvider
 import net.pantasystem.milktea.common.Hash
+import net.pantasystem.milktea.common.glide.svg.SvgDecoder
 import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.common_android.hilt.IODispatcher
 import net.pantasystem.milktea.model.image.ImageCache
@@ -121,12 +125,28 @@ class ImageCacheRepositoryImpl @Inject constructor(
                         throw Exception("Download failed: url=$url")
                     }
                 }
-            val options = BitmapFactory.Options()
-            options.inJustDecodeBounds = true
-            BitmapFactory.decodeFile(
-                file.absolutePath, options
-            ) ?: return@use null to null
-            options.outWidth to options.outHeight
+
+            // check svg
+            val source = file.inputStream()
+            source.use {
+                if (SvgDecoder.isSvg(file.inputStream())) {
+                    try {
+                        val svg = SVG.getFromInputStream(source)
+                        Log.d("ImageCache", "SVGのサイズ: width=${svg.documentWidth}, height=${svg.documentHeight}")
+                        svg.documentWidth.toInt() to svg.documentHeight.toInt()
+                    } catch (e: SVGParseException) {
+                        Log.e("ImageCache", "SVGParseException", e)
+                        throw e
+                    }
+                } else {
+                    val options = BitmapFactory.Options()
+                    options.inJustDecodeBounds = true
+                    BitmapFactory.decodeFile(
+                        file.absolutePath, options
+                    ) ?: return null to null
+                    options.outWidth to options.outHeight
+                }
+            }
         }
     }
 
