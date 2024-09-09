@@ -27,6 +27,7 @@ class SafeSearchDescriptionDialog : DialogFragment() {
             .setTitle(R.string.safe_search_description_dialog_title)
             .setMessage(R.string.safe_search_description_dialog_message)
             .setPositiveButton(R.string.safe_search_description_dialog_positive_button) { _, _ ->
+                mainViewModel.onGoToSettingSafeSearchButtonClicked()
                 val intent = Intent(requireContext(), SettingMovementActivity::class.java)
                 intent.putExtra(SettingMovementActivity.EXTRA_HIGHLIGHT_SAFE_SEARCH, true)
                 startActivity(intent)

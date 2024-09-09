@@ -6,7 +6,17 @@ import com.google.firebase.crashlytics.FirebaseCrashlytics
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.shareIn
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import net.pantasystem.milktea.app_store.account.AccountStore
 import net.pantasystem.milktea.app_store.setting.SettingStore
@@ -68,7 +78,7 @@ class MainViewModel @Inject constructor(
     val isShowEnableSafeSearchDescription = settingStore.configState.map {
         it.isEnableSafeSearch
     }.map {
-        !(!it.isEnabled || it.isConfirmed)
+        !it.isConfirmed
     }.distinctUntilChanged().shareIn(viewModelScope, SharingStarted.Lazily)
 
     val isShowGoogleAnalyticsDialog = settingStore.configState.map { config ->
@@ -138,6 +148,15 @@ class MainViewModel @Inject constructor(
         }
     }
 
+    fun onGoToSettingSafeSearchButtonClicked() {
+        viewModelScope.launch {
+            configRepository.get().mapCancellableCatching {
+                configRepository.save(it.copy(isEnableSafeSearch = it.isEnableSafeSearch.copy(isConfirmed = true)))
+            }.onFailure {
+                logger.error("設定状態の保存に失敗", it)
+            }
+        }
+    }
 }
 
 data class MainUiState (
