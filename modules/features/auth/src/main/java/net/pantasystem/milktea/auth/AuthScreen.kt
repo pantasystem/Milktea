@@ -1,6 +1,13 @@
 package net.pantasystem.milktea.auth
 
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.WindowInsetsSides
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.navigationBars
+import androidx.compose.foundation.layout.only
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
@@ -8,14 +15,17 @@ import androidx.compose.material.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import net.pantasystem.milktea.auth.viewmodel.app.AppAuthViewModel
 import net.pantasystem.milktea.data.infrastructure.auth.Authorization
 
-@OptIn(ExperimentalCoroutinesApi::class)
+@OptIn(ExperimentalCoroutinesApi::class, ExperimentalComposeUiApi::class)
 @Composable
 fun AuthScreen(
     modifier: Modifier = Modifier,
@@ -32,7 +42,9 @@ fun AuthScreen(
             WindowInsets
                 .navigationBars
                 .only(WindowInsetsSides.Horizontal + WindowInsetsSides.Top)
-        ),
+        ).semantics {
+            testTagsAsResourceId = true
+        },
         topBar = {
             TopAppBar(
                 backgroundColor = MaterialTheme.colors.surface,

@@ -11,7 +11,11 @@ import android.os.Build
 import android.util.Log
 import androidx.activity.result.ActivityResultLauncher
 import androidx.core.content.ContextCompat
-import androidx.lifecycle.*
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.flowWithLifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.work.WorkInfo
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.crashlytics.FirebaseCrashlytics
@@ -22,7 +26,12 @@ import jp.panta.misskeyandroidclient.ui.main.viewmodel.MainViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.distinctUntilChangedBy
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import net.pantasystem.milktea.app_store.account.AccountStore
@@ -245,28 +254,28 @@ internal class MainActivityEventHandler(
     private fun collectUnauthorizedState() {
         lifecycleScope.launch {
             lifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                accountStore.state.collect { state ->
+                mainViewModel.accountState.collect { state ->
                     FirebaseCrashlytics.getInstance().setCustomKey(
                         "CURRENT_ACCOUNT_USER_ID",
-                        state.currentAccount?.remoteId ?: ""
+                        state.state.currentAccount?.remoteId ?: ""
                     )
                     FirebaseCrashlytics.getInstance().setCustomKey(
                         "CURRENT_INSTANCE_DOMAIN",
-                        state.currentAccount?.instanceDomain ?: ""
+                        state.state.currentAccount?.instanceDomain ?: ""
                     )
                     FirebaseCrashlytics.getInstance().setCustomKey(
                         "CURRENT_USERNAME",
-                        state.currentAccount?.userName ?: ""
+                        state.state.currentAccount?.userName ?: ""
                     )
                     FirebaseAnalytics.getInstance(activity).setUserProperty(
                         "CURRENT_ACCOUNT_USER_ID",
-                        state.currentAccount?.let {
+                        state.state.currentAccount?.let {
                             it.remoteId.substring(0, 36.coerceAtMost(it.remoteId.length))
                         }
                     )
                     FirebaseAnalytics.getInstance(activity).setUserProperty(
                         "CURRENT_INSTANCE_DOMAIN",
-                        state.currentAccount?.let {
+                        state.state.currentAccount?.let {
                             it.instanceDomain.substring(
                                 0,
                                 36.coerceAtMost(it.instanceDomain.length)
@@ -275,11 +284,11 @@ internal class MainActivityEventHandler(
                     )
                     FirebaseAnalytics.getInstance(activity).setUserProperty(
                         "CURRENT_USERNAME",
-                        state.currentAccount?.let {
+                        state.state.currentAccount?.let {
                             it.userName.substring(0, 36.coerceAtMost(it.userName.length))
                         }
                     )
-                    if (state.isUnauthorized) {
+                    if (state.state.isUnauthorized && !state.shouldWaitForAuthentication) {
                         activity.startActivity(
                             Intent(activity, JoinMilkteaActivity::class.java)
                         )

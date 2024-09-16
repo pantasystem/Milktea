@@ -37,6 +37,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
@@ -86,7 +87,8 @@ fun AuthFormScreen(
                 instanceDomain,
                 onValueChange = onInputInstanceDomain,
                 modifier = Modifier
-                    .fillMaxWidth(),
+                    .fillMaxWidth()
+                    .testTag("instanceUrlTextField"),
                 maxLines = 1,
                 label = {
                     Text(stringResource(R.string.auth_instance_domain))
@@ -109,7 +111,7 @@ fun AuthFormScreen(
                 OutlinedTextField(
                     password,
                     onInputPassword,
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier.fillMaxWidth().testTag("passwordTextField"),
                     maxLines = 1,
                     label = {
                         Text(stringResource(R.string.password))
@@ -166,6 +168,7 @@ fun AuthFormScreen(
             ) {
                 OutlinedButton(
                     onClick = onSignUpButtonClicked,
+                    Modifier.testTag("signUpButton"),
                     shape = RoundedCornerShape(32.dp)
                 ) {
                     Text(stringResource(R.string.auth_sign_up))
@@ -175,12 +178,13 @@ fun AuthFormScreen(
 
                 Button(
                     onClick = onStartAuthButtonClicked,
+                    Modifier.testTag("authenticateButton"),
                     enabled = uiState.instanceInfoResultState is ResultState.Fixed
                             && uiState.instanceInfoResultState.content is StateContent.Exist
                             && uiState.formState.isPrivacyPolicyAgreement
                             && uiState.formState.isTermsOfServiceAgreement
                             && (!uiState.isMastodon || uiState.formState.isAcceptMastodonAlphaTest),
-                    shape = RoundedCornerShape(32.dp)
+                    shape = RoundedCornerShape(32.dp),
                 ) {
                     Text(stringResource(R.string.start_auth))
                 }
@@ -213,7 +217,8 @@ private fun AgreementLayout(
         }
         Switch(
             checked = uiState.formState.isTermsOfServiceAgreement,
-            onCheckedChange = onToggleTermsOfServiceAgreement
+            onCheckedChange = onToggleTermsOfServiceAgreement,
+            Modifier.testTag("toggleTermsOfServiceAgreementSwitch"),
         )
     }
     Row(
@@ -229,7 +234,8 @@ private fun AgreementLayout(
         }
         Switch(
             checked = uiState.formState.isPrivacyPolicyAgreement,
-            onCheckedChange = onTogglePrivacyPolicyAgreement
+            onCheckedChange = onTogglePrivacyPolicyAgreement,
+            Modifier.testTag("togglePrivacyPolicyAgreementSwitch")
         )
     }
 

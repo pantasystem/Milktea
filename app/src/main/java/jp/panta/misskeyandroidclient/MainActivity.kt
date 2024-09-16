@@ -25,6 +25,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import jp.panta.misskeyandroidclient.databinding.ActivityMainBinding
 import jp.panta.misskeyandroidclient.ui.main.AccountViewModelHandler
 import jp.panta.misskeyandroidclient.ui.main.FabClickHandler
+import jp.panta.misskeyandroidclient.ui.main.IntentToAddAccountHandler
 import jp.panta.misskeyandroidclient.ui.main.MainActivityEventHandler
 import jp.panta.misskeyandroidclient.ui.main.MainActivityInitialIntentHandler
 import jp.panta.misskeyandroidclient.ui.main.MainActivityMenuProvider
@@ -82,6 +83,9 @@ class MainActivity : AppCompatActivity(), ToolbarSetter {
     @Inject
     internal lateinit var userActionAppGlobalErrorListener: UserActionAppGlobalErrorListener
 
+    @Inject
+    internal lateinit var intentToAddAccountHandler: IntentToAddAccountHandler.Factory
+
     private val notesViewModel: NotesViewModel by viewModels()
 
     private val accountViewModel: AccountViewModel by viewModels()
@@ -104,6 +108,8 @@ class MainActivity : AppCompatActivity(), ToolbarSetter {
         super.onCreate(savedInstanceState)
         applyTheme.invoke()
         setContentView(R.layout.activity_main)
+
+        intentToAddAccountHandler.create(lifecycleScope, mainViewModel).invoke(intent)
 
         toggleNavigationDrawerDelegate = ToggleNavigationDrawerDelegate(this, binding.drawerLayout)
 

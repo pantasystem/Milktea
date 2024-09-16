@@ -4,8 +4,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import dagger.hilt.android.lifecycle.HiltViewModel
+import jp.panta.misskeyandroidclient.BuildConfig
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
@@ -18,6 +20,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import net.pantasystem.milktea.app_store.account.AccountState
 import net.pantasystem.milktea.app_store.account.AccountStore
 import net.pantasystem.milktea.app_store.setting.SettingStore
 import net.pantasystem.milktea.common.Logger
@@ -100,6 +103,11 @@ class MainViewModel @Inject constructor(
         MainUiState(unc, umc)
     }.stateIn(viewModelScope, SharingStarted.Lazily, MainUiState())
 
+    private val shouldWaitForAuthentication = MutableStateFlow(false)
+    val accountState = combine(accountStore.state, shouldWaitForAuthentication) { state, waitAuth ->
+        MainAccountState(state, waitAuth)
+    }
+
     init {
         viewModelScope.launch {
             accountStore.observeCurrentAccount.collect(emojiEventHandler::observe)
@@ -157,9 +165,25 @@ class MainViewModel @Inject constructor(
             }
         }
     }
+
+    fun setShouldWaitForAuthentication(value: Boolean) {
+        shouldWaitForAuthentication.value = value
+    }
 }
 
 data class MainUiState (
     val unreadNotificationCount: Int = 0,
     val unreadMessagesCount: Int = 0,
 )
+
+data class MainAccountState(
+    val state: AccountState,
+    val shouldWaitForAuthentication: Boolean = false,
+) {
+    // shouldWaitForAuthenticationはデバッグ時・ベンチマーク時の裏技機能なので本番環境では有効化できない
+    init {
+        require(!shouldWaitForAuthentication || BuildConfig.BUILD_TYPE == "benchmark" || BuildConfig.BUILD_TYPE == "debug") {
+            "shouldWaitForAuthenticationはデバッグ・ベンチマークモード以外の時は有効にすることができません"
+        }
+    }
+}

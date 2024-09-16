@@ -6,6 +6,9 @@ import androidx.benchmark.macro.StartupTimingMetric
 import androidx.benchmark.macro.junit4.MacrobenchmarkRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
+import androidx.test.uiautomator.By
+import androidx.test.uiautomator.UiDevice
+import androidx.test.uiautomator.Until
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import net.pantasystem.milktea.common.getPreferenceName
@@ -71,7 +74,9 @@ class ExampleStartupBenchmark {
         iterations = 5,
         startupMode = StartupMode.COLD,
         setupBlock = {
-            setupAccount()
+            val uiAutomation = InstrumentationRegistry.getInstrumentation().uiAutomation
+            val device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
+            device.wait(Until.hasObject(By.pkg("jp.panta.misskeyandroidclient").depth(0)), 5000)
         }
     ) {
         pressHome()
