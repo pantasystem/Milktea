@@ -288,6 +288,9 @@ internal class MainActivityEventHandler(
                             it.userName.substring(0, 36.coerceAtMost(it.userName.length))
                         }
                     )
+
+                    // NOTE: shouldWaitForAuthenticationは任意の処理が終わるまで認証画面への遷移をブロックするための処理で、
+                    // NOTE: 未認証かつ待ち受ける必要性がない場合に認証画面に遷移するようにしている。
                     if (state.state.isUnauthorized && !state.shouldWaitForAuthentication) {
                         activity.startActivity(
                             Intent(activity, JoinMilkteaActivity::class.java)

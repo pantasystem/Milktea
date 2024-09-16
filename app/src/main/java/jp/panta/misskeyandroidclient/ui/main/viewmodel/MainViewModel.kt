@@ -176,6 +176,9 @@ data class MainUiState (
     val unreadMessagesCount: Int = 0,
 )
 
+/**
+ * @param shouldWaitForAuthentication 任意の処理が終わるまで、認証画面に遷移するのを待つためのフラグ。
+ */
 data class MainAccountState(
     val state: AccountState,
     val shouldWaitForAuthentication: Boolean = false,
