@@ -9,7 +9,11 @@ import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.AccountRepository
 import javax.inject.Inject
 
-
+/**
+ * 起動時にIntentを受け取り、その中に認証情報が含まれていれば、
+ * DBに認証情報を追加するための処理。
+ * 脆弱性につながる可能性があるため、デバッグモード時とベンチマーク時には動作しないように実装してある。
+ */
 internal class IntentToAddAccountHandler(
     private val coroutineScope: CoroutineScope,
     private val mainViewModel: MainViewModel,
