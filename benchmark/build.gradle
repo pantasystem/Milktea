@@ -1,0 +1,66 @@
+plugins {
+    id 'com.android.test'
+    id 'org.jetbrains.kotlin.android'
+}
+
+android {
+    namespace 'systems.panta.benchmark'
+    compileSdk 34
+
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_1_8
+        targetCompatibility = JavaVersion.VERSION_1_8
+    }
+
+    kotlinOptions {
+        jvmTarget = "1.8"
+    }
+
+    defaultConfig {
+        minSdk 28
+        targetSdk 34
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+
+//        testInstrumentationRunnerArguments["androidx.benchmark.suppressErrors"] = "EMULATOR"
+
+        def properties = new Properties()
+        properties.load(project.rootProject.file('benchmark.properties').newDataInputStream())
+        def REMOTE_ID = properties.getProperty('account.remote_id')
+        def INSTANCE_DOMAIN = properties.getProperty('account.instance_domain')
+        def USERNAME = properties.getProperty('account.username')
+        def TOKEN = properties.getProperty('account.token')
+        buildConfigField('String', 'ACCOUNT_REMOTE_ID', "\"${REMOTE_ID}\"")
+        buildConfigField('String', 'INSTANCE_DOMMAIN', "\"${INSTANCE_DOMAIN}\"")
+        buildConfigField('String', 'USERNAME', "\"${USERNAME}\"")
+        buildConfigField('String', 'TOKEN', "\"${TOKEN}\"")
+
+    }
+
+    buildTypes {
+        // This benchmark buildType is used for benchmarking, and should function like your
+        // release build (for example, with minification on). It's signed with a debug key
+        // for easy local/CI testing.
+        benchmark {
+            debuggable = true
+            signingConfig = debug.signingConfig
+            matchingFallbacks = ["release"]
+        }
+    }
+
+    targetProjectPath = ":app"
+    experimentalProperties["android.experimental.self-instrumenting"] = true
+}
+
+dependencies {
+    implementation 'androidx.test.ext:junit:1.1.5'
+    implementation 'androidx.test.espresso:espresso-core:3.5.1'
+    implementation 'androidx.test.uiautomator:uiautomator:2.2.0'
+    implementation 'androidx.benchmark:benchmark-macro-junit4:1.2.0-beta01'
+}
+
+androidComponents {
+    beforeVariants(selector().all()) {
+        enable = buildType == "benchmark"
+    }
+}
