@@ -4,6 +4,7 @@ import android.content.Intent
 import jp.panta.misskeyandroidclient.BuildConfig
 import jp.panta.misskeyandroidclient.ui.main.viewmodel.MainViewModel
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.AccountRepository
@@ -46,7 +47,14 @@ internal class IntentToAddAccountHandler(
                     val token = intent.getStringExtra("token") ?: return@launch
                     val remoteId = intent.getStringExtra("remoteId") ?: return@launch
 
-                    accountRepository.add(
+                    val state = mainViewModel.accountState.first()
+                    if (state.state.accounts.any {
+                        it.userName == username && it.instanceDomain == host
+                    }) {
+                        return@launch
+                    }
+
+                    mainViewModel.accountStore.addAccount(
                         Account(
                             remoteId = remoteId,
                             instanceDomain = host,
@@ -54,7 +62,7 @@ internal class IntentToAddAccountHandler(
                             token = token,
                             instanceType = Account.InstanceType.MISSKEY,
                         )
-                    ).getOrThrow()
+                    )
                 } finally {
                     mainViewModel.setShouldWaitForAuthentication(false)
                 }

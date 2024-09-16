@@ -103,6 +103,7 @@ class TabFragment : Fragment(R.layout.fragment_tab) {
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.RESUMED) {
                 mTabViewModel.pages.collect { pages ->
+                    requireActivity().reportFullyDrawn()
                     mPages = pages
                     mPagerAdapter.setList(
                         pages.sortedBy {
