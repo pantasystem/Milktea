@@ -22,8 +22,6 @@ android {
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
-//        testInstrumentationRunnerArguments["androidx.benchmark.suppressErrors"] = "EMULATOR"
-
         def properties = new Properties()
         properties.load(project.rootProject.file('benchmark.properties').newDataInputStream())
         def REMOTE_ID = properties.getProperty('account.remote_id')
@@ -53,10 +51,15 @@ android {
 }
 
 dependencies {
-    implementation 'androidx.test.ext:junit:1.1.5'
-    implementation 'androidx.test.espresso:espresso-core:3.5.1'
-    implementation 'androidx.test.uiautomator:uiautomator:2.2.0'
-    implementation 'androidx.benchmark:benchmark-macro-junit4:1.2.0-beta01'
+    implementation 'androidx.test.ext:junit:1.2.1'
+    implementation 'androidx.test.espresso:espresso-core:3.6.1'
+    implementation 'androidx.test.uiautomator:uiautomator:2.3.0'
+    implementation 'androidx.benchmark:benchmark-macro-junit4:1.3.0'
+
+    implementation project(":modules:data")
+    implementation project(":modules:model")
+    implementation project(":modules:common")
+    implementation "androidx.room:room-runtime:$room_version"
 }
 
 androidComponents {

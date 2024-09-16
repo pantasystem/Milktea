@@ -1,9 +1,21 @@
 package systems.panta.benchmark
 
+import android.content.Context
 import androidx.benchmark.macro.StartupMode
 import androidx.benchmark.macro.StartupTimingMetric
 import androidx.benchmark.macro.junit4.MacrobenchmarkRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.platform.app.InstrumentationRegistry
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.runBlocking
+import net.pantasystem.milktea.common.getPreferenceName
+import net.pantasystem.milktea.data.di.module.DbModule
+import net.pantasystem.milktea.data.infrastructure.account.db.MediatorAccountRepository
+import net.pantasystem.milktea.data.infrastructure.account.db.RoomAccountRepository
+import net.pantasystem.milktea.data.infrastructure.auth.KeyStoreSystemEncryption
+import net.pantasystem.milktea.model.account.Account
+import net.pantasystem.milktea.model.account.AccountRepository
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -25,16 +37,61 @@ class ExampleStartupBenchmark {
     @get:Rule
     val benchmarkRule = MacrobenchmarkRule()
 
+    lateinit var accountRepository: AccountRepository
+
+    @Before
+    fun setup() {
+        val context = InstrumentationRegistry.getInstrumentation().targetContext
+
+        val database = DbModule.database(context)
+
+        val preferences =
+            InstrumentationRegistry.getInstrumentation().targetContext.getSharedPreferences(
+                context.getPreferenceName(),
+                Context.MODE_PRIVATE,
+            )
+        val encryption = KeyStoreSystemEncryption(context)
+
+        val roomAccountRepository = RoomAccountRepository(
+            database,
+            preferences,
+            database.accountDAO(),
+            database.pageDAO(),
+            encryption
+        )
+
+        accountRepository = MediatorAccountRepository(roomAccountRepository, Dispatchers.IO)
+
+    }
+
     @Test
     fun startup() = benchmarkRule.measureRepeated(
         packageName = "jp.panta.misskeyandroidclient",
         metrics = listOf(StartupTimingMetric()),
         iterations = 5,
-        startupMode = StartupMode.COLD
+        startupMode = StartupMode.COLD,
+        setupBlock = {
+            setupAccount()
+        }
     ) {
-
-
         pressHome()
         startActivityAndWait()
+    }
+
+    private fun setupAccount() {
+        runBlocking {
+            val added = accountRepository.add(
+                Account(
+                    remoteId = BuildConfig.ACCOUNT_REMOTE_ID,
+                    instanceDomain = BuildConfig.INSTANCE_DOMMAIN,
+                    userName = BuildConfig.USERNAME,
+                    token = BuildConfig.TOKEN,
+                    pages = emptyList(),
+                    instanceType = Account.InstanceType.MISSKEY,
+                )
+            ).getOrThrow()
+            println("added account:$added")
+            println("accounts:${accountRepository.getCurrentAccount().getOrThrow()}")
+        }
     }
 }

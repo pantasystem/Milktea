@@ -172,7 +172,7 @@ class AuthStateHelper @Inject constructor(
 
     }
 
-    suspend fun getMeta(url: String): InstanceInfoType {
+    suspend fun getInstanceInfoType(url: String): InstanceInfoType {
         if (urlPattern.matcher(url).find()) {
 
             return instanceInfoService.find(url).getOrThrow()
@@ -181,10 +181,20 @@ class AuthStateHelper @Inject constructor(
         }
     }
 
-    fun toEnableUrl(base: String): String {
+    fun convertEnableUrl(base: String): String {
+
+        val urlFromIdPassword = if (userNameRegex.matches(base)) {
+            runCancellableCatching {
+                userNameRegex.find(base)?.groups?.get(2)
+            }.getOrNull()?.value
+        } else null
+
         var url = if (base.startsWith("https://")) {
             base
-        } else {
+        } else if (!urlFromIdPassword.isNullOrBlank()) {
+            "https://$urlFromIdPassword"
+        }
+        else {
             "https://$base"
         }.replace(" ", "").replace("\t", "").replace("　", "")
 
@@ -245,7 +255,7 @@ class AuthStateHelper @Inject constructor(
         runCancellableCatching {
             withContext(Dispatchers.IO) {
 
-                val baseUrl = toEnableUrl(requireNotNull(formState.host))
+                val baseUrl = convertEnableUrl(requireNotNull(formState.host))
                 val api = misskeyAPIServiceBuilder.buildAuthAPI(baseUrl)
                 require(formState.isIdPassword) {
                     "入力がid, passwordのパターンと異なります"

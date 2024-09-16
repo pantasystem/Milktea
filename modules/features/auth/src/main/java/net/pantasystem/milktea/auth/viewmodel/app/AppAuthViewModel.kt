@@ -71,12 +71,12 @@ class AppAuthViewModel @Inject constructor(
     val password = MutableStateFlow("")
 
     private val metaState = instanceDomain.map {
-        authService.toEnableUrl(it)
+        authService.convertEnableUrl(it)
     }.filter {
         authService.checkUrlPattern(it)
     }.flatMapLatest {
         suspend {
-            authService.getMeta(it)
+            authService.getInstanceInfoType(it)
         }.asLoadingStateFlow()
     }.flowOn(Dispatchers.IO).stateIn(
         viewModelScope, SharingStarted.Lazily, ResultState.Fixed(
@@ -120,7 +120,7 @@ class AppAuthViewModel @Inject constructor(
         checkBoxes,
     ) { domain, name, password, checkBoxes ->
         AuthUserInputState(
-            instanceDomain = authService.toEnableUrl(domain),
+            instanceDomain = authService.convertEnableUrl(domain),
             appName = name,
             rawInputInstanceDomain = domain,
             password = password,
