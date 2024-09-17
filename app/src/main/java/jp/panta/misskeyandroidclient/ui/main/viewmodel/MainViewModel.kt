@@ -81,7 +81,7 @@ class MainViewModel @Inject constructor(
     val isShowEnableSafeSearchDescription = settingStore.configState.map {
         it.isEnableSafeSearch
     }.map {
-        !it.isConfirmed
+        !it.isConfirmed && !it.isEnabled
     }.distinctUntilChanged().shareIn(viewModelScope, SharingStarted.Lazily)
 
     val isShowGoogleAnalyticsDialog = settingStore.configState.map { config ->

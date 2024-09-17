@@ -34,7 +34,7 @@ class SafeSearchDescriptionDialog : DialogFragment() {
                 dismiss()
             }
             .setNegativeButton(R.string.safe_search_description_dialog_negative_button) { _, _ ->
-                if (preferences.getInt("counter", 0) >= 2) {
+                if (preferences.getInt("counter", 0) >= 1) {
                     mainViewModel.onDoNotShowSafeSearchDescription()
                 }
                 preferences.edit().putInt("counter", preferences.getInt("counter", 0) + 1).apply()
