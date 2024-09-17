@@ -424,8 +424,8 @@ class TimelineRepositoryImpl @Inject constructor(
         }
         TimelineResponse(
             localItems.map { Note.Id(it.accountId, it.noteId) },
-            sinceId = localItems.firstOrNull()?.noteLocalId,
-            untilId = localItems.lastOrNull()?.noteLocalId
+            sinceId = localItems.firstOrNull()?.noteId,
+            untilId = localItems.lastOrNull()?.noteId
         )
 
     }
