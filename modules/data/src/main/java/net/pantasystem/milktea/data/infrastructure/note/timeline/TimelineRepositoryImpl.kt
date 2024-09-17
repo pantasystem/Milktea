@@ -23,6 +23,7 @@ class TimelineRepositoryImpl @Inject constructor(
     private val noteRepository: NoteRepository,
     private val loggerFactory: Logger.Factory,
     private val timelineFetcher: TimelineFetcher,
+    private val timelineLocalSourceLoader: TimelineLocalSourceLoader,
 ) : TimelineRepository {
 
     private val logger by lazy {
@@ -232,51 +233,13 @@ class TimelineRepositoryImpl @Inject constructor(
         untilId: String?,
         sinceId: String?,
         limit: Int
-    ): Result<TimelineResponse> = runCancellableCatching {
-        val localItems = when {
-            untilId != null && sinceId != null -> {
-                timelineCacheDAO.getTimelineItemsUntilIdAndSinceId(
-                    accountId,
-                    pageId,
-                    untilId,
-                    sinceId,
-                    limit
-                )
-            }
-
-            untilId != null -> {
-                timelineCacheDAO.getTimelineItemsUntilId(
-                    accountId,
-                    pageId,
-                    untilId,
-                    limit
-                )
-            }
-
-            sinceId != null -> {
-                timelineCacheDAO.getTimelineItemsSinceId(
-                    accountId,
-                    pageId,
-                    sinceId,
-                    limit
-                )
-            }
-
-            else -> {
-                timelineCacheDAO.getTimelineItems(
-                    accountId,
-                    pageId,
-                    limit
-                )
-            }
-        }
-        TimelineResponse(
-            localItems.map { Note.Id(it.accountId, it.noteId) },
-            sinceId = localItems.firstOrNull()?.noteId,
-            untilId = localItems.lastOrNull()?.noteId
-        )
-
-    }
+    ): Result<TimelineResponse> = timelineLocalSourceLoader.getFromCache(
+        accountId = accountId,
+        pageId = pageId,
+        untilId = untilId,
+        sinceId = sinceId,
+        limit = limit,
+    )
 
 
     private suspend fun saveToCache(
