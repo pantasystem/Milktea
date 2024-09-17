@@ -200,6 +200,82 @@ class TimelineCacheDAOTest {
         )
     }
 
+    @Test
+    fun findLastPreviousId() = runTest {
+        val accountId = 1L
+        val pageId = 1L
+        timelineCacheDAO.clear(accountId, pageId)
+        val testData = (1 until 1000).map {
+            val noteId = it.toString().padStart(4, '0')
+            Assert.assertEquals(4, noteId.length)
+            TimelineItemEntity(
+                accountId = accountId,
+                pageId = pageId,
+                noteId = noteId,
+                noteLocalId = NoteEntity.makeEntityId(
+                    Note.Id(accountId, noteId)
+                ),
+                id = 0
+            )
+        }
+        noteDAO.insertAll(
+            testData.map {
+                NoteEntity.fromModel(Note.make(
+                    Note.Id(it.accountId, it.noteId),
+                    User.Id(it.accountId, "user")
+                ))
+            }
+        )
+        timelineCacheDAO.insertAll(testData)
+        Assert.assertEquals(
+            testData.size.toLong(), noteDAO.count()
+        )
+        Assert.assertEquals(
+            testData.size.toLong(),
+            timelineCacheDAO.count()
+        )
+        val lastPreviousId = timelineCacheDAO.findLastPreviousId(accountId, pageId)
+        Assert.assertNotNull(lastPreviousId)
+        Assert.assertEquals("0001", lastPreviousId)
+    }
+
+    @Test
+    fun findFirstLaterId() = runTest {
+        val accountId = 1L
+        val pageId = 1L
+        timelineCacheDAO.clear(accountId, pageId)
+        val testData = (1 until 1000).map {
+            val noteId = it.toString().padStart(4, '0')
+            Assert.assertEquals(4, noteId.length)
+            TimelineItemEntity(
+                accountId = accountId,
+                pageId = pageId,
+                noteId = noteId,
+                noteLocalId = NoteEntity.makeEntityId(
+                    Note.Id(accountId, noteId)
+                ),
+                id = 0
+            )
+        }
+        noteDAO.insertAll(
+            testData.map {
+                NoteEntity.fromModel(Note.make(
+                    Note.Id(it.accountId, it.noteId),
+                    User.Id(it.accountId, "user")
+                ))
+            }
+        )
+        timelineCacheDAO.insertAll(testData)
+        Assert.assertEquals(
+            testData.size.toLong(), noteDAO.count()
+        )
+        Assert.assertEquals(
+            testData.size.toLong(),
+            timelineCacheDAO.count()
+        )
+        val firstLaterId = timelineCacheDAO.findFirstLaterId(accountId, pageId)
+        Assert.assertEquals("0999", firstLaterId)
+    }
 
     @After
     fun after() {
