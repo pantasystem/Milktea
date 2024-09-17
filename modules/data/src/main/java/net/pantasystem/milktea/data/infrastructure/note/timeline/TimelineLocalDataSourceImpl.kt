@@ -1,13 +1,31 @@
 package net.pantasystem.milktea.data.infrastructure.note.timeline
 
 import net.pantasystem.milktea.common.runCancellableCatching
+import net.pantasystem.milktea.data.infrastructure.note.impl.sqlite.NoteEntity
 import net.pantasystem.milktea.model.note.Note
 import net.pantasystem.milktea.model.note.timeline.TimelineResponse
 import javax.inject.Inject
 
-internal class TimelineLocalSourceLoaderImpl @Inject constructor(
+internal class TimelineLocalDataSourceImpl @Inject constructor(
     private val timelineCacheDAO: TimelineCacheDAO,
-): TimelineLocalSourceLoader {
+): TimelineLocalDataSource {
+    override suspend fun saveToCache(
+        accountId: Long,
+        pageId: Long,
+        timelineItems: List<String>
+    ): Result<Unit> = runCancellableCatching {
+        timelineCacheDAO.insertAll(
+            timelineItems.map {
+                TimelineItemEntity(
+                    accountId = accountId,
+                    pageId = pageId,
+                    noteId = it,
+                    noteLocalId = NoteEntity.makeEntityId(accountId, it)
+                )
+            }
+        )
+    }
+
     override suspend fun getFromCache(
         accountId: Long,
         pageId: Long,

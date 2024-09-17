@@ -2,7 +2,7 @@ package net.pantasystem.milktea.data.infrastructure.note.timeline
 
 import net.pantasystem.milktea.model.note.timeline.TimelineResponse
 
-interface TimelineLocalSourceLoader {
+interface TimelineLocalDataSource {
 
     suspend fun getFromCache(
         accountId: Long,
@@ -12,4 +12,9 @@ interface TimelineLocalSourceLoader {
         limit: Int
     ): Result<TimelineResponse>
 
+    suspend fun saveToCache(
+        accountId: Long,
+        pageId: Long,
+        timelineItems: List<String>,
+    ): Result<Unit>
 }

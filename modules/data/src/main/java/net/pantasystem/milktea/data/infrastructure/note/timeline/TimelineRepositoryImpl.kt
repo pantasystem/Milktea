@@ -5,7 +5,6 @@ import kotlinx.coroutines.launch
 import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.common.mapCancellableCatching
 import net.pantasystem.milktea.common.runCancellableCatching
-import net.pantasystem.milktea.data.infrastructure.note.impl.sqlite.NoteEntity
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.account.page.Pageable
@@ -23,7 +22,7 @@ class TimelineRepositoryImpl @Inject constructor(
     private val noteRepository: NoteRepository,
     private val loggerFactory: Logger.Factory,
     private val timelineFetcher: TimelineFetcher,
-    private val timelineLocalSourceLoader: TimelineLocalSourceLoader,
+    private val timelineLocalDataSource: TimelineLocalDataSource,
 ) : TimelineRepository {
 
     private val logger by lazy {
@@ -233,7 +232,7 @@ class TimelineRepositoryImpl @Inject constructor(
         untilId: String?,
         sinceId: String?,
         limit: Int
-    ): Result<TimelineResponse> = timelineLocalSourceLoader.getFromCache(
+    ): Result<TimelineResponse> = timelineLocalDataSource.getFromCache(
         accountId = accountId,
         pageId = pageId,
         untilId = untilId,
@@ -246,18 +245,7 @@ class TimelineRepositoryImpl @Inject constructor(
         accountId: Long,
         pageId: Long,
         timelineItems: List<String>,
-    ): Result<Unit> = runCancellableCatching {
-        timelineCacheDAO.insertAll(
-            timelineItems.map {
-                TimelineItemEntity(
-                    accountId = accountId,
-                    pageId = pageId,
-                    noteId = it,
-                    noteLocalId = NoteEntity.makeEntityId(accountId, it)
-                )
-            }
-        )
-    }
+    ): Result<Unit> = timelineLocalDataSource.saveToCache(accountId, pageId, timelineItems)
 
 
 }
