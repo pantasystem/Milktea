@@ -23,11 +23,14 @@ android {
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
         def properties = new Properties()
-        properties.load(project.rootProject.file('benchmark.properties').newDataInputStream())
-        def REMOTE_ID = properties.getProperty('account.remote_id')
-        def INSTANCE_DOMAIN = properties.getProperty('account.instance_domain')
-        def USERNAME = properties.getProperty('account.username')
-        def TOKEN = properties.getProperty('account.token')
+        def propertyFile = project.rootProject.file('benchmark.properties')
+        if (propertyFile.exists()) {
+            properties.load(project.rootProject.file('benchmark.properties').newDataInputStream())
+        }
+        def REMOTE_ID = properties.getProperty('account.remote_id', '')
+        def INSTANCE_DOMAIN = properties.getProperty('account.instance_domain', '')
+        def USERNAME = properties.getProperty('account.username', '')
+        def TOKEN = properties.getProperty('account.token', '')
         buildConfigField('String', 'ACCOUNT_REMOTE_ID', "\"${REMOTE_ID}\"")
         buildConfigField('String', 'INSTANCE_DOMMAIN', "\"${INSTANCE_DOMAIN}\"")
         buildConfigField('String', 'USERNAME', "\"${USERNAME}\"")
@@ -51,8 +54,8 @@ android {
 }
 
 dependencies {
-    implementation 'androidx.test.ext:junit:1.2.1'
-    implementation 'androidx.test.espresso:espresso-core:3.6.1'
+    implementation libs.androidx.test.ext.junit
+    implementation libs.androidx.test.espresso.core
     implementation 'androidx.test.uiautomator:uiautomator:2.3.0'
     implementation 'androidx.benchmark:benchmark-macro-junit4:1.3.0'
 
