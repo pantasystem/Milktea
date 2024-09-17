@@ -24,6 +24,8 @@ import net.pantasystem.milktea.data.infrastructure.note.impl.ThreadContextApiAda
 import net.pantasystem.milktea.data.infrastructure.note.impl.ThreadContextApiAdapterFactoryImpl
 import net.pantasystem.milktea.data.infrastructure.note.impl.sqlite.SQLiteNoteDataSource
 import net.pantasystem.milktea.data.infrastructure.note.renote.RenotesPagingServiceImpl
+import net.pantasystem.milktea.data.infrastructure.note.timeline.TimelineFetcher
+import net.pantasystem.milktea.data.infrastructure.note.timeline.TimelineFetcherImpl
 import net.pantasystem.milktea.data.infrastructure.note.timeline.TimelineRepositoryImpl
 import net.pantasystem.milktea.data.infrastructure.note.timeline.favorite.FavoriteTimelineRepositoryImpl
 import net.pantasystem.milktea.model.note.NoteDataSource
@@ -88,6 +90,8 @@ abstract class NoteBindModule{
     @Singleton
     internal abstract fun bindFavoriteTimelineRepository(impl: FavoriteTimelineRepositoryImpl): FavoriteTimelineRepository
 
+    @Binds
+    internal abstract fun bindTimelineFetcher(impl: TimelineFetcherImpl): TimelineFetcher
 }
 
 @Module
