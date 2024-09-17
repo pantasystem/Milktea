@@ -28,7 +28,7 @@ class NotificationTabViewModel @Inject constructor(
                     ),
                     NotificationTabType.TitleWithPageable(
                         StringSource(net.pantasystem.milktea.common_android_ui.R.string.mention),
-                        Pageable.Notification(),
+                        Pageable.Mention(following = null),
                     ),
                     NotificationTabType.FollowRequests(
                         StringSource(R.string.notifications_follow_requests)
