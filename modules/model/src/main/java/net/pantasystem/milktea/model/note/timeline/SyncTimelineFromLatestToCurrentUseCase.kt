@@ -27,7 +27,7 @@ class SyncTimelineFromLatestToCurrentUseCase @Inject constructor(
                         pageId = it.pageId,
                     )
                     if (type.canCache() && it.isSavePagePosition) {
-                        val currentId = timelineRepository.findLastPreviousId(type).getOrThrow()
+                        val currentId = timelineRepository.findFirstLaterId(type).getOrThrow()
                         sync(
                             type,
                             nextId = null,
@@ -53,7 +53,7 @@ class SyncTimelineFromLatestToCurrentUseCase @Inject constructor(
         // 最後にある要素がcurrentIdより小さくなれば終了
         // ページ数が100ページを越えれば終了
         // 100という数字に特に意味はないが10 * 100で1000投稿になり流石にそれ以上の投稿をユーザが読むとは思えないため
-        if (currentId != null && lastItemId < currentId || loopCount > 100) {
+        if ((currentId != null && lastItemId < currentId) || loopCount > 100) {
             return@runCancellableCatching
         }
 

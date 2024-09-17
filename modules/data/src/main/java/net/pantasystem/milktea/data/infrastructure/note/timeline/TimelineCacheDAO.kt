@@ -30,7 +30,7 @@ interface TimelineCacheDAO {
         WHERE account_id = :accountId
         AND page_id = :pageId
         AND note_id > :sinceId
-        ORDER BY note_id DESC
+        ORDER BY note_id ASC
         LIMIT :limit
         """
     )
@@ -115,4 +115,12 @@ interface TimelineCacheDAO {
         """
     )
     suspend fun findFirstLaterId(accountId: Long, pageId: Long): String?
+
+    @Query(
+        """
+        SELECT count(*) FROM timeline_item
+        """
+    )
+    suspend fun count(): Long
+
 }
