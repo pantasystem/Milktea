@@ -24,7 +24,7 @@ class SyncTimelineFromLatestToCurrentUseCase @Inject constructor(
                     val type = TimelineType(
                         accountId = it.accountId,
                         pageable = it.pageable(),
-                        pageId = null,
+                        pageId = it.pageId,
                     )
                     if (type.canCache() && it.isSavePagePosition) {
                         val currentId = timelineRepository.findLastPreviousId(type).getOrThrow()
@@ -32,7 +32,7 @@ class SyncTimelineFromLatestToCurrentUseCase @Inject constructor(
                             type,
                             nextId = null,
                             currentId,
-                        )
+                        ).getOrThrow()
                     }
                 }
             }.awaitAll()
