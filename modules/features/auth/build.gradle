@@ -65,7 +65,8 @@ dependencies {
     testImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:$coroutines_version"
     testImplementation libs.arch.core.testing
 
-    implementation libs.bundles.emoji2
+    implementation libs.androidx.emoji2
+    implementation libs.androidx.emoji2.bundled
 
     // hilt
     implementation libs.hilt.android
@@ -107,9 +108,13 @@ dependencies {
     implementation libs.activity.ktx
 
     // compose
-    implementation libs.bundles.compose.ui
-    implementation libs.bundles.compose.foundation
-    implementation libs.bundles.compose.material
+    implementation libs.compose.ui.ui
+    implementation libs.compose.ui.ui.tooling
+
+    implementation libs.compose.foundation.foundation
+    implementation libs.compose.material.material
+    implementation libs.compose.material.material.icons.core
+    implementation libs.compose.material.material.icons.extended
     androidTestImplementation libs.compose.ui.ui.test.junit4
     implementation libs.compose.runtime.runtime.livedata
     implementation libs.android.material.compose.theme.adapter

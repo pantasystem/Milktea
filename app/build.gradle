@@ -134,7 +134,8 @@ dependencies {
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
     implementation libs.appcompat.appcompat
 
-    implementation libs.bundles.emoji2
+    implementation libs.androidx.emoji2
+    implementation libs.androidx.emoji2.bundled
 
 
     // NOTE: リアクションピッカーなどでリフレクションを行っているのでバージョンを変更しないこと
@@ -231,9 +232,14 @@ dependencies {
     implementation libs.lifecycle.livedata
 
     // compose
-    implementation libs.bundles.compose.ui
-    implementation libs.bundles.compose.foundation
-    implementation libs.bundles.compose.material
+    implementation libs.compose.ui.ui
+    implementation libs.compose.ui.ui.tooling
+
+    implementation libs.compose.foundation.foundation
+    implementation libs.compose.material.material
+    implementation libs.compose.material.material.icons.core
+    implementation libs.compose.material.material.icons.extended
+
     androidTestImplementation libs.compose.ui.ui.test.junit4
     implementation libs.compose.runtime.runtime.livedata
     implementation libs.android.material.compose.theme.adapter

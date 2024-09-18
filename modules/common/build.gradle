@@ -62,9 +62,13 @@ dependencies {
     implementation("com.jakewharton.retrofit:retrofit2-kotlinx-serialization-converter:1.0.0")
 
     // compose
-    implementation libs.bundles.compose.ui
-    implementation libs.bundles.compose.foundation
-    implementation libs.bundles.compose.material
+    implementation libs.compose.ui.ui
+    implementation libs.compose.ui.ui.tooling
+
+    implementation libs.compose.foundation.foundation
+    implementation libs.compose.material.material
+    implementation libs.compose.material.material.icons.core
+    implementation libs.compose.material.material.icons.extended
 
 
 
