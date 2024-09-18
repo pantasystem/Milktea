@@ -8,6 +8,7 @@ plugins {
     id('dagger.hilt.android.plugin')
     id('com.github.triplet.play') version("3.7.0")
     id('com.google.firebase.crashlytics')
+    alias(libs.plugins.compose.compiler)
 }
 
 
@@ -77,7 +78,7 @@ android {
 
 
     composeOptions {
-        kotlinCompilerExtensionVersion = compose_version
+//        kotlinCompilerExtensionVersion = compose_version
     }
     // for junit5
     testOptions {

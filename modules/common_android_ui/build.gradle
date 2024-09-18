@@ -3,6 +3,7 @@ plugins {
     id 'org.jetbrains.kotlin.android'
     id('kotlin-kapt')
     id('dagger.hilt.android.plugin')
+    alias(libs.plugins.compose.compiler)
 }
 
 android {
@@ -34,7 +35,7 @@ android {
         compose true
     }
     composeOptions {
-        kotlinCompilerExtensionVersion = compose_version
+//        kotlinCompilerExtensionVersion = compose_version
     }
     // for junit5
     testOptions {

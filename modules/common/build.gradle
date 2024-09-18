@@ -3,6 +3,7 @@ plugins {
     id 'org.jetbrains.kotlin.android'
     id 'kotlin-kapt'
     alias libs.plugins.kotlin.serialization.plugin
+    alias(libs.plugins.compose.compiler)
 }
 
 android {
@@ -35,7 +36,7 @@ android {
     }
 
     composeOptions {
-        kotlinCompilerExtensionVersion = compose_version
+//        kotlinCompilerExtensionVersion = compose_version
     }
     // for junit5
     testOptions {

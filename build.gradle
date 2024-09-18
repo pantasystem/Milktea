@@ -33,6 +33,8 @@ plugins {
     //classpath 'com.google.dagger:hilt-android-gradle-plugin:2.48.1'
     alias(libs.plugins.dagger.hilt.android) apply false
     alias(libs.plugins.android.test) apply false
+
+    alias(libs.plugins.compose.compiler) apply false
 }
 
 allprojects {
