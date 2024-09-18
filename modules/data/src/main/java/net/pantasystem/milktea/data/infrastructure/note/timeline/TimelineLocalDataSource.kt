@@ -1,6 +1,7 @@
 package net.pantasystem.milktea.data.infrastructure.note.timeline
 
 import net.pantasystem.milktea.model.note.timeline.TimelineResponse
+import net.pantasystem.milktea.model.note.timeline.TimelineType
 
 interface TimelineLocalDataSource {
 
@@ -17,4 +18,10 @@ interface TimelineLocalDataSource {
         pageId: Long,
         timelineItems: List<String>,
     ): Result<Unit>
+
+    suspend fun clear(type: TimelineType): Result<Unit>
+
+    suspend fun findFirstLaterId(type: TimelineType): Result<String?>
+
+    suspend fun findLastPreviousId(type: TimelineType): Result<String?>
 }

@@ -6,7 +6,7 @@ import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.common.mapCancellableCatching
 import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.model.account.Account
-import net.pantasystem.milktea.model.account.AccountRepository
+import net.pantasystem.milktea.model.account.GetAccount
 import net.pantasystem.milktea.model.account.page.Pageable
 import net.pantasystem.milktea.model.note.Note
 import net.pantasystem.milktea.model.note.NoteRepository
@@ -16,8 +16,7 @@ import net.pantasystem.milktea.model.note.timeline.TimelineType
 import javax.inject.Inject
 
 class TimelineRepositoryImpl @Inject constructor(
-    private val accountRepository: AccountRepository,
-    private val timelineCacheDAO: TimelineCacheDAO,
+    private val getAccount: GetAccount,
     private val applicationScope: CoroutineScope,
     private val noteRepository: NoteRepository,
     private val loggerFactory: Logger.Factory,
@@ -39,7 +38,7 @@ class TimelineRepositoryImpl @Inject constructor(
             throw IllegalArgumentException("pageable is not allowed")
         }
 
-        val account = accountRepository.get(type.accountId).getOrThrow()
+        val account = getAccount.get(type.accountId)
 
         if (type.canCache() && sinceDate == null) {
             val inCache = getFromCache(
@@ -108,7 +107,7 @@ class TimelineRepositoryImpl @Inject constructor(
             throw IllegalArgumentException("pageable is not allowed")
         }
 
-        val account = accountRepository.get(type.accountId).getOrThrow()
+        val account = getAccount.get(type.accountId)
 
         if (type.canCache() && untilDate == null) {
             val inCache = getFromCache(
@@ -177,7 +176,7 @@ class TimelineRepositoryImpl @Inject constructor(
                 return@runCancellableCatching
             }
 
-            val account = accountRepository.get(type.accountId).getOrThrow()
+            val account = getAccount.get(type.accountId)
             saveToCache(
                 accountId = account.accountId,
                 pageId = type.pageId!!,
@@ -185,28 +184,14 @@ class TimelineRepositoryImpl @Inject constructor(
             )
         }
 
-    override suspend fun clear(type: TimelineType): Result<Unit> = runCancellableCatching {
-        if (!type.canCache()) {
-            return@runCancellableCatching
-        }
-        timelineCacheDAO.clear(type.accountId, type.pageId!!)
-    }
+    override suspend fun clear(type: TimelineType): Result<Unit> =
+        timelineLocalDataSource.clear(type)
 
     override suspend fun findFirstLaterId(type: TimelineType): Result<String?> =
-        runCancellableCatching {
-            if (!type.canCache()) {
-                return@runCancellableCatching null
-            }
-            timelineCacheDAO.findFirstLaterId(type.accountId, type.pageId!!)
-        }
+        timelineLocalDataSource.findFirstLaterId(type)
 
     override suspend fun findLastPreviousId(type: TimelineType): Result<String?> =
-        runCancellableCatching {
-            if (!type.canCache()) {
-                return@runCancellableCatching null
-            }
-            timelineCacheDAO.findLastPreviousId(type.accountId, type.pageId!!)
-        }
+        timelineLocalDataSource.findLastPreviousId(type)
 
     private suspend fun fetchTimeline(
         account: Account,

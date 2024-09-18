@@ -4,6 +4,7 @@ import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.data.infrastructure.note.impl.sqlite.NoteEntity
 import net.pantasystem.milktea.model.note.Note
 import net.pantasystem.milktea.model.note.timeline.TimelineResponse
+import net.pantasystem.milktea.model.note.timeline.TimelineType
 import javax.inject.Inject
 
 internal class TimelineLocalDataSourceImpl @Inject constructor(
@@ -76,5 +77,28 @@ internal class TimelineLocalDataSourceImpl @Inject constructor(
             untilId = localItems.lastOrNull()?.noteId
         )
     }
+
+    override suspend fun clear(type: TimelineType): Result<Unit> = runCancellableCatching {
+        if (!type.canCache()) {
+            return@runCancellableCatching
+        }
+        timelineCacheDAO.clear(type.accountId, type.pageId!!)
+    }
+
+    override suspend fun findFirstLaterId(type: TimelineType): Result<String?> =
+        runCancellableCatching {
+            if (!type.canCache()) {
+                return@runCancellableCatching null
+            }
+            timelineCacheDAO.findFirstLaterId(type.accountId, type.pageId!!)
+        }
+
+    override suspend fun findLastPreviousId(type: TimelineType): Result<String?> =
+        runCancellableCatching {
+            if (!type.canCache()) {
+                return@runCancellableCatching null
+            }
+            timelineCacheDAO.findLastPreviousId(type.accountId, type.pageId!!)
+        }
 
 }
