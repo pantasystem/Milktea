@@ -30,7 +30,7 @@ import net.pantasystem.milktea.common_navigation.MainNavigation
 import net.pantasystem.milktea.data.infrastructure.auth.Authorization
 import net.pantasystem.milktea.data.infrastructure.auth.custom.CustomAuthStore
 import net.pantasystem.milktea.data.infrastructure.auth.from
-import java.util.*
+import java.util.Locale
 import javax.inject.Inject
 
 
@@ -152,11 +152,11 @@ class AuthorizationActivity : AppCompatActivity() {
 
 
     @SuppressLint("MissingSuperCall")
-    override fun onNewIntent(intent: Intent?) {
+    override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         val authStore = CustomAuthStore.newInstance(this)
-        val callbackToken = intent?.data?.getQueryParameter("token")
-        val callbackMastodonCode = intent?.data?.getQueryParameter("code")
+        val callbackToken = intent.data?.getQueryParameter("token")
+        val callbackMastodonCode = intent.data?.getQueryParameter("code")
 
         if (callbackToken?.isNotBlank() == true) {
             authStore.getCustomAuthBridge()?.let {
