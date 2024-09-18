@@ -1,4 +1,5 @@
 [versions]
+kotlin-version = "1.9.10"
 date-time = "0.4.0"
 compose = "1.7.1"
 compose-material-icons = "1.7.1"
@@ -117,6 +118,11 @@ robolectric = { module = "org.robolectric:robolectric", version.ref = "robolectr
 
 accompanist-glide = { module = "com.google.accompanist:accompanist-glide", version = "0.14.0" }
 
-wada811-databinding = { module = "com.github.wada811:DataBinding-ktx", version = "5.0.2"}
+wada811-databinding = { module = "com.github.wada811:DataBinding-ktx", version = "5.0.2" }
 
 [plugins]
+kotlin-serialization-plugin = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin-version" }
+android-application = { id = "com.android.application", version = "8.1.3" }
+kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin-version" }
+dagger-hilt-android = { id = "com.google.dagger.hilt.android", version.ref = "hilt" }
+android-test = { id = "com.android.test", version = "8.1.3" }

@@ -24,15 +24,15 @@ buildscript {
 }
 
 plugins {
-    id("org.jetbrains.kotlin.plugin.serialization") version "$kotlin_version" apply false
+    alias libs.plugins.kotlin.serialization.plugin apply false
     //com.android.tools.build:gradle:8.1.3
-    id('com.android.application') version '8.1.3' apply false
+    alias(libs.plugins.android.application) apply false
     // classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
-    id('org.jetbrains.kotlin.android') version "$kotlin_version" apply false
+    alias(libs.plugins.kotlin.android) apply false
 
     //classpath 'com.google.dagger:hilt-android-gradle-plugin:2.48.1'
-    id("com.google.dagger.hilt.android") version '2.48.1' apply false
-    id 'com.android.test' version '8.1.3' apply false
+    alias(libs.plugins.dagger.hilt.android) apply false
+    alias(libs.plugins.android.test) apply false
 }
 
 allprojects {
