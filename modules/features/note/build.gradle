@@ -3,7 +3,7 @@ plugins {
     id 'org.jetbrains.kotlin.android'
     id 'dagger.hilt.android.plugin'
     id 'kotlin-kapt'
-    id 'org.jetbrains.kotlin.plugin.serialization' version "$kotlin_version"
+    alias libs.plugins.kotlin.serialization.plugin
 }
 
 android {
