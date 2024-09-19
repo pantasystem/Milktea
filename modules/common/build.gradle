@@ -35,8 +35,8 @@ android {
         compose true
     }
 
-    composeOptions {
-//        kotlinCompilerExtensionVersion = compose_version
+    composeCompiler {
+        enableStrongSkippingMode = true
     }
     // for junit5
     testOptions {
