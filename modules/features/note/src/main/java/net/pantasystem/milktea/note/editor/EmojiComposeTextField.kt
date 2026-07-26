@@ -41,12 +41,14 @@ import androidx.compose.ui.window.PopupPositionProvider
 import androidx.compose.ui.window.PopupProperties
 import coil.compose.rememberAsyncImagePainter
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.SharedFlow
 import net.pantasystem.milktea.common.text.UrlPatternChecker
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.emoji.CustomEmoji
 import net.pantasystem.milktea.model.emoji.CustomEmojiRepository
 import net.pantasystem.milktea.note.editor.emoji.EmojiToken
 import net.pantasystem.milktea.note.editor.emoji.EmojiTokenScanner
+import net.pantasystem.milktea.note.editor.viewmodel.TextWithCursorPos
 
 private const val SEARCH_DEBOUNCE_MS = 150L
 private const val MAX_SUGGESTIONS = 20
@@ -69,6 +71,8 @@ private const val MAX_SUGGESTIONS = 20
  * @param onFocused フォーカスを得たときのコールバック
  * @param onCursorPositionChanged カーソル位置が変わったときのコールバック
  * @param onUrlPasted URL 貼り付けを検出したときのコールバック。null の場合は検出しない
+ * @param textCursorPosFlow ViewModel から流れる「テキスト＋カーソル位置」の更新イベント。
+ *   絵文字ピッカー・メンション挿入後にテキストを置き換えつつカーソルを挿入位置直後へ移動する
  * @param autoFocus true の場合、初回表示時にフォーカスを当てて IME を表示する
  */
 @OptIn(ExperimentalComposeUiApi::class)
@@ -86,6 +90,7 @@ fun EmojiComposeTextField(
     onFocused: () -> Unit = {},
     onCursorPositionChanged: (Int) -> Unit = {},
     onUrlPasted: ((text: String, start: Int, beforeText: String, count: Int) -> Unit)? = null,
+    textCursorPosFlow: SharedFlow<TextWithCursorPos>? = null,
     autoFocus: Boolean = false,
     textStyle: TextStyle = LocalTextStyle.current,
 ) {
@@ -99,9 +104,22 @@ fun EmojiComposeTextField(
 
     // 外部 value が内部 text と食い違った場合のみ同期する（外部からのテキスト差し替え）。
     // 自分の onValueChange 経由で戻ってくる value は既に一致しているためリセットされない。
+    // NOTE: value 更新（カーソル末尾）と下の textCursorPosFlow（正しいカーソル位置）は
+    //       どちらが先に走っても、この「text が異なる場合のみ」ガードにより最終的に
+    //       正しいカーソル位置へ収束する（旧 AndroidView 実装の update ブロックと同じ仕組み）。
     LaunchedEffect(value) {
         if (value != textFieldValue.text) {
             textFieldValue = TextFieldValue(value, TextRange(value.length))
+        }
+    }
+
+    // ViewModel からの「テキスト＋カーソル位置」更新（絵文字ピッカー・メンション挿入）を反映する。
+    LaunchedEffect(textCursorPosFlow) {
+        textCursorPosFlow?.collect { data ->
+            val newText = data.text ?: ""
+            val pos = data.cursorPos.coerceIn(0, newText.length)
+            textFieldValue = TextFieldValue(newText, TextRange(pos))
+            currentOnCursorPositionChanged(pos)
         }
     }
 

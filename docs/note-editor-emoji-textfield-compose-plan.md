@@ -194,20 +194,23 @@ CW フィールドは補完はあるが URL 検出・auto-focus・ピッカー�
    - `windowSoftInputMode="adjustNothing"` 環境での表示可否を実機確認（今回のバグの再発防止）
 
 3. **絵文字ピッカーからの挿入位置**
-   - `NoteEditorActivity.onSelect` が参照する `textCursorPosition` / `cwCursorPosition` を、
-     「フォーカス中フィールドの現在 `selection` に挿入」する形へ寄せる
-   - ViewModel の `addEmoji(emoji, pos)` はそのまま活用。挿入後カーソル位置の反映を
-     `textCursorPosFlow` 逆流ではなく `TextFieldValue` 更新で行う
+   - `NoteEditorActivity.onSelect` が参照する `textCursorPosition` / `cwCursorPosition` は、
+     `onCursorPositionChanged`（= `selection.end`）で常に実キャレット位置に更新されるため、
+     `addEmoji(emoji, pos)` はそのまま正しい位置に挿入される（旧実装のカーソル追跡ハックは不要に）
+   - 挿入後のキャレット再配置は `textCursorPosFlow`（text + pos）を `EmojiComposeTextField` 側で
+     `TextFieldValue` に反映して行う。value 同期との競合は「text が異なる場合のみ」ガードで収束する
+     （※ このフローは「二重管理」ではなく挿入後の再配置に必要な最小限の経路として残す）
 
 ### チェックリスト
 
-- [ ] 本文側を純粋 Compose 版へ差し替え
-- [ ] URL 貼り付け検出が従来通り発火する（ファイルサイズ/添付確認等の既存挙動を確認）
-- [ ] 画面を開いた瞬間の auto-focus + IME 表示が動く（adjustNothing 環境で確認）
-- [ ] カーソル中間移動 → ピッカー挿入がその位置に入る
-- [ ] 返信/引用/下書き/共有インテントの初期テキスト反映を確認
-- [ ] 画面回転・SavedState 復元でテキスト/カーソルが保持される
-- [ ] `./gradlew :modules:features:note:compileDebugKotlin` が通る
+- [x] 本文側を純粋 Compose 版へ差し替え
+- [x] `InputType` など不要 import を除去
+- [ ] URL 貼り付け検出が従来通り発火する（ファイルサイズ/添付確認等の既存挙動を確認）※実機
+- [ ] 画面を開いた瞬間の auto-focus + IME 表示が動く（adjustNothing 環境で確認）※実機
+- [ ] カーソル中間移動 → ピッカー挿入がその位置に入る ※実機
+- [ ] 返信/引用/下書き/共有インテントの初期テキスト反映を確認 ※実機
+- [ ] 画面回転・SavedState 復元でテキスト/カーソルが保持される ※実機
+- [x] `./gradlew :modules:features:note:compileDebugKotlin` が通る
 
 **完了確認:** 受け入れ基準チェックリストを全て満たす。
 

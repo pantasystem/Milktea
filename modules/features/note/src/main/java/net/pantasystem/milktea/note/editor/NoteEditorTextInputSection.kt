@@ -1,6 +1,5 @@
 package net.pantasystem.milktea.note.editor
 
-import android.text.InputType
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -23,7 +22,7 @@ import net.pantasystem.milktea.note.editor.viewmodel.TextWithCursorPos
 /**
  * テキスト入力エリア（CW フィールド + 本文フィールド + 文字数カウント）
  *
- * 内部で EmojiAutoCompleteTextField（AndroidView ラッパー）を使用する。
+ * 内部で EmojiComposeTextField（純粋 Compose の補完対応テキストフィールド）を使用する。
  *
  * @param onFocusChanged どちらのフィールドがフォーカスされたかを通知するコールバック。
  *   NoteEditorScreen で focusedField 状態の更新に使う。
@@ -66,7 +65,8 @@ fun NoteEditorTextInputSection(
             HorizontalDivider(modifier = Modifier.padding(horizontal = 8.dp))
         }
 
-        EmojiAutoCompleteTextField(
+        // 本文フィールドも純粋 Compose 版へ移行済み（段階移行 Phase 4）
+        EmojiComposeTextField(
             value = text,
             onValueChange = onTextChanged,
             onFocused = { onFocusChanged(NoteEditorFocusEditTextType.Text) },
@@ -76,7 +76,6 @@ fun NoteEditorTextInputSection(
                 .fillMaxWidth()
                 .padding(horizontal = 8.dp, vertical = 4.dp),
             hint = stringResource(id = R.string.please_speak),
-            inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_FLAG_MULTI_LINE,
             minLines = 1,
             textCursorPosFlow = textCursorPosFlow,
             onUrlPasted = onUrlPasted,
