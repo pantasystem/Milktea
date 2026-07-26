@@ -108,9 +108,9 @@ AndroidView ブリッジのために存在している状態管理と、Compose 
 
 ### チェックリスト
 
-- [ ] `NoteEditorTextField.kt` を作成（補完なし・複数行・ヒント対応）
-- [ ] Preview で表示・入力・複数行・ヒント表示を確認
-- [ ] `./gradlew :modules:features:note:compileDebugKotlin` が通る
+- [x] `NoteEditorTextField.kt` を作成（補完なし・複数行・ヒント対応）
+- [ ] Preview で表示・入力・複数行・ヒント表示を確認（実機/Preview レンダリング要）
+- [x] `./gradlew :modules:features:note:compileDebugKotlin` が通る
 
 **完了確認:** 単体 Preview で入力できる。既存フィールドには未接続なので本番挙動は不変。
 
@@ -143,12 +143,12 @@ AndroidView ブリッジのために存在している状態管理と、Compose 
 
 ### チェックリスト
 
-- [ ] `EmojiTokenScanner`（純粋関数）を作成し、Tokenizer 相当の境界ケースをユニットテスト
-- [ ] `snapshotFlow` + `debounce` + suspend `search()` で候補取得を実装（`runBlocking` を使わない）
-- [ ] `Popup` ベースの候補リスト UI を実装し、`CustomEmojiText` で行を描画
-- [ ] 候補選択でトークン置換＋カーソル移動が正しく動く
-- [ ] Preview / 単体画面で補完の一連の流れを確認
-- [ ] `./gradlew :modules:features:note:compileDebugKotlin` が通る
+- [x] `EmojiTokenScanner`（純粋関数）を作成し、Tokenizer 相当の境界ケースをユニットテスト
+- [x] `debounce` 相当（`LaunchedEffect` キー切替でキャンセル）+ suspend `search()` で候補取得を実装（`runBlocking` を使わない）
+- [x] `Popup` ベースの候補リスト UI を実装し、絵文字画像＋名前で行を描画
+- [x] 候補選択でトークン置換＋カーソル移動が正しく動く
+- [ ] Preview / 単体画面で補完の一連の流れを確認（実機要）
+- [x] `./gradlew :modules:features:note:compileDebugKotlin` が通る
 
 **完了確認:** 補完付きフィールド単体で `:emoji` 入力→候補→選択→置換が動く。既存フィールドには未接続。
 
@@ -166,10 +166,10 @@ CW フィールドは補完はあるが URL 検出・auto-focus・ピッカー�
 
 ### チェックリスト
 
-- [ ] `NoteEditorTextInputSection` の CW 側を純粋 Compose 版に差し替え
+- [x] `NoteEditorTextInputSection` の CW 側を純粋 Compose 版に差し替え
 - [ ] CW の補完・入力・カーソル・`onFocused` 通知が従来通り動くことを実機確認
 - [ ] CW → 本文のフォーカス移動、`focusedField` 状態更新が壊れていないことを確認
-- [ ] `./gradlew :modules:features:note:compileDebugKotlin` が通る
+- [x] `./gradlew :modules:features:note:compileDebugKotlin` が通る
 
 **完了確認:** CW フィールドが純粋 Compose で動作。本文は AndroidView 版のまま無変更で共存。
 

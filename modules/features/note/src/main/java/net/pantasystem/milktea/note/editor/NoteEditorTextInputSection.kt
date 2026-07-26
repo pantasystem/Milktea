@@ -48,7 +48,8 @@ fun NoteEditorTextInputSection(
 ) {
     Column(modifier = modifier) {
         if (hasCw) {
-            EmojiAutoCompleteTextField(
+            // CW フィールドは純粋 Compose 版へ移行済み（段階移行 Phase 3）
+            EmojiComposeTextField(
                 value = cw ?: "",
                 onValueChange = onCwChanged,
                 onFocused = { onFocusChanged(NoteEditorFocusEditTextType.Cw) },
@@ -58,7 +59,7 @@ fun NoteEditorTextInputSection(
                     .fillMaxWidth()
                     .padding(horizontal = 8.dp, vertical = 4.dp),
                 hint = stringResource(id = R.string.cw_hint),
-                inputType = InputType.TYPE_CLASS_TEXT,
+                singleLine = true,
                 minLines = 1,
                 onCursorPositionChanged = onCwCursorPositionChanged,
             )
