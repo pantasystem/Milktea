@@ -126,6 +126,11 @@ fun EmojiComposeTextField(
     // 補完候補
     var suggestions by remember { mutableStateOf<List<CustomEmoji>>(emptyList()) }
 
+    // フィールドがフォーカスを持っているか。候補ドロップダウンの表示条件に使う。
+    // フォーカスを失ったら（外側タップ・別フィールドへ移動）候補を隠す。
+    // フォーカス状態は入力中に切り替わらないためフリッカーしない。
+    var isFocused by remember { mutableStateOf(false) }
+
     // カーソル直前のトークン（選択範囲が無く、query が空でないときのみ有効）
     val currentToken: EmojiToken? = remember(textFieldValue) {
         if (!textFieldValue.selection.collapsed) {
@@ -201,11 +206,14 @@ fun EmojiComposeTextField(
             singleLine = singleLine,
             keyboardOptions = keyboardOptions,
             focusRequester = focusRequester,
-            onFocusChanged = { focused -> if (focused) onFocused() },
+            onFocusChanged = { focused ->
+                isFocused = focused
+                if (focused) onFocused()
+            },
             textStyle = textStyle,
         )
 
-        if (suggestions.isNotEmpty()) {
+        if (isFocused && suggestions.isNotEmpty()) {
             EmojiSuggestionPopup(
                 suggestions = suggestions,
                 accountHost = account?.getHost(),
