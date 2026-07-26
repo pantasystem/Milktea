@@ -80,6 +80,7 @@ fun NoteEditorTextInputSection(
             textCursorPosFlow = textCursorPosFlow,
             onUrlPasted = onUrlPasted,
             onCursorPositionChanged = onTextCursorPositionChanged,
+            autoFocus = true,
         )
     }
 }

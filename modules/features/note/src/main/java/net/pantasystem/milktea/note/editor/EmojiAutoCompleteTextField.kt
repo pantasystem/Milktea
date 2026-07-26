@@ -1,7 +1,11 @@
 package net.pantasystem.milktea.note.editor
 
+import android.content.Context
 import android.text.InputType
+import android.view.inputmethod.InputMethodManager
 import android.widget.MultiAutoCompleteTextView
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -40,6 +44,7 @@ import net.pantasystem.milktea.note.editor.viewmodel.TextWithCursorPos
  * @param onUrlPasted URL が貼り付けられたときのコールバック。null の場合は検出しない
  * @param onCursorPositionChanged テキスト変化後のカーソル位置を通知するコールバック。
  *   絵文字ピッカーから挿入位置を決める際に使う
+ * @param autoFocus true の場合、画面表示時にこのフィールドへフォーカスを当てて IME を表示する
  */
 @Composable
 fun EmojiAutoCompleteTextField(
@@ -55,6 +60,7 @@ fun EmojiAutoCompleteTextField(
     textCursorPosFlow: SharedFlow<TextWithCursorPos>? = null,
     onUrlPasted: ((text: String, start: Int, beforeText: String, count: Int) -> Unit)? = null,
     onCursorPositionChanged: (Int) -> Unit = {},
+    autoFocus: Boolean = false,
 ) {
     // MultiAutoCompleteTextView への参照を保持して LaunchedEffect からアクセスできるようにする
     val viewRef = remember { mutableStateOf<MultiAutoCompleteTextView?>(null) }
@@ -134,6 +140,26 @@ fun EmojiAutoCompleteTextField(
 
                 setOnFocusChangeListener { _, hasFocus ->
                     if (hasFocus) currentOnFocused()
+                }
+
+                if (autoFocus) {
+                    // 画面を開いた時点で本文フィールドへフォーカスを当て、IME を表示する。
+                    // adjustNothing のため OS 側の自動表示は行われないので明示的に呼ぶ。
+                    // View がアタッチされてから実行する必要があるため post で遅延させる。
+                    post {
+                        if (requestFocus()) {
+                            // SHOW_IMPLICIT は端末状態により無視されることがあるため、
+                            // edge-to-edge で推奨される WindowInsetsController を優先して使う。
+                            val controller = ViewCompat.getWindowInsetsController(this)
+                            if (controller != null) {
+                                controller.show(WindowInsetsCompat.Type.ime())
+                            } else {
+                                val imm = ctx.getSystemService(Context.INPUT_METHOD_SERVICE)
+                                        as? InputMethodManager
+                                imm?.showSoftInput(this, InputMethodManager.SHOW_IMPLICIT)
+                            }
+                        }
+                    }
                 }
             }.also { viewRef.value = it }
         },
