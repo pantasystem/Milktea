@@ -73,6 +73,8 @@ private const val MAX_SUGGESTIONS = 20
  * @param onUrlPasted URL 貼り付けを検出したときのコールバック。null の場合は検出しない
  * @param textCursorPosFlow ViewModel から流れる「テキスト＋カーソル位置」の更新イベント。
  *   絵文字ピッカー・メンション挿入後にテキストを置き換えつつカーソルを挿入位置直後へ移動する
+ * @param dismissSignal 値が変化するたびに補完ドロップダウンを一時的に閉じる（外側タップ等の合図）。
+ *   フォーカス・IME は保持したままドロップダウンだけを隠す。次にトークンが変化すると再表示される
  * @param autoFocus true の場合、初回表示時にフォーカスを当てて IME を表示する
  */
 @OptIn(ExperimentalComposeUiApi::class)
@@ -91,6 +93,7 @@ fun EmojiComposeTextField(
     onCursorPositionChanged: (Int) -> Unit = {},
     onUrlPasted: ((text: String, start: Int, beforeText: String, count: Int) -> Unit)? = null,
     textCursorPosFlow: SharedFlow<TextWithCursorPos>? = null,
+    dismissSignal: Int = 0,
     autoFocus: Boolean = false,
     textStyle: TextStyle = LocalTextStyle.current,
 ) {
@@ -127,9 +130,13 @@ fun EmojiComposeTextField(
     var suggestions by remember { mutableStateOf<List<CustomEmoji>>(emptyList()) }
 
     // フィールドがフォーカスを持っているか。候補ドロップダウンの表示条件に使う。
-    // フォーカスを失ったら（外側タップ・別フィールドへ移動）候補を隠す。
+    // フォーカスを失ったら（別フィールドへ移動）候補を隠す。
     // フォーカス状態は入力中に切り替わらないためフリッカーしない。
     var isFocused by remember { mutableStateOf(false) }
+
+    // 外側タップ等の合図で一時的にドロップダウンを閉じる。フォーカス・IME は保持したまま隠す。
+    // 次にトークン（query）が変化したら解除して再表示できるようにする。
+    var suppressed by remember { mutableStateOf(false) }
 
     // カーソル直前のトークン（選択範囲が無く、query が空でないときのみ有効）
     val currentToken: EmojiToken? = remember(textFieldValue) {
@@ -152,6 +159,15 @@ fun EmojiComposeTextField(
         suggestions = customEmojiRepository.search(account.getHost(), query)
             .getOrElse { emptyList() }
             .take(MAX_SUGGESTIONS)
+    }
+
+    // 外側タップ等の合図でドロップダウンを一時的に閉じる（初期値 0 のときは何もしない）
+    LaunchedEffect(dismissSignal) {
+        if (dismissSignal != 0) suppressed = true
+    }
+    // トークン（query）が変化したら抑制を解除して再表示できるようにする
+    LaunchedEffect(currentToken?.query) {
+        suppressed = false
     }
 
     val focusRequester = remember { FocusRequester() }
@@ -213,7 +229,7 @@ fun EmojiComposeTextField(
             textStyle = textStyle,
         )
 
-        if (isFocused && suggestions.isNotEmpty()) {
+        if (isFocused && !suppressed && suggestions.isNotEmpty()) {
             EmojiSuggestionPopup(
                 suggestions = suggestions,
                 accountHost = account?.getHost(),

@@ -25,7 +25,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.datetime.Clock
@@ -136,7 +135,9 @@ fun NoteEditorScreen(
         )
     }
 
-    val focusManager = LocalFocusManager.current
+    // 外側タップで補完ドロップダウンを閉じるための合図。値が変わるたびに閉じる。
+    // フォーカス・IME は保持したままドロップダウンだけを隠す。
+    var dismissSuggestionsSignal by remember { mutableStateOf(0) }
 
     Scaffold(
         contentWindowInsets = WindowInsets.safeDrawing,
@@ -209,11 +210,11 @@ fun NoteEditorScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
-                // 入力欄・ボタン以外の空白部分をタップしたらフォーカスを外す。
-                // フォーカスが外れると補完ドロップダウンが閉じる（isFocused 連動）。
+                // 入力欄・ボタン以外の空白部分をタップしたら補完ドロップダウンを閉じる。
+                // フォーカス・IME は保持したまま（clearFocus はしない）。
                 // 子の clickable / テキストフィールドはタップを消費するため影響しない。
                 .pointerInput(Unit) {
-                    detectTapGestures(onTap = { focusManager.clearFocus() })
+                    detectTapGestures(onTap = { dismissSuggestionsSignal++ })
                 }
                 .verticalScroll(rememberScrollState()),
         ) {
@@ -259,6 +260,7 @@ fun NoteEditorScreen(
                 },
                 onTextCursorPositionChanged = onTextCursorPositionChanged,
                 onCwCursorPositionChanged = onCwCursorPositionChanged,
+                dismissSuggestionsSignal = dismissSuggestionsSignal,
             )
 
             // 投票エディタ

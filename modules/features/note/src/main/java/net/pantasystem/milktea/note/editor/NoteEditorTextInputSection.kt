@@ -43,6 +43,7 @@ fun NoteEditorTextInputSection(
     onUrlPasted: (text: String, start: Int, beforeText: String, count: Int) -> Unit,
     onTextCursorPositionChanged: (Int) -> Unit = {},
     onCwCursorPositionChanged: (Int) -> Unit = {},
+    dismissSuggestionsSignal: Int = 0,
     modifier: Modifier = Modifier,
 ) {
     Column(modifier = modifier) {
@@ -61,6 +62,7 @@ fun NoteEditorTextInputSection(
                 singleLine = true,
                 minLines = 1,
                 onCursorPositionChanged = onCwCursorPositionChanged,
+                dismissSignal = dismissSuggestionsSignal,
             )
             HorizontalDivider(modifier = Modifier.padding(horizontal = 8.dp))
         }
@@ -80,6 +82,7 @@ fun NoteEditorTextInputSection(
             textCursorPosFlow = textCursorPosFlow,
             onUrlPasted = onUrlPasted,
             onCursorPositionChanged = onTextCursorPositionChanged,
+            dismissSignal = dismissSuggestionsSignal,
             autoFocus = true,
         )
     }
