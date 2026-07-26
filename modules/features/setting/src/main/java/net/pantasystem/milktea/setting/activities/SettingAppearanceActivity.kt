@@ -172,16 +172,6 @@ class SettingAppearanceActivity : AppCompatActivity() {
                             }
 
                             SettingSwitchTile(
-                                checked = currentConfigState.isSimpleEditorEnabled,
-                                onChanged = {
-                                    currentConfigState =
-                                        currentConfigState.copy(isSimpleEditorEnabled = it)
-                                }
-                            ) {
-                                Text(stringResource(R.string.use_simple_editor))
-                            }
-
-                            SettingSwitchTile(
                                 checked = currentConfigState.isUserNameDefault, onChanged = {
                                     currentConfigState =
                                         currentConfigState.copy(isUserNameDefault = it)

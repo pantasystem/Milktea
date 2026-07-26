@@ -1,6 +1,5 @@
 package net.pantasystem.milktea.note.editor
 
-import android.text.InputType
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -23,7 +22,7 @@ import net.pantasystem.milktea.note.editor.viewmodel.TextWithCursorPos
 /**
  * テキスト入力エリア（CW フィールド + 本文フィールド + 文字数カウント）
  *
- * 内部で EmojiAutoCompleteTextField（AndroidView ラッパー）を使用する。
+ * 内部で EmojiComposeTextField（純粋 Compose の補完対応テキストフィールド）を使用する。
  *
  * @param onFocusChanged どちらのフィールドがフォーカスされたかを通知するコールバック。
  *   NoteEditorScreen で focusedField 状態の更新に使う。
@@ -44,11 +43,13 @@ fun NoteEditorTextInputSection(
     onUrlPasted: (text: String, start: Int, beforeText: String, count: Int) -> Unit,
     onTextCursorPositionChanged: (Int) -> Unit = {},
     onCwCursorPositionChanged: (Int) -> Unit = {},
+    dismissSuggestionsSignal: Int = 0,
     modifier: Modifier = Modifier,
 ) {
     Column(modifier = modifier) {
         if (hasCw) {
-            EmojiAutoCompleteTextField(
+            // CW フィールドは純粋 Compose 版へ移行済み（段階移行 Phase 3）
+            EmojiComposeTextField(
                 value = cw ?: "",
                 onValueChange = onCwChanged,
                 onFocused = { onFocusChanged(NoteEditorFocusEditTextType.Cw) },
@@ -58,14 +59,16 @@ fun NoteEditorTextInputSection(
                     .fillMaxWidth()
                     .padding(horizontal = 8.dp, vertical = 4.dp),
                 hint = stringResource(id = R.string.cw_hint),
-                inputType = InputType.TYPE_CLASS_TEXT,
+                singleLine = true,
                 minLines = 1,
                 onCursorPositionChanged = onCwCursorPositionChanged,
+                dismissSignal = dismissSuggestionsSignal,
             )
             HorizontalDivider(modifier = Modifier.padding(horizontal = 8.dp))
         }
 
-        EmojiAutoCompleteTextField(
+        // 本文フィールドも純粋 Compose 版へ移行済み（段階移行 Phase 4）
+        EmojiComposeTextField(
             value = text,
             onValueChange = onTextChanged,
             onFocused = { onFocusChanged(NoteEditorFocusEditTextType.Text) },
@@ -75,11 +78,11 @@ fun NoteEditorTextInputSection(
                 .fillMaxWidth()
                 .padding(horizontal = 8.dp, vertical = 4.dp),
             hint = stringResource(id = R.string.please_speak),
-            inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_FLAG_MULTI_LINE,
             minLines = 1,
             textCursorPosFlow = textCursorPosFlow,
             onUrlPasted = onUrlPasted,
             onCursorPositionChanged = onTextCursorPositionChanged,
+            dismissSignal = dismissSuggestionsSignal,
             autoFocus = true,
         )
     }
@@ -91,7 +94,7 @@ private fun Preview_NoteEditorTextInputSection() {
     MaterialTheme {
         Surface {
             Text(
-                text = "EmojiAutoCompleteTextField preview requires Android context",
+                text = "EmojiComposeTextField preview requires Android context",
                 modifier = Modifier.padding(16.dp),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
