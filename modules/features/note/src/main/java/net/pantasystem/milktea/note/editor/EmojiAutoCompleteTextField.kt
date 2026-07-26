@@ -63,7 +63,7 @@ fun EmojiAutoCompleteTextField(
     autoFocus: Boolean = false,
 ) {
     // MultiAutoCompleteTextView への参照を保持して LaunchedEffect からアクセスできるようにする
-    val viewRef = remember { mutableStateOf<MultiAutoCompleteTextView?>(null) }
+    val viewRef = remember { mutableStateOf<SelectionAwareMultiAutoCompleteTextView?>(null) }
 
     // アダプターの再セットが必要かどうかを判定するために前回のアカウント ID を記憶する
     val lastAdapterAccountId = remember { mutableStateOf<Long?>(null) }
@@ -94,7 +94,7 @@ fun EmojiAutoCompleteTextField(
 
     AndroidView(
         factory = { ctx ->
-            MultiAutoCompleteTextView(ctx).apply {
+            SelectionAwareMultiAutoCompleteTextView(ctx).apply {
                 this.hint = hint
                 this.inputType = inputType
                 this.minLines = minLines
@@ -113,11 +113,15 @@ fun EmojiAutoCompleteTextField(
                     setTokenizer(CustomEmojiTokenizer())
                 }
 
+                // カーソル移動（タップやドラッグでの選択位置変更）を通知する。
+                // テキスト変化時だけでなく、ユーザーがカーソルだけを動かした場合も
+                // 最新のカーソル位置を反映させる（絵文字・メンション挿入位置の決定に使う）。
+                onSelectionChangedListener = { _, selEnd ->
+                    currentOnCursorPositionChanged(selEnd)
+                }
+
                 addTextChangedListener(
                     onTextChanged = { text, start, _, count ->
-                        // テキスト変化後のカーソル位置を通知
-                        currentOnCursorPositionChanged(start + count)
-
                         // URL 貼り付け検出（コールバックが設定されている場合のみ）
                         if (currentOnUrlPasted != null && text != null && count > 0) {
                             val inputText = try {
@@ -182,4 +186,24 @@ fun EmojiAutoCompleteTextField(
         },
         modifier = modifier,
     )
+}
+
+/**
+ * カーソル（選択範囲）の変化を外部へ通知できる MultiAutoCompleteTextView。
+ *
+ * TextView.onSelectionChanged は protected のため、カーソル位置の変化を検知するには
+ * サブクラス化して override する必要がある。テキスト変化を伴わないカーソル移動
+ * （タップやドラッグでのキャレット移動）も拾えるようにする。
+ */
+class SelectionAwareMultiAutoCompleteTextView(
+    context: Context,
+) : MultiAutoCompleteTextView(context) {
+
+    /** 選択範囲が変わったときに (selStart, selEnd) を通知するリスナー */
+    var onSelectionChangedListener: ((Int, Int) -> Unit)? = null
+
+    override fun onSelectionChanged(selStart: Int, selEnd: Int) {
+        super.onSelectionChanged(selStart, selEnd)
+        onSelectionChangedListener?.invoke(selStart, selEnd)
+    }
 }
