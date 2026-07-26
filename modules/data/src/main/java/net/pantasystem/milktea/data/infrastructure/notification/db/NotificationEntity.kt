@@ -685,7 +685,7 @@ data class NotificationWithDetails(
                     Notification.Id(notification.accountId, notification.notificationId),
                     notification.createdAt,
                     isRead(),
-                    userId = User.Id(notification.accountId, noteNotification!!.userId),
+                    userId = noteNotification?.userId?.let { User.Id(notification.accountId, noteNotification.userId) },
                     rawType = unknownNotification!!.rawType,
                 )
             }
