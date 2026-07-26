@@ -56,8 +56,8 @@ private const val MAX_SUGGESTIONS = 20
 /**
  * カスタム絵文字補完に対応した純粋 Compose のテキスト入力フィールド。
  *
- * 旧 [EmojiAutoCompleteTextField]（`MultiAutoCompleteTextView` の `AndroidView` ラッパー）の
- * 置き換えを目的とした実装。`TextFieldValue` で text と selection を一体管理し、
+ * 旧 EmojiAutoCompleteTextField（`MultiAutoCompleteTextView` の `AndroidView` ラッパー）の
+ * 置き換えとして実装したもの。`TextFieldValue` で text と selection を一体管理し、
  * カーソル追跡・カーソル逆流・二重管理といった AndroidView 由来のハックを排する。
  *
  * まだ [NoteEditorTextInputSection] には接続していない（段階移行のため）。

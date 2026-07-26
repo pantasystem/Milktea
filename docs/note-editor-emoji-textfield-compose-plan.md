@@ -224,24 +224,31 @@ CW フィールドは補完はあるが URL 検出・auto-focus・ピッカー�
 
 ### 削除・整理候補
 
-- [ ] `SelectionAwareMultiAutoCompleteTextView`（onSelectionChanged 追跡サブクラス）
-- [ ] `EmojiAutoCompleteTextField` 内の `AndroidView` factory/update ブロック
-- [ ] `textCursorPosFlow` 逆流の経路（ViewModel 側の該当 flow・emit）
-- [ ] Activity 側 `textCursorPosition` / `cwCursorPosition` の二重管理（Phase 4 で寄せた後）
-- [ ] `CustomEmojiCompleteAdapter`（`Filter` 版）※他に参照がないことを確認してから
-- [ ] `CustomEmojiTokenizer`（Compose 版 `EmojiTokenScanner` へ置換後、他参照が無ければ）
+- [x] `SelectionAwareMultiAutoCompleteTextView` + `EmojiAutoCompleteTextField.kt`（AndroidView 版）を削除
+- [x] `CustomEmojiCompleteAdapter`（`Filter` 版）を削除
+- [x] `CustomEmojiTokenizer`（`common_android`）を削除 ※全参照を grep 確認済み
+- [x] 空の重複ファイル `modules/features/note/CustomEmojiCompleteAdapter.kt` を削除
+- [~] `textCursorPosFlow` 逆流の経路 → **意図的に残す**。絵文字ピッカー・メンション挿入後の
+  キャレット再配置に必要な最小限の経路であり「二重管理」ではないと判断（Phase 4 の補足参照）
+- [~] Activity 側 `textCursorPosition` / `cwCursorPosition` → 残す。`onCursorPositionChanged`
+  （= `selection.end`）で常に実キャレットを反映するため誤位置挿入は解消済み
 
-> `CustomEmojiTokenizer` は `common_android` にあり他モジュールから参照される可能性がある。
-> 削除前に全参照を grep で確認すること。
+> **補足: SimpleEditor 廃止**
+> `CustomEmojiCompleteAdapter` / `CustomEmojiTokenizer` は View ベースの簡易エディタ
+> `SimpleEditorFragment` からも使われていたため、本フェーズで SimpleEditor 機能ごと廃止した。
+> 削除対象: `SimpleEditorFragment.kt`（`SimpleEditor` interface 含む）、`fragment_simple_editor.xml`、
+> app 側 `SetSimpleEditor.kt` + `MainActivity.setSimpleEditor()` + `app_bar_main.xml` の `simpleEditorBase`、
+> 設定画面 `SettingAppearanceActivity` のトグル。
+> 永続化 Config の `isSimpleEditorEnabled` フィールドは**残す**（ユーザー判断・スキーマ churn 回避）。
 
 ### チェックリスト
 
-- [ ] 参照調査（grep）で安全に削除できるものだけ削除
-- [ ] 未使用 import / 未使用パラメータの整理
-- [ ] `./gradlew :modules:features:note:compileDebugKotlin` が通る
-- [ ] `./gradlew :app:assembleDebug` が通る
+- [x] 参照調査（grep）で安全に削除できるものだけ削除
+- [x] 未使用 import / 未使用パラメータの整理
+- [x] `./gradlew :app:compileDebugKotlin` が通る
+- [x] `./gradlew :app:assembleDebug` が通る
 
-**完了確認:** ビルドが通り、受け入れ基準を維持したまま旧経路が消えている。
+**完了確認:** `BUILD SUCCESSFUL`。旧 AndroidView 経路と SimpleEditor が消え、Config フィールドのみ残置。
 
 ---
 

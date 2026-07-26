@@ -30,7 +30,6 @@ import jp.panta.misskeyandroidclient.ui.main.MainActivityEventHandler
 import jp.panta.misskeyandroidclient.ui.main.MainActivityInitialIntentHandler
 import jp.panta.misskeyandroidclient.ui.main.MainActivityMenuProvider
 import jp.panta.misskeyandroidclient.ui.main.MainActivityNavigationDrawerMenuItemClickListener
-import jp.panta.misskeyandroidclient.ui.main.SetSimpleEditor
 import jp.panta.misskeyandroidclient.ui.main.SetUpNavHeader
 import jp.panta.misskeyandroidclient.ui.main.SetupOnBackPressedDispatcherHandler
 import jp.panta.misskeyandroidclient.ui.main.ToggleNavigationDrawerDelegate
@@ -205,17 +204,6 @@ class MainActivity : AppCompatActivity(), ToolbarSetter {
         GoogleApiAvailability.getInstance().makeGooglePlayServicesAvailable(this)
     }
 
-    /**
-     * シンプルエディターの表示・非表示を行う
-     */
-    private fun ActivityMainBinding.setSimpleEditor() {
-        SetSimpleEditor(
-            supportFragmentManager,
-            settingStore,
-            appBarMain.fab
-        ).invoke()
-    }
-
     @MainThread
     private fun DrawerLayout.closeDrawerWhenOpened() {
         if (this.isDrawerOpen(GravityCompat.START)) {
@@ -268,7 +256,6 @@ class MainActivity : AppCompatActivity(), ToolbarSetter {
     @MainThread
     private fun applyUI() {
         invalidateOptionsMenu()
-        binding.setSimpleEditor()
 
         binding.appBarMain.bottomNavigation.visibility = if (settingStore.isClassicUI) {
             View.GONE

@@ -94,7 +94,7 @@ private fun Preview_NoteEditorTextInputSection() {
     MaterialTheme {
         Surface {
             Text(
-                text = "EmojiAutoCompleteTextField preview requires Android context",
+                text = "EmojiComposeTextField preview requires Android context",
                 modifier = Modifier.padding(16.dp),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
